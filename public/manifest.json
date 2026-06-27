@@ -1,0 +1,17 @@
+{
+    "short_name": "Spritedex",
+    "name": "Fortnite Sprite Tracker",
+    "icons": [
+        {
+            "src": "app_icon.png",
+            "sizes": "192x192 512x512",
+            "type": "image/png",
+            "purpose": "any maskable"
+        }
+    ],
+    "start_url": ".",
+    "background_color": "#0b0c10",
+    "theme_color": "#0e1017",
+    "display": "standalone",
+    "orientation": "portrait"
+}
