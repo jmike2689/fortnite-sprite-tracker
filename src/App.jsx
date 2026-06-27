@@ -252,8 +252,10 @@ export default function App() {
   const [searchQuery, setSearchQuery] = useState('');
   const [rarityFilter, setRarityFilter] = useState('All');
   const [soundEnabled, setSoundEnabled] = useState(true);
-  const [previewVariants, setPreviewVariants] = useState({});
   const [showResetConfirm, setShowResetConfirm] = useState(false);
+
+  // --- EXPLICIT DISPLAY STATE PIPELINE ---
+  const [activeTabs, setActiveTabs] = useState({});
 
   const audioCtxRef = useRef(null);
 
@@ -292,9 +294,11 @@ export default function App() {
     } catch (e) { }
   };
 
-  const toggleSpriteVariant = (spriteId, variant, isNa) => {
-    if (isNa) return;
+  const handleTabClick = (spriteId, variant) => {
+    // 1. Immediately lock down the visual tab view state change
+    setActiveTabs(prev => ({ ...prev, [spriteId]: variant }));
 
+    // 2. Compute state logic and play corresponding frequency notes
     const currentVal = collection[spriteId]?.[variant];
     const newVal = !currentVal;
 
@@ -329,6 +333,7 @@ export default function App() {
 
   const handleAbsoluteReset = () => {
     setCollection({});
+    setActiveTabs({});
     setShowResetConfirm(false);
     playBeep(180, 'sawtooth', 0.3);
   };
@@ -353,35 +358,17 @@ export default function App() {
     return matchesSearch && matchesRarity;
   });
 
-  const getActiveVariantName = (sprite) => {
-    const activePreview = previewVariants[sprite.id];
-    if (activePreview && sprite.rates[activePreview] !== "N/A") return activePreview.toUpperCase();
-
-    const status = collection[sprite.id] || {};
-    if (status.galaxy && sprite.rates.galaxy !== "N/A") return 'GALAXY';
-    if (status.gummy && sprite.rates.gummy !== "N/A") return 'GUMMY';
-    if (status.gold && sprite.rates.gold !== "N/A") return 'GOLD';
-    return 'BASE';
-  };
-
-  const getDisplayRate = (sprite) => {
-    const activeSelection = getActiveVariantName(sprite).toLowerCase();
-    return sprite.rates[activeSelection];
-  };
-
-  const getVariantModifierText = (sprite) => {
-    const currentActiveSelection = getActiveVariantName(sprite).toLowerCase();
-    if (currentActiveSelection === 'gold') return "Gain 3x bonus XP from eliminations";
-    if (currentActiveSelection === 'gummy') return "Gain 20% more Sprite Dust upon Extraction";
-    if (currentActiveSelection === 'galaxy') return "Gain 30% more Ammunition when looting";
+  const getVariantModifierText = (variantName) => {
+    if (variantName === 'gold') return "Gain 3x bonus XP from eliminations";
+    if (variantName === 'gummy') return "Gain 20% more Sprite Dust upon Extraction";
+    if (variantName === 'galaxy') return "Gain 30% more Ammunition when looting";
     return null;
   };
 
-  const getDynamicSummonCost = (sprite) => {
-    const activeSelection = getActiveVariantName(sprite).toLowerCase();
-    const rarityMatrix = SUMMON_COST_MATRIX[sprite.rarity];
+  const getDynamicSummonCost = (rarity, variantName) => {
+    const rarityMatrix = SUMMON_COST_MATRIX[rarity];
     if (!rarityMatrix) return "0";
-    return activeSelection === 'base' ? rarityMatrix.base : rarityMatrix.variant;
+    return variantName === 'base' ? rarityMatrix.base : rarityMatrix.variant;
   };
 
   return (
@@ -483,8 +470,10 @@ export default function App() {
 
             const rarityStyle = RARITY_COLORS[sprite.rarity] || 'bg-slate-700 text-white';
             const spriteBgGradient = RARITY_BG_GRADIENTS[sprite.rarity] || 'from-slate-700 to-slate-900';
-            const variantModifier = getVariantModifierText(sprite);
-            const activeVariantName = getActiveVariantName(sprite).toLowerCase();
+
+            // --- DETERMINE THE TRUE ISOLATED ACTIVE TAB ---
+            const currentTab = activeTabs[sprite.id] || 'base';
+            const variantModifier = getVariantModifierText(currentTab);
 
             return (
               <article
@@ -494,14 +483,10 @@ export default function App() {
               >
                 <div className="p-4 flex gap-4">
 
-                  {/* --- ADVANCED ZERO-LATENCY OPACITY STACK CONTAINER --- */}
                   <div className={`w-24 h-24 bg-gradient-to-b ${spriteBgGradient} rounded-xl p-0.5 border-2 border-white/10 relative overflow-hidden flex-shrink-0 transform-gpu backface-hidden`}>
                     {variantsList.map(v => {
-                      const isNa = sprite.rates[v] === "N/A";
-                      if (isNa) return null;
-
-                      // Calculate if this layer should be instantly visible or completely hidden
-                      const isVisible = activeVariantName === v;
+                      if (sprite.rates[v] === "N/A") return null;
+                      const isVisible = currentTab === v;
 
                       return (
                         <img
@@ -522,7 +507,7 @@ export default function App() {
                       <h4 className="font-black text-md text-white tracking-tight uppercase italic">{sprite.name}</h4>
                       <div className="flex items-center gap-1 flex-shrink-0">
                         <span className="text-[8px] bg-slate-900 text-slate-400 font-mono font-bold px-1.5 py-0.5 rounded border border-slate-800">
-                          {getDynamicSummonCost(sprite)} DUST
+                          {getDynamicSummonCost(sprite.rarity, currentTab)} DUST
                         </span>
                         <span className={`text-[8px] font-black uppercase px-2 py-0.5 rounded-md border ${rarityStyle}`}>
                           {sprite.rarity}
@@ -533,7 +518,7 @@ export default function App() {
                     <div className="flex items-center gap-1 mt-1 bg-cyan-950/40 border border-cyan-800/20 rounded-md px-2 py-0.5 w-fit">
                       <Percent className="w-3 h-3 text-cyan-400" />
                       <span className="text-[10px] font-mono font-black text-white">
-                        {getDisplayRate(sprite)}
+                        {sprite.rates[currentTab]}
                       </span>
                     </div>
 
@@ -551,7 +536,7 @@ export default function App() {
                         {variantModifier ? (
                           <p className="text-xs text-slate-200">
                             <span className="font-mono text-[9px] font-black text-yellow-400 block tracking-wider uppercase">
-                              +{activeVariantName.toUpperCase()} STYLE MODIFIER:
+                              +{currentTab.toUpperCase()} STYLE MODIFIER:
                             </span>
                             {variantModifier}
                           </p>
@@ -573,7 +558,7 @@ export default function App() {
                 <div className="grid grid-cols-4 border-t-2 border-slate-800/80 bg-black/40">
                   {variantsList.map(variant => {
                     const isNa = sprite.rates[variant] === "N/A";
-                    const active = status[variant];
+                    const isChecked = status[variant];
 
                     if (isNa) {
                       return (
@@ -590,13 +575,11 @@ export default function App() {
                     return (
                       <button
                         key={variant}
-                        onClick={() => toggleSpriteVariant(sprite.id, variant, false)}
-                        onMouseEnter={() => setPreviewVariants(prev => ({ ...prev, [sprite.id]: variant }))}
-                        onMouseLeave={() => setPreviewVariants(prev => ({ ...prev, [sprite.id]: null }))}
-                        className={`py-3 flex flex-col items-center gap-1.5 border-r border-slate-800/40 last:border-0 transition-all transform-gpu ${active ? `${VARIANT_INFO[variant].color} bg-slate-900/40 font-black` : 'text-slate-600'}`}
+                        onClick={() => handleTabClick(sprite.id, variant)}
+                        className={`py-3 flex flex-col items-center gap-1.5 border-r border-slate-800/40 last:border-0 transition-all transform-gpu ${isChecked ? `${VARIANT_INFO[variant].color} bg-slate-900/40 font-black` : 'text-slate-600'}`}
                       >
                         <span className="text-[9px] font-mono tracking-widest font-bold">{variant.toUpperCase()}</span>
-                        {active ? <CheckCircle className="w-4 h-4 text-current" /> : <Circle className="w-4 h-4 opacity-40" />}
+                        {isChecked ? <CheckCircle className="w-4 h-4 text-current" /> : <Circle className="w-4 h-4 opacity-40" />}
                       </button>
                     );
                   })}
