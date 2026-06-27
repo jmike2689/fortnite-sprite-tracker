@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Spritedex</string>
+    <string name="title_activity_main">Spritedex</string>
+    <string name="package_name">com.prosynctech.spritedex</string>
+    <string name="custom_url_scheme">com.prosynctech.spritedex</string>
+</resources>
