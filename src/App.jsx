@@ -353,28 +353,6 @@ export default function App() {
     return matchesSearch && matchesRarity;
   });
 
-  const getDisplayImage = (sprite) => {
-    const activePreview = previewVariants[sprite.id];
-    if (activePreview && sprite.images[activePreview] && sprite.rates[activePreview] !== "N/A") return sprite.images[activePreview];
-
-    const status = collection[sprite.id] || {};
-    if (status.galaxy && sprite.rates.galaxy !== "N/A") return sprite.images.galaxy;
-    if (status.gummy && sprite.rates.gummy !== "N/A") return sprite.images.gummy;
-    if (status.gold && sprite.rates.gold !== "N/A") return sprite.images.gold;
-    return sprite.images.base;
-  };
-
-  const getDisplayRate = (sprite) => {
-    const activePreview = previewVariants[sprite.id];
-    if (activePreview && sprite.rates[activePreview] !== "N/A") return sprite.rates[activePreview];
-
-    const status = collection[sprite.id] || {};
-    if (status.galaxy && sprite.rates.galaxy !== "N/A") return sprite.rates.galaxy;
-    if (status.gummy && sprite.rates.gummy !== "N/A") return sprite.rates.gummy;
-    if (status.gold && sprite.rates.gold !== "N/A") return sprite.images.gold;
-    return sprite.rates.base;
-  };
-
   const getActiveVariantName = (sprite) => {
     const activePreview = previewVariants[sprite.id];
     if (activePreview && sprite.rates[activePreview] !== "N/A") return activePreview.toUpperCase();
@@ -384,6 +362,11 @@ export default function App() {
     if (status.gummy && sprite.rates.gummy !== "N/A") return 'GUMMY';
     if (status.gold && sprite.rates.gold !== "N/A") return 'GOLD';
     return 'BASE';
+  };
+
+  const getDisplayRate = (sprite) => {
+    const activeSelection = getActiveVariantName(sprite).toLowerCase();
+    return sprite.rates[activeSelection];
   };
 
   const getVariantModifierText = (sprite) => {
@@ -501,6 +484,7 @@ export default function App() {
             const rarityStyle = RARITY_COLORS[sprite.rarity] || 'bg-slate-700 text-white';
             const spriteBgGradient = RARITY_BG_GRADIENTS[sprite.rarity] || 'from-slate-700 to-slate-900';
             const variantModifier = getVariantModifierText(sprite);
+            const activeVariantName = getActiveVariantName(sprite).toLowerCase();
 
             return (
               <article
@@ -510,13 +494,25 @@ export default function App() {
               >
                 <div className="p-4 flex gap-4">
 
-                  <div className={`w-24 h-24 bg-gradient-to-b ${spriteBgGradient} rounded-xl p-0.5 border-2 border-white/10 relative overflow-hidden flex-shrink-0 flex items-center justify-center transform-gpu backface-hidden`}>
-                    <img
-                      src={getDisplayImage(sprite)}
-                      alt={sprite.name}
-                      className="w-full h-full object-contain rounded-lg p-1 transform-gpu"
-                    />
-                    <span className="absolute bottom-1 right-1 bg-black/80 font-mono text-[9px] font-black text-cyan-400 px-1.5 rounded border border-slate-700/60">
+                  {/* --- ADVANCED ZERO-LATENCY OPACITY STACK CONTAINER --- */}
+                  <div className={`w-24 h-24 bg-gradient-to-b ${spriteBgGradient} rounded-xl p-0.5 border-2 border-white/10 relative overflow-hidden flex-shrink-0 transform-gpu backface-hidden`}>
+                    {variantsList.map(v => {
+                      const isNa = sprite.rates[v] === "N/A";
+                      if (isNa) return null;
+
+                      // Calculate if this layer should be instantly visible or completely hidden
+                      const isVisible = activeVariantName === v;
+
+                      return (
+                        <img
+                          key={v}
+                          src={sprite.images[v]}
+                          alt={`${sprite.name} ${v}`}
+                          className={`absolute inset-0 w-full h-full object-contain rounded-lg p-1 transform-gpu transition-opacity duration-150 will-change-opacity ${isVisible ? 'opacity-100 z-10' : 'opacity-0 z-0'}`}
+                        />
+                      );
+                    })}
+                    <span className="absolute bottom-1 right-1 bg-black/80 font-mono text-[9px] font-black text-cyan-400 px-1.5 rounded border border-slate-700/60 z-20">
                       {masteredCount}/{totalValidCount}
                     </span>
                   </div>
@@ -555,7 +551,7 @@ export default function App() {
                         {variantModifier ? (
                           <p className="text-xs text-slate-200">
                             <span className="font-mono text-[9px] font-black text-yellow-400 block tracking-wider uppercase">
-                              +{getActiveVariantName(sprite)} STYLE MODIFIER:
+                              +{activeVariantName.toUpperCase()} STYLE MODIFIER:
                             </span>
                             {variantModifier}
                           </p>
