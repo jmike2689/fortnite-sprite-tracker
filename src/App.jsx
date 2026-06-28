@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import {
-  Search, CheckCircle, Circle, Volume2, VolumeX, Percent, RotateCcw, AlertTriangle, X
+  Search, CheckCircle, Circle, Volume2, VolumeX, Percent, RotateCcw, AlertTriangle, X, Eye, Grid
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { useAuth } from './AuthContext';
@@ -106,11 +106,41 @@ const SPRITES_DATABASE = [
   { id: "fishy", name: "Fishy", rarity: "Rare", images: { base: fishyBase, gold: fishyGold, gummy: fishyGummy, galaxy: fishyGalaxy }, rates: { base: "13.79%", gold: "0.17%", gummy: "0.08%", galaxy: "0.06%" }, baseAbility: "Swim speed greatly increased. Taking damage also briefly increases movement speed. Tiers: 25%/10% -> 50%/20% -> 100%/30% -> 150%/40% -> 200%/50% bonuses." }
 ];
 
+const UNOFFICIAL_LEAKS_DATABASE = [
+  { file: "ESD_ZeroPointSprite_Variant_Gem", sprite: "Zero Point", variant: "Gem", type: "Style Variant" },
+  { file: "ESD_ZeroPointSprite_Variant_Holofoil", sprite: "Zero Point", variant: "Holofoil", type: "Style Variant" },
+  { file: "ESD_ZeroPointSprite_Variant_Cube", sprite: "Zero Point", variant: "Cube", type: "Style Variant" },
+  { file: "ESD_ZeroPointSprite_Variant_Quack", sprite: "Zero Point", variant: "Quack", type: "Style Variant" },
+  { file: "ESD_PunkSprite_Variant_Gem", sprite: "Punk", variant: "Gem", type: "Style Variant" },
+  { file: "ESD_PunkSprite_Variant_Cube", sprite: "Punk", variant: "Cube", type: "Style Variant" },
+  { file: "ESD_SleepySprite_Variant_Gem", sprite: "Dream", variant: "Gem", type: "NEW SPRITE TYPE" },
+  { file: "ESD_SleepySprite_Variant_Cube", sprite: "Dream", variant: "Cube", type: "NEW SPRITE TYPE" },
+  { file: "ESD_DuckSprite_Variant_Gem", sprite: "Duck", variant: "Gem", type: "Style Variant" },
+  { file: "ESD_DuckSprite_Variant_Holofoil", sprite: "Duck", variant: "Holofoil", type: "Style Variant" },
+  { file: "ESD_DemonSprite_Variant_Gem", sprite: "Demon", variant: "Gem", type: "Style Variant" },
+  { file: "ESD_GhostSprite_Variant_Gem", sprite: "Ghost", variant: "Gem", type: "Style Variant" },
+  { file: "ESD_GhostSprite_Variant_Holofoil", sprite: "Ghost", variant: "Holofoil", type: "Style Variant" },
+  { file: "ESD_KingSprite_Variant_Holofoil", sprite: "King", variant: "Holofoil", type: "Style Variant" },
+  { file: "ESD_Water_Variant_Gem", sprite: "Water", variant: "Gem", type: "Style Variant" },
+  { file: "ESD_Water_Variant_Holofoil", sprite: "Water", variant: "Holofoil", type: "Style Variant" },
+  { file: "ESD_EarthSprite_Variant_Gem", sprite: "Earth", variant: "Gem", type: "Style Variant" },
+  { file: "ESD_EarthSprite_Variant_Holofoil", sprite: "Earth", variant: "Holofoil", type: "Style Variant" },
+  { file: "ESD_Spitfire_Variant_Gem", sprite: "Fire", variant: "Gem", type: "NEW SPRITE TYPE" },
+  { file: "ESD_Spitfire_Variant_Holofoil", sprite: "Fire", variant: "Holofoil", type: "NEW SPRITE TYPE" }
+];
+
 const VARIANT_INFO = {
   base: { name: "Base", color: "text-blue-400" },
   gold: { name: "Gold", color: "text-amber-400" },
   gummy: { name: "Gummy", color: "text-pink-500" },
   galaxy: { name: "Galaxy", color: "text-purple-400" }
+};
+
+const LEAK_VARIANT_COLORS = {
+  Gem: "border-emerald-500/40 text-emerald-400 bg-emerald-950/20",
+  Holofoil: "border-fuchsia-500/40 text-fuchsia-400 bg-fuchsia-950/20",
+  Cube: "border-purple-500/40 text-purple-400 bg-purple-950/20",
+  Quack: "border-yellow-500/40 text-yellow-400 bg-yellow-950/20"
 };
 
 const RARITY_COLORS = {
@@ -140,9 +170,11 @@ export default function App() {
   const { user, signUp, logIn, logOut } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-
-  // Forgot Password State
   const [resetSent, setResetSent] = useState(false);
+  const [isLoginMode, setIsLoginMode] = useState(true);
+
+  // --- NEW: View State for Navigation ---
+  const [currentView, setCurrentView] = useState('sprites'); // 'sprites' | 'unreleased'
 
   const [collection, setCollection] = useState({});
   const [searchQuery, setSearchQuery] = useState('');
@@ -236,7 +268,6 @@ export default function App() {
         });
       }
 
-      // Save to Cloud instantly
       if (user) {
         setDoc(doc(db, "users", user.uid), { sprites: updated }, { merge: true })
           .catch(err => console.error("Cloud save failed:", err));
@@ -251,7 +282,6 @@ export default function App() {
     setActiveTabs({});
     setShowResetConfirm(false);
 
-    // Wipe Cloud Data
     if (user) {
       setDoc(doc(db, "users", user.uid), { sprites: {} }, { merge: true });
     }
@@ -267,7 +297,7 @@ export default function App() {
     sendPasswordResetEmail(auth, email)
       .then(() => {
         setResetSent(true);
-        setTimeout(() => setResetSent(false), 6000); // Reset text after 6 seconds
+        setTimeout(() => setResetSent(false), 6000);
       })
       .catch((error) => {
         alert(error.message);
@@ -310,25 +340,56 @@ export default function App() {
   if (!user) {
     return (
       <div className="min-h-screen bg-[#0b0c10] flex items-center justify-center p-4">
-        <div className="bg-[#12141f] p-8 rounded-2xl border border-slate-800 w-full max-w-sm shadow-2xl text-center">
-          <h2 className="text-2xl font-black text-white mb-6 uppercase italic">Spritedex Login</h2>
-          <input className="w-full p-3 mb-4 bg-black border border-slate-700 rounded-xl text-white focus:outline-none focus:border-cyan-500" placeholder="Email" type="email" onChange={(e) => setEmail(e.target.value)} />
-          <input className="w-full p-3 mb-6 bg-black border border-slate-700 rounded-xl text-white focus:outline-none focus:border-cyan-500" type="password" placeholder="Password" onChange={(e) => setPassword(e.target.value)} />
+        <form
+          className="bg-[#12141f] p-8 rounded-2xl border border-slate-800 w-full max-w-sm shadow-2xl text-center"
+          onSubmit={(e) => {
+            e.preventDefault();
+            if (isLoginMode) logIn(email, password).catch(err => alert(err.message));
+            else signUp(email, password).catch(err => alert(err.message));
+          }}
+        >
+          <h2 className="text-2xl font-black text-white mb-6 uppercase italic">
+            {isLoginMode ? 'Login' : 'Sign Up'}
+          </h2>
+          <input
+            className="w-full p-3 mb-4 bg-black border border-slate-700 rounded-xl text-white focus:outline-none focus:border-cyan-500"
+            placeholder="Email"
+            type="email"
+            onChange={(e) => setEmail(e.target.value)}
+          />
+          <input
+            className="w-full p-3 mb-6 bg-black border border-slate-700 rounded-xl text-white focus:outline-none focus:border-cyan-500"
+            type="password"
+            placeholder="Password"
+            onChange={(e) => setPassword(e.target.value)}
+          />
 
-          <div className="flex gap-2 mb-4">
-            <button onClick={() => logIn(email, password).catch(err => alert(err.message))} className="flex-1 bg-cyan-600 py-3 rounded-xl font-black uppercase text-white hover:bg-cyan-500 transition-colors">Login</button>
-            <button onClick={() => signUp(email, password).catch(err => alert(err.message))} className="flex-1 bg-slate-700 py-3 rounded-xl font-black uppercase text-white hover:bg-slate-600 transition-colors">Sign Up</button>
-          </div>
-
-          <button onClick={handlePasswordReset} className="text-xs text-slate-400 hover:text-cyan-400 font-bold underline mb-5 transition-colors">
-            {resetSent ? "Reset link sent! Check your inbox." : "Forgot Password?"}
+          <button
+            type="submit"
+            className="w-full bg-cyan-600 py-3 rounded-xl font-black uppercase text-white hover:bg-cyan-500 mb-4 transition-colors"
+          >
+            {isLoginMode ? 'Login' : 'Sign Up'}
           </button>
 
-          <p className="text-slate-500 text-[10px] px-2 leading-relaxed">
-            New user? Enter email/password and click <span className="text-cyan-400 font-bold">Sign Up</span>.<br />
-            Returning? Click <span className="text-cyan-400 font-bold">Login</span>.
-          </p>
-        </div>
+          <div className="flex flex-col gap-2">
+            <button
+              type="button"
+              onClick={() => setIsLoginMode(!isLoginMode)}
+              className="text-sm text-cyan-400 font-bold underline hover:text-cyan-300"
+            >
+              {isLoginMode ? "Don't have an account? Sign Up" : "Already have an account? Login"}
+            </button>
+            {isLoginMode && (
+              <button
+                type="button"
+                onClick={handlePasswordReset}
+                className="text-xs text-slate-400 hover:text-white transition-colors"
+              >
+                {resetSent ? "Reset link sent!" : "Forgot Password?"}
+              </button>
+            )}
+          </div>
+        </form>
       </div>
     );
   }
@@ -388,173 +449,227 @@ export default function App() {
         </div>
       </header>
 
-      <main className="flex-1 max-w-md w-full mx-auto p-4 flex flex-col gap-5 pb-12 style={{ willChange: 'transform' }}">
-        <section className="sticky top-[86px] z-30 bg-[#151824]/95 backdrop-blur-md rounded-2xl p-4 border-2 border-slate-800 shadow-xl transform-gpu backface-hidden">
-          <div className="flex items-center justify-between mb-2.5">
-            <span className="text-xs font-black text-gray-200 tracking-wider font-mono">SPRITE PROGRESS</span>
-            <button
-              onClick={() => { setShowResetConfirm(true); playBeep(330, 'sine', 0.08); }}
-              className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-red-950/30 hover:bg-red-950/60 border border-red-900/40 text-[9px] font-mono font-black text-red-400 tracking-wider uppercase"
-            >
-              <RotateCcw className="w-3 h-3" />
-              RESET ARCHIVE
-            </button>
-          </div>
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-[10px] text-slate-400 font-mono">COMPLETION PERCENTAGE</span>
-            <span className="text-xl font-black text-cyan-400 font-mono">{completionRate}%</span>
-          </div>
-          <div className="w-full bg-black/60 h-4 rounded-md overflow-hidden p-0.5 border border-slate-700/50">
-            <div className="bg-gradient-to-r from-cyan-400 via-yellow-400 to-pink-500 h-full rounded transition-all duration-300" style={{ width: `${completionRate}%` }} />
-          </div>
-        </section>
+      {/* --- ADDED pb-24 TO AVOID OVERLAP WITH BOTTOM NAV --- */}
+      <main className="flex-1 max-w-md w-full mx-auto p-4 flex flex-col gap-5 pb-24" style={{ willChange: 'transform' }}>
 
-        <section className="flex flex-col gap-2 bg-[#12141f] p-3 rounded-xl border border-slate-800/80 transform-gpu backface-hidden">
-          <div className="relative">
-            <Search className="w-4 h-4 text-cyan-500/70 absolute left-3 top-3" />
-            <input
-              type="text" placeholder="Search across core sprites..." value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-black/50 border-2 border-slate-800 rounded-xl pl-9 pr-3 py-2 text-sm text-white focus:outline-none focus:border-cyan-500"
-            />
-          </div>
-          <div className="flex gap-1 overflow-x-auto py-1">
-            {['All', 'Mythic', 'Legendary', 'Epic', 'Rare'].map(rarity => (
-              <button key={rarity} onClick={() => setRarityFilter(rarity)} className={`px-3 py-1.5 text-[10px] font-black tracking-wider rounded-lg border uppercase ${rarityFilter === rarity ? 'bg-cyan-400 text-black border-cyan-300' : 'bg-black/40 text-slate-400 border-slate-800'}`}>
-                {rarity}
-              </button>
-            ))}
-          </div>
-        </section>
+        {/* --- SCREEN 1: SPRITES --- */}
+        {currentView === 'sprites' && (
+          <div className="flex flex-col gap-5 animate-in fade-in duration-300">
+            <section className="sticky top-[86px] z-30 bg-[#151824]/95 backdrop-blur-md rounded-2xl p-4 border-2 border-slate-800 shadow-xl transform-gpu backface-hidden">
+              <div className="flex items-center justify-between mb-2.5">
+                <span className="text-xs font-black text-gray-200 tracking-wider font-mono">SPRITE PROGRESS</span>
+                <button
+                  onClick={() => { setShowResetConfirm(true); playBeep(330, 'sine', 0.08); }}
+                  className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-red-950/30 hover:bg-red-950/60 border border-red-900/40 text-[9px] font-mono font-black text-red-400 tracking-wider uppercase"
+                >
+                  <RotateCcw className="w-3 h-3" />
+                  RESET ARCHIVE
+                </button>
+              </div>
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-[10px] text-slate-400 font-mono">COMPLETION PERCENTAGE</span>
+                <span className="text-xl font-black text-cyan-400 font-mono">{completionRate}%</span>
+              </div>
+              <div className="w-full bg-black/60 h-4 rounded-md overflow-hidden p-0.5 border border-slate-700/50">
+                <div className="bg-gradient-to-r from-cyan-400 via-yellow-400 to-pink-500 h-full rounded transition-all duration-300" style={{ width: `${completionRate}%` }} />
+              </div>
+            </section>
 
-        <section className="flex flex-col gap-4">
-          {filteredSprites.map(sprite => {
-            const status = collection[sprite.id] || { base: false, gold: false, gummy: false, galaxy: false };
+            <section className="flex flex-col gap-2 bg-[#12141f] p-3 rounded-xl border border-slate-800/80 transform-gpu backface-hidden">
+              <div className="relative">
+                <Search className="w-4 h-4 text-cyan-500/70 absolute left-3 top-3" />
+                <input
+                  type="text" placeholder="Search across core sprites..." value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full bg-black/50 border-2 border-slate-800 rounded-xl pl-9 pr-3 py-2 text-sm text-white focus:outline-none focus:border-cyan-500"
+                />
+              </div>
+              <div className="flex gap-1 overflow-x-auto py-1">
+                {['All', 'Mythic', 'Legendary', 'Epic', 'Rare'].map(rarity => (
+                  <button key={rarity} onClick={() => setRarityFilter(rarity)} className={`px-3 py-1.5 text-[10px] font-black tracking-wider rounded-lg border uppercase ${rarityFilter === rarity ? 'bg-cyan-400 text-black border-cyan-300' : 'bg-black/40 text-slate-400 border-slate-800'}`}>
+                    {rarity}
+                  </button>
+                ))}
+              </div>
+            </section>
 
-            const validVariantsInRow = variantsList.filter(v => sprite.rates[v] !== "N/A");
-            const masteredCount = validVariantsInRow.filter(v => status[v]).length;
-            const totalValidCount = validVariantsInRow.length;
+            <section className="flex flex-col gap-4">
+              {filteredSprites.map(sprite => {
+                const status = collection[sprite.id] || { base: false, gold: false, gummy: false, galaxy: false };
 
-            const rarityStyle = RARITY_COLORS[sprite.rarity] || 'bg-slate-700 text-white';
-            const spriteBgGradient = RARITY_BG_GRADIENTS[sprite.rarity] || 'from-slate-700 to-slate-900';
+                const validVariantsInRow = variantsList.filter(v => sprite.rates[v] !== "N/A");
+                const masteredCount = validVariantsInRow.filter(v => status[v]).length;
+                const totalValidCount = validVariantsInRow.length;
 
-            const currentTab = activeTabs[sprite.id] || 'base';
-            const variantModifier = getVariantModifierText(currentTab);
+                const rarityStyle = RARITY_COLORS[sprite.rarity] || 'bg-slate-700 text-white';
+                const spriteBgGradient = RARITY_BG_GRADIENTS[sprite.rarity] || 'from-slate-700 to-slate-900';
 
-            return (
-              <article
-                key={sprite.id}
-                className={`bg-[#151722] rounded-2xl overflow-hidden border-2 transition-all duration-200 transform-gpu backface-hidden ${masteredCount === totalValidCount ? 'border-yellow-400 shadow-[0_0_15px_rgba(255,230,0,0.15)]' : 'border-slate-800/90'}`}
-                style={{ willChange: 'transform, opacity' }}
-              >
-                <div className="p-4 flex gap-4">
+                const currentTab = activeTabs[sprite.id] || 'base';
+                const variantModifier = getVariantModifierText(currentTab);
 
-                  <div className={`w-24 h-24 bg-gradient-to-b ${spriteBgGradient} rounded-xl p-0.5 border-2 border-white/10 relative overflow-hidden flex-shrink-0 transform-gpu backface-hidden`}>
-                    {variantsList.map(v => {
-                      if (sprite.rates[v] === "N/A") return null;
-                      const isVisible = currentTab === v;
+                return (
+                  <article
+                    key={sprite.id}
+                    className={`bg-[#151722] rounded-2xl overflow-hidden border-2 transition-all duration-200 transform-gpu backface-hidden ${masteredCount === totalValidCount ? 'border-yellow-400 shadow-[0_0_15px_rgba(255,230,0,0.15)]' : 'border-slate-800/90'}`}
+                    style={{ willChange: 'transform, opacity' }}
+                  >
+                    <div className="p-4 flex gap-4">
 
-                      return (
-                        <img
-                          key={v}
-                          src={sprite.images[v]}
-                          alt={`${sprite.name} ${v}`}
-                          className={`absolute inset-0 w-full h-full object-contain rounded-lg p-1 transform-gpu transition-opacity duration-150 will-change-opacity ${isVisible ? 'opacity-100 z-10' : 'opacity-0 z-0'}`}
-                        />
-                      );
-                    })}
-                    <span className="absolute bottom-1 right-1 bg-black/80 font-mono text-[9px] font-black text-cyan-400 px-1.5 rounded border border-slate-700/60 z-20">
-                      {masteredCount}/{totalValidCount}
-                    </span>
-                  </div>
+                      <div className={`w-24 h-24 bg-gradient-to-b ${spriteBgGradient} rounded-xl p-0.5 border-2 border-white/10 relative overflow-hidden flex-shrink-0 transform-gpu backface-hidden`}>
+                        {variantsList.map(v => {
+                          if (sprite.rates[v] === "N/A") return null;
+                          const isVisible = currentTab === v;
 
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center justify-between gap-2">
-                      <h4 className="font-black text-md text-white tracking-tight uppercase italic">{sprite.name}</h4>
-                      <div className="flex items-center gap-1 flex-shrink-0">
-                        <span className="text-[8px] bg-slate-900 text-slate-400 font-mono font-bold px-1.5 py-0.5 rounded border border-slate-800">
-                          {getDynamicSummonCost(sprite.rarity, currentTab)} DUST
-                        </span>
-                        <span className={`text-[8px] font-black uppercase px-2 py-0.5 rounded-md border ${rarityStyle}`}>
-                          {sprite.rarity}
+                          return (
+                            <img
+                              key={v}
+                              src={sprite.images[v]}
+                              alt={`${sprite.name} ${v}`}
+                              className={`absolute inset-0 w-full h-full object-contain rounded-lg p-1 transform-gpu transition-opacity duration-150 will-change-[opacity] ${isVisible ? 'opacity-100 z-10' : 'opacity-0 z-0'}`}
+                            />
+                          );
+                        })}
+                        <span className="absolute bottom-1 right-1 bg-black/80 font-mono text-[9px] font-black text-cyan-400 px-1.5 rounded border border-slate-700/60 z-20">
+                          {masteredCount}/{totalValidCount}
                         </span>
                       </div>
-                    </div>
 
-                    <div className="flex items-center gap-1 mt-1 bg-cyan-950/40 border border-cyan-800/20 rounded-md px-2 py-0.5 w-fit">
-                      <Percent className="w-3 h-3 text-cyan-400" />
-                      <span className="text-[10px] font-mono font-black text-white">
-                        {sprite.rates[currentTab]}
-                      </span>
-                    </div>
-
-                    <div className="mt-2.5 bg-black/20 rounded-lg p-2 border border-slate-800/40">
-                      <p className="text-xs text-slate-300">
-                        <span className="font-mono text-[9px] font-black text-cyan-400 block tracking-wider uppercase">
-                          BASE SPRITE PERK:
-                        </span>
-                        {sprite.baseAbility}
-                      </p>
-                    </div>
-
-                    <div className="mt-2 min-h-[56px] rounded-lg p-2 border border-slate-800/30 bg-black/40 flex items-center">
-                      <div className="w-full text-left">
-                        {variantModifier ? (
-                          <p className="text-xs text-slate-200">
-                            <span className="font-mono text-[9px] font-black text-yellow-400 block tracking-wider uppercase">
-                              +{currentTab.toUpperCase()} STYLE MODIFIER:
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center justify-between gap-2">
+                          <h4 className="font-black text-md text-white tracking-tight uppercase italic">{sprite.name}</h4>
+                          <div className="flex items-center gap-1 flex-shrink-0">
+                            <span className="text-[8px] bg-slate-900 text-slate-400 font-mono font-bold px-1.5 py-0.5 rounded border border-slate-800">
+                              {getDynamicSummonCost(sprite.rarity, currentTab)} DUST
                             </span>
-                            {variantModifier}
-                          </p>
-                        ) : (
-                          <div className="w-full opacity-95">
-                            <span className="font-mono text-[9px] font-black text-slate-500 block tracking-wider uppercase mb-0.5">
-                              GLOBAL STYLE BONUSES
+                            <span className={`text-[8px] font-black uppercase px-2 py-0.5 rounded-md border ${rarityStyle}`}>
+                              {sprite.rarity}
                             </span>
-                            <p className="text-[10px] text-slate-400 font-mono leading-relaxed">
-                              <span className="text-amber-400 font-bold">GOLD:</span> 3x Elims XP <span className="text-slate-600 px-0.5">|</span> <span className="text-pink-400 font-bold">GUMMY:</span> +20% Dust <span className="text-slate-600 px-0.5">|</span> <span className="text-purple-400 font-bold">GALAXY:</span> +30% Ammo
-                            </p>
                           </div>
-                        )}
+                        </div>
+
+                        <div className="flex items-center gap-1 mt-1 bg-cyan-950/40 border border-cyan-800/20 rounded-md px-2 py-0.5 w-fit">
+                          <Percent className="w-3 h-3 text-cyan-400" />
+                          <span className="text-[10px] font-mono font-black text-white">
+                            {sprite.rates[currentTab]}
+                          </span>
+                        </div>
+
+                        <div className="mt-2.5 bg-black/20 rounded-lg p-2 border border-slate-800/40">
+                          <p className="text-xs text-slate-300">
+                            <span className="font-mono text-[9px] font-black text-cyan-400 block tracking-wider uppercase">
+                              BASE SPRITE PERK:
+                            </span>
+                            {sprite.baseAbility}
+                          </p>
+                        </div>
+
+                        <div className="mt-2 min-h-[56px] rounded-lg p-2 border border-slate-800/30 bg-black/40 flex items-center">
+                          <div className="w-full text-left">
+                            {variantModifier ? (
+                              <p className="text-xs text-slate-200">
+                                <span className="font-mono text-[9px] font-black text-yellow-400 block tracking-wider uppercase">
+                                  +{currentTab.toUpperCase()} STYLE MODIFIER:
+                                </span>
+                                {variantModifier}
+                              </p>
+                            ) : (
+                              <div className="w-full opacity-95">
+                                <span className="font-mono text-[9px] font-black text-slate-500 block tracking-wider uppercase mb-0.5">
+                                  GLOBAL STYLE BONUSES
+                                </span>
+                                <p className="text-[10px] text-slate-400 font-mono leading-relaxed">
+                                  <span className="text-amber-400 font-bold">GOLD:</span> 3x Elims XP <span className="text-slate-600 px-0.5">|</span> <span className="text-pink-400 font-bold">GUMMY:</span> +20% Dust <span className="text-slate-600 px-0.5">|</span> <span className="text-purple-400 font-bold">GALAXY:</span> +30% Ammo
+                                </p>
+                              </div>
+                            )}
+                          </div>
+                        </div>
                       </div>
                     </div>
-                  </div>
+
+                    <div className="grid grid-cols-4 border-t-2 border-slate-800/80 bg-black/40">
+                      {variantsList.map(variant => {
+                        const isNa = sprite.rates[variant] === "N/A";
+                        const isChecked = status[variant];
+
+                        if (isNa) {
+                          return (
+                            <div
+                              key={variant}
+                              className="py-3 flex flex-col items-center justify-center bg-black/20 border-r border-slate-800/20 last:border-0 select-none text-slate-700"
+                            >
+                              <span className="text-[9px] font-mono tracking-widest font-bold opacity-30">{variant.toUpperCase()}</span>
+                              <span className="text-[10px] font-mono font-black tracking-tighter mt-1 opacity-40">N/A</span>
+                            </div>
+                          );
+                        }
+
+                        return (
+                          <button
+                            key={variant}
+                            onClick={() => handleTabClick(sprite.id, variant)}
+                            className={`py-3 flex flex-col items-center gap-1.5 border-r border-slate-800/40 last:border-0 transition-all transform-gpu ${isChecked ? `${VARIANT_INFO[variant].color} bg-slate-900/40 font-black` : 'text-slate-600'}`}
+                          >
+                            <span className="text-[9px] font-mono tracking-widest font-bold">{variant.toUpperCase()}</span>
+                            {isChecked ? <CheckCircle className="w-4 h-4 text-current" /> : <Circle className="w-4 h-4 opacity-40" />}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </article>
+                );
+              })}
+            </section>
+          </div>
+        )}
+
+        {currentView === 'unreleased' && (
+          <section className="flex flex-col gap-4 animate-in fade-in duration-300 pt-2">
+            <div className="bg-[#12141f] border-2 border-amber-500/40 rounded-2xl p-5">
+              <h3 className="text-lg font-black text-amber-400 uppercase italic mb-2">UNRELEASED / RUMORED</h3>
+              <p className="text-xs text-slate-400">Files found in-game for upcoming sprites and variants.</p>
+            </div>
+
+            {[...new Set(UNOFFICIAL_LEAKS_DATABASE.map(l => l.sprite))].map((sName) => (
+              <div key={sName} className="bg-[#12141f] border border-slate-800 rounded-xl p-4">
+                <h4 className="text-xs font-black text-amber-500 uppercase mb-3 border-b border-slate-800 pb-2">{sName}</h4>
+                <div className="flex flex-col gap-2">
+                  {UNOFFICIAL_LEAKS_DATABASE.filter(l => l.sprite === sName).map((l, i) => (
+                    <div key={i} className="bg-black/40 px-3 py-2 rounded-lg border border-slate-900 flex flex-col gap-1">
+                      <div className="flex justify-between items-center">
+                        <code className="text-[10px] text-slate-300 font-bold">{l.file}</code>
+                        <span className={`text-[8px] font-bold px-1.5 py-0.5 rounded border uppercase ${LEAK_VARIANT_COLORS[l.variant]}`}>
+                          {l.variant}
+                        </span>
+                      </div>
+                    </div>
+                  ))}
                 </div>
-
-                <div className="grid grid-cols-4 border-t-2 border-slate-800/80 bg-black/40">
-                  {variantsList.map(variant => {
-                    const isNa = sprite.rates[variant] === "N/A";
-                    const isChecked = status[variant];
-
-                    if (isNa) {
-                      return (
-                        <div
-                          key={variant}
-                          className="py-3 flex flex-col items-center justify-center bg-black/20 border-r border-slate-800/20 last:border-0 select-none text-slate-700"
-                        >
-                          <span className="text-[9px] font-mono tracking-widest font-bold opacity-30">{variant.toUpperCase()}</span>
-                          <span className="text-[10px] font-mono font-black tracking-tighter mt-1 opacity-40">N/A</span>
-                        </div>
-                      );
-                    }
-
-                    return (
-                      <button
-                        key={variant}
-                        onClick={() => handleTabClick(sprite.id, variant)}
-                        className={`py-3 flex flex-col items-center gap-1.5 border-r border-slate-800/40 last:border-0 transition-all transform-gpu ${isChecked ? `${VARIANT_INFO[variant].color} bg-slate-900/40 font-black` : 'text-slate-600'}`}
-                      >
-                        <span className="text-[9px] font-mono tracking-widest font-bold">{variant.toUpperCase()}</span>
-                        {isChecked ? <CheckCircle className="w-4 h-4 text-current" /> : <Circle className="w-4 h-4 opacity-40" />}
-                      </button>
-                    );
-                  })}
-                </div>
-              </article>
-            );
-          })}
-        </section>
+              </div>
+            ))}
+          </section>
+        )}
       </main>
+
+      {/* --- TIGHTENED BOTTOM NAVIGATION BAR --- */}
+      <nav className="fixed bottom-4 left-0 right-0 z-50 flex justify-center">
+        <div className="bg-[#0e1017]/90 backdrop-blur-md border border-slate-800 rounded-full px-6 py-2 flex gap-8 shadow-2xl">
+          <button
+            onClick={() => { setCurrentView('sprites'); playBeep(440, 'sine', 0.05); }}
+            className={`flex flex-col items-center gap-0.5 transition-colors ${currentView === 'sprites' ? 'text-cyan-400' : 'text-slate-600'}`}
+          >
+            <Grid className="w-5 h-5" />
+            <span className="text-[9px] font-black uppercase">Sprites</span>
+          </button>
+          <button
+            onClick={() => { setCurrentView('unreleased'); playBeep(523, 'sine', 0.05); }}
+            className={`flex flex-col items-center gap-0.5 transition-colors ${currentView === 'unreleased' ? 'text-amber-400' : 'text-slate-600'}`}
+          >
+            <Eye className="w-5 h-5" />
+            <span className="text-[9px] font-black uppercase">Rumored</span>
+          </button>
+        </div>
+      </nav>
     </div>
   );
 }
