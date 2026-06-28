@@ -337,59 +337,112 @@ export default function App() {
     return variantName === 'base' ? rarityMatrix.base : rarityMatrix.variant;
   };
 
+  // --- NEW LOGIN UI INJECTED HERE ---
   if (!user) {
     return (
-      <div className="min-h-screen bg-[#0b0c10] flex items-center justify-center p-4">
-        <form
-          className="bg-[#12141f] p-8 rounded-2xl border border-slate-800 w-full max-w-sm shadow-2xl text-center"
-          onSubmit={(e) => {
-            e.preventDefault();
-            if (isLoginMode) logIn(email, password).catch(err => alert(err.message));
-            else signUp(email, password).catch(err => alert(err.message));
-          }}
-        >
-          <h2 className="text-2xl font-black text-white mb-6 uppercase italic">
-            {isLoginMode ? 'Login' : 'Sign Up'}
-          </h2>
-          <input
-            className="w-full p-3 mb-4 bg-black border border-slate-700 rounded-xl text-white focus:outline-none focus:border-cyan-500"
-            placeholder="Email"
-            type="email"
-            onChange={(e) => setEmail(e.target.value)}
-          />
-          <input
-            className="w-full p-3 mb-6 bg-black border border-slate-700 rounded-xl text-white focus:outline-none focus:border-cyan-500"
-            type="password"
-            placeholder="Password"
-            onChange={(e) => setPassword(e.target.value)}
-          />
+      <div className="min-h-screen w-full flex items-center justify-center bg-slate-950 overflow-hidden relative font-sans px-4">
 
-          <button
-            type="submit"
-            className="w-full bg-cyan-600 py-3 rounded-xl font-black uppercase text-white hover:bg-cyan-500 mb-4 transition-colors"
+        {/* Ambient background glow effects */}
+        <div className="absolute top-1/4 left-1/4 w-72 h-72 bg-purple-600 rounded-full blur-[120px] opacity-20 pointer-events-none" />
+        <div className="absolute bottom-1/4 right-1/4 w-72 h-72 bg-blue-600 rounded-full blur-[120px] opacity-15 pointer-events-none" />
+
+        {/* Main Login Card Container */}
+        <div className="bg-white/[0.03] backdrop-blur-xl p-8 rounded-2xl border border-white/10 w-full max-w-md shadow-2xl z-10 transition-all duration-300 hover:border-white/15">
+
+          {/* App Branding & Icon */}
+          <div className="flex flex-col items-center text-center mb-8">
+            <img
+              src="/app_icon.webp"
+              className="w-24 h-24 drop-shadow-[0_0_15px_rgba(168,85,247,0.4)] object-contain mb-4 animate-pulse duration-[4000ms]"
+              alt="Spritedex Logo"
+            />
+            <h1 className="text-white text-3xl font-extrabold tracking-tight mb-2 bg-gradient-to-r from-white via-slate-200 to-slate-400 bg-clip-text text-transparent">
+              Spritedex
+            </h1>
+            <p className="text-purple-400 text-sm font-semibold uppercase tracking-wider mb-1">
+              Master your collection
+            </p>
+            <p className="text-slate-400 text-xs max-w-xs px-2">
+              Track every sprite, sync across your devices, and monitor your personal repository in real-time.
+            </p>
+          </div>
+
+          {/* Form Fields */}
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              if (isLoginMode) {
+                logIn(email, password).catch(err => alert(err.message));
+              } else {
+                signUp(email, password).catch(err => alert(err.message));
+              }
+            }}
+            className="space-y-5"
           >
-            {isLoginMode ? 'Login' : 'Sign Up'}
-          </button>
+            <div>
+              <label className="block text-slate-300 text-xs font-medium uppercase tracking-wide mb-2">
+                Email Address
+              </label>
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="w-full bg-slate-900/60 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-all text-sm"
+                placeholder="name@example.com"
+                required
+              />
+            </div>
 
-          <div className="flex flex-col gap-2">
+            <div>
+              <div className="flex justify-between items-center mb-2">
+                <label className="block text-slate-300 text-xs font-medium uppercase tracking-wide">
+                  Password
+                </label>
+              </div>
+              <input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="w-full bg-slate-900/60 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-all text-sm"
+                placeholder="••••••••"
+                required
+              />
+            </div>
+
+            {/* Submit Button */}
             <button
-              type="button"
-              onClick={() => setIsLoginMode(!isLoginMode)}
-              className="text-sm text-cyan-400 font-bold underline hover:text-cyan-300"
+              type="submit"
+              className="w-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-medium rounded-xl py-3 px-4 shadow-lg shadow-purple-900/30 transition-all duration-200 transform active:scale-[0.98] mt-2 text-sm"
             >
-              {isLoginMode ? "Don't have an account? Sign Up" : "Already have an account? Login"}
+              {isLoginMode ? 'Sign In' : 'Create Account'}
             </button>
+          </form>
+
+          {/* Toggle between Sign In and Sign Up */}
+          <div className="mt-6 text-center border-t border-white/5 pt-5 flex flex-col gap-3">
+            <p className="text-slate-400 text-sm">
+              {isLoginMode ? "Don't have an account?" : "Already have an account?"}{' '}
+              <button
+                type="button"
+                onClick={() => setIsLoginMode(!isLoginMode)}
+                className="text-purple-400 font-medium hover:text-purple-300 hover:underline transition-all bg-transparent border-none p-0 cursor-pointer"
+              >
+                {isLoginMode ? 'Sign Up' : 'Sign In'}
+              </button>
+            </p>
+
             {isLoginMode && (
               <button
                 type="button"
                 onClick={handlePasswordReset}
-                className="text-xs text-slate-400 hover:text-white transition-colors"
+                className="text-xs text-slate-500 hover:text-slate-300 transition-colors"
               >
                 {resetSent ? "Reset link sent!" : "Forgot Password?"}
               </button>
             )}
           </div>
-        </form>
+
+        </div>
       </div>
     );
   }
