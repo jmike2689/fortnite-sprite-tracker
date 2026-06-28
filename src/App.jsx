@@ -363,7 +363,7 @@ export default function App() {
               Master your collection
             </p>
             <p className="text-slate-400 text-xs max-w-xs px-2">
-              Track every sprite, sync across your devices, and monitor your personal repository in real-time.
+              Track every sprite, sync across your devices, and monitor your personal collection in real-time.
             </p>
           </div>
 
