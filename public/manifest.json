@@ -3,9 +3,9 @@
     "name": "Fortnite Sprite Tracker",
     "icons": [
         {
-            "src": "app_icon.png",
+            "src": "app_icon.webp",
             "sizes": "192x192 512x512",
-            "type": "image/png",
+            "type": "image/webp",
             "purpose": "any maskable"
         }
     ],
