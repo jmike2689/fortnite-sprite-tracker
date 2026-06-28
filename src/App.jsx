@@ -3,6 +3,11 @@ import {
   Search, CheckCircle, Circle, Volume2, VolumeX, Percent, RotateCcw, AlertTriangle, X
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
+import { useAuth } from './AuthContext';
+// --- FIRESTORE & AUTH IMPORTS ---
+import { doc, getDoc, setDoc } from 'firebase/firestore';
+import { sendPasswordResetEmail } from 'firebase/auth';
+import { auth, db } from './firebase';
 
 // --- VERBATIM ASSET IMPORTS ---
 import zpBase from './assets/Zero_Point_Sprite_-_Item_-_Fortnite.webp';
@@ -83,134 +88,22 @@ import strikerGummy from './assets/Gummy_Striker_Sprite_-_Item_-_Fortnite.webp';
 import strikerGalaxy from './assets/Galaxy_Striker_Sprite_-_Item_-_Fortnite.webp';
 
 const SPRITES_DATABASE = [
-  {
-    id: "zero-point",
-    name: "Zero Point",
-    rarity: "Mythic",
-    images: { base: zpBase, gold: zpGold, gummy: zpGummy, galaxy: zpGalaxy },
-    rates: { base: "0.000098%", gold: "0.00012%", gummy: "0.00006%", galaxy: "0.00004%" },
-    baseAbility: "Spawn a Shield Bubble Jr. when you use a healing item on yourself (excluding splashes and grenades). Duration at each Level Up: 6s -> 7s -> 8s -> 9s -> 10s."
-  },
-  {
-    id: "burnt-peanut",
-    name: "Burnt Peanut",
-    rarity: "Mythic",
-    images: { base: peanutBase, gold: peanutBase, gummy: peanutBase, galaxy: peanutBase },
-    rates: { base: "1.01%", gold: "N/A", gummy: "N/A", galaxy: "N/A" },
-    baseAbility: "Goop! When eliminating players, you may find more loot. Sometimes mythic! Chance at each Level Up: 20% -> 30% -> 40% -> 50% -> 60% chance (10% chance to find Mythic at Max Level!)."
-  },
-  {
-    id: "dream",
-    name: "Dream",
-    rarity: "Legendary",
-    images: { base: dreamBase, gold: dreamGold, gummy: dreamGummy, galaxy: dreamGalaxy },
-    rates: { base: "2.63%", gold: "0.03%", gummy: "0.02%", galaxy: "0.01%" },
-    baseAbility: "Grants a random item at each level, exploding with legendary loot at Max Level. Loot value increases at each Level Up!"
-  },
-  {
-    id: "punk",
-    name: "Punk",
-    rarity: "Legendary",
-    images: { base: punkBase, gold: punkGold, gummy: punkGummy, galaxy: punkGalaxy },
-    rates: { base: "1.98%", gold: "0.02%", gummy: "0.01%", galaxy: "0.01%" },
-    baseAbility: "Does nothing until Level 5, in which it will always grant a buff for unlimited ammo."
-  },
-  {
-    id: "boss",
-    name: "Boss",
-    rarity: "Legendary",
-    images: { base: bossBase, gold: bossGold, gummy: bossGummy, galaxy: bossGalaxy },
-    rates: { base: "2.63%", gold: "0.03%", gummy: "0.02%", galaxy: "0.01%" },
-    baseAbility: "Grants an increase to your max HP and Shield. Increases at each Level Up: 5 -> 10 -> 15 -> 20 -> 25 HP/Shield."
-  },
-  {
-    id: "grim",
-    name: "Grim",
-    rarity: "Legendary",
-    images: { base: grimBase, gold: grimGold, gummy: grimGummy, galaxy: grimGalaxy },
-    rates: { base: "0.0098%", gold: "0.00012%", gummy: "0.00006%", galaxy: "0.00004%" },
-    baseAbility: "Players who attack you are marked for a duration. Duration at each Level Up: 3s -> 3.5s -> 4s -> 4.5s -> 5s."
-  },
-  {
-    id: "duck",
-    name: "Duck",
-    rarity: "Epic",
-    images: { base: duckBase, gold: duckGold, gummy: duckGummy, galaxy: duckGalaxy },
-    rates: { base: "5.74%", gold: "0.07%", gummy: "0.04%", galaxy: "0.02%" },
-    baseAbility: "Emoting or Jamming replenishes shields. Increases in power at each Level Up: 2 -> 3 -> 4 -> 6 -> 8 Shield per tick."
-  },
-  {
-    id: "demon",
-    name: "Demon",
-    rarity: "Epic",
-    images: { base: demonBase, gold: demonGold, gummy: demonGummy, galaxy: demonGalaxy },
-    rates: { base: "5.76%", gold: "0.07%", gummy: "0.04%", galaxy: "0.01%" },
-    baseAbility: "Siphon some health and shields when you eliminate an opponent. Increases in power at each Level Up: 10 -> 15 -> 20 -> 25 -> 30 Healing per elimination."
-  },
-  {
-    id: "ghost",
-    name: "Ghost",
-    rarity: "Epic",
-    images: { base: ghostBase, gold: ghostGold, gummy: ghostGummy, galaxy: ghostGalaxy },
-    rates: { base: "5.74%", gold: "0.07%", gummy: "0.04%", galaxy: "0.02%" },
-    baseAbility: "Grants cloak for a duration upon reloading. Increases in duration at each Level Up: 3s -> 3.5s -> 4s -> 4.5s -> 5s."
-  },
-  {
-    id: "ghost-king",
-    name: "GhostKing",
-    rarity: "Epic",
-    images: { base: kingBase, gold: kingGold, gummy: kingGummy, galaxy: kingGalaxy },
-    rates: { base: "5.74%", gold: "0.07%", gummy: "0.04%", galaxy: "0.02%" },
-    baseAbility: "Your Pickaxe deals more damage. Increases in damage at each Level Up: 30 -> 40 -> 60 -> 80 -> 120 bonus damage."
-  },
-  {
-    id: "aura",
-    name: "Aura",
-    rarity: "Epic",
-    images: { base: auraBase, gold: auraGold, gummy: auraGummy, galaxy: auraGalaxy },
-    rates: { base: "5.74%", gold: "0.07%", gummy: "0.04%", galaxy: "0.02%" },
-    baseAbility: "Gain a Shock Rock charge when you deal enough damage to enemies! Required damage decreases at each Level Up: 175 -> 150 -> 125 -> 100 -> 75 Damage to trigger."
-  },
-  {
-    id: "striker",
-    name: "Striker",
-    rarity: "Epic",
-    images: { base: strikerBase, gold: strikerGold, gummy: strikerGummy, galaxy: strikerGalaxy },
-    rates: { base: "5.74%", gold: "0.07%", gummy: "0.04%", galaxy: "0.02%" },
-    baseAbility: "Gain the Overdrive effect when you Mantle, Hurdle, or Wall Scramble. Duration increases at each Level Up: 6s -> 7s -> 8s -> 9s -> 10s of Overdrive."
-  },
-  {
-    id: "water",
-    name: "Water",
-    rarity: "Rare",
-    images: { base: waterBase, gold: waterGold, gummy: waterGummy, galaxy: waterGalaxy },
-    rates: { base: "12.83%", gold: "0.70%", gummy: "0.28%", galaxy: "0.28%" },
-    baseAbility: "Replenish shields while standing in water! Increases in power at each Level Up: 2 -> 3 -> 4 -> 5 -> 6 Shield per tick."
-  },
-  {
-    id: "earth",
-    name: "Earth",
-    rarity: "Rare",
-    images: { base: earthBase, gold: earthGold, gummy: earthGummy, galaxy: earthGalaxy },
-    rates: { base: "12.83%", gold: "0.70%", gummy: "0.28%", galaxy: "0.28%" },
-    baseAbility: "You have a chance to find additional rare items when opening chests. Chance increases at each Level Up: 10% -> 12.5% -> 15% -> 17.5% -> 20% chance."
-  },
-  {
-    id: "fire",
-    name: "Fire",
-    rarity: "Rare",
-    images: { base: fireBase, gold: fireGold, gummy: fireGummy, galaxy: fireGalaxy },
-    rates: { base: "12.45%", gold: "0.68%", gummy: "0.68%", galaxy: "0.27%" },
-    baseAbility: "Creates a fiery burst when you deal enough damage to an enemy! Required damage decreases at each Level Up: 150 -> 125 -> 100 -> 75 -> 50 Damage to trigger."
-  },
-  {
-    id: "fishy",
-    name: "Fishy",
-    rarity: "Rare",
-    images: { base: fishyBase, gold: fishyGold, gummy: fishyGummy, galaxy: fishyGalaxy },
-    rates: { base: "13.79%", gold: "0.17%", gummy: "0.08%", galaxy: "0.06%" },
-    baseAbility: "Swim speed greatly increased. Taking damage also briefly increases movement speed. Tiers: 25%/10% -> 50%/20% -> 100%/30% -> 150%/40% -> 200%/50% bonuses."
-  }
+  { id: "zero-point", name: "Zero Point", rarity: "Mythic", images: { base: zpBase, gold: zpGold, gummy: zpGummy, galaxy: zpGalaxy }, rates: { base: "0.000098%", gold: "0.00012%", gummy: "0.00006%", galaxy: "0.00004%" }, baseAbility: "Spawn a Shield Bubble Jr. when you use a healing item on yourself (excluding splashes and grenades). Duration at each Level Up: 6s -> 7s -> 8s -> 9s -> 10s." },
+  { id: "burnt-peanut", name: "Burnt Peanut", rarity: "Mythic", images: { base: peanutBase, gold: peanutBase, gummy: peanutBase, galaxy: peanutBase }, rates: { base: "1.01%", gold: "N/A", gummy: "N/A", galaxy: "N/A" }, baseAbility: "Goop! When eliminating players, you may find more loot. Sometimes mythic! Chance at each Level Up: 20% -> 30% -> 40% -> 50% -> 60% chance (10% chance to find Mythic at Max Level!)." },
+  { id: "dream", name: "Dream", rarity: "Legendary", images: { base: dreamBase, gold: dreamGold, gummy: dreamGummy, galaxy: dreamGalaxy }, rates: { base: "2.63%", gold: "0.03%", gummy: "0.02%", galaxy: "0.01%" }, baseAbility: "Grants a random item at each level, exploding with legendary loot at Max Level. Loot value increases at each Level Up!" },
+  { id: "punk", name: "Punk", rarity: "Legendary", images: { base: punkBase, gold: punkGold, gummy: punkGummy, galaxy: punkGalaxy }, rates: { base: "1.98%", gold: "0.02%", gummy: "0.01%", galaxy: "0.01%" }, baseAbility: "Does nothing until Level 5, in which it will always grant a buff for unlimited ammo." },
+  { id: "boss", name: "Boss", rarity: "Legendary", images: { base: bossBase, gold: bossGold, gummy: bossGummy, galaxy: bossGalaxy }, rates: { base: "2.63%", gold: "0.03%", gummy: "0.02%", galaxy: "0.01%" }, baseAbility: "Grants an increase to your max HP and Shield. Increases at each Level Up: 5 -> 10 -> 15 -> 20 -> 25 HP/Shield." },
+  { id: "grim", name: "Grim", rarity: "Legendary", images: { base: grimBase, gold: grimGold, gummy: grimGummy, galaxy: grimGalaxy }, rates: { base: "0.0098%", gold: "0.00012%", gummy: "0.00006%", galaxy: "0.00004%" }, baseAbility: "Players who attack you are marked for a duration. Duration at each Level Up: 3s -> 3.5s -> 4s -> 4.5s -> 5s." },
+  { id: "duck", name: "Duck", rarity: "Epic", images: { base: duckBase, gold: duckGold, gummy: duckGummy, galaxy: duckGalaxy }, rates: { base: "5.74%", gold: "0.07%", gummy: "0.04%", galaxy: "0.02%" }, baseAbility: "Emoting or Jamming replenishes shields. Increases in power at each Level Up: 2 -> 3 -> 4 -> 6 -> 8 Shield per tick." },
+  { id: "demon", name: "Demon", rarity: "Epic", images: { base: demonBase, gold: demonGold, gummy: demonGummy, galaxy: demonGalaxy }, rates: { base: "5.76%", gold: "0.07%", gummy: "0.04%", galaxy: "0.01%" }, baseAbility: "Siphon some health and shields when you eliminate an opponent. Increases in power at each Level Up: 10 -> 15 -> 20 -> 25 -> 30 Healing per elimination." },
+  { id: "ghost", name: "Ghost", rarity: "Epic", images: { base: ghostBase, gold: ghostGold, gummy: ghostGummy, galaxy: ghostGalaxy }, rates: { base: "5.74%", gold: "0.07%", gummy: "0.04%", galaxy: "0.02%" }, baseAbility: "Grants cloak for a duration upon reloading. Increases in duration at each Level Up: 3s -> 3.5s -> 4s -> 4.5s -> 5s." },
+  { id: "ghost-king", name: "GhostKing", rarity: "Epic", images: { base: kingBase, gold: kingGold, gummy: kingGummy, galaxy: kingGalaxy }, rates: { base: "5.74%", gold: "0.07%", gummy: "0.04%", galaxy: "0.02%" }, baseAbility: "Your Pickaxe deals more damage. Increases in damage at each Level Up: 30 -> 40 -> 60 -> 80 -> 120 bonus damage." },
+  { id: "aura", name: "Aura", rarity: "Epic", images: { base: auraBase, gold: auraGold, gummy: auraGummy, galaxy: auraGalaxy }, rates: { base: "5.74%", gold: "0.07%", gummy: "0.04%", galaxy: "0.02%" }, baseAbility: "Gain a Shock Rock charge when you deal enough damage to enemies! Required damage decreases at each Level Up: 175 -> 150 -> 125 -> 100 -> 75 Damage to trigger." },
+  { id: "striker", name: "Striker", rarity: "Epic", images: { base: strikerBase, gold: strikerGold, gummy: strikerGummy, galaxy: strikerGalaxy }, rates: { base: "5.74%", gold: "0.07%", gummy: "0.04%", galaxy: "0.02%" }, baseAbility: "Gain the Overdrive effect when you Mantle, Hurdle, or Wall Scramble. Duration increases at each Level Up: 6s -> 7s -> 8s -> 9s -> 10s of Overdrive." },
+  { id: "water", name: "Water", rarity: "Rare", images: { base: waterBase, gold: waterGold, gummy: waterGummy, galaxy: waterGalaxy }, rates: { base: "12.83%", gold: "0.70%", gummy: "0.28%", galaxy: "0.28%" }, baseAbility: "Replenish shields while standing in water! Increases in power at each Level Up: 2 -> 3 -> 4 -> 5 -> 6 Shield per tick." },
+  { id: "earth", name: "Earth", rarity: "Rare", images: { base: earthBase, gold: earthGold, gummy: earthGummy, galaxy: earthGalaxy }, rates: { base: "12.83%", gold: "0.70%", gummy: "0.28%", galaxy: "0.28%" }, baseAbility: "You have a chance to find additional rare items when opening chests. Chance increases at each Level Up: 10% -> 12.5% -> 15% -> 17.5% -> 20% chance." },
+  { id: "fire", name: "Fire", rarity: "Rare", images: { base: fireBase, gold: fireGold, gummy: fireGummy, galaxy: fireGalaxy }, rates: { base: "12.45%", gold: "0.68%", gummy: "0.68%", galaxy: "0.27%" }, baseAbility: "Creates a fiery burst when you deal enough damage to an enemy! Required damage decreases at each Level Up: 150 -> 125 -> 100 -> 75 -> 50 Damage to trigger." },
+  { id: "fishy", name: "Fishy", rarity: "Rare", images: { base: fishyBase, gold: fishyGold, gummy: fishyGummy, galaxy: fishyGalaxy }, rates: { base: "13.79%", gold: "0.17%", gummy: "0.08%", galaxy: "0.06%" }, baseAbility: "Swim speed greatly increased. Taking damage also briefly increases movement speed. Tiers: 25%/10% -> 50%/20% -> 100%/30% -> 150%/40% -> 200%/50% bonuses." }
 ];
 
 const VARIANT_INFO = {
@@ -244,21 +137,22 @@ const SUMMON_COST_MATRIX = {
 const variantsList = ['base', 'gold', 'gummy', 'galaxy'];
 
 export default function App() {
-  const [collection, setCollection] = useState(() => {
-    const saved = localStorage.getItem('fn_sprites_tracker_v1');
-    return saved ? JSON.parse(saved) : {};
-  });
+  const { user, signUp, logIn, logOut } = useAuth();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
+  // Forgot Password State
+  const [resetSent, setResetSent] = useState(false);
+
+  const [collection, setCollection] = useState({});
   const [searchQuery, setSearchQuery] = useState('');
   const [rarityFilter, setRarityFilter] = useState('All');
   const [soundEnabled, setSoundEnabled] = useState(true);
   const [showResetConfirm, setShowResetConfirm] = useState(false);
-
-  // --- EXPLICIT DISPLAY STATE PIPELINE ---
   const [activeTabs, setActiveTabs] = useState({});
-
   const audioCtxRef = useRef(null);
 
+  // Pre-load images
   useEffect(() => {
     SPRITES_DATABASE.forEach(sprite => {
       Object.values(sprite.images).forEach(src => {
@@ -268,9 +162,25 @@ export default function App() {
     });
   }, []);
 
+  // Fetch Cloud Data on Login
   useEffect(() => {
-    localStorage.setItem('fn_sprites_tracker_v1', JSON.stringify(collection));
-  }, [collection]);
+    if (!user) {
+      setCollection({});
+      return;
+    }
+    const loadDataFromCloud = async () => {
+      try {
+        const docRef = doc(db, "users", user.uid);
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+          setCollection(docSnap.data().sprites || {});
+        }
+      } catch (error) {
+        console.error("Failed to fetch cloud data:", error);
+      }
+    };
+    loadDataFromCloud();
+  }, [user]);
 
   const playBeep = (freq, type = 'sine', duration = 0.08) => {
     if (!soundEnabled) return;
@@ -295,10 +205,8 @@ export default function App() {
   };
 
   const handleTabClick = (spriteId, variant) => {
-    // 1. Immediately lock down the visual tab view state change
     setActiveTabs(prev => ({ ...prev, [spriteId]: variant }));
 
-    // 2. Compute state logic and play corresponding frequency notes
     const currentVal = collection[spriteId]?.[variant];
     const newVal = !currentVal;
 
@@ -327,6 +235,13 @@ export default function App() {
           colors: ['#00f0ff', '#ffe600', '#ff007f', '#8a2be2']
         });
       }
+
+      // Save to Cloud instantly
+      if (user) {
+        setDoc(doc(db, "users", user.uid), { sprites: updated }, { merge: true })
+          .catch(err => console.error("Cloud save failed:", err));
+      }
+
       return updated;
     });
   };
@@ -335,7 +250,28 @@ export default function App() {
     setCollection({});
     setActiveTabs({});
     setShowResetConfirm(false);
+
+    // Wipe Cloud Data
+    if (user) {
+      setDoc(doc(db, "users", user.uid), { sprites: {} }, { merge: true });
+    }
+
     playBeep(180, 'sawtooth', 0.3);
+  };
+
+  const handlePasswordReset = () => {
+    if (!email) {
+      alert("Please enter your email address in the field above first.");
+      return;
+    }
+    sendPasswordResetEmail(auth, email)
+      .then(() => {
+        setResetSent(true);
+        setTimeout(() => setResetSent(false), 6000); // Reset text after 6 seconds
+      })
+      .catch((error) => {
+        alert(error.message);
+      });
   };
 
   const totalPossible = SPRITES_DATABASE.reduce((acc, sprite) => {
@@ -370,6 +306,32 @@ export default function App() {
     if (!rarityMatrix) return "0";
     return variantName === 'base' ? rarityMatrix.base : rarityMatrix.variant;
   };
+
+  if (!user) {
+    return (
+      <div className="min-h-screen bg-[#0b0c10] flex items-center justify-center p-4">
+        <div className="bg-[#12141f] p-8 rounded-2xl border border-slate-800 w-full max-w-sm shadow-2xl text-center">
+          <h2 className="text-2xl font-black text-white mb-6 uppercase italic">Spritedex Login</h2>
+          <input className="w-full p-3 mb-4 bg-black border border-slate-700 rounded-xl text-white focus:outline-none focus:border-cyan-500" placeholder="Email" type="email" onChange={(e) => setEmail(e.target.value)} />
+          <input className="w-full p-3 mb-6 bg-black border border-slate-700 rounded-xl text-white focus:outline-none focus:border-cyan-500" type="password" placeholder="Password" onChange={(e) => setPassword(e.target.value)} />
+
+          <div className="flex gap-2 mb-4">
+            <button onClick={() => logIn(email, password).catch(err => alert(err.message))} className="flex-1 bg-cyan-600 py-3 rounded-xl font-black uppercase text-white hover:bg-cyan-500 transition-colors">Login</button>
+            <button onClick={() => signUp(email, password).catch(err => alert(err.message))} className="flex-1 bg-slate-700 py-3 rounded-xl font-black uppercase text-white hover:bg-slate-600 transition-colors">Sign Up</button>
+          </div>
+
+          <button onClick={handlePasswordReset} className="text-xs text-slate-400 hover:text-cyan-400 font-bold underline mb-5 transition-colors">
+            {resetSent ? "Reset link sent! Check your inbox." : "Forgot Password?"}
+          </button>
+
+          <p className="text-slate-500 text-[10px] px-2 leading-relaxed">
+            New user? Enter email/password and click <span className="text-cyan-400 font-bold">Sign Up</span>.<br />
+            Returning? Click <span className="text-cyan-400 font-bold">Login</span>.
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[#0b0c10] text-gray-100 flex flex-col font-sans select-none relative">
@@ -415,9 +377,14 @@ export default function App() {
               SPRITEDEX
             </h1>
           </div>
-          <button onClick={() => setSoundEnabled(!soundEnabled)} className="p-2 rounded-xl bg-slate-900 border-2 border-slate-700/60">
-            {soundEnabled ? <Volume2 className="w-4 h-4 text-cyan-400" /> : <VolumeX className="w-4 h-4 text-gray-500" />}
-          </button>
+          <div className="flex items-center gap-3">
+            <button onClick={logOut} className="text-[10px] text-red-400 font-bold uppercase tracking-widest hover:text-red-300 transition-colors">
+              Logout
+            </button>
+            <button onClick={() => setSoundEnabled(!soundEnabled)} className="p-2 rounded-xl bg-slate-900 border-2 border-slate-700/60">
+              {soundEnabled ? <Volume2 className="w-4 h-4 text-cyan-400" /> : <VolumeX className="w-4 h-4 text-gray-500" />}
+            </button>
+          </div>
         </div>
       </header>
 
@@ -448,7 +415,7 @@ export default function App() {
             <input
               type="text" placeholder="Search across core sprites..." value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-black/50 border-2 border-slate-800 rounded-xl pl-9 pr-3 py-2 text-sm text-white focus:outline-none"
+              className="w-full bg-black/50 border-2 border-slate-800 rounded-xl pl-9 pr-3 py-2 text-sm text-white focus:outline-none focus:border-cyan-500"
             />
           </div>
           <div className="flex gap-1 overflow-x-auto py-1">
@@ -471,7 +438,6 @@ export default function App() {
             const rarityStyle = RARITY_COLORS[sprite.rarity] || 'bg-slate-700 text-white';
             const spriteBgGradient = RARITY_BG_GRADIENTS[sprite.rarity] || 'from-slate-700 to-slate-900';
 
-            // --- DETERMINE THE TRUE ISOLATED ACTIVE TAB ---
             const currentTab = activeTabs[sprite.id] || 'base';
             const variantModifier = getVariantModifierText(currentTab);
 
