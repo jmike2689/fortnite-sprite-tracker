@@ -733,6 +733,10 @@ function MainApp() {
                 {resetSent ? "Reset link sent!" : "Forgot Password?"}
               </button>
             )}
+            {/* --- EPIC GAMES DISCLAIMER --- */}
+            <p className="text-[9px] text-slate-500 mt-2 leading-relaxed max-w-xs mx-auto">
+              Portions of the materials used are trademarks and/or copyrighted works of Epic Games, Inc. All rights reserved by Epic. This material is not official and is not endorsed by Epic.
+            </p>
           </div>
         </div>
       </div>
@@ -1370,6 +1374,14 @@ function MainApp() {
             ))}
           </section>
         )}
+
+        {/* --- EPIC GAMES DISCLAIMER ADDED HERE --- */}
+        <footer className="mt-6 pt-6 border-t border-slate-800 text-center pb-4">
+          <p className="text-[9px] text-slate-500 leading-relaxed px-2">
+            Portions of the materials used are trademarks and/or copyrighted works of Epic Games, Inc. All rights reserved by Epic. This material is not official and is not endorsed by Epic.
+          </p>
+        </footer>
+
       </main>
 
       {/* --- EXTENDED BOTTOM NAVIGATION BAR --- */}
