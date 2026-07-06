@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import PrivacyPolicy from './PrivacyPolicy';
 import {
-  Search, CheckCircle, Circle, Volume2, VolumeX, Percent, RotateCcw, AlertTriangle, X, Eye, Grid, Crown, Users, UserPlus, ChevronLeft, ChevronRight, Check, XCircle, UserMinus
+  Search, CheckCircle, Circle, Volume2, VolumeX, Percent, RotateCcw, AlertTriangle, X, Eye, Grid, Crown, Users, UserPlus, ChevronLeft, ChevronRight, Check, XCircle, UserMinus, Target, Plus, FileText, Radio, Info
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { useAuth } from './AuthContext';
@@ -165,8 +165,8 @@ const SPRITES_DATABASE = [
     baseAbility: "Grants cloak for a duration upon reloading. Increases in duration at each Level Up: 3s -> 3.5s -> 4s -> 4.5s -> 5s."
   },
   {
-    id: "ghost-king",
-    name: "GhostKing",
+    id: "king",
+    name: "King",
     rarity: "Epic",
     images: { base: kingBase, gold: kingGold, gummy: kingGummy, galaxy: kingGalaxy },
     rates: { base: "5.74%", gold: "0.07%", gummy: "0.04%", galaxy: "0.02%" },
@@ -219,6 +219,22 @@ const SPRITES_DATABASE = [
     images: { base: fishyBase, gold: fishyGold, gummy: fishyGummy, galaxy: fishyGalaxy },
     rates: { base: "13.79%", gold: "0.17%", gummy: "0.08%", galaxy: "0.06%" },
     baseAbility: "Swim speed greatly increased. Taking damage also briefly increases movement speed. Tiers: 25%/10% -> 50%/20% -> 100%/30% -> 150%/40% -> 200%/50% bonuses."
+  }
+];
+
+// --- APP PATCH NOTES ---
+const PATCH_NOTES = [
+  {
+    version: "v1.1.0",
+    date: "07/06/2026",
+    title: "Extraction Targets Deployed",
+    changes: [
+      "Added 'Extraction Targets' panel to the Sprite Squad tab.",
+      "You can now set up to 3 specific sprites you are hunting for in-game.",
+      "Mutual Match System: Squad namecards will now pulse with an electric blue aura when a 1-for-1 trade is possible with a friend.",
+      "Inspecting a friend's library now displays their active Extraction Targets at the top of the screen.",
+      "Performance Update: Improved list rendering to prevent animation freezes on older devices."
+    ]
   }
 ];
 
@@ -289,7 +305,6 @@ const SUMMON_COST_MATRIX = {
   Rare: { base: "100", variant: "4,000" }
 };
 
-// --- RENAME ORIGINAL COMPONENT TO MainApp ---
 function MainApp() {
   const { user, signUp, logIn, logOut } = useAuth();
 
@@ -315,9 +330,15 @@ function MainApp() {
   const [viewingTabs, setViewingTabs] = useState({});
   const audioCtxRef = useRef(null);
 
+  // --- PATCH NOTES STATES ---
+  const [showPatchNotes, setShowPatchNotes] = useState(false);
+  const [showTransmission, setShowTransmission] = useState(false);
+  const [hasCheckedVersion, setHasCheckedVersion] = useState(false);
+
   // --- DATA STATES ---
   const [collection, setCollection] = useState({});
   const [mastery, setMastery] = useState({});
+  const [extractionTargets, setExtractionTargets] = useState([]);
 
   // --- FRIEND & INSPECTION STATES ---
   const [friendSearchQuery, setFriendSearchQuery] = useState('');
@@ -326,8 +347,12 @@ function MainApp() {
   const [pendingRequests, setPendingRequests] = useState([]);
   const [sentRequests, setSentRequests] = useState([]);
   const [friendsList, setFriendsList] = useState([]);
-  const [richFriends, setRichFriends] = useState([]); // Leaderboard state
+  const [richFriends, setRichFriends] = useState([]);
   const [activeViewingFriend, setActiveViewingFriend] = useState(null);
+
+  // --- EXTRACTION TARGET MODAL STATES ---
+  const [showTargetSelector, setShowTargetSelector] = useState(false);
+  const [targetSlotIndex, setTargetSlotIndex] = useState(null);
 
   // Pre-load images
   useEffect(() => {
@@ -344,12 +369,14 @@ function MainApp() {
     if (!user) {
       setCollection({});
       setMastery({});
+      setExtractionTargets([]);
       setSpriteId(null);
       setFriendsList([]);
       setPendingRequests([]);
       setSentRequests([]);
       setRichFriends([]);
       setActiveViewingFriend(null);
+      setHasCheckedVersion(false);
       return;
     }
 
@@ -359,12 +386,23 @@ function MainApp() {
         const data = docSnap.data();
         setCollection(data.sprites || {});
         setMastery(data.mastery || {});
+        setExtractionTargets(data.extractionTargets || []);
         setFriendsList(data.friends || []);
         if (data.spriteId) {
           setSpriteId(data.spriteId);
         } else {
           setIsSettingSpriteId(true);
         }
+
+        // --- VERSION CHECK ---
+        if (!hasCheckedVersion && !isSettingSpriteId) {
+          const userVersion = data.lastSeenVersion || "v1.0.0";
+          if (userVersion !== PATCH_NOTES[0].version) {
+            setShowTransmission(true);
+          }
+          setHasCheckedVersion(true);
+        }
+
       } else {
         setIsSettingSpriteId(true);
       }
@@ -381,7 +419,7 @@ function MainApp() {
     });
 
     return () => { unsubUser(); unsubReqs(); unsubSentReqs(); };
-  }, [user]);
+  }, [user, hasCheckedVersion, isSettingSpriteId]);
 
   // Fetch Completion Stats for Leaderboard
   useEffect(() => {
@@ -392,12 +430,13 @@ function MainApp() {
       }
 
       const promises = friendsList.map(async (friend) => {
-        if (typeof friend === 'string') return null; // Legacy protection
+        if (typeof friend === 'string') return null;
         try {
           const docSnap = await getDoc(doc(db, "users", friend.uid));
           if (docSnap.exists()) {
             const data = docSnap.data();
             const sprites = data.sprites || {};
+            const friendTargets = data.extractionTargets || [];
             let tCollected = 0;
 
             SPRITES_DATABASE.forEach(sprite => {
@@ -406,24 +445,23 @@ function MainApp() {
             });
 
             const cRate = totalPossibleStatic > 0 ? Math.round((tCollected / totalPossibleStatic) * 100) : 0;
-            return { ...friend, completionRate: cRate };
+            return { ...friend, completionRate: cRate, sprites, extractionTargets: friendTargets };
           }
         } catch (e) {
           console.error("Error fetching friend data:", e);
         }
-        return { ...friend, completionRate: 0 };
+        return { ...friend, completionRate: 0, sprites: {}, extractionTargets: [] };
       });
 
       const results = await Promise.all(promises);
       const validResults = results.filter(Boolean);
 
-      // Sort Highest Completion to Lowest
       validResults.sort((a, b) => b.completionRate - a.completionRate);
       setRichFriends(validResults);
     };
 
     fetchRichFriends();
-  }, [friendsList]);
+  }, [friendsList, collection]);
 
   const playBeep = (freq, type = 'sine', duration = 0.08) => {
     if (!soundEnabled) return;
@@ -462,7 +500,7 @@ function MainApp() {
         setSpriteIdError('That Sprite ID is already taken!');
         return;
       }
-      await setDoc(doc(db, "users", user.uid), { spriteId: desiredSpriteId.toLowerCase(), friends: [] }, { merge: true });
+      await setDoc(doc(db, "users", user.uid), { spriteId: desiredSpriteId.toLowerCase(), friends: [], extractionTargets: [], lastSeenVersion: PATCH_NOTES[0].version }, { merge: true });
       setSpriteId(desiredSpriteId.toLowerCase());
       setIsSettingSpriteId(false);
     } catch (error) {
@@ -623,7 +661,6 @@ function MainApp() {
     if (!showUnfriendConfirm) return;
     const target = showUnfriendConfirm;
     try {
-      // Create objects to remove exactly as they were added
       const targetObj = { uid: target.uid, spriteId: target.spriteId };
       const selfObj = { uid: user.uid, spriteId: spriteId };
 
@@ -645,11 +682,81 @@ function MainApp() {
           spriteId: friendObj.spriteId,
           completionRate: friendObj.completionRate || 0,
           sprites: docSnap.data().sprites || {},
-          mastery: docSnap.data().mastery || {}
+          mastery: docSnap.data().mastery || {},
+          extractionTargets: docSnap.data().extractionTargets || []
         });
       }
     } catch (e) {
       alert("Could not fetch friend data.");
+    }
+  };
+
+  // --- EXTRACTION TARGET FUNCTIONS ---
+  const handleSetTarget = async (targetSpriteId, variant) => {
+    const newTargets = [...extractionTargets];
+    newTargets[targetSlotIndex] = `${targetSpriteId}_${variant}`;
+    setExtractionTargets(newTargets);
+    setShowTargetSelector(false);
+    if (user) {
+      await updateDoc(doc(db, "users", user.uid), { extractionTargets: newTargets });
+    }
+  };
+
+  const handleRemoveTarget = async (index, e) => {
+    e.stopPropagation();
+    const newTargets = [...extractionTargets];
+    newTargets.splice(index, 1);
+    setExtractionTargets(newTargets);
+    if (user) {
+      await updateDoc(doc(db, "users", user.uid), { extractionTargets: newTargets });
+    }
+  };
+
+  const isMutualMatch = (friendObj) => {
+    const friendTargets = friendObj.extractionTargets || [];
+    const friendSprites = friendObj.sprites || {};
+
+    const friendHasWhatIWant = extractionTargets.some(target => {
+      if (!target) return false;
+      const [sId, v] = target.split('_');
+      return friendSprites[sId]?.[v] === true;
+    });
+
+    const iHaveWhatFriendWants = friendTargets.some(target => {
+      if (!target) return false;
+      const [sId, v] = target.split('_');
+      return collection[sId]?.[v] === true;
+    });
+
+    return friendHasWhatIWant && iHaveWhatFriendWants;
+  };
+
+  const renderTargetSlot = (targetKey, index) => {
+    if (!targetKey) {
+      return (
+        <button key={index} onClick={() => { setTargetSlotIndex(index); setShowTargetSelector(true); }} className="flex-1 aspect-square border-2 border-dashed border-slate-700 rounded-xl flex items-center justify-center bg-black/40 hover:bg-black/60 transition-colors">
+          <Plus className="w-6 h-6 text-slate-600" />
+        </button>
+      );
+    }
+    const [sId, v] = targetKey.split('_');
+    const sprite = SPRITES_DATABASE.find(s => s.id === sId);
+    return (
+      <div key={index} className="flex-1 aspect-square border-2 border-cyan-500/50 rounded-xl bg-cyan-950/30 relative flex flex-col items-center justify-center overflow-hidden">
+        <button onClick={(e) => handleRemoveTarget(index, e)} className="absolute top-1 right-1 bg-black/60 rounded-full p-0.5 text-slate-400 hover:text-white z-20">
+          <X className="w-3 h-3" />
+        </button>
+        <img src={sprite?.images[v]} className="w-10 h-10 object-contain z-10" alt="" />
+        <span className={`text-[8px] font-black uppercase mt-1 z-10 ${VARIANT_INFO[v]?.color}`}>{v}</span>
+      </div>
+    );
+  };
+
+  // --- VERSION ACKNOWLEDGEMENT ---
+  const handleAcknowledgeTransmission = async () => {
+    setShowTransmission(false);
+    if (user) {
+      await updateDoc(doc(db, "users", user.uid), { lastSeenVersion: PATCH_NOTES[0].version }, { merge: true });
     }
   };
 
@@ -733,7 +840,6 @@ function MainApp() {
                 {resetSent ? "Reset link sent!" : "Forgot Password?"}
               </button>
             )}
-            {/* --- EPIC GAMES DISCLAIMER --- */}
             <p className="text-[9px] text-slate-500 mt-2 leading-relaxed max-w-xs mx-auto">
               Portions of the materials used are trademarks and/or copyrighted works of Epic Games, Inc. All rights reserved by Epic. This material is not official and is not endorsed by Epic.
             </p>
@@ -777,6 +883,126 @@ function MainApp() {
 
   return (
     <div className="min-h-screen bg-[#0b0c10] text-gray-100 flex flex-col font-sans select-none relative">
+
+      {/* --- MODAL: TRANSMISSION SPLASH SCREEN --- */}
+      {showTransmission && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/90 backdrop-blur-md animate-in fade-in duration-300">
+          <div className="bg-[#12141f] border-2 border-cyan-500 shadow-[0_0_40px_rgba(34,211,238,0.2)] rounded-2xl max-w-sm w-full relative overflow-hidden flex flex-col">
+            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-cyan-400 to-transparent animate-pulse"></div>
+            <header className="p-5 border-b border-cyan-900/50 flex flex-col items-center text-center">
+              <div className="w-12 h-12 bg-cyan-950/50 rounded-full border border-cyan-500/40 flex items-center justify-center mb-3">
+                <Radio className="w-6 h-6 text-cyan-400 animate-pulse" />
+              </div>
+              <h2 className="text-xl font-black text-cyan-400 uppercase italic tracking-wider">Incoming Transmission</h2>
+              <span className="text-[10px] font-mono text-cyan-600 uppercase tracking-widest mt-1">Update {PATCH_NOTES[0].version} Deployed</span>
+            </header>
+            <div className="p-5 flex flex-col gap-4">
+              <h3 className="text-md font-bold text-white text-center">{PATCH_NOTES[0].title}</h3>
+              <ul className="space-y-3">
+                {PATCH_NOTES[0].changes.map((change, idx) => (
+                  <li key={idx} className="flex items-start gap-2 text-xs text-slate-300 leading-relaxed">
+                    <CheckCircle className="w-4 h-4 text-cyan-500 shrink-0 mt-0.5" />
+                    {change}
+                  </li>
+                ))}
+              </ul>
+              <button onClick={handleAcknowledgeTransmission} className="w-full mt-4 bg-cyan-600 hover:bg-cyan-500 text-white font-black uppercase tracking-wider py-3 rounded-xl transition-colors">
+                Acknowledge
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* --- MODAL: PATCH NOTES & ABOUT HUB --- */}
+      {showPatchNotes && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90 backdrop-blur-md animate-in fade-in duration-200">
+          <div className="bg-[#12141f] border-2 border-slate-700 rounded-2xl flex flex-col max-w-sm w-full h-[80vh] relative overflow-hidden">
+            <header className="p-4 border-b border-slate-800 flex justify-between items-center bg-[#0e1017]">
+              <h3 className="text-md font-black tracking-tight text-white uppercase italic flex items-center gap-2">
+                <FileText className="w-5 h-5 text-purple-400" /> Patch Notes
+              </h3>
+              <button onClick={() => setShowPatchNotes(false)} className="text-slate-400 hover:text-white">
+                <X className="w-6 h-6" />
+              </button>
+            </header>
+            <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-6">
+
+              {/* --- APP DESCRIPTION / ABOUT SECTION --- */}
+              <section className="bg-gradient-to-br from-purple-900/30 to-indigo-900/20 border border-purple-500/30 rounded-xl p-4">
+                <div className="flex items-center gap-2 mb-2">
+                  <Info className="w-5 h-5 text-purple-400" />
+                  <h4 className="font-black text-purple-400 uppercase italic">About the App</h4>
+                </div>
+                <p className="text-xs text-slate-300 leading-relaxed">
+                  Spritedex is your ultimate companion for tracking Battle Royale Sprites. Sync your collection across devices, coordinate in-game trades with your Sprite Squad using Extraction Targets, and keep track of your Mastery crowns all in one secure, real-time interface.
+                </p>
+              </section>
+
+              {/* --- UPDATE TIMELINE --- */}
+              <section className="flex flex-col gap-4">
+                <h4 className="text-xs font-black text-slate-500 uppercase tracking-widest border-b border-slate-800 pb-2">Transmission History</h4>
+                {PATCH_NOTES.map((note, index) => (
+                  <div key={index} className="bg-black/40 border border-slate-800 rounded-xl p-4">
+                    <div className="flex justify-between items-center mb-2">
+                      <span className="text-sm font-black text-white">{note.version}</span>
+                      <span className="text-[10px] font-mono text-slate-500">{note.date}</span>
+                    </div>
+                    <span className="text-xs font-bold text-cyan-400 block mb-3">{note.title}</span>
+                    <ul className="space-y-2">
+                      {note.changes.map((change, cIdx) => (
+                        <li key={cIdx} className="text-[10px] text-slate-400 leading-relaxed flex items-start gap-1.5">
+                          <span className="w-1 h-1 rounded-full bg-slate-600 mt-1.5 shrink-0"></span>
+                          {change}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                ))}
+              </section>
+
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* --- MODAL: TARGET SELECTOR --- */}
+      {showTargetSelector && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90 backdrop-blur-md animate-in fade-in duration-200">
+          <div className="bg-[#12141f] border-2 border-cyan-500/60 rounded-2xl flex flex-col max-w-sm w-full h-[75vh] relative overflow-hidden">
+            <header className="p-4 border-b border-slate-800 flex justify-between items-center bg-[#0e1017]">
+              <h3 className="text-md font-black tracking-tight text-cyan-400 uppercase italic flex items-center gap-2">
+                <Target className="w-5 h-5" /> Select Target
+              </h3>
+              <button onClick={() => setShowTargetSelector(false)} className="text-slate-400 hover:text-white">
+                <X className="w-6 h-6" />
+              </button>
+            </header>
+            <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-4">
+              {SPRITES_DATABASE.map(sprite => {
+                const validVariants = variantsList.filter(v => sprite.rates[v] !== "N/A");
+                return (
+                  <div key={sprite.id} className="bg-slate-900 border border-slate-800 rounded-xl p-3">
+                    <span className="text-xs font-black text-white uppercase italic mb-2 block">{sprite.name}</span>
+                    <div className="grid grid-cols-4 gap-2">
+                      {validVariants.map(v => (
+                        <button
+                          key={v}
+                          onClick={() => handleSetTarget(sprite.id, v)}
+                          className="flex flex-col items-center p-2 rounded-lg border border-slate-700 bg-black/40 hover:bg-slate-800 transition-colors"
+                        >
+                          <img src={sprite.images[v]} className="w-8 h-8 object-contain mb-1" alt="" />
+                          <span className={`text-[8px] font-black uppercase ${VARIANT_INFO[v]?.color}`}>{v}</span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* --- MODAL: ABSOLUTE DATA RESET --- */}
       {showResetConfirm && (
@@ -842,6 +1068,32 @@ function MainApp() {
               </button>
             </div>
           </header>
+
+          {activeViewingFriend.extractionTargets && activeViewingFriend.extractionTargets.length > 0 && (
+            <div className="max-w-md mx-auto w-full px-4 pt-4">
+              <div className="bg-[#151722] border border-cyan-500/30 rounded-xl p-3 flex flex-col gap-2">
+                <span className="text-[10px] font-black text-cyan-400 uppercase tracking-widest flex items-center gap-1.5">
+                  <Target className="w-3.5 h-3.5" /> Their Extraction Targets
+                </span>
+                <div className="flex gap-2">
+                  {activeViewingFriend.extractionTargets.map((target, idx) => {
+                    if (!target) return null;
+                    const [sId, v] = target.split('_');
+                    const sprite = SPRITES_DATABASE.find(s => s.id === sId);
+                    return (
+                      <div key={idx} className="flex-1 flex items-center gap-2 bg-black/40 border border-slate-800 rounded-lg p-1.5">
+                        <img src={sprite?.images[v]} className="w-6 h-6 object-contain" alt="" />
+                        <div className="flex flex-col">
+                          <span className="text-[9px] font-bold text-white uppercase truncate">{sprite?.name}</span>
+                          <span className={`text-[8px] font-black uppercase ${VARIANT_INFO[v]?.color}`}>{v}</span>
+                        </div>
+                      </div>
+                    )
+                  })}
+                </div>
+              </div>
+            </div>
+          )}
 
           <div className="max-w-md w-full mx-auto p-4 flex flex-col gap-4">
             {SPRITES_DATABASE.map(sprite => {
@@ -958,24 +1210,27 @@ function MainApp() {
             <p className="text-[10px] font-mono text-slate-400 uppercase tracking-widest mt-0.5">ID: {spriteId}</p>
           </div>
           <div className="flex items-center gap-3">
-            <button onClick={logOut} className="text-[10px] text-red-400 font-bold uppercase tracking-widest hover:text-red-300 transition-colors">
-              Logout
+            <button onClick={() => { setShowPatchNotes(true); playBeep(523, 'sine', 0.08); }} className="p-2 rounded-xl bg-slate-900 border-2 border-slate-700/60 hover:bg-slate-800 transition-colors">
+              <FileText className="w-4 h-4 text-purple-400" />
             </button>
-            <button onClick={() => setSoundEnabled(!soundEnabled)} className="p-2 rounded-xl bg-slate-900 border-2 border-slate-700/60">
+            <button onClick={() => setSoundEnabled(!soundEnabled)} className="p-2 rounded-xl bg-slate-900 border-2 border-slate-700/60 hover:bg-slate-800 transition-colors">
               {soundEnabled ? <Volume2 className="w-4 h-4 text-cyan-400" /> : <VolumeX className="w-4 h-4 text-gray-500" />}
+            </button>
+            <button onClick={logOut} className="text-[10px] text-red-400 font-bold uppercase tracking-widest hover:text-red-300 transition-colors ml-1">
+              Logout
             </button>
           </div>
         </div>
       </header>
 
-      <main className="flex-1 max-w-md w-full mx-auto p-4 flex flex-col gap-5 pb-24" style={{ willChange: 'transform' }}>
+      <main className="flex-1 max-w-md w-full mx-auto p-4 flex flex-col gap-5 pb-24">
 
         {/* --- MAIN VIEWS (SPRITES / MASTERY) --- */}
         {(currentView === 'sprites' || currentView === 'mastery') && (
           <div className="flex flex-col gap-5 animate-in fade-in duration-300">
 
             {currentView === 'sprites' && (
-              <section className="sticky top-[86px] z-30 bg-[#151824]/95 backdrop-blur-md rounded-2xl p-4 border-2 border-slate-800 shadow-xl transform-gpu backface-hidden">
+              <section className="sticky top-[86px] z-30 bg-[#151824]/95 backdrop-blur-md rounded-2xl p-4 border-2 border-slate-800 shadow-xl">
                 <div className="flex items-center justify-between mb-2.5">
                   <span className="text-xs font-black text-gray-200 tracking-wider font-mono">SPRITE PROGRESS</span>
                   <button onClick={() => { setShowResetConfirm(true); playBeep(330, 'sine', 0.08); }} className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-red-950/30 hover:bg-red-950/60 border border-red-900/40 text-[9px] font-mono font-black text-red-400 tracking-wider uppercase">
@@ -1004,7 +1259,7 @@ function MainApp() {
               </section>
             )}
 
-            <section className="flex flex-col gap-2 bg-[#12141f] p-3 rounded-xl border border-slate-800/80 transform-gpu backface-hidden">
+            <section className="flex flex-col gap-2 bg-[#12141f] p-3 rounded-xl border border-slate-800/80">
               <div className="relative">
                 <Search className="w-4 h-4 text-cyan-500/70 absolute left-3 top-3" />
                 <input
@@ -1065,12 +1320,12 @@ function MainApp() {
                 return (
                   <article
                     key={sprite.id}
-                    className={`bg-[#151722] rounded-2xl overflow-hidden border-2 transition-all duration-300 transform-gpu backface-hidden border-slate-800/90`}
+                    className={`bg-[#151722] rounded-2xl overflow-hidden border-2 transition-all duration-300 border-slate-800/90`}
                   >
                     <div className="p-4 flex gap-4">
 
                       <div className="flex flex-col gap-2 w-24 flex-shrink-0">
-                        <div className={`w-24 h-24 bg-gradient-to-b ${spriteBgGradient} rounded-xl p-0.5 border-2 relative overflow-hidden transform-gpu backface-hidden transition-all duration-300 ${isCurrentTabMastered ? 'border-yellow-400 shadow-[0_0_20px_rgba(255,215,0,0.4)]' : 'border-white/10'}`}>
+                        <div className={`w-24 h-24 bg-gradient-to-b ${spriteBgGradient} rounded-xl p-0.5 border-2 relative overflow-hidden transition-all duration-300 ${isCurrentTabMastered ? 'border-yellow-400 shadow-[0_0_20px_rgba(255,215,0,0.4)]' : 'border-white/10'}`}>
 
                           {isCurrentTabMastered && (
                             <div className="absolute top-1 right-1 z-40 bg-black/60 rounded-full p-0.5 border border-yellow-500/50">
@@ -1097,7 +1352,7 @@ function MainApp() {
                                 key={v}
                                 src={sprite.images[v]}
                                 alt={`${sprite.name} ${v}`}
-                                className={`absolute inset-0 w-full h-full object-contain rounded-lg p-1 transform-gpu transition-opacity duration-150 will-change-[opacity] ${isVisible ? 'opacity-100 z-10' : 'opacity-0 z-0'}`}
+                                className={`absolute inset-0 w-full h-full object-contain rounded-lg p-1 transition-opacity duration-150 ${isVisible ? 'opacity-100 z-10' : 'opacity-0 z-0'}`}
                               />
                             );
                           })}
@@ -1209,7 +1464,7 @@ function MainApp() {
                                 handleToggleCheck(sprite.id, variant);
                               }
                             }}
-                            className={`py-3 flex flex-col items-center gap-1.5 border-r border-slate-800/40 last:border-r-0 transition-all transform-gpu relative ${btnStyle} ${isActiveTab && !isVariantMastered ? 'bg-slate-800/50' : ''} ${isMasteryView ? 'cursor-pointer' : ''}`}
+                            className={`py-3 flex flex-col items-center gap-1.5 border-r border-slate-800/40 last:border-r-0 transition-all relative ${btnStyle} ${isActiveTab && !isVariantMastered ? 'bg-slate-800/50' : ''} ${isMasteryView ? 'cursor-pointer' : ''}`}
                           >
                             <span className="text-[9px] font-mono tracking-widest font-bold">{variant.toUpperCase()}</span>
 
@@ -1242,6 +1497,19 @@ function MainApp() {
               <p className="text-xs text-slate-300 leading-relaxed">
                 Search for friends by their Sprite ID. Once they accept your request, you can view their collections and crowns.
               </p>
+            </section>
+
+            <section className="bg-[#12141f] rounded-2xl border border-slate-800 p-4">
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="text-xs font-black text-cyan-400 uppercase tracking-wider flex items-center gap-2">
+                  <Target className="w-4 h-4" /> Extraction Targets
+                </h3>
+                <span className="text-[10px] text-slate-500 font-bold uppercase">{extractionTargets.filter(Boolean).length} / 3 Set</span>
+              </div>
+              <div className="flex gap-3">
+                {[0, 1, 2].map(index => renderTargetSlot(extractionTargets[index], index))}
+              </div>
+              <p className="text-[10px] text-slate-500 mt-3 leading-tight">Set up to 3 sprites you are currently hunting for in-game. If a mutual trade is possible with a friend, their Sprite ID will glow below. Link up in-game to make the trade.</p>
             </section>
 
             <section className="bg-[#12141f] rounded-2xl border border-slate-800 p-4">
@@ -1316,33 +1584,45 @@ function MainApp() {
                 </div>
               ) : (
                 <div className="flex flex-col gap-2">
-                  {richFriends.map((friend, index) => (
-                    <div key={index} className="bg-slate-900 p-3 rounded-xl flex items-center justify-between border border-slate-800/80">
+                  {richFriends.map((friend, index) => {
+                    const matchFound = isMutualMatch(friend);
+                    const cardClass = matchFound
+                      ? "bg-cyan-950/40 border-2 border-cyan-400 shadow-[0_0_15px_rgba(34,211,238,0.5)]"
+                      : "bg-slate-900 border border-slate-800/80";
 
-                      <div className="flex items-center gap-3">
-                        <div className="w-6 h-6 rounded-full bg-indigo-900/50 border border-indigo-500/50 flex items-center justify-center text-[10px] font-black text-indigo-400">
-                          #{index + 1}
+                    return (
+                      <div key={index} className={`p-3 rounded-xl flex items-center justify-between transition-all duration-300 ${cardClass}`}>
+                        <div className="flex items-center gap-3">
+                          <div className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-black ${matchFound ? 'bg-cyan-900/50 border-cyan-400 text-cyan-400' : 'bg-indigo-900/50 border-indigo-500/50 text-indigo-400'}`}>
+                            #{index + 1}
+                          </div>
+                          <div className="flex flex-col">
+                            <span className="text-sm font-bold text-white tracking-wider flex items-center gap-1">
+                              @{friend.spriteId || 'Unknown'}
+                            </span>
+                            {matchFound ? (
+                              <span className="text-[9px] font-black text-cyan-400 font-mono tracking-widest mt-0.5 animate-pulse uppercase flex items-center gap-1">
+                                <Target className="w-3 h-3" /> Extraction Match
+                              </span>
+                            ) : (
+                              <span className="text-[10px] font-black text-indigo-400 font-mono tracking-widest">
+                                {friend.completionRate}% COMPLETE
+                              </span>
+                            )}
+                          </div>
                         </div>
-                        <div className="flex flex-col">
-                          <span className="text-sm font-bold text-white tracking-wider flex items-center gap-1">
-                            @{friend.spriteId || 'Unknown'}
-                          </span>
-                          <span className="text-[10px] font-black text-indigo-400 font-mono tracking-widest">
-                            {friend.completionRate}% COMPLETE
-                          </span>
+
+                        <div className="flex items-center gap-2">
+                          <button onClick={() => inspectFriendLibrary(friend)} className={`text-[10px] font-bold uppercase tracking-wider px-3 py-1.5 rounded-lg border transition-colors ${matchFound ? 'bg-cyan-900/40 text-cyan-300 hover:bg-cyan-900/60 border-cyan-500/50' : 'bg-indigo-900/40 text-indigo-300 hover:bg-indigo-900/60 border-indigo-500/30'}`}>
+                            View
+                          </button>
+                          <button onClick={() => setShowUnfriendConfirm(friend)} className="text-slate-500 hover:text-red-400 p-1.5 rounded-lg hover:bg-red-950/30 transition-colors">
+                            <UserMinus className="w-4 h-4" />
+                          </button>
                         </div>
                       </div>
-
-                      <div className="flex items-center gap-2">
-                        <button onClick={() => inspectFriendLibrary(friend)} className="text-[10px] bg-indigo-900/40 text-indigo-300 font-bold uppercase tracking-wider px-3 py-1.5 rounded-lg hover:bg-indigo-900/60 border border-indigo-500/30 transition-colors">
-                          View
-                        </button>
-                        <button onClick={() => setShowUnfriendConfirm(friend)} className="text-slate-500 hover:text-red-400 p-1.5 rounded-lg hover:bg-red-950/30 transition-colors">
-                          <UserMinus className="w-4 h-4" />
-                        </button>
-                      </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               )}
             </section>
@@ -1375,7 +1655,6 @@ function MainApp() {
           </section>
         )}
 
-        {/* --- EPIC GAMES DISCLAIMER ADDED HERE --- */}
         <footer className="mt-6 pt-6 border-t border-slate-800 text-center pb-4">
           <p className="text-[9px] text-slate-500 leading-relaxed px-2">
             Portions of the materials used are trademarks and/or copyrighted works of Epic Games, Inc. All rights reserved by Epic. This material is not official and is not endorsed by Epic.
