@@ -8,7 +8,7 @@ import confetti from 'canvas-confetti';
 import { useAuth } from './AuthContext';
 // --- FIRESTORE & AUTH IMPORTS ---
 import { doc, getDoc, setDoc, updateDoc, collection as firestoreCollection, query, where, getDocs, arrayUnion, arrayRemove, deleteDoc, onSnapshot } from 'firebase/firestore';
-import { sendPasswordResetEmail } from 'firebase/auth';
+import { sendPasswordResetEmail, onAuthStateChanged } from 'firebase/auth';
 import { auth, db } from './firebase';
 
 // --- VERBATIM ASSET IMPORTS ---
@@ -233,7 +233,8 @@ const PATCH_NOTES = [
       "You can now set up to 3 specific sprites you are hunting for in-game.",
       "Mutual Match System: Squad namecards will now pulse with an electric blue aura when a 1-for-1 trade is possible with a friend.",
       "Inspecting a friend's library now displays their active Extraction Targets at the top of the screen.",
-      "Performance Update: Improved list rendering to prevent animation freezes on older devices."
+      "Performance Update: Improved list rendering to prevent animation freezes on older devices.",
+      "Bug Fix: Resolved a login splash screen flicker for authenticated users upon app launch."
     ]
   }
 ];
@@ -309,6 +310,7 @@ function MainApp() {
   const { user, signUp, logIn, logOut } = useAuth();
 
   // --- AUTH STATES ---
+  const [isInitializing, setIsInitializing] = useState(true);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [resetSent, setResetSent] = useState(false);
@@ -362,6 +364,14 @@ function MainApp() {
         img.src = src;
       });
     });
+  }, []);
+
+  // Firebase Auth Initialization Check
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, () => {
+      setIsInitializing(false);
+    });
+    return unsubscribe;
   }, []);
 
   // Fetch Cloud Data on Login (Real-time listeners)
@@ -795,6 +805,17 @@ function MainApp() {
     return variantName === 'base' ? rarityMatrix.base : rarityMatrix.variant;
   };
 
+  // --- INITIALIZATION SCREEN ---
+  if (isInitializing) {
+    return (
+      <div className="min-h-screen w-full flex items-center justify-center bg-slate-950 overflow-hidden relative font-sans px-4">
+        <div className="absolute top-1/4 left-1/4 w-72 h-72 bg-purple-600 rounded-full blur-[120px] opacity-20 pointer-events-none" />
+        <div className="absolute bottom-1/4 right-1/4 w-72 h-72 bg-blue-600 rounded-full blur-[120px] opacity-15 pointer-events-none" />
+        <img src="/app_icon.webp" className="w-24 h-24 drop-shadow-[0_0_15px_rgba(168,85,247,0.4)] object-contain animate-pulse duration-[2000ms] z-10" alt="Loading Spritedex..." />
+      </div>
+    );
+  }
+
   // --- LOGIN UI ---
   if (!user) {
     return (
@@ -1122,7 +1143,7 @@ function MainApp() {
                   <div className="p-4 flex gap-4">
 
                     <div className="flex flex-col gap-2 w-24 flex-shrink-0">
-                      <div className={`w-24 h-24 bg-gradient-to-b ${RARITY_BG_GRADIENTS[sprite.rarity]} rounded-xl p-0.5 border-2 relative overflow-hidden ${friendMastery[currentTab] ? 'border-yellow-400' : 'border-white/10'}`}>
+                      <div className={`w-24 h-24 bg-gradient-to-b ${RARITY_BG_GRADIENTS[sprite.rarity]} rounded-xl p-0.5 border-2 relative overflow-hidden z-0 ${friendMastery[currentTab] ? 'border-yellow-400' : 'border-white/10'}`}>
 
                         {friendMastery[currentTab] && (
                           <div className="absolute top-1 right-1 z-40 bg-black/60 rounded-full p-0.5 border border-yellow-500/50">
@@ -1201,7 +1222,7 @@ function MainApp() {
         </div>
       )}
 
-      <header className="sticky top-0 z-40 bg-[#0e1017]/95 backdrop-blur-md border-b-2 border-cyan-500/80 shadow-[0_4px_20px_rgba(0,240,255,0.15)] px-4 py-4">
+      <header className="sticky top-0 z-50 bg-[#0e1017]/95 backdrop-blur-md border-b-2 border-cyan-500/80 shadow-[0_4px_20px_rgba(0,240,255,0.15)] px-4 py-4">
         <div className="max-w-md mx-auto flex items-center justify-between">
           <div>
             <h1 className="text-xl font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-yellow-400 to-pink-500 uppercase italic">
@@ -1230,7 +1251,7 @@ function MainApp() {
           <div className="flex flex-col gap-5 animate-in fade-in duration-300">
 
             {currentView === 'sprites' && (
-              <section className="sticky top-[86px] z-30 bg-[#151824]/95 backdrop-blur-md rounded-2xl p-4 border-2 border-slate-800 shadow-xl">
+              <section className="sticky top-[86px] z-40 bg-[#151824]/95 backdrop-blur-md rounded-2xl p-4 border-2 border-slate-800 shadow-xl">
                 <div className="flex items-center justify-between mb-2.5">
                   <span className="text-xs font-black text-gray-200 tracking-wider font-mono">SPRITE PROGRESS</span>
                   <button onClick={() => { setShowResetConfirm(true); playBeep(330, 'sine', 0.08); }} className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-red-950/30 hover:bg-red-950/60 border border-red-900/40 text-[9px] font-mono font-black text-red-400 tracking-wider uppercase">
@@ -1325,7 +1346,7 @@ function MainApp() {
                     <div className="p-4 flex gap-4">
 
                       <div className="flex flex-col gap-2 w-24 flex-shrink-0">
-                        <div className={`w-24 h-24 bg-gradient-to-b ${spriteBgGradient} rounded-xl p-0.5 border-2 relative overflow-hidden transition-all duration-300 ${isCurrentTabMastered ? 'border-yellow-400 shadow-[0_0_20px_rgba(255,215,0,0.4)]' : 'border-white/10'}`}>
+                        <div className={`w-24 h-24 bg-gradient-to-b ${spriteBgGradient} rounded-xl p-0.5 border-2 relative overflow-hidden z-0 transition-all duration-300 ${isCurrentTabMastered ? 'border-yellow-400 shadow-[0_0_20px_rgba(255,215,0,0.4)]' : 'border-white/10'}`}>
 
                           {isCurrentTabMastered && (
                             <div className="absolute top-1 right-1 z-40 bg-black/60 rounded-full p-0.5 border border-yellow-500/50">
