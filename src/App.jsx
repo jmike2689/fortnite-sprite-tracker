@@ -21,6 +21,7 @@ import waterBase from './assets/Water_Sprite_-_Item_-_Fortnite.webp';
 import waterGold from './assets/Gold_Water_Sprite_-_Item_-_Fortnite.webp';
 import waterGummy from './assets/Gummy_Water_Sprite_-_Item_-_Fortnite.webp';
 import waterGalaxy from './assets/Galaxy_Water_Sprite_-_Item_-_Fortnite.webp';
+import waterHolofoil from './assets/Holofoil_Water_Sprite_-_Item_-_Fortnite.webp';
 
 import earthBase from './assets/Earth_Sprite_-_Item_-_Fortnite.webp';
 import earthGold from './assets/Gold_Earth_Sprite_-_Item_-_Fortnite.webp';
@@ -31,11 +32,13 @@ import fireBase from './assets/Fire_Sprite_-_Item_-_Fortnite.webp';
 import fireGold from './assets/Gold_Fire_Sprite_-_Item_-_Fortnite.webp';
 import fireGummy from './assets/Gummy_Fire_Sprite_-_Item_-_Fortnite.webp';
 import fireGalaxy from './assets/Galaxy_Fire_Sprite_-_Item_-_Fortnite.webp';
+import fireHolofoil from './assets/Holofoil_Fire_Sprite_-_Item_-_Fortnite.webp';
 
 import duckBase from './assets/Duck_Sprite_-_Item_-_Fortnite.webp';
 import duckGold from './assets/Gold_Duck_Sprite_-_Item_-_Fortnite.webp';
 import duckGummy from './assets/Gummy_Duck_Sprite_-_Item_-_Fortnite.webp';
 import duckGalaxy from './assets/Galaxy_Duck_Sprite_-_Item_-_Fortnite.webp';
+import duckHolofoil from './assets/Holofoil_Duck_Sprite_-_Item_-_Fortnite.webp';
 
 import dreamBase from './assets/Dream_Sprite_-_Item_-_Fortnite.webp';
 import dreamGold from './assets/Gold_Dream_Sprite_-_Item_-_Fortnite.webp';
@@ -58,11 +61,13 @@ import ghostBase from './assets/Ghost_Sprite_-_Item_-_Fortnite.webp';
 import ghostGold from './assets/Gold_Ghost_Sprite_-_Item_-_Fortnite.webp';
 import ghostGummy from './assets/Gummy_Ghost_Sprite_-_Item_-_Fortnite.webp';
 import ghostGalaxy from './assets/Galaxy_Ghost_Sprite_-_Item_-_Fortnite.webp';
+import ghostHolofoil from './assets/Holofoil_Ghost_Sprite_-_Item_-_Fortnite.webp';
 
 import kingBase from './assets/King_Sprite_-_Item_-_Fortnite.webp';
 import kingGold from './assets/Gold_King_Sprite_-_Item_-_Fortnite.webp';
 import kingGummy from './assets/Gummy_King_Sprite_-_Item_-_Fortnite.webp';
 import kingGalaxy from './assets/Galaxy_King_Sprite_-_Item_-_Fortnite.webp';
+import kingHolofoil from './assets/Holofoil_King_Sprite_-_Item_-_Fortnite.webp';
 
 import auraBase from './assets/Aura_Sprite_-_Item_-_Fortnite.webp';
 import auraGold from './assets/Gold_Aura_Sprite_-_Item_-_Fortnite.webp';
@@ -88,136 +93,137 @@ import strikerBase from './assets/Striker_Sprite_-_Item_-_Fortnite.webp';
 import strikerGold from './assets/Gold_Striker_Sprite_-_Item_-_Fortnite.webp';
 import strikerGummy from './assets/Gummy_Striker_Sprite_-_Item_-_Fortnite.webp';
 import strikerGalaxy from './assets/Galaxy_Striker_Sprite_-_Item_-_Fortnite.webp';
+import strikerHolofoil from './assets/Holofoil_Striker_Sprite_-_Item_-_Fortnite.webp';
 
-const variantsList = ['base', 'gold', 'gummy', 'galaxy'];
+const variantsList = ['base', 'gold', 'gummy', 'galaxy', 'holofoil'];
 
 const SPRITES_DATABASE = [
   {
     id: "zero-point",
     name: "Zero Point",
     rarity: "Mythic",
-    images: { base: zpBase, gold: zpGold, gummy: zpGummy, galaxy: zpGalaxy },
-    rates: { base: "0.000098%", gold: "0.00012%", gummy: "0.00006%", galaxy: "0.00004%" },
+    images: { base: zpBase, gold: zpGold, gummy: zpGummy, galaxy: zpGalaxy, holofoil: zpBase },
+    rates: { base: "0.000098%", gold: "0.00012%", gummy: "0.00006%", galaxy: "0.00004%", holofoil: "TBD" },
     baseAbility: "Spawn a Shield Bubble Jr. when you use a healing item on yourself (excluding splashes and grenades). Duration at each Level Up: 6s -> 7s -> 8s -> 9s -> 10s."
   },
   {
     id: "burnt-peanut",
     name: "Burnt Peanut",
     rarity: "Mythic",
-    images: { base: peanutBase, gold: peanutBase, gummy: peanutBase, galaxy: peanutBase },
-    rates: { base: "1.01%", gold: "N/A", gummy: "N/A", galaxy: "N/A" },
+    images: { base: peanutBase, gold: peanutBase, gummy: peanutBase, galaxy: peanutBase, holofoil: peanutBase },
+    rates: { base: "1.01%", gold: "N/A", gummy: "N/A", galaxy: "N/A", holofoil: "N/A" },
     baseAbility: "Goop! When eliminating players, you may find more loot. Sometimes mythic! Chance at each Level Up: 20% -> 30% -> 40% -> 50% -> 60% chance (10% chance to find Mythic at Max Level!)."
   },
   {
     id: "dream",
     name: "Dream",
     rarity: "Legendary",
-    images: { base: dreamBase, gold: dreamGold, gummy: dreamGummy, galaxy: dreamGalaxy },
-    rates: { base: "2.63%", gold: "0.03%", gummy: "0.02%", galaxy: "0.01%" },
+    images: { base: dreamBase, gold: dreamGold, gummy: dreamGummy, galaxy: dreamGalaxy, holofoil: dreamBase },
+    rates: { base: "2.63%", gold: "0.03%", gummy: "0.02%", galaxy: "0.01%", holofoil: "TBD" },
     baseAbility: "Grants a random item at each level, exploding with legendary loot at Max Level. Loot value increases at each Level Up!"
   },
   {
     id: "punk",
     name: "Punk",
     rarity: "Legendary",
-    images: { base: punkBase, gold: punkGold, gummy: punkGummy, galaxy: punkGalaxy },
-    rates: { base: "1.98%", gold: "0.02%", gummy: "0.01%", galaxy: "0.01%" },
+    images: { base: punkBase, gold: punkGold, gummy: punkGummy, galaxy: punkGalaxy, holofoil: punkBase },
+    rates: { base: "1.98%", gold: "0.02%", gummy: "0.01%", galaxy: "0.01%", holofoil: "TBD" },
     baseAbility: "Does nothing until Level 5, in which it will always grant a buff for unlimited ammo."
   },
   {
     id: "boss",
     name: "Boss",
     rarity: "Legendary",
-    images: { base: bossBase, gold: bossGold, gummy: bossGummy, galaxy: bossGalaxy },
-    rates: { base: "2.63%", gold: "0.03%", gummy: "0.02%", galaxy: "0.01%" },
+    images: { base: bossBase, gold: bossGold, gummy: bossGummy, galaxy: bossGalaxy, holofoil: bossBase },
+    rates: { base: "2.63%", gold: "0.03%", gummy: "0.02%", galaxy: "0.01%", holofoil: "TBD" },
     baseAbility: "Grants an increase to your max HP and Shield. Increases at each Level Up: 5 -> 10 -> 15 -> 20 -> 25 HP/Shield."
   },
   {
     id: "grim",
     name: "Grim",
     rarity: "Legendary",
-    images: { base: grimBase, gold: grimGold, gummy: grimGummy, galaxy: grimGalaxy },
-    rates: { base: "0.0098%", gold: "0.00012%", gummy: "0.00006%", galaxy: "0.00004%" },
+    images: { base: grimBase, gold: grimGold, gummy: grimGummy, galaxy: grimGalaxy, holofoil: grimBase },
+    rates: { base: "0.0098%", gold: "0.00012%", gummy: "0.00006%", galaxy: "0.00004%", holofoil: "TBD" },
     baseAbility: "Players who attack you are marked for a duration. Duration at each Level Up: 3s -> 3.5s -> 4s -> 4.5s -> 5s."
   },
   {
     id: "duck",
     name: "Duck",
     rarity: "Epic",
-    images: { base: duckBase, gold: duckGold, gummy: duckGummy, galaxy: duckGalaxy },
-    rates: { base: "5.74%", gold: "0.07%", gummy: "0.04%", galaxy: "0.02%" },
+    images: { base: duckBase, gold: duckGold, gummy: duckGummy, galaxy: duckGalaxy, holofoil: duckHolofoil },
+    rates: { base: "5.74%", gold: "0.07%", gummy: "0.04%", galaxy: "0.02%", holofoil: "TBD" },
     baseAbility: "Emoting or Jamming replenishes shields. Increases in power at each Level Up: 2 -> 3 -> 4 -> 6 -> 8 Shield per tick."
   },
   {
     id: "demon",
     name: "Demon",
     rarity: "Epic",
-    images: { base: demonBase, gold: demonGold, gummy: demonGummy, galaxy: demonGalaxy },
-    rates: { base: "5.76%", gold: "0.07%", gummy: "0.04%", galaxy: "0.01%" },
+    images: { base: demonBase, gold: demonGold, gummy: demonGummy, galaxy: demonGalaxy, holofoil: demonBase },
+    rates: { base: "5.76%", gold: "0.07%", gummy: "0.04%", galaxy: "0.01%", holofoil: "TBD" },
     baseAbility: "Siphon some health and shields when you eliminate an opponent. Increases in power at each Level Up: 10 -> 15 -> 20 -> 25 -> 30 Healing per elimination."
   },
   {
     id: "ghost",
     name: "Ghost",
     rarity: "Epic",
-    images: { base: ghostBase, gold: ghostGold, gummy: ghostGummy, galaxy: ghostGalaxy },
-    rates: { base: "5.74%", gold: "0.07%", gummy: "0.04%", galaxy: "0.02%" },
+    images: { base: ghostBase, gold: ghostGold, gummy: ghostGummy, galaxy: ghostGalaxy, holofoil: ghostHolofoil },
+    rates: { base: "5.74%", gold: "0.07%", gummy: "0.04%", galaxy: "0.02%", holofoil: "TBD" },
     baseAbility: "Grants cloak for a duration upon reloading. Increases in duration at each Level Up: 3s -> 3.5s -> 4s -> 4.5s -> 5s."
   },
   {
     id: "king",
     name: "King",
     rarity: "Epic",
-    images: { base: kingBase, gold: kingGold, gummy: kingGummy, galaxy: kingGalaxy },
-    rates: { base: "5.74%", gold: "0.07%", gummy: "0.04%", galaxy: "0.02%" },
+    images: { base: kingBase, gold: kingGold, gummy: kingGummy, galaxy: kingGalaxy, holofoil: kingHolofoil },
+    rates: { base: "5.74%", gold: "0.07%", gummy: "0.04%", galaxy: "0.02%", holofoil: "TBD" },
     baseAbility: "Your Pickaxe deals more damage. Increases in damage at each Level Up: 30 -> 40 -> 60 -> 80 -> 120 bonus damage."
   },
   {
     id: "aura",
     name: "Aura",
     rarity: "Epic",
-    images: { base: auraBase, gold: auraGold, gummy: auraGummy, galaxy: auraGalaxy },
-    rates: { base: "5.74%", gold: "0.07%", gummy: "0.04%", galaxy: "0.02%" },
+    images: { base: auraBase, gold: auraGold, gummy: auraGummy, galaxy: auraGalaxy, holofoil: auraBase },
+    rates: { base: "5.74%", gold: "0.07%", gummy: "0.04%", galaxy: "0.02%", holofoil: "TBD" },
     baseAbility: "Gain a Shock Rock charge when you deal enough damage to enemies! Required damage decreases at each Level Up: 175 -> 150 -> 125 -> 100 -> 75 Damage to trigger."
   },
   {
     id: "striker",
     name: "Striker",
     rarity: "Epic",
-    images: { base: strikerBase, gold: strikerGold, gummy: strikerGummy, galaxy: strikerGalaxy },
-    rates: { base: "5.74%", gold: "0.07%", gummy: "0.04%", galaxy: "0.02%" },
+    images: { base: strikerBase, gold: strikerGold, gummy: strikerGummy, galaxy: strikerGalaxy, holofoil: strikerHolofoil },
+    rates: { base: "5.74%", gold: "0.07%", gummy: "0.04%", galaxy: "0.02%", holofoil: "TBD" },
     baseAbility: "Gain the Overdrive effect when you Mantle, Hurdle, or Wall Scramble. Duration increases at each Level Up: 6s -> 7s -> 8s -> 9s -> 10s of Overdrive."
   },
   {
     id: "water",
     name: "Water",
     rarity: "Rare",
-    images: { base: waterBase, gold: waterGold, gummy: waterGummy, galaxy: waterGalaxy },
-    rates: { base: "12.83%", gold: "0.70%", gummy: "0.28%", galaxy: "0.28%" },
+    images: { base: waterBase, gold: waterGold, gummy: waterGummy, galaxy: waterGalaxy, holofoil: waterHolofoil },
+    rates: { base: "12.83%", gold: "0.70%", gummy: "0.28%", galaxy: "0.28%", holofoil: "TBD" },
     baseAbility: "Replenish shields while standing in water! Increases in power at each Level Up: 2 -> 3 -> 4 -> 5 -> 6 Shield per tick."
   },
   {
     id: "earth",
     name: "Earth",
     rarity: "Rare",
-    images: { base: earthBase, gold: earthGold, gummy: earthGummy, galaxy: earthGalaxy },
-    rates: { base: "12.83%", gold: "0.70%", gummy: "0.28%", galaxy: "0.28%" },
+    images: { base: earthBase, gold: earthGold, gummy: earthGummy, galaxy: earthGalaxy, holofoil: earthBase },
+    rates: { base: "12.83%", gold: "0.70%", gummy: "0.28%", galaxy: "0.28%", holofoil: "TBD" },
     baseAbility: "You have a chance to find additional rare items when opening chests. Chance increases at each Level Up: 10% -> 12.5% -> 15% -> 17.5% -> 20% chance."
   },
   {
     id: "fire",
     name: "Fire",
     rarity: "Rare",
-    images: { base: fireBase, gold: fireGold, gummy: fireGummy, galaxy: fireGalaxy },
-    rates: { base: "12.45%", gold: "0.68%", gummy: "0.68%", galaxy: "0.27%" },
+    images: { base: fireBase, gold: fireGold, gummy: fireGummy, galaxy: fireGalaxy, holofoil: fireHolofoil },
+    rates: { base: "12.45%", gold: "0.68%", gummy: "0.68%", galaxy: "0.27%", holofoil: "TBD" },
     baseAbility: "Creates a fiery burst when you deal enough damage to an enemy! Required damage decreases at each Level Up: 150 -> 125 -> 100 -> 75 -> 50 Damage to trigger."
   },
   {
     id: "fishy",
     name: "Fishy",
     rarity: "Rare",
-    images: { base: fishyBase, gold: fishyGold, gummy: fishyGummy, galaxy: fishyGalaxy },
-    rates: { base: "13.79%", gold: "0.17%", gummy: "0.08%", galaxy: "0.06%" },
+    images: { base: fishyBase, gold: fishyGold, gummy: fishyGummy, galaxy: fishyGalaxy, holofoil: fishyBase },
+    rates: { base: "13.79%", gold: "0.17%", gummy: "0.08%", galaxy: "0.06%", holofoil: "TBD" },
     baseAbility: "Swim speed greatly increased. Taking damage also briefly increases movement speed. Tiers: 25%/10% -> 50%/20% -> 100%/30% -> 150%/40% -> 200%/50% bonuses."
   }
 ];
@@ -225,16 +231,25 @@ const SPRITES_DATABASE = [
 // --- APP PATCH NOTES ---
 const PATCH_NOTES = [
   {
-    version: "v1.1.0",
-    date: "07/06/2026",
-    title: "Extraction Targets Deployed",
+    version: "v1.2.0",
+    date: "07/08/2026",
+    title: "The Holofoil Integration",
     changes: [
-      "Added 'Extraction Targets' panel to the Sprite Squad tab.",
-      "You can now set up to 3 specific sprites you are hunting for in-game.",
-      "Mutual Match System: Squad namecards will now pulse with an electric blue aura when a 1-for-1 trade is possible with a friend.",
-      "Inspecting a friend's library now displays their active Extraction Targets at the top of the screen.",
-      "Performance Update: Improved list rendering to prevent animation freezes on older devices.",
-      "Bug Fix: Resolved a login splash screen flicker for authenticated users upon app launch."
+      "NEW VARIANT: Added the elusive 'Holofoil' variant for all active sprites. Note: Some Holofoil variant images aren't available yet, but they can still be marked if found! Missing images will be added soon.",
+      "Holofoil Global Bonus: Grants a 5% increased chance of finding rare Sprites for yourself and your entire squad.",
+      "UI Refactor: 'Extraction Targets' has been compressed to a sleek pinned banner above the Sprite Squad list.",
+      "Target Filter: The Target Selector screen now intelligently hides sprites you already own.",
+      "Target Tracking: Inspecting a friend's library now highlights exact Extraction Matches with a glowing blue aura.",
+      "Mastery Bar: Added a new dedicated progress bar for the Mastery Vault."
+    ]
+  },
+  {
+    version: "v1.1.1",
+    date: "07/06/2026",
+    title: "Layering Hotfix",
+    changes: [
+      "Graphical Fix: Trapped the chevron arrows and mastery crowns within their proper containers to prevent overlay issues during scrolling.",
+      "Performance Fix: Eliminated the brief login screen flash for users who are already securely authenticated."
     ]
   }
 ];
@@ -246,7 +261,6 @@ const totalPossibleStatic = SPRITES_DATABASE.reduce((acc, sprite) => {
 
 const UNOFFICIAL_LEAKS_DATABASE = [
   { file: "ESD_ZeroPointSprite_Variant_Gem", sprite: "Zero Point", variant: "Gem", type: "Style Variant" },
-  { file: "ESD_ZeroPointSprite_Variant_Holofoil", sprite: "Zero Point", variant: "Holofoil", type: "Style Variant" },
   { file: "ESD_ZeroPointSprite_Variant_Cube", sprite: "Zero Point", variant: "Cube", type: "Style Variant" },
   { file: "ESD_ZeroPointSprite_Variant_Quack", sprite: "Zero Point", variant: "Quack", type: "Style Variant" },
   { file: "ESD_PunkSprite_Variant_Gem", sprite: "Punk", variant: "Gem", type: "Style Variant" },
@@ -254,17 +268,11 @@ const UNOFFICIAL_LEAKS_DATABASE = [
   { file: "ESD_SleepySprite_Variant_Gem", sprite: "Dream", variant: "Gem", type: "NEW SPRITE TYPE" },
   { file: "ESD_SleepySprite_Variant_Cube", sprite: "Dream", variant: "Cube", type: "NEW SPRITE TYPE" },
   { file: "ESD_DuckSprite_Variant_Gem", sprite: "Duck", variant: "Gem", type: "Style Variant" },
-  { file: "ESD_DuckSprite_Variant_Holofoil", sprite: "Duck", variant: "Holofoil", type: "Style Variant" },
   { file: "ESD_DemonSprite_Variant_Gem", sprite: "Demon", variant: "Gem", type: "Style Variant" },
   { file: "ESD_GhostSprite_Variant_Gem", sprite: "Ghost", variant: "Gem", type: "Style Variant" },
-  { file: "ESD_GhostSprite_Variant_Holofoil", sprite: "Ghost", variant: "Holofoil", type: "Style Variant" },
-  { file: "ESD_KingSprite_Variant_Holofoil", sprite: "King", variant: "Holofoil", type: "Style Variant" },
   { file: "ESD_Water_Variant_Gem", sprite: "Water", variant: "Gem", type: "Style Variant" },
-  { file: "ESD_Water_Variant_Holofoil", sprite: "Water", variant: "Holofoil", type: "Style Variant" },
   { file: "ESD_EarthSprite_Variant_Gem", sprite: "Earth", variant: "Gem", type: "Style Variant" },
-  { file: "ESD_EarthSprite_Variant_Holofoil", sprite: "Earth", variant: "Holofoil", type: "Style Variant" },
-  { file: "ESD_Spitfire_Variant_Gem", sprite: "Fire", variant: "Gem", type: "NEW SPRITE TYPE" },
-  { file: "ESD_Spitfire_Variant_Holofoil", sprite: "Fire", variant: "Holofoil", type: "NEW SPRITE TYPE" }
+  { file: "ESD_Spitfire_Variant_Gem", sprite: "Fire", variant: "Gem", type: "NEW SPRITE TYPE" }
 ];
 
 const PROFANITY_LIST = [
@@ -275,12 +283,12 @@ const VARIANT_INFO = {
   base: { name: "Base", color: "text-blue-400" },
   gold: { name: "Gold", color: "text-amber-400" },
   gummy: { name: "Gummy", color: "text-pink-500" },
-  galaxy: { name: "Galaxy", color: "text-purple-400" }
+  galaxy: { name: "Galaxy", color: "text-purple-400" },
+  holofoil: { name: "Holofoil", color: "text-sky-400" }
 };
 
 const LEAK_VARIANT_COLORS = {
   Gem: "border-emerald-500/40 text-emerald-400 bg-emerald-950/20",
-  Holofoil: "border-fuchsia-500/40 text-fuchsia-400 bg-fuchsia-950/20",
   Cube: "border-purple-500/40 text-purple-400 bg-purple-950/20",
   Quack: "border-yellow-500/40 text-yellow-400 bg-yellow-950/20"
 };
@@ -352,7 +360,7 @@ function MainApp() {
   const [richFriends, setRichFriends] = useState([]);
   const [activeViewingFriend, setActiveViewingFriend] = useState(null);
 
-  // --- EXTRACTION TARGET MODAL STATES ---
+  // --- EXTRACTION TARGET SELECTION SCREEN STATES ---
   const [showTargetSelector, setShowTargetSelector] = useState(false);
   const [targetSlotIndex, setTargetSlotIndex] = useState(null);
 
@@ -523,7 +531,8 @@ function MainApp() {
     const newVal = !currentVal;
 
     if (newVal) {
-      if (variant === 'galaxy') playBeep(880, 'triangle', 0.15);
+      if (variant === 'holofoil') playBeep(1200, 'square', 0.15);
+      else if (variant === 'galaxy') playBeep(880, 'triangle', 0.15);
       else if (variant === 'gold') playBeep(659, 'sine', 0.1);
       else if (variant === 'gummy') playBeep(587, 'sine', 0.1);
       else playBeep(440, 'sine', 0.08);
@@ -533,7 +542,7 @@ function MainApp() {
     }
 
     setCollection(prev => {
-      const currentSprite = prev[spriteId] || { base: false, gold: false, gummy: false, galaxy: false };
+      const currentSprite = prev[spriteId] || {};
       const updated = { ...prev, [spriteId]: { ...currentSprite, [variant]: newVal } };
 
       const targetSprite = SPRITES_DATABASE.find(s => s.id === spriteId);
@@ -545,7 +554,7 @@ function MainApp() {
           particleCount: 80,
           spread: 80,
           origin: { y: 0.6 },
-          colors: ['#00f0ff', '#ffe600', '#ff007f', '#8a2be2']
+          colors: ['#00f0ff', '#ffe600', '#ff007f', '#8a2be2', '#38bdf8']
         });
       }
 
@@ -560,7 +569,7 @@ function MainApp() {
 
   const toggleMastery = (spriteId, variant, forceValue = null) => {
     setMastery(prev => {
-      const currentSpriteMastery = prev[spriteId] || { base: false, gold: false, gummy: false, galaxy: false };
+      const currentSpriteMastery = prev[spriteId] || {};
       const isCurrentlyMastered = currentSpriteMastery[variant];
       const newVal = forceValue !== null ? forceValue : !isCurrentlyMastered;
 
@@ -744,20 +753,20 @@ function MainApp() {
   const renderTargetSlot = (targetKey, index) => {
     if (!targetKey) {
       return (
-        <button key={index} onClick={() => { setTargetSlotIndex(index); setShowTargetSelector(true); }} className="flex-1 aspect-square border-2 border-dashed border-slate-700 rounded-xl flex items-center justify-center bg-black/40 hover:bg-black/60 transition-colors">
-          <Plus className="w-6 h-6 text-slate-600" />
+        <button key={index} onClick={() => { setTargetSlotIndex(index); setShowTargetSelector(true); }} className="flex-1 h-12 border-2 border-dashed border-slate-700 rounded-xl flex items-center justify-center bg-black/40 hover:bg-black/60 transition-colors">
+          <Plus className="w-5 h-5 text-slate-600" />
         </button>
       );
     }
     const [sId, v] = targetKey.split('_');
     const sprite = SPRITES_DATABASE.find(s => s.id === sId);
     return (
-      <div key={index} className="flex-1 aspect-square border-2 border-cyan-500/50 rounded-xl bg-cyan-950/30 relative flex flex-col items-center justify-center overflow-hidden">
-        <button onClick={(e) => handleRemoveTarget(index, e)} className="absolute top-1 right-1 bg-black/60 rounded-full p-0.5 text-slate-400 hover:text-white z-20">
-          <X className="w-3 h-3" />
+      <div key={index} className="flex-1 h-12 border-2 border-cyan-500/50 rounded-xl bg-cyan-950/30 relative flex flex-col items-center justify-center overflow-hidden">
+        <button onClick={(e) => handleRemoveTarget(index, e)} className="absolute top-0.5 right-0.5 bg-black/80 rounded-full p-0.5 text-slate-400 hover:text-white z-20">
+          <X className="w-2.5 h-2.5" />
         </button>
-        <img src={sprite?.images[v]} className="w-10 h-10 object-contain z-10" alt="" />
-        <span className={`text-[8px] font-black uppercase mt-1 z-10 ${VARIANT_INFO[v]?.color}`}>{v}</span>
+        <img src={sprite?.images[v]} className="w-6 h-6 object-contain z-10" alt="" />
+        <span className={`text-[7px] sm:text-[8px] font-black uppercase mt-0.5 z-10 ${VARIANT_INFO[v]?.color}`}>{v}</span>
       </div>
     );
   };
@@ -776,7 +785,15 @@ function MainApp() {
     return acc + validChecked;
   }, 0);
 
+  const totalMastered = SPRITES_DATABASE.reduce((acc, sprite) => {
+    const status = mastery[sprite.id] || {};
+    const validMastered = variantsList.filter(v => sprite.rates[v] !== "N/A" && status[v]).length;
+    return acc + validMastered;
+  }, 0);
+
   const completionRate = totalPossibleStatic > 0 ? Math.round((totalCollected / totalPossibleStatic) * 100) : 0;
+  const masteryRate = totalPossibleStatic > 0 ? Math.round((totalMastered / totalPossibleStatic) * 100) : 0;
+
   const isMasteryView = currentView === 'mastery';
 
   const filteredSprites = SPRITES_DATABASE.filter(sprite => {
@@ -796,10 +813,12 @@ function MainApp() {
     if (variantName === 'gold') return "Gain 3x bonus XP from eliminations";
     if (variantName === 'gummy') return "Gain 20% more Sprite Dust upon Extraction";
     if (variantName === 'galaxy') return "Gain 30% more Ammunition when looting";
+    if (variantName === 'holofoil') return "Gain 5% increased chance of finding rare Sprites for yourself and entire squad";
     return null;
   };
 
   const getDynamicSummonCost = (rarity, variantName) => {
+    if (variantName === 'holofoil') return "TBD";
     const rarityMatrix = SUMMON_COST_MATRIX[rarity];
     if (!rarityMatrix) return "0";
     return variantName === 'base' ? rarityMatrix.base : rarityMatrix.variant;
@@ -811,7 +830,7 @@ function MainApp() {
       <div className="min-h-screen w-full flex items-center justify-center bg-slate-950 overflow-hidden relative font-sans px-4">
         <div className="absolute top-1/4 left-1/4 w-72 h-72 bg-purple-600 rounded-full blur-[120px] opacity-20 pointer-events-none" />
         <div className="absolute bottom-1/4 right-1/4 w-72 h-72 bg-blue-600 rounded-full blur-[120px] opacity-15 pointer-events-none" />
-        <img src="/app_icon.webp" className="w-24 h-24 drop-shadow-[0_0_15px_rgba(168,85,247,0.4)] object-contain animate-pulse duration-[2000ms] z-10" alt="Loading Spritedex..." />
+        <img src={waterHolofoil} className="w-24 h-24 drop-shadow-[0_0_15px_rgba(168,85,247,0.4)] object-contain animate-pulse duration-[2000ms] z-10" alt="Loading Spritedex..." />
       </div>
     );
   }
@@ -825,12 +844,12 @@ function MainApp() {
 
         <div className="bg-white/[0.03] backdrop-blur-xl p-8 rounded-2xl border border-white/10 w-full max-w-md shadow-2xl z-10 transition-all duration-300 hover:border-white/15">
           <div className="flex flex-col items-center text-center mb-8">
-            <img src="/app_icon.webp" className="w-24 h-24 drop-shadow-[0_0_15px_rgba(168,85,247,0.4)] object-contain mb-4 animate-pulse duration-[4000ms]" alt="Spritedex Logo" />
+            <img src={waterHolofoil} className="w-24 h-24 drop-shadow-[0_0_15px_rgba(168,85,247,0.4)] object-contain mb-4 animate-pulse duration-[4000ms]" alt="Spritedex Logo" />
             <h1 className="text-white text-3xl font-extrabold tracking-tight mb-2 bg-gradient-to-r from-white via-slate-200 to-slate-400 bg-clip-text text-transparent">
               Spritedex
             </h1>
             <p className="text-purple-400 text-sm font-semibold uppercase tracking-wider mb-1">Master your collection</p>
-            <p className="text-slate-400 text-xs max-w-xs px-2">Track every sprite, sync across your devices, and monitor your personal collection in real-time.</p>
+            <p className="text-slate-400 text-sm sm:text-base max-w-xs px-2">Track every sprite, sync across your devices, and monitor your personal collection in real-time.</p>
           </div>
 
           <form onSubmit={(e) => { e.preventDefault(); isLoginMode ? logIn(email, password).catch(err => alert(err.message)) : signUp(email, password).catch(err => alert(err.message)); }} className="space-y-5">
@@ -861,7 +880,7 @@ function MainApp() {
                 {resetSent ? "Reset link sent!" : "Forgot Password?"}
               </button>
             )}
-            <p className="text-[9px] text-slate-500 mt-2 leading-relaxed max-w-xs mx-auto">
+            <p className="text-[10px] sm:text-xs text-slate-500 mt-2 leading-relaxed max-w-xs mx-auto">
               Portions of the materials used are trademarks and/or copyrighted works of Epic Games, Inc. All rights reserved by Epic. This material is not official and is not endorsed by Epic.
             </p>
           </div>
@@ -878,8 +897,8 @@ function MainApp() {
           <div className="w-16 h-16 bg-cyan-950/50 rounded-full flex items-center justify-center mx-auto mb-4 border border-cyan-500/30">
             <Users className="w-8 h-8 text-cyan-400" />
           </div>
-          <h2 className="text-2xl font-black text-white uppercase italic mb-2">Claim Your Sprite ID</h2>
-          <p className="text-sm text-slate-400 mb-6">
+          <h2 className="text-2xl sm:text-3xl font-black text-white uppercase italic mb-2">Claim Your Sprite ID</h2>
+          <p className="text-sm sm:text-base text-slate-400 mb-6">
             We're launching new social features! Set your unique public Sprite ID so your friends can find you.
           </p>
           <form onSubmit={handleSaveSpriteId} className="space-y-4">
@@ -905,7 +924,7 @@ function MainApp() {
   return (
     <div className="min-h-screen bg-[#0b0c10] text-gray-100 flex flex-col font-sans select-none relative">
 
-      {/* --- MODAL: TRANSMISSION SPLASH SCREEN --- */}
+      {/* --- MENU: TRANSMISSION SPLASH SCREEN --- */}
       {showTransmission && (
         <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/90 backdrop-blur-md animate-in fade-in duration-300">
           <div className="bg-[#12141f] border-2 border-cyan-500 shadow-[0_0_40px_rgba(34,211,238,0.2)] rounded-2xl max-w-sm w-full relative overflow-hidden flex flex-col">
@@ -914,14 +933,14 @@ function MainApp() {
               <div className="w-12 h-12 bg-cyan-950/50 rounded-full border border-cyan-500/40 flex items-center justify-center mb-3">
                 <Radio className="w-6 h-6 text-cyan-400 animate-pulse" />
               </div>
-              <h2 className="text-xl font-black text-cyan-400 uppercase italic tracking-wider">Incoming Transmission</h2>
-              <span className="text-[10px] font-mono text-cyan-600 uppercase tracking-widest mt-1">Update {PATCH_NOTES[0].version} Deployed</span>
+              <h2 className="text-xl sm:text-2xl font-black text-cyan-400 uppercase italic tracking-wider">Incoming Transmission</h2>
+              <span className="text-[10px] sm:text-xs font-mono text-cyan-600 uppercase tracking-widest mt-1">Update {PATCH_NOTES[0].version} Deployed</span>
             </header>
             <div className="p-5 flex flex-col gap-4">
-              <h3 className="text-md font-bold text-white text-center">{PATCH_NOTES[0].title}</h3>
+              <h3 className="text-md sm:text-lg font-bold text-white text-center">{PATCH_NOTES[0].title}</h3>
               <ul className="space-y-3">
                 {PATCH_NOTES[0].changes.map((change, idx) => (
-                  <li key={idx} className="flex items-start gap-2 text-xs text-slate-300 leading-relaxed">
+                  <li key={idx} className="flex items-start gap-2 text-sm text-slate-300 leading-relaxed">
                     <CheckCircle className="w-4 h-4 text-cyan-500 shrink-0 mt-0.5" />
                     {change}
                   </li>
@@ -935,12 +954,12 @@ function MainApp() {
         </div>
       )}
 
-      {/* --- MODAL: PATCH NOTES & ABOUT HUB --- */}
+      {/* --- MENU: PATCH NOTES & ABOUT HUB --- */}
       {showPatchNotes && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90 backdrop-blur-md animate-in fade-in duration-200">
           <div className="bg-[#12141f] border-2 border-slate-700 rounded-2xl flex flex-col max-w-sm w-full h-[80vh] relative overflow-hidden">
             <header className="p-4 border-b border-slate-800 flex justify-between items-center bg-[#0e1017]">
-              <h3 className="text-md font-black tracking-tight text-white uppercase italic flex items-center gap-2">
+              <h3 className="text-md sm:text-lg font-black tracking-tight text-white uppercase italic flex items-center gap-2">
                 <FileText className="w-5 h-5 text-purple-400" /> Patch Notes
               </h3>
               <button onClick={() => setShowPatchNotes(false)} className="text-slate-400 hover:text-white">
@@ -953,27 +972,27 @@ function MainApp() {
               <section className="bg-gradient-to-br from-purple-900/30 to-indigo-900/20 border border-purple-500/30 rounded-xl p-4">
                 <div className="flex items-center gap-2 mb-2">
                   <Info className="w-5 h-5 text-purple-400" />
-                  <h4 className="font-black text-purple-400 uppercase italic">About the App</h4>
+                  <h4 className="font-black text-purple-400 uppercase italic text-sm sm:text-base">About the App</h4>
                 </div>
-                <p className="text-xs text-slate-300 leading-relaxed">
+                <p className="text-sm sm:text-base text-slate-300 leading-relaxed">
                   Spritedex is your ultimate companion for tracking Battle Royale Sprites. Sync your collection across devices, coordinate in-game trades with your Sprite Squad using Extraction Targets, and keep track of your Mastery crowns all in one secure, real-time interface.
                 </p>
               </section>
 
               {/* --- UPDATE TIMELINE --- */}
               <section className="flex flex-col gap-4">
-                <h4 className="text-xs font-black text-slate-500 uppercase tracking-widest border-b border-slate-800 pb-2">Transmission History</h4>
+                <h4 className="text-sm font-black text-slate-500 uppercase tracking-widest border-b border-slate-800 pb-2">Transmission History</h4>
                 {PATCH_NOTES.map((note, index) => (
                   <div key={index} className="bg-black/40 border border-slate-800 rounded-xl p-4">
                     <div className="flex justify-between items-center mb-2">
-                      <span className="text-sm font-black text-white">{note.version}</span>
-                      <span className="text-[10px] font-mono text-slate-500">{note.date}</span>
+                      <span className="text-base sm:text-lg font-black text-white">{note.version}</span>
+                      <span className="text-[10px] sm:text-xs font-mono text-slate-500">{note.date}</span>
                     </div>
-                    <span className="text-xs font-bold text-cyan-400 block mb-3">{note.title}</span>
+                    <span className="text-sm font-bold text-cyan-400 block mb-3">{note.title}</span>
                     <ul className="space-y-2">
                       {note.changes.map((change, cIdx) => (
-                        <li key={cIdx} className="text-[10px] text-slate-400 leading-relaxed flex items-start gap-1.5">
-                          <span className="w-1 h-1 rounded-full bg-slate-600 mt-1.5 shrink-0"></span>
+                        <li key={cIdx} className="text-xs sm:text-sm text-slate-400 leading-relaxed flex items-start gap-1.5">
+                          <span className="w-1.5 h-1.5 rounded-full bg-slate-600 mt-1.5 shrink-0"></span>
                           {change}
                         </li>
                       ))}
@@ -987,12 +1006,12 @@ function MainApp() {
         </div>
       )}
 
-      {/* --- MODAL: TARGET SELECTOR --- */}
+      {/* --- SELECTION SCREEN: TARGET SELECTOR --- */}
       {showTargetSelector && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90 backdrop-blur-md animate-in fade-in duration-200">
           <div className="bg-[#12141f] border-2 border-cyan-500/60 rounded-2xl flex flex-col max-w-sm w-full h-[75vh] relative overflow-hidden">
             <header className="p-4 border-b border-slate-800 flex justify-between items-center bg-[#0e1017]">
-              <h3 className="text-md font-black tracking-tight text-cyan-400 uppercase italic flex items-center gap-2">
+              <h3 className="text-md sm:text-lg font-black tracking-tight text-cyan-400 uppercase italic flex items-center gap-2">
                 <Target className="w-5 h-5" /> Select Target
               </h3>
               <button onClick={() => setShowTargetSelector(false)} className="text-slate-400 hover:text-white">
@@ -1001,11 +1020,13 @@ function MainApp() {
             </header>
             <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-4">
               {SPRITES_DATABASE.map(sprite => {
-                const validVariants = variantsList.filter(v => sprite.rates[v] !== "N/A");
+                const validVariants = variantsList.filter(v => sprite.rates[v] !== "N/A" && !collection[sprite.id]?.[v]);
+                if (validVariants.length === 0) return null;
+
                 return (
                   <div key={sprite.id} className="bg-slate-900 border border-slate-800 rounded-xl p-3">
-                    <span className="text-xs font-black text-white uppercase italic mb-2 block">{sprite.name}</span>
-                    <div className="grid grid-cols-4 gap-2">
+                    <span className="text-sm font-black text-white uppercase italic mb-2 block">{sprite.name}</span>
+                    <div className="grid grid-cols-5 gap-2">
                       {validVariants.map(v => (
                         <button
                           key={v}
@@ -1013,7 +1034,7 @@ function MainApp() {
                           className="flex flex-col items-center p-2 rounded-lg border border-slate-700 bg-black/40 hover:bg-slate-800 transition-colors"
                         >
                           <img src={sprite.images[v]} className="w-8 h-8 object-contain mb-1" alt="" />
-                          <span className={`text-[8px] font-black uppercase ${VARIANT_INFO[v]?.color}`}>{v}</span>
+                          <span className={`text-[7px] sm:text-[8px] font-black uppercase ${VARIANT_INFO[v]?.color}`}>{v}</span>
                         </button>
                       ))}
                     </div>
@@ -1025,7 +1046,7 @@ function MainApp() {
         </div>
       )}
 
-      {/* --- MODAL: ABSOLUTE DATA RESET --- */}
+      {/* --- MENU: ABSOLUTE DATA RESET --- */}
       {showResetConfirm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-200">
           <div className="bg-[#12141f] border-2 border-red-500/60 rounded-2xl p-6 max-w-sm w-full text-center relative">
@@ -1035,19 +1056,19 @@ function MainApp() {
             <div className="mx-auto w-12 h-12 rounded-full bg-red-950/60 border border-red-500/40 flex items-center justify-center mb-4">
               <AlertTriangle className="w-6 h-6 text-red-400" />
             </div>
-            <h3 className="text-lg font-black tracking-tight text-white uppercase italic">RESET LOG DATA?</h3>
-            <p className="text-xs text-slate-400 mt-2 leading-relaxed">
+            <h3 className="text-xl sm:text-2xl font-black tracking-tight text-white uppercase italic">RESET LOG DATA?</h3>
+            <p className="text-sm sm:text-base text-slate-400 mt-2 leading-relaxed">
               This action will completely wipe your checked archive configurations. Mastery counts and storage caches will revert back to 0%.
             </p>
             <div className="grid grid-cols-2 gap-3 mt-6">
-              <button onClick={() => { setShowResetConfirm(false); playBeep(440, 'sine', 0.05); }} className="py-2.5 text-xs font-black uppercase font-mono bg-black/40 text-slate-300 border border-slate-800 rounded-xl hover:bg-black/60">ABORT</button>
-              <button onClick={handleAbsoluteReset} className="py-2.5 text-xs font-black uppercase font-mono bg-gradient-to-r from-red-600 to-rose-700 text-white border border-red-500/40 rounded-xl hover:brightness-110">CONFIRM WIPE</button>
+              <button onClick={() => { setShowResetConfirm(false); playBeep(440, 'sine', 0.05); }} className="py-2.5 text-sm font-black uppercase font-mono bg-black/40 text-slate-300 border border-slate-800 rounded-xl hover:bg-black/60">ABORT</button>
+              <button onClick={handleAbsoluteReset} className="py-2.5 text-sm font-black uppercase font-mono bg-gradient-to-r from-red-600 to-rose-700 text-white border border-red-500/40 rounded-xl hover:brightness-110">CONFIRM WIPE</button>
             </div>
           </div>
         </div>
       )}
 
-      {/* --- MODAL: THEMED UNFRIEND CONFIRMATION --- */}
+      {/* --- MENU: THEMED UNFRIEND CONFIRMATION --- */}
       {showUnfriendConfirm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-200">
           <div className="bg-[#12141f] border-2 border-amber-500/60 rounded-2xl p-6 max-w-sm w-full text-center relative">
@@ -1057,13 +1078,13 @@ function MainApp() {
             <div className="mx-auto w-12 h-12 rounded-full bg-amber-950/60 border border-amber-500/40 flex items-center justify-center mb-4">
               <UserMinus className="w-6 h-6 text-amber-400" />
             </div>
-            <h3 className="text-lg font-black tracking-tight text-white uppercase italic">REMOVE FRIEND?</h3>
-            <p className="text-xs text-slate-400 mt-2 leading-relaxed">
+            <h3 className="text-xl sm:text-2xl font-black tracking-tight text-white uppercase italic">REMOVE FRIEND?</h3>
+            <p className="text-sm sm:text-base text-slate-400 mt-2 leading-relaxed">
               Are you sure you want to remove <span className="text-amber-400 font-bold">@{showUnfriendConfirm.spriteId}</span>? This severs connection access across both profiles immediately.
             </p>
             <div className="grid grid-cols-2 gap-3 mt-6">
-              <button onClick={() => setShowUnfriendConfirm(null)} className="py-2.5 text-xs font-black uppercase font-mono bg-black/40 text-slate-300 border border-slate-800 rounded-xl">CANCEL</button>
-              <button onClick={handleUnfriendExecution} className="py-2.5 text-xs font-black uppercase font-mono bg-gradient-to-r from-amber-600 to-amber-700 text-white rounded-xl">UNFRIEND</button>
+              <button onClick={() => setShowUnfriendConfirm(null)} className="py-2.5 text-sm font-black uppercase font-mono bg-black/40 text-slate-300 border border-slate-800 rounded-xl">CANCEL</button>
+              <button onClick={handleUnfriendExecution} className="py-2.5 text-sm font-black uppercase font-mono bg-gradient-to-r from-amber-600 to-amber-700 text-white rounded-xl">UNFRIEND</button>
             </div>
           </div>
         </div>
@@ -1078,13 +1099,13 @@ function MainApp() {
               <div>
                 <span className="text-xs font-mono font-black text-indigo-400 uppercase tracking-widest block">INSPECTING ARCHIVE</span>
                 <div className="flex items-center gap-2">
-                  <h2 className="text-xl font-black italic uppercase text-white">@{activeViewingFriend.spriteId}</h2>
-                  <span className="bg-indigo-900/40 border border-indigo-500/30 text-indigo-300 text-[10px] font-black px-2 py-0.5 rounded-md">
+                  <h2 className="text-2xl sm:text-3xl font-black italic uppercase text-white">@{activeViewingFriend.spriteId}</h2>
+                  <span className="bg-indigo-900/40 border border-indigo-500/30 text-indigo-300 text-[10px] sm:text-xs font-black px-2 py-0.5 rounded-md">
                     {activeViewingFriend.completionRate}%
                   </span>
                 </div>
               </div>
-              <button onClick={() => setActiveViewingFriend(null)} className="flex items-center gap-1 bg-slate-900 border border-slate-700 px-3 py-1.5 rounded-xl text-xs font-black text-slate-300 hover:text-white transition-colors">
+              <button onClick={() => setActiveViewingFriend(null)} className="flex items-center gap-1 bg-slate-900 border border-slate-700 px-3 py-1.5 rounded-xl text-xs sm:text-sm font-black text-slate-300 hover:text-white transition-colors">
                 <X className="w-4 h-4" /> CLOSE VIEW
               </button>
             </div>
@@ -1093,7 +1114,7 @@ function MainApp() {
           {activeViewingFriend.extractionTargets && activeViewingFriend.extractionTargets.length > 0 && (
             <div className="max-w-md mx-auto w-full px-4 pt-4">
               <div className="bg-[#151722] border border-cyan-500/30 rounded-xl p-3 flex flex-col gap-2">
-                <span className="text-[10px] font-black text-cyan-400 uppercase tracking-widest flex items-center gap-1.5">
+                <span className="text-[10px] sm:text-xs font-black text-cyan-400 uppercase tracking-widest flex items-center gap-1.5">
                   <Target className="w-3.5 h-3.5" /> Their Extraction Targets
                 </span>
                 <div className="flex gap-2">
@@ -1105,8 +1126,8 @@ function MainApp() {
                       <div key={idx} className="flex-1 flex items-center gap-2 bg-black/40 border border-slate-800 rounded-lg p-1.5">
                         <img src={sprite?.images[v]} className="w-6 h-6 object-contain" alt="" />
                         <div className="flex flex-col">
-                          <span className="text-[9px] font-bold text-white uppercase truncate">{sprite?.name}</span>
-                          <span className={`text-[8px] font-black uppercase ${VARIANT_INFO[v]?.color}`}>{v}</span>
+                          <span className="text-[9px] sm:text-[10px] font-bold text-white uppercase truncate">{sprite?.name}</span>
+                          <span className={`text-[8px] sm:text-[9px] font-black uppercase ${VARIANT_INFO[v]?.color}`}>{v}</span>
                         </div>
                       </div>
                     )
@@ -1138,14 +1159,22 @@ function MainApp() {
                 setViewingTabs(prev => ({ ...prev, [`inspect_${sprite.id}`]: validVariantsInRow[newIndex] }));
               };
 
+              const isMatchHighlight = extractionTargets.includes(`${sprite.id}_${currentTab}`) && friendStatus[currentTab];
+
               return (
                 <article key={sprite.id} className="bg-[#151722] rounded-2xl overflow-hidden border-2 border-slate-800/90 flex flex-col">
                   <div className="p-4 flex gap-4">
 
-                    <div className="flex flex-col gap-2 w-24 flex-shrink-0">
-                      <div className={`w-24 h-24 bg-gradient-to-b ${RARITY_BG_GRADIENTS[sprite.rarity]} rounded-xl p-0.5 border-2 relative overflow-hidden z-0 ${friendMastery[currentTab] ? 'border-yellow-400' : 'border-white/10'}`}>
+                    <div className="flex flex-col gap-2 w-24 sm:w-28 flex-shrink-0">
+                      <div className={`w-24 h-24 sm:w-28 sm:h-28 bg-gradient-to-b ${RARITY_BG_GRADIENTS[sprite.rarity]} rounded-xl p-0.5 border-2 relative overflow-hidden z-0 transition-all duration-300 ${isMatchHighlight ? 'border-cyan-400 shadow-[0_0_20px_rgba(34,211,238,0.6)] animate-pulse' : friendMastery[currentTab] ? 'border-yellow-400' : 'border-white/10'}`}>
 
-                        {friendMastery[currentTab] && (
+                        {isMatchHighlight && (
+                          <div className="absolute top-0 left-0 right-0 bg-cyan-500 text-black text-[8px] sm:text-[9px] font-black uppercase text-center z-40 py-0.5 tracking-widest">
+                            Match
+                          </div>
+                        )}
+
+                        {friendMastery[currentTab] && !isMatchHighlight && (
                           <div className="absolute top-1 right-1 z-40 bg-black/60 rounded-full p-0.5 border border-yellow-500/50">
                             <Crown className="w-4 h-4 text-yellow-400" />
                           </div>
@@ -1177,7 +1206,7 @@ function MainApp() {
                       </div>
 
                       {friendStatus[currentTab] && (
-                        <div className={`w-full py-1.5 rounded-lg text-[9px] font-black uppercase text-center border flex items-center justify-center gap-1 ${friendMastery[currentTab] ? 'bg-yellow-500/10 border-yellow-500/30 text-yellow-400' : 'bg-slate-900 border-slate-800 text-slate-400'}`}>
+                        <div className={`w-full py-1.5 rounded-lg text-[9px] sm:text-[10px] font-black uppercase text-center border flex items-center justify-center gap-1 ${friendMastery[currentTab] ? 'bg-yellow-500/10 border-yellow-500/30 text-yellow-400' : 'bg-slate-900 border-slate-800 text-slate-400'}`}>
                           {friendMastery[currentTab] ? <><Crown className="w-3 h-3" /> Mastered</> : <><CheckCircle className="w-3 h-3" /> Collected</>}
                         </div>
                       )}
@@ -1185,15 +1214,15 @@ function MainApp() {
 
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between">
-                        <h4 className="font-black text-md text-white uppercase italic">{sprite.name}</h4>
+                        <h4 className="font-black text-lg sm:text-xl text-white uppercase italic tracking-tight">{sprite.name}</h4>
                       </div>
-                      <div className="mt-2 bg-black/20 rounded-lg p-2 border border-slate-800/40 text-xs text-slate-300">
+                      <div className="mt-2 bg-black/20 rounded-lg p-2 border border-slate-800/40 text-sm sm:text-base text-slate-300 leading-snug">
                         {sprite.baseAbility}
                       </div>
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-4 border-t border-slate-800 bg-black/20">
+                  <div className="grid grid-cols-5 border-t border-slate-800 bg-black/20">
                     {variantsList.map(v => {
                       if (sprite.rates[v] === "N/A") return <div key={v} className="py-2 text-center text-[9px] text-slate-800 font-bold border-r border-slate-800/40 last:border-r-0">N/A</div>;
 
@@ -1201,7 +1230,7 @@ function MainApp() {
                         <button
                           key={v}
                           onClick={() => setViewingTabs({ ...viewingTabs, [`inspect_${sprite.id}`]: v })}
-                          className={`py-3 flex flex-col items-center gap-1.5 text-[9px] font-bold uppercase tracking-wider border-r border-slate-800/40 last:border-r-0 transition-colors ${currentTab === v ? 'bg-slate-800/40 text-white' : 'text-slate-600'}`}
+                          className={`py-3 flex flex-col items-center gap-1.5 text-[7px] sm:text-[8px] font-bold uppercase tracking-wider border-r border-slate-800/40 last:border-r-0 transition-colors ${currentTab === v ? 'bg-slate-800/40 text-white' : 'text-slate-600'}`}
                         >
                           {v}
                           {friendMastery[v] ? (
@@ -1225,19 +1254,19 @@ function MainApp() {
       <header className="sticky top-0 z-50 bg-[#0e1017]/95 backdrop-blur-md border-b-2 border-cyan-500/80 shadow-[0_4px_20px_rgba(0,240,255,0.15)] px-4 py-4">
         <div className="max-w-md mx-auto flex items-center justify-between">
           <div>
-            <h1 className="text-xl font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-yellow-400 to-pink-500 uppercase italic">
+            <h1 className="text-2xl sm:text-3xl font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-yellow-400 to-pink-500 uppercase italic">
               SPRITEDEX
             </h1>
-            <p className="text-[10px] font-mono text-slate-400 uppercase tracking-widest mt-0.5">ID: {spriteId}</p>
+            <p className="text-[10px] sm:text-xs font-mono text-slate-400 uppercase tracking-widest mt-0.5">ID: {spriteId}</p>
           </div>
           <div className="flex items-center gap-3">
             <button onClick={() => { setShowPatchNotes(true); playBeep(523, 'sine', 0.08); }} className="p-2 rounded-xl bg-slate-900 border-2 border-slate-700/60 hover:bg-slate-800 transition-colors">
-              <FileText className="w-4 h-4 text-purple-400" />
+              <FileText className="w-4 h-4 sm:w-5 sm:h-5 text-purple-400" />
             </button>
             <button onClick={() => setSoundEnabled(!soundEnabled)} className="p-2 rounded-xl bg-slate-900 border-2 border-slate-700/60 hover:bg-slate-800 transition-colors">
-              {soundEnabled ? <Volume2 className="w-4 h-4 text-cyan-400" /> : <VolumeX className="w-4 h-4 text-gray-500" />}
+              {soundEnabled ? <Volume2 className="w-4 h-4 sm:w-5 sm:h-5 text-cyan-400" /> : <VolumeX className="w-4 h-4 sm:w-5 sm:h-5 text-gray-500" />}
             </button>
-            <button onClick={logOut} className="text-[10px] text-red-400 font-bold uppercase tracking-widest hover:text-red-300 transition-colors ml-1">
+            <button onClick={logOut} className="text-[10px] sm:text-xs text-red-400 font-bold uppercase tracking-widest hover:text-red-300 transition-colors ml-1">
               Logout
             </button>
           </div>
@@ -1251,18 +1280,18 @@ function MainApp() {
           <div className="flex flex-col gap-5 animate-in fade-in duration-300">
 
             {currentView === 'sprites' && (
-              <section className="sticky top-[86px] z-40 bg-[#151824]/95 backdrop-blur-md rounded-2xl p-4 border-2 border-slate-800 shadow-xl">
+              <section className="sticky top-[86px] sm:top-[94px] z-40 bg-[#151824]/95 backdrop-blur-md rounded-2xl p-4 border-2 border-slate-800 shadow-xl">
                 <div className="flex items-center justify-between mb-2.5">
-                  <span className="text-xs font-black text-gray-200 tracking-wider font-mono">SPRITE PROGRESS</span>
-                  <button onClick={() => { setShowResetConfirm(true); playBeep(330, 'sine', 0.08); }} className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-red-950/30 hover:bg-red-950/60 border border-red-900/40 text-[9px] font-mono font-black text-red-400 tracking-wider uppercase">
+                  <span className="text-sm sm:text-base font-black text-gray-200 tracking-wider font-mono">SPRITE PROGRESS</span>
+                  <button onClick={() => { setShowResetConfirm(true); playBeep(330, 'sine', 0.08); }} className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-red-950/30 hover:bg-red-950/60 border border-red-900/40 text-[9px] sm:text-[10px] font-mono font-black text-red-400 tracking-wider uppercase">
                     <RotateCcw className="w-3 h-3" /> RESET ARCHIVE
                   </button>
                 </div>
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-[10px] text-slate-400 font-mono">COMPLETION PERCENTAGE</span>
-                  <span className="text-xl font-black text-cyan-400 font-mono">{completionRate}%</span>
+                  <span className="text-[10px] sm:text-xs text-slate-400 font-mono">COMPLETION PERCENTAGE</span>
+                  <span className="text-2xl sm:text-3xl font-black text-cyan-400 font-mono">{completionRate}%</span>
                 </div>
-                <div className="w-full bg-black/60 h-4 rounded-md overflow-hidden p-0.5 border border-slate-700/50">
+                <div className="w-full bg-black/60 h-4 sm:h-5 rounded-md overflow-hidden p-0.5 border border-slate-700/50">
                   <div className="bg-gradient-to-r from-cyan-400 via-yellow-400 to-pink-500 h-full rounded transition-all duration-300" style={{ width: `${completionRate}%` }} />
                 </div>
               </section>
@@ -1271,12 +1300,22 @@ function MainApp() {
             {isMasteryView && (
               <section className="bg-gradient-to-r from-yellow-900/40 to-amber-900/20 border-2 border-yellow-500/50 rounded-2xl p-5 mb-2">
                 <div className="flex items-center gap-3 mb-2">
-                  <Crown className="w-6 h-6 text-yellow-400" />
-                  <h2 className="text-lg font-black text-yellow-400 uppercase italic">Mastery Vault</h2>
+                  <Crown className="w-6 h-6 sm:w-7 sm:h-7 text-yellow-400" />
+                  <h2 className="text-xl sm:text-2xl font-black text-yellow-400 uppercase italic">Mastery Vault</h2>
                 </div>
-                <p className="text-xs text-slate-300 leading-relaxed">
+                <p className="text-sm sm:text-base text-slate-300 leading-relaxed mb-4">
                   Your most prestigious assets. Only variants that have reached Level 5 and earned a crown are displayed here.
                 </p>
+
+                <div className="mt-2">
+                  <div className="flex items-center justify-between mb-1.5">
+                    <span className="text-[10px] sm:text-xs text-yellow-500/80 font-mono font-bold tracking-wider">VAULT COMPLETION</span>
+                    <span className="text-lg sm:text-xl font-black text-yellow-400 font-mono">{masteryRate}%</span>
+                  </div>
+                  <div className="w-full bg-black/60 h-2.5 sm:h-3 rounded-full overflow-hidden p-0.5 border border-yellow-900/50">
+                    <div className="bg-gradient-to-r from-yellow-600 via-yellow-400 to-amber-200 h-full rounded-full transition-all duration-300" style={{ width: `${masteryRate}%` }} />
+                  </div>
+                </div>
               </section>
             )}
 
@@ -1286,12 +1325,12 @@ function MainApp() {
                 <input
                   type="text" placeholder="Search sprites..." value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full bg-black/50 border-2 border-slate-800 rounded-xl pl-9 pr-3 py-2 text-sm text-white focus:outline-none focus:border-cyan-500"
+                  className="w-full bg-black/50 border-2 border-slate-800 rounded-xl pl-9 pr-3 py-2 text-sm sm:text-base text-white focus:outline-none focus:border-cyan-500"
                 />
               </div>
               <div className="flex gap-1 overflow-x-auto py-1">
                 {['All', 'Mythic', 'Legendary', 'Epic', 'Rare'].map(rarity => (
-                  <button key={rarity} onClick={() => setRarityFilter(rarity)} className={`px-3 py-1.5 text-[10px] font-black tracking-wider rounded-lg border uppercase ${rarityFilter === rarity ? 'bg-cyan-400 text-black border-cyan-300' : 'bg-black/40 text-slate-400 border-slate-800'}`}>
+                  <button key={rarity} onClick={() => setRarityFilter(rarity)} className={`px-3 py-1.5 text-[10px] sm:text-[11px] font-black tracking-wider rounded-lg border uppercase ${rarityFilter === rarity ? 'bg-cyan-400 text-black border-cyan-300' : 'bg-black/40 text-slate-400 border-slate-800'}`}>
                     {rarity}
                   </button>
                 ))}
@@ -1302,14 +1341,14 @@ function MainApp() {
               {filteredSprites.length === 0 && isMasteryView && (
                 <div className="text-center p-8 bg-[#12141f] rounded-2xl border border-slate-800">
                   <Crown className="w-12 h-12 text-slate-700 mx-auto mb-4" />
-                  <p className="text-slate-400 font-bold uppercase tracking-widest">No Crowns Yet</p>
-                  <p className="text-xs text-slate-500 mt-2">Level up a variant and mark it as mastered to see it here.</p>
+                  <p className="text-sm sm:text-base text-slate-400 font-bold uppercase tracking-widest">No Crowns Yet</p>
+                  <p className="text-sm sm:text-base text-slate-500 mt-2">Level up a variant and mark it as mastered to see it here.</p>
                 </div>
               )}
 
               {filteredSprites.map(sprite => {
-                const status = collection[sprite.id] || { base: false, gold: false, gummy: false, galaxy: false };
-                const spriteMastery = mastery[sprite.id] || { base: false, gold: false, gummy: false, galaxy: false };
+                const status = collection[sprite.id] || {};
+                const spriteMastery = mastery[sprite.id] || {};
 
                 const validVariantsInRow = variantsList.filter(v => sprite.rates[v] !== "N/A");
                 const masteredCount = validVariantsInRow.filter(v => status[v]).length;
@@ -1345,12 +1384,12 @@ function MainApp() {
                   >
                     <div className="p-4 flex gap-4">
 
-                      <div className="flex flex-col gap-2 w-24 flex-shrink-0">
-                        <div className={`w-24 h-24 bg-gradient-to-b ${spriteBgGradient} rounded-xl p-0.5 border-2 relative overflow-hidden z-0 transition-all duration-300 ${isCurrentTabMastered ? 'border-yellow-400 shadow-[0_0_20px_rgba(255,215,0,0.4)]' : 'border-white/10'}`}>
+                      <div className="flex flex-col gap-2 w-24 sm:w-28 flex-shrink-0">
+                        <div className={`w-24 h-24 sm:w-28 sm:h-28 bg-gradient-to-b ${spriteBgGradient} rounded-xl p-0.5 border-2 relative overflow-hidden z-0 transition-all duration-300 ${isCurrentTabMastered ? 'border-yellow-400 shadow-[0_0_20px_rgba(255,215,0,0.4)]' : 'border-white/10'}`}>
 
                           {isCurrentTabMastered && (
                             <div className="absolute top-1 right-1 z-40 bg-black/60 rounded-full p-0.5 border border-yellow-500/50">
-                              <Crown className="w-4 h-4 text-yellow-400 drop-shadow-[0_0_8px_rgba(255,215,0,1)]" />
+                              <Crown className="w-4 h-4 sm:w-5 sm:h-5 text-yellow-400 drop-shadow-[0_0_8px_rgba(255,215,0,1)]" />
                             </div>
                           )}
 
@@ -1377,7 +1416,7 @@ function MainApp() {
                               />
                             );
                           })}
-                          <span className="absolute bottom-1 right-1 bg-black/80 font-mono text-[9px] font-black text-cyan-400 px-1.5 rounded border border-slate-700/60 z-20">
+                          <span className="absolute bottom-1 right-1 bg-black/80 font-mono text-[9px] sm:text-[10px] font-black text-cyan-400 px-1.5 rounded border border-slate-700/60 z-20">
                             {masteredCount}/{totalValidCount}
                           </span>
                         </div>
@@ -1385,25 +1424,25 @@ function MainApp() {
                         {isCurrentTabCollected && !isMasteryView && (
                           <button
                             onClick={() => toggleMastery(sprite.id, currentTab)}
-                            className={`w-full py-1.5 rounded-lg text-[9px] font-black uppercase tracking-wider flex flex-col items-center justify-center gap-0.5 transition-all border-2 ${isCurrentTabMastered ? 'bg-yellow-500/20 text-yellow-400 border-yellow-500/50 shadow-[0_0_15px_rgba(255,215,0,0.2)]' : 'bg-slate-900 text-slate-400 border-slate-800 hover:bg-slate-800 hover:text-white'}`}
+                            className={`w-full py-1.5 rounded-lg text-[9px] sm:text-[10px] font-black uppercase tracking-wider flex flex-col items-center justify-center gap-0.5 transition-all border-2 ${isCurrentTabMastered ? 'bg-yellow-500/20 text-yellow-400 border-yellow-500/50 shadow-[0_0_15px_rgba(255,215,0,0.2)]' : 'bg-slate-900 text-slate-400 border-slate-800 hover:bg-slate-800 hover:text-white'}`}
                           >
-                            <Crown className="w-3.5 h-3.5" />
+                            <Crown className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                             {isCurrentTabMastered ? 'Mastered' : 'Set Lvl 5'}
                           </button>
                         )}
 
                         {isCurrentTabMastered && isMasteryView && (
-                          <div className="w-full py-1.5 rounded-lg bg-yellow-500/10 border border-yellow-500/30 flex flex-col items-center justify-center gap-0.5 text-yellow-400 text-[9px] font-black uppercase text-center">
-                            <Crown className="w-3.5 h-3.5" /> Mastered
+                          <div className="w-full py-1.5 rounded-lg bg-yellow-500/10 border border-yellow-500/30 flex flex-col items-center justify-center gap-0.5 text-yellow-400 text-[9px] sm:text-[10px] font-black uppercase text-center">
+                            <Crown className="w-3.5 h-3.5 sm:w-4 sm:h-4" /> Mastered
                           </div>
                         )}
                       </div>
 
                       <div className="flex-1 min-w-0 flex flex-col justify-start">
                         <div className="flex items-center justify-between gap-2">
-                          <h4 className="font-black text-md text-white tracking-tight uppercase italic">{sprite.name}</h4>
+                          <h4 className="font-black text-lg sm:text-xl text-white tracking-tight uppercase italic">{sprite.name}</h4>
                           <div className="flex items-center gap-1 flex-shrink-0">
-                            <span className={`text-[8px] font-black uppercase px-2 py-0.5 rounded-md border ${rarityStyle}`}>
+                            <span className={`text-[8px] sm:text-[9px] font-black uppercase px-2 py-0.5 rounded-md border ${rarityStyle}`}>
                               {sprite.rarity}
                             </span>
                           </div>
@@ -1411,17 +1450,17 @@ function MainApp() {
 
                         <div className="flex items-center gap-2 mt-1">
                           <div className="bg-cyan-950/40 border border-cyan-800/20 rounded-md px-2 py-0.5 flex items-center gap-1">
-                            <Percent className="w-3 h-3 text-cyan-400" />
-                            <span className="text-[10px] font-mono font-black text-white">{sprite.rates[currentTab]}</span>
+                            {sprite.rates[currentTab] !== "TBD" && <Percent className="w-3 h-3 text-cyan-400" />}
+                            <span className="text-[10px] sm:text-xs font-mono font-black text-white">{sprite.rates[currentTab]}</span>
                           </div>
-                          <span className="text-[8px] bg-slate-900 text-slate-400 font-mono font-bold px-1.5 py-1 rounded border border-slate-800">
+                          <span className="text-[9px] sm:text-[10px] bg-slate-900 text-slate-400 font-mono font-bold px-1.5 py-1 rounded border border-slate-800">
                             {getDynamicSummonCost(sprite.rarity, currentTab)} DUST
                           </span>
                         </div>
 
                         <div className="mt-2.5 bg-black/20 rounded-lg p-2 border border-slate-800/40">
-                          <p className="text-xs text-slate-300 leading-tight">
-                            <span className="font-mono text-[9px] font-black text-cyan-400 block tracking-wider uppercase mb-0.5">
+                          <p className="text-sm sm:text-base text-slate-300 leading-snug">
+                            <span className="font-mono text-[10px] sm:text-xs font-black text-cyan-400 block tracking-wider uppercase mb-0.5">
                               BASE SPRITE PERK:
                             </span>
                             {sprite.baseAbility}
@@ -1431,19 +1470,19 @@ function MainApp() {
                         <div className="mt-2 min-h-[48px] rounded-lg p-2 border border-slate-800/30 bg-black/40 flex items-center">
                           <div className="w-full text-left">
                             {variantModifier ? (
-                              <p className="text-xs text-slate-200">
-                                <span className="font-mono text-[9px] font-black text-yellow-400 block tracking-wider uppercase mb-0.5">
+                              <p className="text-sm sm:text-base text-slate-200">
+                                <span className="font-mono text-[10px] sm:text-xs font-black text-yellow-400 block tracking-wider uppercase mb-0.5">
                                   +{currentTab.toUpperCase()} STYLE MODIFIER:
                                 </span>
                                 {variantModifier}
                               </p>
                             ) : (
                               <div className="w-full opacity-95">
-                                <span className="font-mono text-[9px] font-black text-slate-500 block tracking-wider uppercase mb-0.5">
+                                <span className="font-mono text-[10px] sm:text-xs font-black text-slate-500 block tracking-wider uppercase mb-0.5">
                                   GLOBAL STYLE BONUSES
                                 </span>
-                                <p className="text-[10px] text-slate-400 font-mono leading-relaxed">
-                                  <span className="text-amber-400 font-bold">GOLD:</span> 3x XP <span className="text-slate-600 px-0.5">|</span> <span className="text-pink-400 font-bold">GUMMY:</span> +20% Dust <span className="text-slate-600 px-0.5">|</span> <span className="text-purple-400 font-bold">GALAXY:</span> +30% Ammo
+                                <p className="text-[10px] sm:text-xs text-slate-400 font-mono leading-relaxed">
+                                  <span className="text-amber-400 font-bold">GOLD:</span> 3x XP <span className="text-slate-600 px-0.5">|</span> <span className="text-pink-400 font-bold">GUMMY:</span> +20% Dust <span className="text-slate-600 px-0.5">|</span> <span className="text-purple-400 font-bold">GALAXY:</span> +30% Ammo <span className="text-slate-600 px-0.5">|</span> <span className="text-sky-400 font-bold">HOLOFOIL:</span> +5% Rare Drop
                                 </p>
                               </div>
                             )}
@@ -1452,7 +1491,7 @@ function MainApp() {
                       </div>
                     </div>
 
-                    <div className="grid grid-cols-4 border-t-2 border-slate-800/80 bg-black/40">
+                    <div className="grid grid-cols-5 border-t-2 border-slate-800/80 bg-black/40">
                       {variantsList.map(variant => {
                         const isNa = sprite.rates[variant] === "N/A";
                         const isChecked = status[variant];
@@ -1462,8 +1501,8 @@ function MainApp() {
                         if (isNa) {
                           return (
                             <div key={variant} className="py-3 flex flex-col items-center justify-center bg-black/20 border-r border-slate-800/20 last:border-r-0 select-none text-slate-700">
-                              <span className="text-[9px] font-mono tracking-widest font-bold opacity-30">{variant.toUpperCase()}</span>
-                              <span className="text-[10px] font-mono font-black tracking-tighter mt-1 opacity-40">N/A</span>
+                              <span className="text-[7px] sm:text-[8px] font-mono tracking-widest font-bold opacity-30">{variant.toUpperCase()}</span>
+                              <span className="text-[10px] sm:text-xs font-mono font-black tracking-tighter mt-1 opacity-40">N/A</span>
                             </div>
                           );
                         }
@@ -1487,14 +1526,14 @@ function MainApp() {
                             }}
                             className={`py-3 flex flex-col items-center gap-1.5 border-r border-slate-800/40 last:border-r-0 transition-all relative ${btnStyle} ${isActiveTab && !isVariantMastered ? 'bg-slate-800/50' : ''} ${isMasteryView ? 'cursor-pointer' : ''}`}
                           >
-                            <span className="text-[9px] font-mono tracking-widest font-bold">{variant.toUpperCase()}</span>
+                            <span className="text-[7px] sm:text-[8px] font-mono tracking-widest font-bold">{variant.toUpperCase()}</span>
 
                             {isVariantMastered ? (
-                              <Crown className="w-4 h-4 text-yellow-400" />
+                              <Crown className="w-4 h-4 sm:w-5 sm:h-5 text-yellow-400" />
                             ) : isChecked ? (
-                              <CheckCircle className="w-4 h-4 text-current" />
+                              <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-current" />
                             ) : (
-                              <Circle className="w-4 h-4 opacity-40" />
+                              <Circle className="w-4 h-4 sm:w-5 sm:h-5 opacity-40" />
                             )}
                           </button>
                         );
@@ -1512,38 +1551,38 @@ function MainApp() {
           <div className="flex flex-col gap-4 animate-in fade-in duration-300">
             <section className="bg-gradient-to-br from-indigo-900/40 to-blue-900/20 border-2 border-indigo-500/50 rounded-2xl p-5">
               <div className="flex items-center gap-3 mb-2">
-                <Users className="w-6 h-6 text-indigo-400" />
-                <h2 className="text-lg font-black text-indigo-400 uppercase italic">Sprite Squad</h2>
+                <Users className="w-6 h-6 sm:w-7 sm:h-7 text-indigo-400" />
+                <h2 className="text-xl sm:text-2xl font-black text-indigo-400 uppercase italic">Sprite Squad</h2>
               </div>
-              <p className="text-xs text-slate-300 leading-relaxed">
+              <p className="text-sm sm:text-base text-slate-300 leading-relaxed">
                 Search for friends by their Sprite ID. Once they accept your request, you can view their collections and crowns.
               </p>
             </section>
 
-            <section className="bg-[#12141f] rounded-2xl border border-slate-800 p-4">
-              <div className="flex items-center justify-between mb-3">
-                <h3 className="text-xs font-black text-cyan-400 uppercase tracking-wider flex items-center gap-2">
-                  <Target className="w-4 h-4" /> Extraction Targets
+            {/* COMPACT EXTRACTION TARGETS BANNER */}
+            <section className="bg-[#12141f] rounded-2xl border border-slate-800 p-4 flex flex-col gap-3">
+              <div className="flex items-center justify-between">
+                <h3 className="text-sm font-black text-cyan-400 uppercase tracking-wider flex items-center gap-2">
+                  <Target className="w-4 h-4 sm:w-5 sm:h-5" /> Active Loadout
                 </h3>
-                <span className="text-[10px] text-slate-500 font-bold uppercase">{extractionTargets.filter(Boolean).length} / 3 Set</span>
+                <span className="text-[10px] sm:text-xs text-slate-500 font-bold uppercase">{extractionTargets.filter(Boolean).length} / 3 Targets</span>
               </div>
-              <div className="flex gap-3">
+              <div className="flex gap-2">
                 {[0, 1, 2].map(index => renderTargetSlot(extractionTargets[index], index))}
               </div>
-              <p className="text-[10px] text-slate-500 mt-3 leading-tight">Set up to 3 sprites you are currently hunting for in-game. If a mutual trade is possible with a friend, their Sprite ID will glow below. Link up in-game to make the trade.</p>
             </section>
 
             <section className="bg-[#12141f] rounded-2xl border border-slate-800 p-4">
-              <h3 className="text-xs font-black text-slate-400 uppercase tracking-wider mb-3">Add Friend</h3>
+              <h3 className="text-sm font-black text-slate-400 uppercase tracking-wider mb-3">Add Friend</h3>
               <div className="flex gap-2">
                 <div className="relative flex-1">
-                  <Search className="w-4 h-4 text-slate-500 absolute left-3 top-3" />
+                  <Search className="w-4 h-4 sm:w-5 sm:h-5 text-slate-500 absolute left-3 top-3" />
                   <input
                     type="text"
                     value={friendSearchQuery}
                     onChange={(e) => setFriendSearchQuery(e.target.value)}
                     placeholder="Search Sprite ID..."
-                    className="w-full bg-black border-2 border-slate-800 rounded-xl pl-9 pr-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500"
+                    className="w-full bg-black border-2 border-slate-800 rounded-xl pl-9 sm:pl-10 pr-3 py-2 text-sm sm:text-base text-white focus:outline-none focus:border-indigo-500"
                   />
                 </div>
                 <button onClick={handleSearchFriend} className="bg-indigo-600 hover:bg-indigo-500 text-white px-4 rounded-xl flex items-center justify-center transition-colors">
@@ -1551,12 +1590,12 @@ function MainApp() {
                 </button>
               </div>
 
-              {friendSearchStatus === 'searching' && <p className="text-xs text-slate-400 mt-3">Searching...</p>}
-              {friendSearchStatus === 'not-found' && <p className="text-xs text-red-400 mt-3 font-bold">Sprite ID not found.</p>}
+              {friendSearchStatus === 'searching' && <p className="text-sm text-slate-400 mt-3">Searching...</p>}
+              {friendSearchStatus === 'not-found' && <p className="text-sm text-red-400 mt-3 font-bold">Sprite ID not found.</p>}
               {friendSearchStatus === 'found' && friendSearchResult && (
                 <div className="mt-4 p-3 bg-indigo-950/30 border border-indigo-500/30 rounded-xl flex justify-between items-center animate-in zoom-in-95">
-                  <span className="text-sm font-bold text-white">@{friendSearchResult.spriteId}</span>
-                  <button onClick={handleSendFriendRequest} className="bg-indigo-500 px-3 py-1.5 rounded-lg text-xs font-bold text-white flex items-center gap-1 hover:bg-indigo-400 transition-colors">
+                  <span className="text-base sm:text-lg font-bold text-white">@{friendSearchResult.spriteId}</span>
+                  <button onClick={handleSendFriendRequest} className="bg-indigo-500 px-3 py-1.5 rounded-lg text-xs sm:text-sm font-bold text-white flex items-center gap-1 hover:bg-indigo-400 transition-colors">
                     <UserPlus className="w-4 h-4" /> Request
                   </button>
                 </div>
@@ -1566,12 +1605,12 @@ function MainApp() {
             {/* SENT REQUESTS */}
             {sentRequests.length > 0 && (
               <section className="bg-slate-900/50 rounded-2xl border border-slate-800 p-4">
-                <h3 className="text-xs font-black text-slate-400 uppercase tracking-wider mb-3">Sent Requests</h3>
+                <h3 className="text-sm font-black text-slate-400 uppercase tracking-wider mb-3">Sent Requests</h3>
                 {sentRequests.map(req => (
                   <div key={req.id} className="flex justify-between items-center bg-black/40 p-3 rounded-lg border border-slate-800 mb-2">
-                    <span className="text-sm font-bold text-slate-300 tracking-wider">To: @{req.receiverSpriteId}</span>
-                    <button onClick={() => cancelFriendRequest(req.id)} className="bg-red-900/40 hover:bg-red-900/60 border border-red-800/50 px-3 py-1.5 rounded-lg text-[10px] font-black uppercase text-red-400 transition-colors flex items-center gap-1">
-                      <XCircle className="w-3.5 h-3.5" /> Cancel
+                    <span className="text-sm sm:text-base font-bold text-slate-300 tracking-wider">To: @{req.receiverSpriteId}</span>
+                    <button onClick={() => cancelFriendRequest(req.id)} className="bg-red-900/40 hover:bg-red-900/60 border border-red-800/50 px-3 py-1.5 rounded-lg text-[10px] sm:text-xs font-black uppercase text-red-400 transition-colors flex items-center gap-1">
+                      <XCircle className="w-3.5 h-3.5 sm:w-4 sm:h-4" /> Cancel
                     </button>
                   </div>
                 ))}
@@ -1581,12 +1620,12 @@ function MainApp() {
             {/* PENDING REQUESTS */}
             {pendingRequests.length > 0 && (
               <section className="bg-indigo-950/20 rounded-2xl border border-indigo-500/30 p-4">
-                <h3 className="text-xs font-black text-indigo-400 uppercase tracking-wider mb-3">Incoming Requests</h3>
+                <h3 className="text-sm font-black text-indigo-400 uppercase tracking-wider mb-3">Incoming Requests</h3>
                 {pendingRequests.map(req => (
                   <div key={req.id} className="flex justify-between items-center bg-black/40 p-3 rounded-lg border border-slate-800 mb-2">
-                    <span className="text-sm font-bold text-white tracking-wider">@{req.senderSpriteId}</span>
-                    <button onClick={() => acceptFriendRequest(req)} className="bg-emerald-600 hover:bg-emerald-500 px-4 py-2 rounded-lg text-[10px] font-black uppercase text-white transition-colors flex items-center gap-1">
-                      <Check className="w-3.5 h-3.5" /> Accept
+                    <span className="text-sm sm:text-base font-bold text-white tracking-wider">@{req.senderSpriteId}</span>
+                    <button onClick={() => acceptFriendRequest(req)} className="bg-emerald-600 hover:bg-emerald-500 px-4 py-2 rounded-lg text-[10px] sm:text-xs font-black uppercase text-white transition-colors flex items-center gap-1">
+                      <Check className="w-3.5 h-3.5 sm:w-4 sm:h-4" /> Accept
                     </button>
                   </div>
                 ))}
@@ -1595,13 +1634,13 @@ function MainApp() {
 
             {/* RICH LEADERBOARD FRIEND LIST */}
             <section className="bg-[#12141f] rounded-2xl border border-slate-800 p-4">
-              <h3 className="text-xs font-black text-slate-400 uppercase tracking-wider mb-3">Sprite Squad ({richFriends.length})</h3>
+              <h3 className="text-sm font-black text-slate-400 uppercase tracking-wider mb-3">Sprite Squad ({richFriends.length})</h3>
 
               {richFriends.length === 0 ? (
                 <div className="text-center py-6">
-                  <Users className="w-10 h-10 text-slate-700 mx-auto mb-3" />
-                  <p className="text-sm font-bold text-slate-500">No friends added yet.</p>
-                  <p className="text-xs text-slate-600 mt-1">Use the search bar above to connect.</p>
+                  <Users className="w-10 h-10 sm:w-12 sm:h-12 text-slate-700 mx-auto mb-3" />
+                  <p className="text-sm sm:text-base font-bold text-slate-500">No friends added yet.</p>
+                  <p className="text-xs sm:text-sm text-slate-600 mt-1">Use the search bar above to connect.</p>
                 </div>
               ) : (
                 <div className="flex flex-col gap-2">
@@ -1614,19 +1653,19 @@ function MainApp() {
                     return (
                       <div key={index} className={`p-3 rounded-xl flex items-center justify-between transition-all duration-300 ${cardClass}`}>
                         <div className="flex items-center gap-3">
-                          <div className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-black ${matchFound ? 'bg-cyan-900/50 border-cyan-400 text-cyan-400' : 'bg-indigo-900/50 border-indigo-500/50 text-indigo-400'}`}>
+                          <div className={`w-6 h-6 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-[10px] sm:text-xs font-black ${matchFound ? 'bg-cyan-900/50 border-cyan-400 text-cyan-400' : 'bg-indigo-900/50 border-indigo-500/50 text-indigo-400'}`}>
                             #{index + 1}
                           </div>
                           <div className="flex flex-col">
-                            <span className="text-sm font-bold text-white tracking-wider flex items-center gap-1">
+                            <span className="text-sm sm:text-base font-bold text-white tracking-wider flex items-center gap-1">
                               @{friend.spriteId || 'Unknown'}
                             </span>
                             {matchFound ? (
-                              <span className="text-[9px] font-black text-cyan-400 font-mono tracking-widest mt-0.5 animate-pulse uppercase flex items-center gap-1">
+                              <span className="text-[9px] sm:text-[10px] font-black text-cyan-400 font-mono tracking-widest mt-0.5 animate-pulse uppercase flex items-center gap-1">
                                 <Target className="w-3 h-3" /> Extraction Match
                               </span>
                             ) : (
-                              <span className="text-[10px] font-black text-indigo-400 font-mono tracking-widest">
+                              <span className="text-[10px] sm:text-[11px] font-black text-indigo-400 font-mono tracking-widest">
                                 {friend.completionRate}% COMPLETE
                               </span>
                             )}
@@ -1634,11 +1673,11 @@ function MainApp() {
                         </div>
 
                         <div className="flex items-center gap-2">
-                          <button onClick={() => inspectFriendLibrary(friend)} className={`text-[10px] font-bold uppercase tracking-wider px-3 py-1.5 rounded-lg border transition-colors ${matchFound ? 'bg-cyan-900/40 text-cyan-300 hover:bg-cyan-900/60 border-cyan-500/50' : 'bg-indigo-900/40 text-indigo-300 hover:bg-indigo-900/60 border-indigo-500/30'}`}>
+                          <button onClick={() => inspectFriendLibrary(friend)} className={`text-[10px] sm:text-xs font-bold uppercase tracking-wider px-3 py-1.5 rounded-lg border transition-colors ${matchFound ? 'bg-cyan-900/40 text-cyan-300 hover:bg-cyan-900/60 border-cyan-500/50' : 'bg-indigo-900/40 text-indigo-300 hover:bg-indigo-900/60 border-indigo-500/30'}`}>
                             View
                           </button>
                           <button onClick={() => setShowUnfriendConfirm(friend)} className="text-slate-500 hover:text-red-400 p-1.5 rounded-lg hover:bg-red-950/30 transition-colors">
-                            <UserMinus className="w-4 h-4" />
+                            <UserMinus className="w-4 h-4 sm:w-5 sm:h-5" />
                           </button>
                         </div>
                       </div>
@@ -1654,18 +1693,18 @@ function MainApp() {
         {currentView === 'unreleased' && (
           <section className="flex flex-col gap-4 animate-in fade-in duration-300 pt-2">
             <div className="bg-[#12141f] border-2 border-amber-500/40 rounded-2xl p-5">
-              <h3 className="text-lg font-black text-amber-400 uppercase italic mb-2">UNRELEASED / RUMORED</h3>
-              <p className="text-xs text-slate-400">Files found in-game for upcoming sprites and variants.</p>
+              <h3 className="text-xl sm:text-2xl font-black text-amber-400 uppercase italic mb-2">UNRELEASED / RUMORED</h3>
+              <p className="text-sm sm:text-base text-slate-400">Files found in-game for upcoming sprites and variants.</p>
             </div>
 
             {[...new Set(UNOFFICIAL_LEAKS_DATABASE.map(l => l.sprite))].map((sName) => (
               <div key={sName} className="bg-[#12141f] border border-slate-800 rounded-xl p-4">
-                <h4 className="text-xs font-black text-amber-500 uppercase mb-3 border-b border-slate-800 pb-2">{sName}</h4>
+                <h4 className="text-sm font-black text-amber-500 uppercase mb-3 border-b border-slate-800 pb-2">{sName}</h4>
                 <div className="flex flex-col gap-2">
                   {UNOFFICIAL_LEAKS_DATABASE.filter(l => l.sprite === sName).map((l, i) => (
                     <div key={i} className="bg-black/40 px-3 py-2 rounded-lg border border-slate-900 flex justify-between items-center">
-                      <code className="text-[10px] text-slate-300 font-bold">{l.file}</code>
-                      <span className={`text-[8px] font-bold px-1.5 py-0.5 rounded border uppercase ${LEAK_VARIANT_COLORS[l.variant]}`}>
+                      <code className="text-[10px] sm:text-xs text-slate-300 font-bold">{l.file}</code>
+                      <span className={`text-[8px] sm:text-[9px] font-bold px-1.5 py-0.5 rounded border uppercase ${LEAK_VARIANT_COLORS[l.variant]}`}>
                         {l.variant}
                       </span>
                     </div>
@@ -1677,7 +1716,7 @@ function MainApp() {
         )}
 
         <footer className="mt-6 pt-6 border-t border-slate-800 text-center pb-4">
-          <p className="text-[9px] text-slate-500 leading-relaxed px-2">
+          <p className="text-[9px] sm:text-[10px] text-slate-500 leading-relaxed px-2">
             Portions of the materials used are trademarks and/or copyrighted works of Epic Games, Inc. All rights reserved by Epic. This material is not official and is not endorsed by Epic.
           </p>
         </footer>
@@ -1689,23 +1728,23 @@ function MainApp() {
         <div className="bg-[#0e1017]/95 backdrop-blur-md border border-slate-800 rounded-2xl w-full max-w-sm px-2 py-2 flex justify-between shadow-2xl">
 
           <button onClick={() => { setCurrentView('sprites'); setActiveViewingFriend(null); playBeep(440, 'sine', 0.05); }} className={`flex-1 flex flex-col items-center gap-1 py-1 transition-colors ${currentView === 'sprites' && !activeViewingFriend ? 'text-cyan-400' : 'text-slate-600'}`}>
-            <Grid className="w-5 h-5" />
-            <span className="text-[9px] font-black uppercase tracking-wider">Sprites</span>
+            <Grid className="w-5 h-5 sm:w-6 sm:h-6" />
+            <span className="text-[9px] sm:text-[10px] font-black uppercase tracking-wider">Sprites</span>
           </button>
 
           <button onClick={() => { setCurrentView('mastery'); setActiveViewingFriend(null); playBeep(523, 'sine', 0.05); }} className={`flex-1 flex flex-col items-center gap-1 py-1 transition-colors ${currentView === 'mastery' && !activeViewingFriend ? 'text-yellow-400' : 'text-slate-600'}`}>
-            <Crown className="w-5 h-5" />
-            <span className="text-[9px] font-black uppercase tracking-wider">Mastery</span>
+            <Crown className="w-5 h-5 sm:w-6 sm:h-6" />
+            <span className="text-[9px] sm:text-[10px] font-black uppercase tracking-wider">Mastery</span>
           </button>
 
           <button onClick={() => { setCurrentView('friends'); setActiveViewingFriend(null); playBeep(587, 'sine', 0.05); }} className={`flex-1 flex flex-col items-center gap-1 py-1 transition-colors ${currentView === 'friends' || activeViewingFriend ? 'text-indigo-400' : 'text-slate-600'}`}>
-            <Users className="w-5 h-5" />
-            <span className="text-[9px] font-black uppercase tracking-wider">Friends</span>
+            <Users className="w-5 h-5 sm:w-6 sm:h-6" />
+            <span className="text-[9px] sm:text-[10px] font-black uppercase tracking-wider">Friends</span>
           </button>
 
           <button onClick={() => { setCurrentView('unreleased'); setActiveViewingFriend(null); playBeep(659, 'sine', 0.05); }} className={`flex-1 flex flex-col items-center gap-1 py-1 transition-colors ${currentView === 'unreleased' && !activeViewingFriend ? 'text-amber-400' : 'text-slate-600'}`}>
-            <Eye className="w-5 h-5" />
-            <span className="text-[9px] font-black uppercase tracking-wider">Rumored</span>
+            <Eye className="w-5 h-5 sm:w-6 sm:h-6" />
+            <span className="text-[9px] sm:text-[10px] font-black uppercase tracking-wider">Rumored</span>
           </button>
 
         </div>
