@@ -1563,7 +1563,7 @@ function MainApp() {
             <section className="bg-[#12141f] rounded-2xl border border-slate-800 p-4 flex flex-col gap-3">
               <div className="flex items-center justify-between">
                 <h3 className="text-sm font-black text-cyan-400 uppercase tracking-wider flex items-center gap-2">
-                  <Target className="w-4 h-4 sm:w-5 sm:h-5" /> Active Loadout
+                  <Target className="w-4 h-4 sm:w-5 sm:h-5" /> Extraction Targets
                 </h3>
                 <span className="text-[10px] sm:text-xs text-slate-500 font-bold uppercase">{extractionTargets.filter(Boolean).length} / 3 Targets</span>
               </div>
