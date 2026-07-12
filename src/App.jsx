@@ -38,7 +38,6 @@ import duckBase from './assets/Duck_Sprite_-_Item_-_Fortnite.webp';
 import duckGold from './assets/Gold_Duck_Sprite_-_Item_-_Fortnite.webp';
 import duckGummy from './assets/Gummy_Duck_Sprite_-_Item_-_Fortnite.webp';
 import duckGalaxy from './assets/Galaxy_Duck_Sprite_-_Item_-_Fortnite.webp';
-import duckHolofoil from './assets/Holofoil_Duck_Sprite_-_Item_-_Fortnite.webp';
 
 import dreamBase from './assets/Dream_Sprite_-_Item_-_Fortnite.webp';
 import dreamGold from './assets/Gold_Dream_Sprite_-_Item_-_Fortnite.webp';
@@ -102,15 +101,15 @@ const SPRITES_DATABASE = [
     id: "zero-point",
     name: "Zero Point",
     rarity: "Mythic",
-    images: { base: zpBase, gold: zpGold, gummy: zpGummy, galaxy: zpGalaxy, holofoil: zpBase },
-    rates: { base: "0.000098%", gold: "0.00012%", gummy: "0.00006%", galaxy: "0.00004%", holofoil: "TBD" },
+    images: { base: zpBase, gold: zpGold, gummy: zpGummy, galaxy: zpGalaxy },
+    rates: { base: "0.000098%", gold: "0.00012%", gummy: "0.00006%", galaxy: "0.00004%", holofoil: "N/A" },
     baseAbility: "Spawn a Shield Bubble Jr. when you use a healing item on yourself (excluding splashes and grenades). Duration at each Level Up: 6s -> 7s -> 8s -> 9s -> 10s."
   },
   {
     id: "burnt-peanut",
     name: "Burnt Peanut",
     rarity: "Mythic",
-    images: { base: peanutBase, gold: peanutBase, gummy: peanutBase, galaxy: peanutBase, holofoil: peanutBase },
+    images: { base: peanutBase, gold: peanutBase, gummy: peanutBase, galaxy: peanutBase },
     rates: { base: "1.01%", gold: "N/A", gummy: "N/A", galaxy: "N/A", holofoil: "N/A" },
     baseAbility: "Goop! When eliminating players, you may find more loot. Sometimes mythic! Chance at each Level Up: 20% -> 30% -> 40% -> 50% -> 60% chance (10% chance to find Mythic at Max Level!)."
   },
@@ -118,48 +117,48 @@ const SPRITES_DATABASE = [
     id: "dream",
     name: "Dream",
     rarity: "Legendary",
-    images: { base: dreamBase, gold: dreamGold, gummy: dreamGummy, galaxy: dreamGalaxy, holofoil: dreamBase },
-    rates: { base: "2.63%", gold: "0.03%", gummy: "0.02%", galaxy: "0.01%", holofoil: "TBD" },
+    images: { base: dreamBase, gold: dreamGold, gummy: dreamGummy, galaxy: dreamGalaxy },
+    rates: { base: "2.63%", gold: "0.03%", gummy: "0.02%", galaxy: "0.01%", holofoil: "N/A" },
     baseAbility: "Grants a random item at each level, exploding with legendary loot at Max Level. Loot value increases at each Level Up!"
   },
   {
     id: "punk",
     name: "Punk",
     rarity: "Legendary",
-    images: { base: punkBase, gold: punkGold, gummy: punkGummy, galaxy: punkGalaxy, holofoil: punkBase },
-    rates: { base: "1.98%", gold: "0.02%", gummy: "0.01%", galaxy: "0.01%", holofoil: "TBD" },
+    images: { base: punkBase, gold: punkGold, gummy: punkGummy, galaxy: punkGalaxy },
+    rates: { base: "1.98%", gold: "0.02%", gummy: "0.01%", galaxy: "0.01%", holofoil: "N/A" },
     baseAbility: "Does nothing until Level 5, in which it will always grant a buff for unlimited ammo."
   },
   {
     id: "boss",
     name: "Boss",
     rarity: "Legendary",
-    images: { base: bossBase, gold: bossGold, gummy: bossGummy, galaxy: bossGalaxy, holofoil: bossBase },
-    rates: { base: "2.63%", gold: "0.03%", gummy: "0.02%", galaxy: "0.01%", holofoil: "TBD" },
+    images: { base: bossBase, gold: bossGold, gummy: bossGummy, galaxy: bossGalaxy },
+    rates: { base: "2.63%", gold: "0.03%", gummy: "0.02%", galaxy: "0.01%", holofoil: "N/A" },
     baseAbility: "Grants an increase to your max HP and Shield. Increases at each Level Up: 5 -> 10 -> 15 -> 20 -> 25 HP/Shield."
   },
   {
     id: "grim",
     name: "Grim",
     rarity: "Legendary",
-    images: { base: grimBase, gold: grimGold, gummy: grimGummy, galaxy: grimGalaxy, holofoil: grimBase },
-    rates: { base: "0.0098%", gold: "0.00012%", gummy: "0.00006%", galaxy: "0.00004%", holofoil: "TBD" },
+    images: { base: grimBase, gold: grimGold, gummy: grimGummy, galaxy: grimGalaxy },
+    rates: { base: "0.0098%", gold: "0.00012%", gummy: "0.00006%", galaxy: "0.00004%", holofoil: "N/A" },
     baseAbility: "Players who attack you are marked for a duration. Duration at each Level Up: 3s -> 3.5s -> 4s -> 4.5s -> 5s."
   },
   {
     id: "duck",
     name: "Duck",
     rarity: "Epic",
-    images: { base: duckBase, gold: duckGold, gummy: duckGummy, galaxy: duckGalaxy, holofoil: duckHolofoil },
-    rates: { base: "5.74%", gold: "0.07%", gummy: "0.04%", galaxy: "0.02%", holofoil: "TBD" },
+    images: { base: duckBase, gold: duckGold, gummy: duckGummy, galaxy: duckGalaxy },
+    rates: { base: "5.74%", gold: "0.07%", gummy: "0.04%", galaxy: "0.02%", holofoil: "N/A" },
     baseAbility: "Emoting or Jamming replenishes shields. Increases in power at each Level Up: 2 -> 3 -> 4 -> 6 -> 8 Shield per tick."
   },
   {
     id: "demon",
     name: "Demon",
     rarity: "Epic",
-    images: { base: demonBase, gold: demonGold, gummy: demonGummy, galaxy: demonGalaxy, holofoil: demonBase },
-    rates: { base: "5.76%", gold: "0.07%", gummy: "0.04%", galaxy: "0.01%", holofoil: "TBD" },
+    images: { base: demonBase, gold: demonGold, gummy: demonGummy, galaxy: demonGalaxy },
+    rates: { base: "5.76%", gold: "0.07%", gummy: "0.04%", galaxy: "0.01%", holofoil: "N/A" },
     baseAbility: "Siphon some health and shields when you eliminate an opponent. Increases in power at each Level Up: 10 -> 15 -> 20 -> 25 -> 30 Healing per elimination."
   },
   {
@@ -182,8 +181,8 @@ const SPRITES_DATABASE = [
     id: "aura",
     name: "Aura",
     rarity: "Epic",
-    images: { base: auraBase, gold: auraGold, gummy: auraGummy, galaxy: auraGalaxy, holofoil: auraBase },
-    rates: { base: "5.74%", gold: "0.07%", gummy: "0.04%", galaxy: "0.02%", holofoil: "TBD" },
+    images: { base: auraBase, gold: auraGold, gummy: auraGummy, galaxy: auraGalaxy },
+    rates: { base: "5.74%", gold: "0.07%", gummy: "0.04%", galaxy: "0.02%", holofoil: "N/A" },
     baseAbility: "Gain a Shock Rock charge when you deal enough damage to enemies! Required damage decreases at each Level Up: 175 -> 150 -> 125 -> 100 -> 75 Damage to trigger."
   },
   {
@@ -206,8 +205,8 @@ const SPRITES_DATABASE = [
     id: "earth",
     name: "Earth",
     rarity: "Rare",
-    images: { base: earthBase, gold: earthGold, gummy: earthGummy, galaxy: earthGalaxy, holofoil: earthBase },
-    rates: { base: "12.83%", gold: "0.70%", gummy: "0.28%", galaxy: "0.28%", holofoil: "TBD" },
+    images: { base: earthBase, gold: earthGold, gummy: earthGummy, galaxy: earthGalaxy },
+    rates: { base: "12.83%", gold: "0.70%", gummy: "0.28%", galaxy: "0.28%", holofoil: "N/A" },
     baseAbility: "You have a chance to find additional rare items when opening chests. Chance increases at each Level Up: 10% -> 12.5% -> 15% -> 17.5% -> 20% chance."
   },
   {
@@ -222,14 +221,24 @@ const SPRITES_DATABASE = [
     id: "fishy",
     name: "Fishy",
     rarity: "Rare",
-    images: { base: fishyBase, gold: fishyGold, gummy: fishyGummy, galaxy: fishyGalaxy, holofoil: fishyBase },
-    rates: { base: "13.79%", gold: "0.17%", gummy: "0.08%", galaxy: "0.06%", holofoil: "TBD" },
+    images: { base: fishyBase, gold: fishyGold, gummy: fishyGummy, galaxy: fishyGalaxy },
+    rates: { base: "13.79%", gold: "0.17%", gummy: "0.08%", galaxy: "0.06%", holofoil: "N/A" },
     baseAbility: "Swim speed greatly increased. Taking damage also briefly increases movement speed. Tiers: 25%/10% -> 50%/20% -> 100%/30% -> 150%/40% -> 200%/50% bonuses."
   }
 ];
 
 // --- APP PATCH NOTES ---
 const PATCH_NOTES = [
+  {
+    version: "v1.2.1",
+    date: "07/11/2026",
+    title: "Holofoil Availability Hotfix",
+    changes: [
+      "Content Correction: Removed Holofoil variants for sprites that do not currently have them available in-game.",
+      "Only the Ghost, King, Water, Fire, and Striker Sprites currently drop in Holofoil rarity.",
+      "Note: If you had previously marked an unreleased Holofoil variant as collected, it has been safely hidden and your overall completion percentage has been properly adjusted."
+    ]
+  },
   {
     version: "v1.2.0",
     date: "07/08/2026",
