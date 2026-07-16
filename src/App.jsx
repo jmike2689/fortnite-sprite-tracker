@@ -2,97 +2,116 @@ import React, { useState, useEffect, useRef } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import PrivacyPolicy from './PrivacyPolicy';
 import {
-  Search, CheckCircle, Circle, Volume2, VolumeX, Percent, RotateCcw, AlertTriangle, X, Eye, Grid, Crown, Users, UserPlus, ChevronLeft, ChevronRight, Check, XCircle, UserMinus, Target, Plus, FileText, Radio, Info
+  Search, CheckCircle, Circle, Volume2, VolumeX, Percent, RotateCcw, AlertTriangle, X, Eye, Crown, Users, UserPlus, ChevronLeft, ChevronRight, Check, XCircle, UserMinus, Target, Plus, FileText, Radio, Info, MessageSquare, Mail, Lock, List, Filter, ChevronDown, ChevronUp
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { useAuth } from './AuthContext';
 // --- FIRESTORE & AUTH IMPORTS ---
-import { doc, getDoc, setDoc, updateDoc, collection as firestoreCollection, query, where, getDocs, arrayUnion, arrayRemove, deleteDoc, onSnapshot } from 'firebase/firestore';
+import { doc, getDoc, setDoc, updateDoc, collection as firestoreCollection, query, where, getDocs, arrayUnion, arrayRemove, deleteDoc, onSnapshot, addDoc } from 'firebase/firestore';
 import { sendPasswordResetEmail, onAuthStateChanged } from 'firebase/auth';
 import { auth, db } from './firebase';
 
-// --- VERBATIM ASSET IMPORTS ---
-import zpBase from './assets/Zero_Point_Sprite_-_Item_-_Fortnite.webp';
-import zpGold from './assets/Gold_Zero_Point_Sprite_-_Item_-_Fortnite.webp';
-import zpGummy from './assets/Gummy_Zero_Point_Sprite_-_Item_-_Fortnite.webp';
-import zpGalaxy from './assets/Galaxy_Zero_Point_Sprite_-_Item_-_Fortnite.webp';
+// --- NEW HIGH-RES ASSET IMPORTS ---
+import zpBase from './assets/Zero Point Base.webp';
+import zpGold from './assets/Zero Point Gold.webp';
+import zpGummy from './assets/Zero Point Gummy.webp';
+import zpGalaxy from './assets/Zero Point Galaxy.webp';
 
-import waterBase from './assets/Water_Sprite_-_Item_-_Fortnite.webp';
-import waterGold from './assets/Gold_Water_Sprite_-_Item_-_Fortnite.webp';
-import waterGummy from './assets/Gummy_Water_Sprite_-_Item_-_Fortnite.webp';
-import waterGalaxy from './assets/Galaxy_Water_Sprite_-_Item_-_Fortnite.webp';
-import waterHolofoil from './assets/Holofoil_Water_Sprite_-_Item_-_Fortnite.webp';
+import waterBase from './assets/Water Base.webp';
+import waterGold from './assets/Water Gold.webp';
+import waterGummy from './assets/Water Gummy.webp';
+import waterGalaxy from './assets/Water Galaxy.webp';
+import waterHolofoil from './assets/Water Holofoil.webp';
 
-import earthBase from './assets/Earth_Sprite_-_Item_-_Fortnite.webp';
-import earthGold from './assets/Gold_Earth_Sprite_-_Item_-_Fortnite.webp';
-import earthGummy from './assets/Gummy_Earth_Sprite_-_Item_-_Fortnite.webp';
-import earthGalaxy from './assets/Galaxy_Earth_Sprite_-_Item_-_Fortnite.webp';
+import earthBase from './assets/Earth Base.webp';
+import earthGold from './assets/Earth Gold.webp';
+import earthGummy from './assets/Earth Gummy.webp';
+import earthGalaxy from './assets/Earth Galaxy.webp';
 
-import fireBase from './assets/Fire_Sprite_-_Item_-_Fortnite.webp';
-import fireGold from './assets/Gold_Fire_Sprite_-_Item_-_Fortnite.webp';
-import fireGummy from './assets/Gummy_Fire_Sprite_-_Item_-_Fortnite.webp';
-import fireGalaxy from './assets/Galaxy_Fire_Sprite_-_Item_-_Fortnite.webp';
-import fireHolofoil from './assets/Holofoil_Fire_Sprite_-_Item_-_Fortnite.webp';
+import fireBase from './assets/Fire Base.webp';
+import fireGold from './assets/Fire Gold.webp';
+import fireGummy from './assets/Fire Gummy.webp';
+import fireGalaxy from './assets/Fire Galaxy.webp';
+import fireHolofoil from './assets/Fire Holofoil.webp';
 
-import duckBase from './assets/Duck_Sprite_-_Item_-_Fortnite.webp';
-import duckGold from './assets/Gold_Duck_Sprite_-_Item_-_Fortnite.webp';
-import duckGummy from './assets/Gummy_Duck_Sprite_-_Item_-_Fortnite.webp';
-import duckGalaxy from './assets/Galaxy_Duck_Sprite_-_Item_-_Fortnite.webp';
+import duckBase from './assets/Duck Base.webp';
+import duckGold from './assets/Duck Gold.webp';
+import duckGummy from './assets/Duck Gummy.webp';
+import duckGalaxy from './assets/Duck Galaxy.webp';
 
-import dreamBase from './assets/Dream_Sprite_-_Item_-_Fortnite.webp';
-import dreamGold from './assets/Gold_Dream_Sprite_-_Item_-_Fortnite.webp';
-import dreamGummy from './assets/Gummy_Dream_Sprite_-_Item_-_Fortnite.webp';
-import dreamGalaxy from './assets/Galaxy_Dream_Sprite_-_Item_-_Fortnite.webp';
+import dreamBase from './assets/Dream Base.webp';
+import dreamGold from './assets/Dream Gold.webp';
+import dreamGummy from './assets/Dream Gummy.webp';
+import dreamGalaxy from './assets/Dream Galaxy.webp';
 
-import demonBase from './assets/Demon_Sprite_-_Item_-_Fortnite.webp';
-import demonGold from './assets/Gold_Demon_Sprite_-_Item_-_Fortnite.webp';
-import demonGummy from './assets/Gummy_Demon_Sprite_-_Item_-_Fortnite.webp';
-import demonGalaxy from './assets/Galaxy_Demon_Sprite_-_Item_-_Fortnite.webp';
+import demonBase from './assets/Demon Base.webp';
+import demonGold from './assets/Demon Gold.webp';
+import demonGummy from './assets/Demon Gummy.webp';
+import demonGalaxy from './assets/Demon Galaxy.webp';
 
-import punkBase from './assets/Punk_Sprite_-_Item_-_Fortnite.webp';
-import punkGold from './assets/Gold_Punk_Sprite_-_Item_-_Fortnite.webp';
-import punkGummy from './assets/Gummy_Punk_Sprite_-_Item_-_Fortnite.webp';
-import punkGalaxy from './assets/Galaxy_Punk_Sprite_-_Item_-_Fortnite.webp';
+import punkBase from './assets/Punk Base.webp';
+import punkGold from './assets/Punk Gold.webp';
+import punkGummy from './assets/Punk Gummy.webp';
+import punkGalaxy from './assets/Punk Galaxy.webp';
 
-import peanutBase from './assets/Burnt_Peanut_-_Item_-_Fortnite.webp';
+import peanutBase from './assets/Burnt Peanut Base.webp';
 
-import ghostBase from './assets/Ghost_Sprite_-_Item_-_Fortnite.webp';
-import ghostGold from './assets/Gold_Ghost_Sprite_-_Item_-_Fortnite.webp';
-import ghostGummy from './assets/Gummy_Ghost_Sprite_-_Item_-_Fortnite.webp';
-import ghostGalaxy from './assets/Galaxy_Ghost_Sprite_-_Item_-_Fortnite.webp';
-import ghostHolofoil from './assets/Holofoil_Ghost_Sprite_-_Item_-_Fortnite.webp';
+import ghostBase from './assets/Ghost Base.webp';
+import ghostGold from './assets/Ghost Gold.webp';
+import ghostGummy from './assets/Ghost Gummy.webp';
+import ghostGalaxy from './assets/Ghost Galaxy.webp';
+import ghostHolofoil from './assets/Ghost Holofoil.webp';
 
-import kingBase from './assets/King_Sprite_-_Item_-_Fortnite.webp';
-import kingGold from './assets/Gold_King_Sprite_-_Item_-_Fortnite.webp';
-import kingGummy from './assets/Gummy_King_Sprite_-_Item_-_Fortnite.webp';
-import kingGalaxy from './assets/Galaxy_King_Sprite_-_Item_-_Fortnite.webp';
-import kingHolofoil from './assets/Holofoil_King_Sprite_-_Item_-_Fortnite.webp';
+import kingBase from './assets/King Base.webp';
+import kingGold from './assets/King Gold.webp';
+import kingGummy from './assets/King Gummy.webp';
+import kingGalaxy from './assets/King Galaxy.webp';
+import kingHolofoil from './assets/King Holofoil.webp';
 
-import auraBase from './assets/Aura_Sprite_-_Item_-_Fortnite.webp';
-import auraGold from './assets/Gold_Aura_Sprite_-_Item_-_Fortnite.webp';
-import auraGummy from './assets/Gummy_Aura_Sprite_-_Item_-_Fortnite.webp';
-import auraGalaxy from './assets/Galaxy_Aura_Sprite_-_Item_-_Fortnite.webp';
+import auraBase from './assets/Aura Base.webp';
+import auraGold from './assets/Aura Gold.webp';
+import auraGummy from './assets/Aura Gummy.webp';
+import auraGalaxy from './assets/Aura Galaxy.webp';
 
-import bossBase from './assets/Boss_Sprite_-_Item_-_Fortnite.webp';
-import bossGold from './assets/Gold_Boss_Sprite_-_Item_-_Fortnite.webp';
-import bossGummy from './assets/Gummy_Boss_Sprite_-_Item_-_Fortnite.webp';
-import bossGalaxy from './assets/Galaxy_Boss_Sprite_-_Item_-_Fortnite.webp';
+import bossBase from './assets/Boss Base.webp';
+import bossGold from './assets/Boss Gold.webp';
+import bossGummy from './assets/Boss Gummy.webp';
+import bossGalaxy from './assets/Boss Galaxy.webp';
 
-import fishyBase from './assets/Fishy_Sprite_-_Item_-_Fortnite.webp';
-import fishyGold from './assets/Gold_Fishy_Sprite_-_Item_-_Fortnite.webp';
-import fishyGummy from './assets/Gummy_Fishy_Sprite_-_Item_-_Fortnite.webp';
-import fishyGalaxy from './assets/Galaxy_Fishy_Sprite_-_Item_-_Fortnite.webp';
+import fishyBase from './assets/Fishy Base.webp';
+import fishyGold from './assets/Fishy Gold.webp';
+import fishyGummy from './assets/Fishy Gummy.webp';
+import fishyGalaxy from './assets/Fishy Galaxy.webp';
 
-import grimBase from './assets/Grim_Sprite_-_Item_-_Fortnite.webp';
-import grimGold from './assets/Gold_Grim_Sprite_-_Item_-_Fortnite.webp';
-import grimGummy from './assets/Gummy_Grim_Sprite_-_Item_-_Fortnite.webp';
-import grimGalaxy from './assets/Galaxy_Grim_Sprite_-_Item_-_Fortnite.webp';
+import grimBase from './assets/Grim Base.webp';
+import grimGold from './assets/Grim Gold.webp';
+import grimGummy from './assets/Grim Gummy.webp';
+import grimGalaxy from './assets/Grim Galaxy.webp';
 
-import strikerBase from './assets/Striker_Sprite_-_Item_-_Fortnite.webp';
-import strikerGold from './assets/Gold_Striker_Sprite_-_Item_-_Fortnite.webp';
-import strikerGummy from './assets/Gummy_Striker_Sprite_-_Item_-_Fortnite.webp';
-import strikerGalaxy from './assets/Galaxy_Striker_Sprite_-_Item_-_Fortnite.webp';
-import strikerHolofoil from './assets/Holofoil_Striker_Sprite_-_Item_-_Fortnite.webp';
+import strikerBase from './assets/Striker Base.webp';
+import strikerGold from './assets/Striker Gold.webp';
+import strikerGummy from './assets/Striker Gummy.webp';
+import strikerGalaxy from './assets/Striker Galaxy.webp';
+import strikerHolofoil from './assets/Striker Holofoil.webp';
+
+import airBase from './assets/Air base.webp';
+import airGold from './assets/Air gold.webp';
+import airGummy from './assets/Air gummy.webp';
+import airGalaxy from './assets/Air galaxy.webp';
+import airHolofoil from './assets/Air holofoil.webp';
+
+import sevenBase from './assets/Seven base.webp';
+import sevenGold from './assets/Seven gold.webp';
+import sevenGummy from './assets/Seven gummy.webp';
+import sevenGalaxy from './assets/Seven galaxy.webp';
+import sevenHolofoil from './assets/Seven holofoil.webp';
+
+import batmanBase from './assets/Batman base.webp';
+import batmanGold from './assets/Batman gold.webp';
+import batmanGummy from './assets/Batman gummy.webp';
+import batmanGalaxy from './assets/Batman galaxy.webp';
+import batmanHolofoil from './assets/Batman holofoil.webp';
+
 
 const variantsList = ['base', 'gold', 'gummy', 'galaxy', 'holofoil'];
 
@@ -112,6 +131,14 @@ const SPRITES_DATABASE = [
     images: { base: peanutBase, gold: peanutBase, gummy: peanutBase, galaxy: peanutBase },
     rates: { base: "1.01%", gold: "N/A", gummy: "N/A", galaxy: "N/A", holofoil: "N/A" },
     baseAbility: "Goop! When eliminating players, you may find more loot. Sometimes mythic! Chance at each Level Up: 20% -> 30% -> 40% -> 50% -> 60% chance (10% chance to find Mythic at Max Level!)."
+  },
+  {
+    id: "batman",
+    name: "Batman",
+    rarity: "Mythic",
+    images: { base: batmanBase, gold: batmanGold, gummy: batmanGummy, galaxy: batmanGalaxy, holofoil: batmanHolofoil },
+    rates: { base: "0.000098%", gold: "0.00012%", gummy: "0.00006%", galaxy: "0.00004%", holofoil: "TBD" },
+    baseAbility: "Grants the ability to launch in the air and deploy the Bat Cape!"
   },
   {
     id: "dream",
@@ -144,6 +171,14 @@ const SPRITES_DATABASE = [
     images: { base: grimBase, gold: grimGold, gummy: grimGummy, galaxy: grimGalaxy },
     rates: { base: "0.0098%", gold: "0.00012%", gummy: "0.00006%", galaxy: "0.00004%", holofoil: "N/A" },
     baseAbility: "Players who attack you are marked for a duration. Duration at each Level Up: 3s -> 3.5s -> 4s -> 4.5s -> 5s."
+  },
+  {
+    id: "seven",
+    name: "Seven",
+    rarity: "Legendary",
+    images: { base: sevenBase, gold: sevenGold, gummy: sevenGummy, galaxy: sevenGalaxy, holofoil: sevenHolofoil },
+    rates: { base: "2.63%", gold: "0.03%", gummy: "0.02%", galaxy: "0.01%", holofoil: "TBD" },
+    baseAbility: "Enemy player foot trails are visible in the world for your Squad. Duration increases at each Level Up: 10 Seconds -> 15 Seconds -> 20 Seconds -> 25 Seconds -> 30 Second foot trails."
   },
   {
     id: "duck",
@@ -224,41 +259,37 @@ const SPRITES_DATABASE = [
     images: { base: fishyBase, gold: fishyGold, gummy: fishyGummy, galaxy: fishyGalaxy },
     rates: { base: "13.79%", gold: "0.17%", gummy: "0.08%", galaxy: "0.06%", holofoil: "N/A" },
     baseAbility: "Swim speed greatly increased. Taking damage also briefly increases movement speed. Tiers: 25%/10% -> 50%/20% -> 100%/30% -> 150%/40% -> 200%/50% bonuses."
+  },
+  {
+    id: "air",
+    name: "Air",
+    rarity: "Rare",
+    images: { base: airBase, gold: airGold, gummy: airGummy, galaxy: airGalaxy, holofoil: airHolofoil },
+    rates: { base: "12.83%", gold: "0.70%", gummy: "0.28%", galaxy: "0.28%", holofoil: "TBD" },
+    baseAbility: "Increases sprinting speed and jump height. Also nullifies fall damage. Jump height increased with each Level Up!"
   }
 ];
 
 // --- APP PATCH NOTES ---
 const PATCH_NOTES = [
   {
-    version: "v1.2.1",
-    date: "07/11/2026",
-    title: "Holofoil Availability Hotfix",
+    version: "v1.5.0",
+    date: "07/16/2026",
+    title: "UI & High-Res Overhaul",
     changes: [
-      "Content Correction: Removed Holofoil variants for sprites that do not currently have them available in-game.",
-      "Only the Ghost, King, Water, Fire, and Striker Sprites currently drop in Holofoil rarity.",
-      "Note: If you had previously marked an unreleased Holofoil variant as collected, it has been safely hidden and your overall completion percentage has been properly adjusted."
+      "Massive UI Overhaul: The streamlined list format is now the standard for maximum clarity. All mastery functions are strictly moved to the Mastery Vault.",
+      "Inspection Modal: Tapping any Sprite now opens a crisp, high-resolution modal to view stats, inspect variants, and log your collection!",
+      "New Sprites: Welcome the Air (Rare), Seven (Legendary), and Batman (Mythic) Sprites to the tracking pool!",
+      "Filter Dropdown: We've added a clean new filter menu so you can easily sort by Rarity, Variant, and Collection Status."
     ]
   },
   {
-    version: "v1.2.0",
-    date: "07/08/2026",
-    title: "The Holofoil Integration",
+    version: "v1.4.1",
+    date: "07/15/2026",
+    title: "UX Streamline Update",
     changes: [
-      "NEW VARIANT: Added the elusive 'Holofoil' variant for all active sprites. Note: Some Holofoil variant images aren't available yet, but they can still be marked if found! Missing images will be added soon.",
-      "Holofoil Global Bonus: Grants a 5% increased chance of finding rare Sprites for yourself and your entire squad.",
-      "UI Refactor: 'Extraction Targets' has been compressed to a sleek pinned banner above the Sprite Squad list.",
-      "Target Filter: The Target Selector screen now intelligently hides sprites you already own.",
-      "Target Tracking: Inspecting a friend's library now highlights exact Extraction Matches with a glowing blue aura.",
-      "Mastery Bar: Added a new dedicated progress bar for the Mastery Vault."
-    ]
-  },
-  {
-    version: "v1.1.1",
-    date: "07/06/2026",
-    title: "Layering Hotfix",
-    changes: [
-      "Graphical Fix: Trapped the chevron arrows and mastery crowns within their proper containers to prevent overlay issues during scrolling.",
-      "Performance Fix: Eliminated the brief login screen flash for users who are already securely authenticated."
+      "Streamlined List View: The main screen is now a pure collection log. The list format is the default and only view for maximum clarity.",
+      "Accidental Click Prevention: Radio dots on the main list are now read-only indicators to prevent accidental unchecking while scrolling."
     ]
   }
 ];
@@ -268,38 +299,16 @@ const totalPossibleStatic = SPRITES_DATABASE.reduce((acc, sprite) => {
   return acc + validCount;
 }, 0);
 
-const UNOFFICIAL_LEAKS_DATABASE = [
-  { file: "ESD_ZeroPointSprite_Variant_Gem", sprite: "Zero Point", variant: "Gem", type: "Style Variant" },
-  { file: "ESD_ZeroPointSprite_Variant_Cube", sprite: "Zero Point", variant: "Cube", type: "Style Variant" },
-  { file: "ESD_ZeroPointSprite_Variant_Quack", sprite: "Zero Point", variant: "Quack", type: "Style Variant" },
-  { file: "ESD_PunkSprite_Variant_Gem", sprite: "Punk", variant: "Gem", type: "Style Variant" },
-  { file: "ESD_PunkSprite_Variant_Cube", sprite: "Punk", variant: "Cube", type: "Style Variant" },
-  { file: "ESD_SleepySprite_Variant_Gem", sprite: "Dream", variant: "Gem", type: "NEW SPRITE TYPE" },
-  { file: "ESD_SleepySprite_Variant_Cube", sprite: "Dream", variant: "Cube", type: "NEW SPRITE TYPE" },
-  { file: "ESD_DuckSprite_Variant_Gem", sprite: "Duck", variant: "Gem", type: "Style Variant" },
-  { file: "ESD_DemonSprite_Variant_Gem", sprite: "Demon", variant: "Gem", type: "Style Variant" },
-  { file: "ESD_GhostSprite_Variant_Gem", sprite: "Ghost", variant: "Gem", type: "Style Variant" },
-  { file: "ESD_Water_Variant_Gem", sprite: "Water", variant: "Gem", type: "Style Variant" },
-  { file: "ESD_EarthSprite_Variant_Gem", sprite: "Earth", variant: "Gem", type: "Style Variant" },
-  { file: "ESD_Spitfire_Variant_Gem", sprite: "Fire", variant: "Gem", type: "NEW SPRITE TYPE" }
-];
-
 const PROFANITY_LIST = [
   'fuck', 'shit', 'bitch', 'asshole', 'cunt', 'dick', 'pussy', 'whore', 'slut', 'fag', 'nigger', 'nigga', 'cock', 'bastard', 'crap'
 ];
 
 const VARIANT_INFO = {
-  base: { name: "Base", color: "text-blue-400" },
-  gold: { name: "Gold", color: "text-amber-400" },
-  gummy: { name: "Gummy", color: "text-pink-500" },
-  galaxy: { name: "Galaxy", color: "text-purple-400" },
-  holofoil: { name: "Holofoil", color: "text-sky-400" }
-};
-
-const LEAK_VARIANT_COLORS = {
-  Gem: "border-emerald-500/40 text-emerald-400 bg-emerald-950/20",
-  Cube: "border-purple-500/40 text-purple-400 bg-purple-950/20",
-  Quack: "border-yellow-500/40 text-yellow-400 bg-yellow-950/20"
+  base: { name: "Base", color: "text-blue-400", bgColor: "bg-blue-400" },
+  gold: { name: "Gold", color: "text-amber-400", bgColor: "bg-amber-400" },
+  gummy: { name: "Gummy", color: "text-pink-500", bgColor: "bg-pink-500" },
+  galaxy: { name: "Galaxy", color: "text-purple-400", bgColor: "bg-purple-400" },
+  holofoil: { name: "Holofoil", color: "text-sky-400", bgColor: "bg-sky-400" }
 };
 
 const RARITY_COLORS = {
@@ -320,7 +329,7 @@ const SUMMON_COST_MATRIX = {
   Mythic: { base: "7,500", variant: "15,000" },
   Legendary: { base: "5,000", variant: "10,000" },
   Epic: { base: "3,000", variant: "6,000" },
-  Rare: { base: "100", variant: "4,000" }
+  Rare: { base: "2,000", variant: "4,000" }
 };
 
 function MainApp() {
@@ -342,11 +351,16 @@ function MainApp() {
   // --- NAVIGATION & UI STATES ---
   const [currentView, setCurrentView] = useState('sprites');
   const [searchQuery, setSearchQuery] = useState('');
+  const [showFilters, setShowFilters] = useState(false);
   const [rarityFilter, setRarityFilter] = useState('All');
+  const [variantFilter, setVariantFilter] = useState('All');
+  const [statusFilter, setStatusFilter] = useState('All');
+
   const [soundEnabled, setSoundEnabled] = useState(true);
   const [showResetConfirm, setShowResetConfirm] = useState(false);
   const [showUnfriendConfirm, setShowUnfriendConfirm] = useState(null);
   const [viewingTabs, setViewingTabs] = useState({});
+  const [selectedSprite, setSelectedSprite] = useState(null);
   const audioCtxRef = useRef(null);
 
   // --- PATCH NOTES STATES ---
@@ -358,6 +372,10 @@ function MainApp() {
   const [collection, setCollection] = useState({});
   const [mastery, setMastery] = useState({});
   const [extractionTargets, setExtractionTargets] = useState([]);
+
+  // --- FEEDBACK FORM STATES ---
+  const [feedbackText, setFeedbackText] = useState("");
+  const [feedbackStatus, setFeedbackStatus] = useState("idle");
 
   // --- FRIEND & INSPECTION STATES ---
   const [friendSearchQuery, setFriendSearchQuery] = useState('');
@@ -626,6 +644,29 @@ function MainApp() {
       .catch((error) => alert(error.message));
   };
 
+  // --- FEEDBACK HANDLER ---
+  const handleFeedbackSubmit = async (e) => {
+    e.preventDefault();
+    if (!feedbackText.trim()) return;
+
+    setFeedbackStatus('submitting');
+    try {
+      await addDoc(firestoreCollection(db, "feedback"), {
+        uid: user?.uid || "anonymous",
+        spriteId: spriteId || "Unknown",
+        message: feedbackText,
+        timestamp: new Date()
+      });
+      setFeedbackStatus('success');
+      setFeedbackText('');
+      setTimeout(() => setFeedbackStatus('idle'), 3000);
+    } catch (error) {
+      console.error("Feedback error:", error);
+      setFeedbackStatus('error');
+      setTimeout(() => setFeedbackStatus('idle'), 3000);
+    }
+  };
+
   // --- SOCIAL OPERATIONS ---
   const handleSearchFriend = async () => {
     if (!friendSearchQuery || friendSearchQuery.toLowerCase() === spriteId) return;
@@ -804,18 +845,42 @@ function MainApp() {
   const masteryRate = totalPossibleStatic > 0 ? Math.round((totalMastered / totalPossibleStatic) * 100) : 0;
 
   const isMasteryView = currentView === 'mastery';
+  const displayVariantKey = variantFilter.toLowerCase();
 
   const filteredSprites = SPRITES_DATABASE.filter(sprite => {
     const matchesSearch = sprite.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       sprite.baseAbility.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesRarity = rarityFilter === 'All' || sprite.rarity === rarityFilter;
+    const matchesVariant = variantFilter === 'All' || sprite.rates[displayVariantKey] !== "N/A";
 
-    if (isMasteryView) {
-      const spriteMastery = mastery[sprite.id] || {};
-      const hasMastery = variantsList.some(v => spriteMastery[v] === true);
-      return matchesSearch && matchesRarity && hasMastery;
+    // Status Filter Logic
+    let matchesStatus = true;
+    if (statusFilter !== 'All') {
+      if (isMasteryView) {
+        if (statusFilter === 'Mastered') {
+          matchesStatus = variantFilter === 'All' ? variantsList.some(v => mastery[sprite.id]?.[v] === true) : mastery[sprite.id]?.[displayVariantKey] === true;
+        } else if (statusFilter === 'Unmastered') {
+          matchesStatus = variantFilter === 'All' ? variantsList.some(v => collection[sprite.id]?.[v] === true && !mastery[sprite.id]?.[v]) : (collection[sprite.id]?.[displayVariantKey] === true && !mastery[sprite.id]?.[displayVariantKey]);
+        }
+      } else {
+        if (statusFilter === 'Collected') {
+          matchesStatus = variantFilter === 'All' ? variantsList.some(v => collection[sprite.id]?.[v] === true) : collection[sprite.id]?.[displayVariantKey] === true;
+        } else if (statusFilter === 'Missing') {
+          // To be missing, it must be available to collect but NOT collected.
+          matchesStatus = variantFilter === 'All' ? variantsList.some(v => sprite.rates[v] !== "N/A" && !collection[sprite.id]?.[v]) : (sprite.rates[displayVariantKey] !== "N/A" && !collection[sprite.id]?.[displayVariantKey]);
+        }
+      }
     }
-    return matchesSearch && matchesRarity;
+
+    if (isMasteryView && statusFilter === 'All') {
+      const status = collection[sprite.id] || {};
+      const hasCollected = variantFilter === 'All'
+        ? variantsList.some(v => status[v] === true)
+        : status[displayVariantKey] === true;
+      return matchesSearch && matchesRarity && matchesVariant && matchesStatus && hasCollected;
+    }
+
+    return matchesSearch && matchesRarity && matchesVariant && matchesStatus;
   });
 
   const getVariantModifierText = (variantName) => {
@@ -932,6 +997,112 @@ function MainApp() {
 
   return (
     <div className="min-h-screen bg-[#0b0c10] text-gray-100 flex flex-col font-sans select-none relative">
+
+      {/* --- MODAL: SPRITE INSPECTION --- */}
+      {selectedSprite && (
+        <div className="fixed inset-0 z-[70] flex items-center justify-center p-4 bg-black/90 backdrop-blur-md animate-in fade-in zoom-in-95 duration-200">
+          {(() => {
+            const sprite = SPRITES_DATABASE.find(s => s.id === selectedSprite.id);
+            const validVariants = variantsList.filter(v => sprite.rates[v] !== "N/A");
+            const v = selectedSprite.variant;
+            const vIndex = validVariants.indexOf(v);
+
+            const isCollected = collection[sprite.id]?.[v];
+            const isMastered = mastery[sprite.id]?.[v];
+            const variantModifier = getVariantModifierText(v);
+
+            const handlePrevVariant = () => {
+              const newV = validVariants[vIndex === 0 ? validVariants.length - 1 : vIndex - 1];
+              setSelectedSprite({ id: sprite.id, variant: newV });
+            };
+
+            const handleNextVariant = () => {
+              const newV = validVariants[vIndex === validVariants.length - 1 ? 0 : vIndex + 1];
+              setSelectedSprite({ id: sprite.id, variant: newV });
+            };
+
+            return (
+              <div className="bg-[#12141f] border border-slate-700/80 rounded-3xl w-full max-w-sm overflow-hidden relative shadow-[0_10px_40px_rgba(0,0,0,0.8)]">
+                <button onClick={() => setSelectedSprite(null)} className="absolute top-4 right-4 z-50 p-2 bg-black/60 rounded-full text-slate-400 hover:text-white transition-colors">
+                  <X className="w-5 h-5" />
+                </button>
+
+                <div className={`w-full aspect-square bg-gradient-to-b ${RARITY_BG_GRADIENTS[sprite.rarity]} flex items-center justify-center relative`}>
+                  {validVariants.length > 1 && (
+                    <button onClick={handlePrevVariant} className="absolute left-4 z-40 p-2 bg-black/40 rounded-full hover:bg-black/60 transition-colors">
+                      <ChevronLeft className="w-6 h-6 text-white" />
+                    </button>
+                  )}
+
+                  {/* Fixed scaling parameters to prevent blurry upscaling of webp images */}
+                  <img
+                    src={sprite.images[v]}
+                    className="w-32 h-32 sm:w-40 sm:h-40 object-contain drop-shadow-[0_0_20px_rgba(255,255,255,0.2)]"
+                    alt=""
+                  />
+
+                  {validVariants.length > 1 && (
+                    <button onClick={handleNextVariant} className="absolute right-4 z-40 p-2 bg-black/40 rounded-full hover:bg-black/60 transition-colors">
+                      <ChevronRight className="w-6 h-6 text-white" />
+                    </button>
+                  )}
+                </div>
+
+                <div className="p-5 flex flex-col gap-4">
+                  <div>
+                    <h3 className="text-2xl sm:text-3xl font-black text-white uppercase italic tracking-tight">{v !== 'base' ? `${v} ` : ''}{sprite.name}</h3>
+                    <div className="flex items-center gap-2 mt-1">
+                      <span className={`text-[9px] sm:text-[10px] font-black uppercase px-2 py-0.5 rounded border ${RARITY_COLORS[sprite.rarity]}`}>
+                        {sprite.rarity}
+                      </span>
+                      <span className={`text-[9px] sm:text-[10px] font-black uppercase px-2 py-0.5 rounded border border-slate-700 bg-slate-800 ${VARIANT_INFO[v]?.color}`}>
+                        {v}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="bg-black/30 rounded-xl p-3 border border-slate-800/60">
+                    <p className="text-sm text-slate-300 leading-snug">
+                      <span className="font-mono text-[10px] font-black text-cyan-400 block tracking-wider uppercase mb-1">Base Ability:</span>
+                      {sprite.baseAbility}
+                    </p>
+                    {variantModifier && (
+                      <p className="text-sm text-slate-200 mt-2 pt-2 border-t border-slate-800/60">
+                        <span className="font-mono text-[10px] font-black text-yellow-400 block tracking-wider uppercase mb-1">+{v} Modifier:</span>
+                        {variantModifier}
+                      </p>
+                    )}
+                  </div>
+
+                  <div className="flex gap-2">
+                    {/* Only show 'Collect' button if in Sprites View */}
+                    {!isMasteryView && (
+                      <button
+                        onClick={() => handleToggleCheck(sprite.id, v)}
+                        className={`flex-1 flex flex-col items-center justify-center py-2.5 rounded-xl border-2 transition-all ${isCollected ? 'bg-cyan-900/40 border-cyan-500 text-cyan-400' : 'bg-slate-900/60 border-slate-700 text-slate-400 hover:border-slate-500'}`}
+                      >
+                        {isCollected ? <CheckCircle className="w-5 h-5 mb-1" /> : <Circle className="w-5 h-5 mb-1 opacity-50" />}
+                        <span className="text-[10px] font-black uppercase tracking-wider">{isCollected ? 'Collected' : 'Collect'}</span>
+                      </button>
+                    )}
+
+                    {/* Only show 'Master' button if in Mastery View */}
+                    {isMasteryView && (
+                      <button
+                        onClick={() => toggleMastery(sprite.id, v)}
+                        className={`flex-1 flex flex-col items-center justify-center py-2.5 rounded-xl border-2 transition-all ${!isCollected ? 'opacity-30 cursor-not-allowed bg-slate-900 border-slate-800 text-slate-600' : isMastered ? 'bg-yellow-900/40 border-yellow-500 text-yellow-400 shadow-[0_0_15px_rgba(255,215,0,0.2)]' : 'bg-slate-900/60 border-slate-700 text-slate-400 hover:border-yellow-500/50 hover:text-yellow-500'}`}
+                      >
+                        <Crown className="w-5 h-5 mb-1" />
+                        <span className="text-[10px] font-black uppercase tracking-wider">{isMastered ? 'Mastered' : 'Set Lvl 5'}</span>
+                      </button>
+                    )}
+                  </div>
+                </div>
+              </div>
+            );
+          })()}
+        </div>
+      )}
 
       {/* --- MENU: TRANSMISSION SPLASH SCREEN --- */}
       {showTransmission && (
@@ -1189,17 +1360,6 @@ function MainApp() {
                           </div>
                         )}
 
-                        {validVariantsInRow.length > 1 && (
-                          <>
-                            <button onClick={handleInspectPrev} className="absolute left-0 top-0 bottom-0 px-0.5 z-30 flex items-center justify-center transition-transform hover:scale-110">
-                              <ChevronLeft className="w-5 h-5 text-white drop-shadow-[0_0_5px_rgba(0,0,0,0.8)]" />
-                            </button>
-                            <button onClick={handleInspectNext} className="absolute right-0 top-0 bottom-0 px-0.5 z-30 flex items-center justify-center transition-transform hover:scale-110">
-                              <ChevronRight className="w-5 h-5 text-white drop-shadow-[0_0_5px_rgba(0,0,0,0.8)]" />
-                            </button>
-                          </>
-                        )}
-
                         {variantsList.map(v => {
                           if (sprite.rates[v] === "N/A") return null;
                           const isVisible = currentTab === v;
@@ -1213,6 +1373,14 @@ function MainApp() {
                           );
                         })}
                       </div>
+
+                      {validVariantsInRow.length > 1 && (
+                        <div className="flex items-center justify-between bg-black/40 rounded-md border border-slate-800/50 p-0.5">
+                          <button onClick={handleInspectPrev} className="p-1 hover:bg-slate-700 rounded transition-colors"><ChevronLeft className="w-3.5 h-3.5 text-slate-400 hover:text-white" /></button>
+                          <span className={`text-[8px] sm:text-[9px] font-black uppercase ${VARIANT_INFO[currentTab]?.color}`}>{currentTab}</span>
+                          <button onClick={handleInspectNext} className="p-1 hover:bg-slate-700 rounded transition-colors"><ChevronRight className="w-3.5 h-3.5 text-slate-400 hover:text-white" /></button>
+                        </div>
+                      )}
 
                       {friendStatus[currentTab] && (
                         <div className={`w-full py-1.5 rounded-lg text-[9px] sm:text-[10px] font-black uppercase text-center border flex items-center justify-center gap-1 ${friendMastery[currentTab] ? 'bg-yellow-500/10 border-yellow-500/30 text-yellow-400' : 'bg-slate-900 border-slate-800 text-slate-400'}`}>
@@ -1236,9 +1404,8 @@ function MainApp() {
                       if (sprite.rates[v] === "N/A") return <div key={v} className="py-2 text-center text-[9px] text-slate-800 font-bold border-r border-slate-800/40 last:border-r-0">N/A</div>;
 
                       return (
-                        <button
+                        <div
                           key={v}
-                          onClick={() => setViewingTabs({ ...viewingTabs, [`inspect_${sprite.id}`]: v })}
                           className={`py-3 flex flex-col items-center gap-1.5 text-[7px] sm:text-[8px] font-bold uppercase tracking-wider border-r border-slate-800/40 last:border-r-0 transition-colors ${currentTab === v ? 'bg-slate-800/40 text-white' : 'text-slate-600'}`}
                         >
                           {v}
@@ -1249,7 +1416,7 @@ function MainApp() {
                           ) : (
                             <div className="w-4 h-4" />
                           )}
-                        </button>
+                        </div>
                       );
                     })}
                   </div>
@@ -1313,7 +1480,7 @@ function MainApp() {
                   <h2 className="text-xl sm:text-2xl font-black text-yellow-400 uppercase italic">Mastery Vault</h2>
                 </div>
                 <p className="text-sm sm:text-base text-slate-300 leading-relaxed mb-4">
-                  Your most prestigious assets. Only variants that have reached Level 5 and earned a crown are displayed here.
+                  Select variants you have already collected and upgrade them to Mastered status once they reach Level 5.
                 </p>
 
                 <div className="mt-2">
@@ -1328,229 +1495,119 @@ function MainApp() {
               </section>
             )}
 
+            {/* --- FILTER & SEARCH SECTION --- */}
             <section className="flex flex-col gap-2 bg-[#12141f] p-3 rounded-xl border border-slate-800/80">
-              <div className="relative">
-                <Search className="w-4 h-4 text-cyan-500/70 absolute left-3 top-3" />
-                <input
-                  type="text" placeholder="Search sprites..." value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full bg-black/50 border-2 border-slate-800 rounded-xl pl-9 pr-3 py-2 text-sm sm:text-base text-white focus:outline-none focus:border-cyan-500"
-                />
+              <div className="flex gap-2">
+                <div className="relative flex-1">
+                  <Search className="w-4 h-4 text-cyan-500/70 absolute left-3 top-3" />
+                  <input
+                    type="text" placeholder="Search sprites..." value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="w-full bg-black/50 border-2 border-slate-800 rounded-xl pl-9 pr-3 py-2 text-sm sm:text-base text-white focus:outline-none focus:border-cyan-500"
+                  />
+                </div>
+                <button
+                  onClick={() => setShowFilters(!showFilters)}
+                  className={`px-4 flex items-center gap-2 rounded-xl border-2 transition-all font-black text-xs uppercase tracking-wider ${showFilters ? 'bg-cyan-900/40 border-cyan-500 text-cyan-400' : 'bg-slate-900 border-slate-800 text-slate-400 hover:bg-slate-800'}`}
+                >
+                  <Filter className="w-4 h-4" />
+                  Filters
+                  {showFilters ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                </button>
               </div>
-              <div className="flex gap-1 overflow-x-auto py-1">
-                {['All', 'Mythic', 'Legendary', 'Epic', 'Rare'].map(rarity => (
-                  <button key={rarity} onClick={() => setRarityFilter(rarity)} className={`px-3 py-1.5 text-[10px] sm:text-[11px] font-black tracking-wider rounded-lg border uppercase ${rarityFilter === rarity ? 'bg-cyan-400 text-black border-cyan-300' : 'bg-black/40 text-slate-400 border-slate-800'}`}>
-                    {rarity}
-                  </button>
-                ))}
-              </div>
+
+              {/* COLLAPSIBLE FILTER DROPDOWN */}
+              {showFilters && (
+                <div className="flex flex-col gap-3 mt-3 pt-3 border-t border-slate-800/80 animate-in slide-in-from-top-2">
+                  <div>
+                    <span className="text-[9px] text-slate-500 font-black uppercase tracking-widest mb-1.5 block">Rarity</span>
+                    <div className="flex flex-wrap gap-1.5">
+                      {['All', 'Mythic', 'Legendary', 'Epic', 'Rare'].map(rarity => (
+                        <button key={rarity} onClick={() => setRarityFilter(rarity)} className={`px-3 py-1.5 text-[10px] font-black tracking-wider rounded-lg border uppercase ${rarityFilter === rarity ? 'bg-cyan-400 text-black border-cyan-300' : 'bg-black/40 text-slate-400 border-slate-800'}`}>
+                          {rarity}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                  <div>
+                    <span className="text-[9px] text-slate-500 font-black uppercase tracking-widest mb-1.5 block">Variant Type</span>
+                    <div className="flex flex-wrap gap-1.5">
+                      {['All', 'Base', 'Gold', 'Gummy', 'Galaxy', 'Holofoil'].map(variant => (
+                        <button key={variant} onClick={() => setVariantFilter(variant)} className={`px-3 py-1.5 text-[10px] font-black tracking-wider rounded-lg border uppercase ${variantFilter === variant ? 'bg-purple-500 text-white border-purple-400' : 'bg-black/40 text-slate-400 border-slate-800'}`}>
+                          {variant}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                  <div>
+                    <span className="text-[9px] text-slate-500 font-black uppercase tracking-widest mb-1.5 block">Collection Status</span>
+                    <div className="flex flex-wrap gap-1.5">
+                      {['All', isMasteryView ? 'Mastered' : 'Collected', isMasteryView ? 'Unmastered' : 'Missing'].map(status => (
+                        <button key={status} onClick={() => setStatusFilter(status)} className={`px-3 py-1.5 text-[10px] font-black tracking-wider rounded-lg border uppercase ${statusFilter === status ? 'bg-emerald-500 text-white border-emerald-400' : 'bg-black/40 text-slate-400 border-slate-800'}`}>
+                          {status}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
             </section>
 
-            <section className="flex flex-col gap-4">
-              {filteredSprites.length === 0 && isMasteryView && (
+            <section className="flex flex-col">
+              {filteredSprites.length === 0 && (
                 <div className="text-center p-8 bg-[#12141f] rounded-2xl border border-slate-800">
                   <Crown className="w-12 h-12 text-slate-700 mx-auto mb-4" />
-                  <p className="text-sm sm:text-base text-slate-400 font-bold uppercase tracking-widest">No Crowns Yet</p>
-                  <p className="text-sm sm:text-base text-slate-500 mt-2">Level up a variant and mark it as mastered to see it here.</p>
+                  <p className="text-sm sm:text-base text-slate-400 font-bold uppercase tracking-widest">{isMasteryView ? "No Collectables Found" : "No Sprites Found"}</p>
+                  <p className="text-sm sm:text-base text-slate-500 mt-2">{isMasteryView ? "You must collect variants in the Sprites tab before you can master them here." : "Try adjusting your search or filters."}</p>
                 </div>
               )}
 
-              {filteredSprites.map(sprite => {
-                const status = collection[sprite.id] || {};
-                const spriteMastery = mastery[sprite.id] || {};
+              {/* COMPACT LIST VIEW */}
+              <div className="flex flex-col gap-2 animate-in fade-in duration-300">
+                {filteredSprites.map(sprite => {
+                  const displayVariant = variantFilter === 'All' ? 'base' : variantFilter.toLowerCase();
+                  const validInitialVariant = sprite.rates[displayVariant] !== "N/A" ? displayVariant : 'base';
+                  const isCollectedMain = collection[sprite.id]?.[validInitialVariant];
 
-                const validVariantsInRow = variantsList.filter(v => sprite.rates[v] !== "N/A");
-                const masteredCount = validVariantsInRow.filter(v => status[v]).length;
-                const totalValidCount = validVariantsInRow.length;
-
-                const rarityStyle = RARITY_COLORS[sprite.rarity] || 'bg-slate-700 text-white';
-                const spriteBgGradient = RARITY_BG_GRADIENTS[sprite.rarity] || 'from-slate-700 to-slate-900';
-
-                const currentTab = viewingTabs[sprite.id] || 'base';
-
-                const handlePrevImage = (e) => {
-                  e.stopPropagation();
-                  const currentIndex = validVariantsInRow.indexOf(currentTab);
-                  const newIndex = currentIndex === 0 ? validVariantsInRow.length - 1 : currentIndex - 1;
-                  setViewingTabs(prev => ({ ...prev, [sprite.id]: validVariantsInRow[newIndex] }));
-                };
-
-                const handleNextImage = (e) => {
-                  e.stopPropagation();
-                  const currentIndex = validVariantsInRow.indexOf(currentTab);
-                  const newIndex = currentIndex === validVariantsInRow.length - 1 ? 0 : currentIndex + 1;
-                  setViewingTabs(prev => ({ ...prev, [sprite.id]: validVariantsInRow[newIndex] }));
-                };
-
-                const variantModifier = getVariantModifierText(currentTab);
-                const isCurrentTabCollected = status[currentTab];
-                const isCurrentTabMastered = spriteMastery[currentTab];
-
-                return (
-                  <article
-                    key={sprite.id}
-                    className={`bg-[#151722] rounded-2xl overflow-hidden border-2 transition-all duration-300 border-slate-800/90`}
-                  >
-                    <div className="p-4 flex gap-4">
-
-                      <div className="flex flex-col gap-2 w-24 sm:w-28 flex-shrink-0">
-                        <div className={`w-24 h-24 sm:w-28 sm:h-28 bg-gradient-to-b ${spriteBgGradient} rounded-xl p-0.5 border-2 relative overflow-hidden z-0 transition-all duration-300 ${isCurrentTabMastered ? 'border-yellow-400 shadow-[0_0_20px_rgba(255,215,0,0.4)]' : 'border-white/10'}`}>
-
-                          {isCurrentTabMastered && (
-                            <div className="absolute top-1 right-1 z-40 bg-black/60 rounded-full p-0.5 border border-yellow-500/50">
-                              <Crown className="w-4 h-4 sm:w-5 sm:h-5 text-yellow-400 drop-shadow-[0_0_8px_rgba(255,215,0,1)]" />
-                            </div>
-                          )}
-
-                          {validVariantsInRow.length > 1 && (
-                            <>
-                              <button onClick={handlePrevImage} className="absolute left-0 top-0 bottom-0 px-0.5 z-30 flex items-center justify-center transition-transform hover:scale-110">
-                                <ChevronLeft className="w-5 h-5 text-white drop-shadow-[0_0_5px_rgba(0,0,0,0.8)]" />
-                              </button>
-                              <button onClick={handleNextImage} className="absolute right-0 top-0 bottom-0 px-0.5 z-30 flex items-center justify-center transition-transform hover:scale-110">
-                                <ChevronRight className="w-5 h-5 text-white drop-shadow-[0_0_5px_rgba(0,0,0,0.8)]" />
-                              </button>
-                            </>
-                          )}
-
-                          {variantsList.map(v => {
-                            if (sprite.rates[v] === "N/A") return null;
-                            const isVisible = currentTab === v;
-                            return (
-                              <img
-                                key={v}
-                                src={sprite.images[v]}
-                                alt={`${sprite.name} ${v}`}
-                                className={`absolute inset-0 w-full h-full object-contain rounded-lg p-1 transition-opacity duration-150 ${isVisible ? 'opacity-100 z-10' : 'opacity-0 z-0'}`}
-                              />
-                            );
-                          })}
-                          <span className="absolute bottom-1 right-1 bg-black/80 font-mono text-[9px] sm:text-[10px] font-black text-cyan-400 px-1.5 rounded border border-slate-700/60 z-20">
-                            {masteredCount}/{totalValidCount}
-                          </span>
+                  return (
+                    <div
+                      key={sprite.id}
+                      onClick={() => setSelectedSprite({ id: sprite.id, variant: validInitialVariant })}
+                      className="flex items-center justify-between bg-[#151722] border border-slate-800/90 rounded-xl p-3 hover:bg-slate-800/80 transition-colors cursor-pointer"
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className={`w-12 h-12 rounded-lg p-1 border-2 transition-all flex-shrink-0 ${isCollectedMain ? 'bg-cyan-950/40 border-cyan-500/50' : 'bg-slate-900 border-slate-800 grayscale opacity-60'}`}>
+                          <img src={sprite.images[validInitialVariant]} className="w-full h-full object-contain drop-shadow-md" alt="" />
                         </div>
-
-                        {isCurrentTabCollected && !isMasteryView && (
-                          <button
-                            onClick={() => toggleMastery(sprite.id, currentTab)}
-                            className={`w-full py-1.5 rounded-lg text-[9px] sm:text-[10px] font-black uppercase tracking-wider flex flex-col items-center justify-center gap-0.5 transition-all border-2 ${isCurrentTabMastered ? 'bg-yellow-500/20 text-yellow-400 border-yellow-500/50 shadow-[0_0_15px_rgba(255,215,0,0.2)]' : 'bg-slate-900 text-slate-400 border-slate-800 hover:bg-slate-800 hover:text-white'}`}
-                          >
-                            <Crown className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-                            {isCurrentTabMastered ? 'Mastered' : 'Set Lvl 5'}
-                          </button>
-                        )}
-
-                        {isCurrentTabMastered && isMasteryView && (
-                          <div className="w-full py-1.5 rounded-lg bg-yellow-500/10 border border-yellow-500/30 flex flex-col items-center justify-center gap-0.5 text-yellow-400 text-[9px] sm:text-[10px] font-black uppercase text-center">
-                            <Crown className="w-3.5 h-3.5 sm:w-4 sm:h-4" /> Mastered
-                          </div>
-                        )}
-                      </div>
-
-                      <div className="flex-1 min-w-0 flex flex-col justify-start">
-                        <div className="flex items-center justify-between gap-2">
-                          <h4 className="font-black text-lg sm:text-xl text-white tracking-tight uppercase italic">{sprite.name}</h4>
-                          <div className="flex items-center gap-1 flex-shrink-0">
-                            <span className={`text-[8px] sm:text-[9px] font-black uppercase px-2 py-0.5 rounded-md border ${rarityStyle}`}>
-                              {sprite.rarity}
-                            </span>
-                          </div>
-                        </div>
-
-                        <div className="flex items-center gap-2 mt-1">
-                          <div className="bg-cyan-950/40 border border-cyan-800/20 rounded-md px-2 py-0.5 flex items-center gap-1">
-                            {sprite.rates[currentTab] !== "TBD" && <Percent className="w-3 h-3 text-cyan-400" />}
-                            <span className="text-[10px] sm:text-xs font-mono font-black text-white">{sprite.rates[currentTab]}</span>
-                          </div>
-                          <span className="text-[9px] sm:text-[10px] bg-slate-900 text-slate-400 font-mono font-bold px-1.5 py-1 rounded border border-slate-800">
-                            {getDynamicSummonCost(sprite.rarity, currentTab)} DUST
-                          </span>
-                        </div>
-
-                        <div className="mt-2.5 bg-black/20 rounded-lg p-2 border border-slate-800/40">
-                          <p className="text-sm sm:text-base text-slate-300 leading-snug">
-                            <span className="font-mono text-[10px] sm:text-xs font-black text-cyan-400 block tracking-wider uppercase mb-0.5">
-                              BASE SPRITE PERK:
-                            </span>
-                            {sprite.baseAbility}
-                          </p>
-                        </div>
-
-                        <div className="mt-2 min-h-[48px] rounded-lg p-2 border border-slate-800/30 bg-black/40 flex items-center">
-                          <div className="w-full text-left">
-                            {variantModifier ? (
-                              <p className="text-sm sm:text-base text-slate-200">
-                                <span className="font-mono text-[10px] sm:text-xs font-black text-yellow-400 block tracking-wider uppercase mb-0.5">
-                                  +{currentTab.toUpperCase()} STYLE MODIFIER:
-                                </span>
-                                {variantModifier}
-                              </p>
-                            ) : (
-                              <div className="w-full opacity-95">
-                                <span className="font-mono text-[10px] sm:text-xs font-black text-slate-500 block tracking-wider uppercase mb-0.5">
-                                  GLOBAL STYLE BONUSES
-                                </span>
-                                <p className="text-[10px] sm:text-xs text-slate-400 font-mono leading-relaxed">
-                                  <span className="text-amber-400 font-bold">GOLD:</span> 3x XP <span className="text-slate-600 px-0.5">|</span> <span className="text-pink-400 font-bold">GUMMY:</span> +20% Dust <span className="text-slate-600 px-0.5">|</span> <span className="text-purple-400 font-bold">GALAXY:</span> +30% Ammo <span className="text-slate-600 px-0.5">|</span> <span className="text-sky-400 font-bold">HOLOFOIL:</span> +5% Rare Drop
-                                </p>
-                              </div>
-                            )}
-                          </div>
+                        <div className="flex flex-col">
+                          <span className="font-black text-sm sm:text-base text-white uppercase italic tracking-tight">{sprite.name}</span>
+                          <span className={`text-[8px] sm:text-[9px] font-black uppercase tracking-wider ${VARIANT_INFO[validInitialVariant]?.color}`}>{validInitialVariant}</span>
                         </div>
                       </div>
-                    </div>
 
-                    <div className="grid grid-cols-5 border-t-2 border-slate-800/80 bg-black/40">
-                      {variantsList.map(variant => {
-                        const isNa = sprite.rates[variant] === "N/A";
-                        const isChecked = status[variant];
-                        const isVariantMastered = spriteMastery[variant];
-                        const isActiveTab = currentTab === variant;
+                      {/* Non-Interactive Labeled Radio Dots Container */}
+                      <div className="flex gap-1.5 sm:gap-2">
+                        {variantsList.map(v => {
+                          if (sprite.rates[v] === "N/A") return null;
+                          const isCollected = collection[sprite.id]?.[v];
+                          const isMastered = mastery[sprite.id]?.[v];
 
-                        if (isNa) {
                           return (
-                            <div key={variant} className="py-3 flex flex-col items-center justify-center bg-black/20 border-r border-slate-800/20 last:border-r-0 select-none text-slate-700">
-                              <span className="text-[7px] sm:text-[8px] font-mono tracking-widest font-bold opacity-30">{variant.toUpperCase()}</span>
-                              <span className="text-[10px] sm:text-xs font-mono font-black tracking-tighter mt-1 opacity-40">N/A</span>
+                            <div key={v} className="flex flex-col items-center gap-1">
+                              <div
+                                className={`w-5 h-5 sm:w-6 sm:h-6 rounded-full flex items-center justify-center border transition-all ${isMastered ? 'bg-yellow-900/40 border-yellow-400' : isCollected ? `bg-slate-900 border-${VARIANT_INFO[v]?.color.split('-')[1]}-500/70` : 'bg-black border-slate-800'}`}
+                              >
+                                {isMastered ? <Crown className="w-3 h-3 text-yellow-400 drop-shadow-[0_0_2px_rgba(255,215,0,0.8)]" /> : isCollected ? <div className={`w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full ${VARIANT_INFO[v]?.bgColor}`} /> : null}
+                              </div>
+                              <span className="text-[7px] font-bold uppercase text-slate-500">{v === 'holofoil' ? 'Holo' : v}</span>
                             </div>
-                          );
-                        }
-
-                        let btnStyle = 'text-slate-600 bg-transparent';
-                        if (isVariantMastered) {
-                          btnStyle = `${VARIANT_INFO[variant].color} bg-yellow-900/20 font-black border-t-2 border-t-yellow-400 shadow-[inset_0_4px_10px_rgba(255,215,0,0.1)]`;
-                        } else if (isChecked) {
-                          btnStyle = `${VARIANT_INFO[variant].color} bg-slate-900/60 font-black`;
-                        }
-
-                        return (
-                          <button
-                            key={variant}
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setViewingTabs(prev => ({ ...prev, [sprite.id]: variant }));
-                              if (!isMasteryView) {
-                                handleToggleCheck(sprite.id, variant);
-                              }
-                            }}
-                            className={`py-3 flex flex-col items-center gap-1.5 border-r border-slate-800/40 last:border-r-0 transition-all relative ${btnStyle} ${isActiveTab && !isVariantMastered ? 'bg-slate-800/50' : ''} ${isMasteryView ? 'cursor-pointer' : ''}`}
-                          >
-                            <span className="text-[7px] sm:text-[8px] font-mono tracking-widest font-bold">{variant.toUpperCase()}</span>
-
-                            {isVariantMastered ? (
-                              <Crown className="w-4 h-4 sm:w-5 sm:h-5 text-yellow-400" />
-                            ) : isChecked ? (
-                              <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-current" />
-                            ) : (
-                              <Circle className="w-4 h-4 sm:w-5 sm:h-5 opacity-40" />
-                            )}
-                          </button>
-                        );
-                      })}
+                          )
+                        })}
+                      </div>
                     </div>
-                  </article>
-                );
-              })}
+                  )
+                })}
+              </div>
             </section>
           </div>
         )}
@@ -1698,29 +1755,31 @@ function MainApp() {
           </div>
         )}
 
-        {/* --- RUMORED TAB VIEW --- */}
-        {currentView === 'unreleased' && (
+        {/* --- FEEDBACK TAB VIEW --- */}
+        {currentView === 'feedback' && (
           <section className="flex flex-col gap-4 animate-in fade-in duration-300 pt-2">
-            <div className="bg-[#12141f] border-2 border-amber-500/40 rounded-2xl p-5">
-              <h3 className="text-xl sm:text-2xl font-black text-amber-400 uppercase italic mb-2">UNRELEASED / RUMORED</h3>
-              <p className="text-sm sm:text-base text-slate-400">Files found in-game for upcoming sprites and variants.</p>
-            </div>
+            <div className="bg-[#12141f] border-2 border-emerald-500/40 rounded-2xl p-5 shadow-[0_0_20px_rgba(16,185,129,0.1)]">
+              <h3 className="text-xl sm:text-2xl font-black text-emerald-400 uppercase italic mb-2">Feedback & Support</h3>
+              <p className="text-sm sm:text-base text-slate-400 mb-6">Have an idea to improve the app? Found missing information or encountered a bug? We want to hear from you!</p>
 
-            {[...new Set(UNOFFICIAL_LEAKS_DATABASE.map(l => l.sprite))].map((sName) => (
-              <div key={sName} className="bg-[#12141f] border border-slate-800 rounded-xl p-4">
-                <h4 className="text-sm font-black text-amber-500 uppercase mb-3 border-b border-slate-800 pb-2">{sName}</h4>
-                <div className="flex flex-col gap-2">
-                  {UNOFFICIAL_LEAKS_DATABASE.filter(l => l.sprite === sName).map((l, i) => (
-                    <div key={i} className="bg-black/40 px-3 py-2 rounded-lg border border-slate-900 flex justify-between items-center">
-                      <code className="text-[10px] sm:text-xs text-slate-300 font-bold">{l.file}</code>
-                      <span className={`text-[8px] sm:text-[9px] font-bold px-1.5 py-0.5 rounded border uppercase ${LEAK_VARIANT_COLORS[l.variant]}`}>
-                        {l.variant}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            ))}
+              <form onSubmit={handleFeedbackSubmit} className="flex flex-col gap-3">
+                <textarea
+                  value={feedbackText}
+                  onChange={(e) => setFeedbackText(e.target.value)}
+                  placeholder="Tell us what you think..."
+                  className="w-full bg-black/50 border-2 border-slate-800 rounded-xl p-3 text-sm sm:text-base text-white focus:outline-none focus:border-emerald-500 min-h-[120px] resize-y"
+                  required
+                />
+                <button
+                  type="submit"
+                  disabled={feedbackStatus === 'submitting'}
+                  className="w-full flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 disabled:hover:bg-emerald-600 text-white font-black uppercase tracking-wider py-3 rounded-xl transition-colors"
+                >
+                  {feedbackStatus === 'submitting' ? 'Sending...' : feedbackStatus === 'success' ? <><CheckCircle className="w-5 h-5" /> Sent!</> : <><Mail className="w-5 h-5" /> Send Feedback</>}
+                </button>
+                {feedbackStatus === 'error' && <p className="text-red-400 text-xs text-center font-bold mt-1">Failed to send. Please try again.</p>}
+              </form>
+            </div>
           </section>
         )}
 
@@ -1737,7 +1796,7 @@ function MainApp() {
         <div className="bg-[#0e1017]/95 backdrop-blur-md border border-slate-800 rounded-2xl w-full max-w-sm px-2 py-2 flex justify-between shadow-2xl">
 
           <button onClick={() => { setCurrentView('sprites'); setActiveViewingFriend(null); playBeep(440, 'sine', 0.05); }} className={`flex-1 flex flex-col items-center gap-1 py-1 transition-colors ${currentView === 'sprites' && !activeViewingFriend ? 'text-cyan-400' : 'text-slate-600'}`}>
-            <Grid className="w-5 h-5 sm:w-6 sm:h-6" />
+            <List className="w-5 h-5 sm:w-6 sm:h-6" />
             <span className="text-[9px] sm:text-[10px] font-black uppercase tracking-wider">Sprites</span>
           </button>
 
@@ -1751,9 +1810,9 @@ function MainApp() {
             <span className="text-[9px] sm:text-[10px] font-black uppercase tracking-wider">Friends</span>
           </button>
 
-          <button onClick={() => { setCurrentView('unreleased'); setActiveViewingFriend(null); playBeep(659, 'sine', 0.05); }} className={`flex-1 flex flex-col items-center gap-1 py-1 transition-colors ${currentView === 'unreleased' && !activeViewingFriend ? 'text-amber-400' : 'text-slate-600'}`}>
-            <Eye className="w-5 h-5 sm:w-6 sm:h-6" />
-            <span className="text-[9px] sm:text-[10px] font-black uppercase tracking-wider">Rumored</span>
+          <button onClick={() => { setCurrentView('feedback'); setActiveViewingFriend(null); playBeep(659, 'sine', 0.05); }} className={`flex-1 flex flex-col items-center gap-1 py-1 transition-colors ${currentView === 'feedback' && !activeViewingFriend ? 'text-emerald-400' : 'text-slate-600'}`}>
+            <MessageSquare className="w-5 h-5 sm:w-6 sm:h-6" />
+            <span className="text-[9px] sm:text-[10px] font-black uppercase tracking-wider">Feedback</span>
           </button>
 
         </div>
