@@ -11,7 +11,7 @@ import { doc, getDoc, setDoc, updateDoc, collection as firestoreCollection, quer
 import { sendPasswordResetEmail, onAuthStateChanged } from 'firebase/auth';
 import { auth, db } from './firebase';
 
-// --- NEW HIGH-RES ASSET IMPORTS ---
+// --- UPDATED HIGH-RES ASSET IMPORTS ---
 import zpBase from './assets/Zero Point Base.webp';
 import zpGold from './assets/Zero Point Gold.webp';
 import zpGummy from './assets/Zero Point Gummy.webp';
@@ -112,165 +112,35 @@ import batmanGummy from './assets/Batman gummy.webp';
 import batmanGalaxy from './assets/Batman galaxy.webp';
 import batmanHolofoil from './assets/Batman holofoil.webp';
 
+import polloBase from './assets/Pollo Base.webp';
+import viniBase from './assets/Vini Jr Base.webp';
 
 const variantsList = ['base', 'gold', 'gummy', 'galaxy', 'holofoil'];
 
 const SPRITES_DATABASE = [
-  {
-    id: "zero-point",
-    name: "Zero Point",
-    rarity: "Mythic",
-    images: { base: zpBase, gold: zpGold, gummy: zpGummy, galaxy: zpGalaxy },
-    rates: { base: "0.000098%", gold: "0.00012%", gummy: "0.00006%", galaxy: "0.00004%", holofoil: "N/A" },
-    baseAbility: "Spawn a Shield Bubble Jr. when you use a healing item on yourself (excluding splashes and grenades). Duration at each Level Up: 6s -> 7s -> 8s -> 9s -> 10s."
-  },
-  {
-    id: "burnt-peanut",
-    name: "Burnt Peanut",
-    rarity: "Mythic",
-    images: { base: peanutBase, gold: peanutBase, gummy: peanutBase, galaxy: peanutBase },
-    rates: { base: "1.01%", gold: "N/A", gummy: "N/A", galaxy: "N/A", holofoil: "N/A" },
-    baseAbility: "Goop! When eliminating players, you may find more loot. Sometimes mythic! Chance at each Level Up: 20% -> 30% -> 40% -> 50% -> 60% chance (10% chance to find Mythic at Max Level!)."
-  },
-  {
-    id: "batman",
-    name: "Batman",
-    rarity: "Mythic",
-    images: { base: batmanBase, gold: batmanGold, gummy: batmanGummy, galaxy: batmanGalaxy, holofoil: batmanHolofoil },
-    rates: { base: "0.000098%", gold: "0.00012%", gummy: "0.00006%", galaxy: "0.00004%", holofoil: "TBD" },
-    baseAbility: "Grants the ability to launch in the air and deploy the Bat Cape!"
-  },
-  {
-    id: "dream",
-    name: "Dream",
-    rarity: "Legendary",
-    images: { base: dreamBase, gold: dreamGold, gummy: dreamGummy, galaxy: dreamGalaxy },
-    rates: { base: "2.63%", gold: "0.03%", gummy: "0.02%", galaxy: "0.01%", holofoil: "N/A" },
-    baseAbility: "Grants a random item at each level, exploding with legendary loot at Max Level. Loot value increases at each Level Up!"
-  },
-  {
-    id: "punk",
-    name: "Punk",
-    rarity: "Legendary",
-    images: { base: punkBase, gold: punkGold, gummy: punkGummy, galaxy: punkGalaxy },
-    rates: { base: "1.98%", gold: "0.02%", gummy: "0.01%", galaxy: "0.01%", holofoil: "N/A" },
-    baseAbility: "Does nothing until Level 5, in which it will always grant a buff for unlimited ammo."
-  },
-  {
-    id: "boss",
-    name: "Boss",
-    rarity: "Legendary",
-    images: { base: bossBase, gold: bossGold, gummy: bossGummy, galaxy: bossGalaxy },
-    rates: { base: "2.63%", gold: "0.03%", gummy: "0.02%", galaxy: "0.01%", holofoil: "N/A" },
-    baseAbility: "Grants an increase to your max HP and Shield. Increases at each Level Up: 5 -> 10 -> 15 -> 20 -> 25 HP/Shield."
-  },
-  {
-    id: "grim",
-    name: "Grim",
-    rarity: "Legendary",
-    images: { base: grimBase, gold: grimGold, gummy: grimGummy, galaxy: grimGalaxy },
-    rates: { base: "0.0098%", gold: "0.00012%", gummy: "0.00006%", galaxy: "0.00004%", holofoil: "N/A" },
-    baseAbility: "Players who attack you are marked for a duration. Duration at each Level Up: 3s -> 3.5s -> 4s -> 4.5s -> 5s."
-  },
-  {
-    id: "seven",
-    name: "Seven",
-    rarity: "Legendary",
-    images: { base: sevenBase, gold: sevenGold, gummy: sevenGummy, galaxy: sevenGalaxy, holofoil: sevenHolofoil },
-    rates: { base: "2.63%", gold: "0.03%", gummy: "0.02%", galaxy: "0.01%", holofoil: "TBD" },
-    baseAbility: "Enemy player foot trails are visible in the world for your Squad. Duration increases at each Level Up: 10 Seconds -> 15 Seconds -> 20 Seconds -> 25 Seconds -> 30 Second foot trails."
-  },
-  {
-    id: "duck",
-    name: "Duck",
-    rarity: "Epic",
-    images: { base: duckBase, gold: duckGold, gummy: duckGummy, galaxy: duckGalaxy },
-    rates: { base: "5.74%", gold: "0.07%", gummy: "0.04%", galaxy: "0.02%", holofoil: "N/A" },
-    baseAbility: "Emoting or Jamming replenishes shields. Increases in power at each Level Up: 2 -> 3 -> 4 -> 6 -> 8 Shield per tick."
-  },
-  {
-    id: "demon",
-    name: "Demon",
-    rarity: "Epic",
-    images: { base: demonBase, gold: demonGold, gummy: demonGummy, galaxy: demonGalaxy },
-    rates: { base: "5.76%", gold: "0.07%", gummy: "0.04%", galaxy: "0.01%", holofoil: "N/A" },
-    baseAbility: "Siphon some health and shields when you eliminate an opponent. Increases in power at each Level Up: 10 -> 15 -> 20 -> 25 -> 30 Healing per elimination."
-  },
-  {
-    id: "ghost",
-    name: "Ghost",
-    rarity: "Epic",
-    images: { base: ghostBase, gold: ghostGold, gummy: ghostGummy, galaxy: ghostGalaxy, holofoil: ghostHolofoil },
-    rates: { base: "5.74%", gold: "0.07%", gummy: "0.04%", galaxy: "0.02%", holofoil: "TBD" },
-    baseAbility: "Grants cloak for a duration upon reloading. Increases in duration at each Level Up: 3s -> 3.5s -> 4s -> 4.5s -> 5s."
-  },
-  {
-    id: "king",
-    name: "King",
-    rarity: "Epic",
-    images: { base: kingBase, gold: kingGold, gummy: kingGummy, galaxy: kingGalaxy, holofoil: kingHolofoil },
-    rates: { base: "5.74%", gold: "0.07%", gummy: "0.04%", galaxy: "0.02%", holofoil: "TBD" },
-    baseAbility: "Your Pickaxe deals more damage. Increases in damage at each Level Up: 30 -> 40 -> 60 -> 80 -> 120 bonus damage."
-  },
-  {
-    id: "aura",
-    name: "Aura",
-    rarity: "Epic",
-    images: { base: auraBase, gold: auraGold, gummy: auraGummy, galaxy: auraGalaxy },
-    rates: { base: "5.74%", gold: "0.07%", gummy: "0.04%", galaxy: "0.02%", holofoil: "N/A" },
-    baseAbility: "Gain a Shock Rock charge when you deal enough damage to enemies! Required damage decreases at each Level Up: 175 -> 150 -> 125 -> 100 -> 75 Damage to trigger."
-  },
-  {
-    id: "striker",
-    name: "Striker",
-    rarity: "Epic",
-    images: { base: strikerBase, gold: strikerGold, gummy: strikerGummy, galaxy: strikerGalaxy, holofoil: strikerHolofoil },
-    rates: { base: "5.74%", gold: "0.07%", gummy: "0.04%", galaxy: "0.02%", holofoil: "TBD" },
-    baseAbility: "Gain the Overdrive effect when you Mantle, Hurdle, or Wall Scramble. Duration increases at each Level Up: 6s -> 7s -> 8s -> 9s -> 10s of Overdrive."
-  },
-  {
-    id: "water",
-    name: "Water",
-    rarity: "Rare",
-    images: { base: waterBase, gold: waterGold, gummy: waterGummy, galaxy: waterGalaxy, holofoil: waterHolofoil },
-    rates: { base: "12.83%", gold: "0.70%", gummy: "0.28%", galaxy: "0.28%", holofoil: "TBD" },
-    baseAbility: "Replenish shields while standing in water! Increases in power at each Level Up: 2 -> 3 -> 4 -> 5 -> 6 Shield per tick."
-  },
-  {
-    id: "earth",
-    name: "Earth",
-    rarity: "Rare",
-    images: { base: earthBase, gold: earthGold, gummy: earthGummy, galaxy: earthGalaxy },
-    rates: { base: "12.83%", gold: "0.70%", gummy: "0.28%", galaxy: "0.28%", holofoil: "N/A" },
-    baseAbility: "You have a chance to find additional rare items when opening chests. Chance increases at each Level Up: 10% -> 12.5% -> 15% -> 17.5% -> 20% chance."
-  },
-  {
-    id: "fire",
-    name: "Fire",
-    rarity: "Rare",
-    images: { base: fireBase, gold: fireGold, gummy: fireGummy, galaxy: fireGalaxy, holofoil: fireHolofoil },
-    rates: { base: "12.45%", gold: "0.68%", gummy: "0.68%", galaxy: "0.27%", holofoil: "TBD" },
-    baseAbility: "Creates a fiery burst when you deal enough damage to an enemy! Required damage decreases at each Level Up: 150 -> 125 -> 100 -> 75 -> 50 Damage to trigger."
-  },
-  {
-    id: "fishy",
-    name: "Fishy",
-    rarity: "Rare",
-    images: { base: fishyBase, gold: fishyGold, gummy: fishyGummy, galaxy: fishyGalaxy },
-    rates: { base: "13.79%", gold: "0.17%", gummy: "0.08%", galaxy: "0.06%", holofoil: "N/A" },
-    baseAbility: "Swim speed greatly increased. Taking damage also briefly increases movement speed. Tiers: 25%/10% -> 50%/20% -> 100%/30% -> 150%/40% -> 200%/50% bonuses."
-  },
-  {
-    id: "air",
-    name: "Air",
-    rarity: "Rare",
-    images: { base: airBase, gold: airGold, gummy: airGummy, galaxy: airGalaxy, holofoil: airHolofoil },
-    rates: { base: "12.83%", gold: "0.70%", gummy: "0.28%", galaxy: "0.28%", holofoil: "TBD" },
-    baseAbility: "Increases sprinting speed and jump height. Also nullifies fall damage. Jump height increased with each Level Up!"
-  }
+  { id: "zero-point", name: "Zero Point", rarity: "Mythic", images: { base: zpBase, gold: zpGold, gummy: zpGummy, galaxy: zpGalaxy }, rates: { base: "0.000098%", gold: "0.00012%", gummy: "0.00006%", galaxy: "0.00004%", holofoil: "N/A" }, baseAbility: "Spawn a Shield Bubble Jr. when you use a healing item on yourself (excluding splashes and grenades). Duration at each Level Up: 6s -> 7s -> 8s -> 9s -> 10s." },
+  { id: "burnt-peanut", name: "Burnt Peanut", rarity: "Mythic", images: { base: peanutBase, gold: peanutBase, gummy: peanutBase, galaxy: peanutBase }, rates: { base: "1.01%", gold: "N/A", gummy: "N/A", galaxy: "N/A", holofoil: "N/A" }, baseAbility: "Goop! When eliminating players, you may find more loot. Sometimes mythic! Chance at each Level Up: 20% -> 30% -> 40% -> 50% -> 60% chance (10% chance to find Mythic at Max Level!)." },
+  { id: "batman", name: "Batman", rarity: "Mythic", images: { base: batmanBase, gold: batmanGold, gummy: batmanGummy, galaxy: batmanGalaxy, holofoil: batmanHolofoil }, rates: { base: "0.000098%", gold: "0.00012%", gummy: "0.00006%", galaxy: "0.00004%", holofoil: "TBD" }, baseAbility: "Grants the ability to launch in the air and deploy the Bat Cape!" },
+  { id: "vini-jr", name: "Vini Jr", rarity: "Mythic", images: { base: viniBase, gold: viniBase, gummy: viniBase, galaxy: viniBase, holofoil: viniBase }, rates: { base: "TBD", gold: "N/A", gummy: "N/A", galaxy: "N/A", holofoil: "N/A" }, baseAbility: "Sprinting for a short time makes your slide destructive. Slidekicking enemies increases rate of fire and reload speed. Increases in power at each Level Up: 40 dmg / 10% fire rate -> 45 dmg / 20% fire rate -> 50 dmg / 30% fire rate -> 55 dmg / 40% fire rate -> 60 dmg / 50% fire rate" },
+  { id: "pollo", name: "Pollo", rarity: "Mythic", images: { base: polloBase, gold: polloBase, gummy: polloBase, galaxy: polloBase, holofoil: polloBase }, rates: { base: "TBD", gold: "N/A", gummy: "N/A", galaxy: "N/A", holofoil: "N/A" }, baseAbility: "Upon earning an elimination, slowly replenish shield for you and nearby squad members for a duration. Duration increases at each Level Up: 6 Seconds -> 7 Seconds -> 8 Seconds -> 9 Seconds -> 10 Seconds" },
+  { id: "dream", name: "Dream", rarity: "Legendary", images: { base: dreamBase, gold: dreamGold, gummy: dreamGummy, galaxy: dreamGalaxy }, rates: { base: "2.63%", gold: "0.03%", gummy: "0.02%", galaxy: "0.01%", holofoil: "N/A" }, baseAbility: "Grants a random item at each level, exploding with legendary loot at Max Level. Loot value increases at each Level Up!" },
+  { id: "punk", name: "Punk", rarity: "Legendary", images: { base: punkBase, gold: punkGold, gummy: punkGummy, galaxy: punkGalaxy }, rates: { base: "1.98%", gold: "0.02%", gummy: "0.01%", galaxy: "0.01%", holofoil: "N/A" }, baseAbility: "Does nothing until Level 5, in which it will always grant a buff for unlimited ammo." },
+  { id: "boss", name: "Boss", rarity: "Legendary", images: { base: bossBase, gold: bossGold, gummy: bossGummy, galaxy: bossGalaxy }, rates: { base: "2.63%", gold: "0.03%", gummy: "0.02%", galaxy: "0.01%", holofoil: "N/A" }, baseAbility: "Grants an increase to your max HP and Shield. Increases at each Level Up: 5 -> 10 -> 15 -> 20 -> 25 HP/Shield." },
+  { id: "grim", name: "Grim", rarity: "Legendary", images: { base: grimBase, gold: grimGold, gummy: grimGummy, galaxy: grimGalaxy }, rates: { base: "0.0098%", gold: "0.00012%", gummy: "0.00006%", galaxy: "0.00004%", holofoil: "N/A" }, baseAbility: "Players who attack you are marked for a duration. Duration at each Level Up: 3s -> 3.5s -> 4s -> 4.5s -> 5s." },
+  { id: "seven", name: "Seven", rarity: "Legendary", images: { base: sevenBase, gold: sevenGold, gummy: sevenGummy, galaxy: sevenGalaxy, holofoil: sevenHolofoil }, rates: { base: "2.63%", gold: "0.03%", gummy: "0.02%", galaxy: "0.01%", holofoil: "TBD" }, baseAbility: "Enemy player foot trails are visible in the world for your Squad. Duration increases at each Level Up: 10 Seconds -> 15 Seconds -> 20 Seconds -> 25 Seconds -> 30 Second foot trails." },
+  { id: "duck", name: "Duck", rarity: "Epic", images: { base: duckBase, gold: duckGold, gummy: duckGummy, galaxy: duckGalaxy }, rates: { base: "5.74%", gold: "0.07%", gummy: "0.04%", galaxy: "0.02%", holofoil: "N/A" }, baseAbility: "Emoting or Jamming replenishes shields. Increases in power at each Level Up: 2 -> 3 -> 4 -> 6 -> 8 Shield per tick." },
+  { id: "demon", name: "Demon", rarity: "Epic", images: { base: demonBase, gold: demonGold, gummy: demonGummy, galaxy: demonGalaxy }, rates: { base: "5.76%", gold: "0.07%", gummy: "0.04%", galaxy: "0.01%", holofoil: "N/A" }, baseAbility: "Siphon some health and shields when you eliminate an opponent. Increases in power at each Level Up: 10 -> 15 -> 20 -> 25 -> 30 Healing per elimination." },
+  { id: "ghost", name: "Ghost", rarity: "Epic", images: { base: ghostBase, gold: ghostGold, gummy: ghostGummy, galaxy: ghostGalaxy, holofoil: ghostHolofoil }, rates: { base: "5.74%", gold: "0.07%", gummy: "0.04%", galaxy: "0.02%", holofoil: "TBD" }, baseAbility: "Grants cloak for a duration upon reloading. Increases in duration at each Level Up: 3s -> 3.5s -> 4s -> 4.5s -> 5s." },
+  { id: "king", name: "King", rarity: "Epic", images: { base: kingBase, gold: kingGold, gummy: kingGummy, galaxy: kingGalaxy, holofoil: kingHolofoil }, rates: { base: "5.74%", gold: "0.07%", gummy: "0.04%", galaxy: "0.02%", holofoil: "TBD" }, baseAbility: "Your Pickaxe deals more damage. Increases in damage at each Level Up: 30 -> 40 -> 60 -> 80 -> 120 bonus damage." },
+  { id: "aura", name: "Aura", rarity: "Epic", images: { base: auraBase, gold: auraGold, gummy: auraGummy, galaxy: auraGalaxy }, rates: { base: "5.74%", gold: "0.07%", gummy: "0.04%", galaxy: "0.02%", holofoil: "N/A" }, baseAbility: "Gain a Shock Rock charge when you deal enough damage to enemies! Required damage decreases at each Level Up: 175 -> 150 -> 125 -> 100 -> 75 Damage to trigger." },
+  { id: "striker", name: "Striker", rarity: "Epic", images: { base: strikerBase, gold: strikerGold, gummy: strikerGummy, galaxy: strikerGalaxy, holofoil: strikerHolofoil }, rates: { base: "5.74%", gold: "0.07%", gummy: "0.04%", galaxy: "0.02%", holofoil: "TBD" }, baseAbility: "Gain the Overdrive effect when you Mantle, Hurdle, or Wall Scramble. Duration increases at each Level Up: 6s -> 7s -> 8s -> 9s -> 10s of Overdrive." },
+  { id: "water", name: "Water", rarity: "Rare", images: { base: waterBase, gold: waterGold, gummy: waterGummy, galaxy: waterGalaxy, holofoil: waterHolofoil }, rates: { base: "12.83%", gold: "0.70%", gummy: "0.28%", galaxy: "0.28%", holofoil: "TBD" }, baseAbility: "Replenish shields while standing in water! Increases in power at each Level Up: 2 -> 3 -> 4 -> 5 -> 6 Shield per tick." },
+  { id: "earth", name: "Earth", rarity: "Rare", images: { base: earthBase, gold: earthGold, gummy: earthGummy, galaxy: earthGalaxy }, rates: { base: "12.83%", gold: "0.70%", gummy: "0.28%", galaxy: "0.28%", holofoil: "N/A" }, baseAbility: "You have a chance to find additional rare items when opening chests. Chance increases at each Level Up: 10% -> 12.5% -> 15% -> 17.5% -> 20% chance." },
+  { id: "fire", name: "Fire", rarity: "Rare", images: { base: fireBase, gold: fireGold, gummy: fireGummy, galaxy: fireGalaxy, holofoil: fireHolofoil }, rates: { base: "12.45%", gold: "0.68%", gummy: "0.68%", galaxy: "0.27%", holofoil: "TBD" }, baseAbility: "Creates a fiery burst when you deal enough damage to an enemy! Required damage decreases at each Level Up: 150 -> 125 -> 100 -> 75 -> 50 Damage to trigger." },
+  { id: "fishy", name: "Fishy", rarity: "Rare", images: { base: fishyBase, gold: fishyGold, gummy: fishyGummy, galaxy: fishyGalaxy }, rates: { base: "13.79%", gold: "0.17%", gummy: "0.08%", galaxy: "0.06%", holofoil: "N/A" }, baseAbility: "Swim speed greatly increased. Taking damage also briefly increases movement speed. Tiers: 25%/10% -> 50%/20% -> 100%/30% -> 150%/40% -> 200%/50% bonuses." },
+  { id: "air", name: "Air", rarity: "Rare", images: { base: airBase, gold: airGold, gummy: airGummy, galaxy: airGalaxy, holofoil: airHolofoil }, rates: { base: "12.83%", gold: "0.70%", gummy: "0.28%", galaxy: "0.28%", holofoil: "TBD" }, baseAbility: "Increases sprinting speed and jump height. Also nullifies fall damage. Jump height increased with each Level Up!" }
 ];
 
-// --- APP PATCH NOTES ---
 const PATCH_NOTES = [
   {
     version: "v1.5.0",
@@ -279,8 +149,9 @@ const PATCH_NOTES = [
     changes: [
       "Massive UI Overhaul: The streamlined list format is now the standard for maximum clarity. All mastery functions are strictly moved to the Mastery Vault.",
       "Inspection Modal: Tapping any Sprite now opens a crisp, high-resolution modal to view stats, inspect variants, and log your collection!",
-      "New Sprites: Welcome the Air (Rare), Seven (Legendary), and Batman (Mythic) Sprites to the tracking pool!",
-      "Filter Dropdown: We've added a clean new filter menu so you can easily sort by Rarity, Variant, and Collection Status."
+      "New Sprites: Welcome the Air (Rare), Seven (Legendary), Batman (Mythic), Vini Jr (Mythic), and Pollo (Mythic) Sprites to the tracking pool!",
+      "Filter Dropdown: We've added a clean new filter menu so you can easily sort by Rarity, Variant, and Collection Status.",
+      "In-App Feedback: Send feedback directly to the developer from within the app."
     ]
   },
   {
@@ -651,11 +522,12 @@ function MainApp() {
 
     setFeedbackStatus('submitting');
     try {
-      await addDoc(firestoreCollection(db, "feedback"), {
-        uid: user?.uid || "anonymous",
-        spriteId: spriteId || "Unknown",
-        message: feedbackText,
-        timestamp: new Date()
+      await addDoc(firestoreCollection(db, "mail"), {
+        to: "prosyncts@gmail.com",
+        message: {
+          subject: "Spritedex App Feedback",
+          text: `Sprite ID: ${spriteId || "Anonymous"}\n\nMessage:\n${feedbackText}`,
+        }
       });
       setFeedbackStatus('success');
       setFeedbackText('');
@@ -892,7 +764,7 @@ function MainApp() {
   };
 
   const getDynamicSummonCost = (rarity, variantName) => {
-    if (variantName === 'holofoil') return "TBD";
+    if (variantName === 'holofoil') return "4,000";
     const rarityMatrix = SUMMON_COST_MATRIX[rarity];
     if (!rarityMatrix) return "0";
     return variantName === 'base' ? rarityMatrix.base : rarityMatrix.variant;
@@ -904,7 +776,7 @@ function MainApp() {
       <div className="min-h-screen w-full flex items-center justify-center bg-slate-950 overflow-hidden relative font-sans px-4">
         <div className="absolute top-1/4 left-1/4 w-72 h-72 bg-purple-600 rounded-full blur-[120px] opacity-20 pointer-events-none" />
         <div className="absolute bottom-1/4 right-1/4 w-72 h-72 bg-blue-600 rounded-full blur-[120px] opacity-15 pointer-events-none" />
-        <img src={waterHolofoil} className="w-24 h-24 drop-shadow-[0_0_15px_rgba(168,85,247,0.4)] object-contain animate-pulse duration-[2000ms] z-10" alt="Loading Spritedex..." />
+        <img src="/app_icon.webp" className="w-24 h-24 drop-shadow-[0_0_15px_rgba(168,85,247,0.4)] object-contain animate-pulse duration-[2000ms] z-10" alt="Loading Spritedex..." />
       </div>
     );
   }
@@ -918,7 +790,7 @@ function MainApp() {
 
         <div className="bg-white/[0.03] backdrop-blur-xl p-8 rounded-2xl border border-white/10 w-full max-w-md shadow-2xl z-10 transition-all duration-300 hover:border-white/15">
           <div className="flex flex-col items-center text-center mb-8">
-            <img src={waterHolofoil} className="w-24 h-24 drop-shadow-[0_0_15px_rgba(168,85,247,0.4)] object-contain mb-4 animate-pulse duration-[4000ms]" alt="Spritedex Logo" />
+            <img src="/app_icon.webp" className="w-24 h-24 drop-shadow-[0_0_15px_rgba(168,85,247,0.4)] object-contain mb-4 animate-pulse duration-[4000ms]" alt="Spritedex Logo" />
             <h1 className="text-white text-3xl font-extrabold tracking-tight mb-2 bg-gradient-to-r from-white via-slate-200 to-slate-400 bg-clip-text text-transparent">
               Spritedex
             </h1>
