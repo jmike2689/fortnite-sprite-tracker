@@ -154,7 +154,7 @@ const SPRITES_DATABASE = [
 
 const PATCH_NOTES = [
   {
-    version: "v1.6.0",
+    version: "v1.4.0",
     date: "07/23/2026",
     title: "Cube Variants & Interface Separation",
     changes: [
