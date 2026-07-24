@@ -125,31 +125,30 @@ import cubeFishy from './assets/Cube Fishy.webp';
 import cubeBoss from './assets/Cube Boss.webp';
 import cubeGrim from './assets/Cube Grim.webp';
 
-
 const variantsList = ['base', 'gold', 'gummy', 'galaxy', 'holofoil', 'cube'];
 
 const SPRITES_DATABASE = [
-  { id: "zero-point", name: "Zero Point", rarity: "Mythic", images: { base: zpBase, gold: zpGold, gummy: zpGummy, galaxy: zpGalaxy }, rates: { base: "0.000098%", gold: "0.00012%", gummy: "0.00006%", galaxy: "0.00004%", holofoil: "N/A", cube: "N/A" }, baseAbility: "Spawn a Shield Bubble Jr. when you use a healing item on yourself (excluding splashes and grenades). Duration at each Level Up: 6s -> 7s -> 8s -> 9s -> 10s." },
-  { id: "burnt-peanut", name: "Burnt Peanut", rarity: "Mythic", images: { base: peanutBase, gold: peanutBase, gummy: peanutBase, galaxy: peanutBase }, rates: { base: "1.01%", gold: "N/A", gummy: "N/A", galaxy: "N/A", holofoil: "N/A", cube: "N/A" }, baseAbility: "Goop! When eliminating players, you may find more loot. Sometimes mythic! Chance at each Level Up: 20% -> 30% -> 40% -> 50% -> 60% chance (10% chance to find Mythic at Max Level!)." },
-  { id: "batman", name: "Batman", rarity: "Mythic", images: { base: batmanBase, gold: batmanGold, gummy: batmanGummy, galaxy: batmanGalaxy, holofoil: batmanHolofoil, cube: cubeBatman }, rates: { base: "0.000098%", gold: "0.00012%", gummy: "0.00006%", galaxy: "0.00004%", holofoil: "TBD", cube: "TBD" }, baseAbility: "Grants the ability to launch in the air and deploy the Bat Cape!" },
-  { id: "vini-jr", name: "Vini Jr", rarity: "Mythic", images: { base: viniBase, gold: viniBase, gummy: viniBase, galaxy: viniBase, holofoil: viniBase }, rates: { base: "TBD", gold: "N/A", gummy: "N/A", galaxy: "N/A", holofoil: "N/A", cube: "N/A" }, baseAbility: "Sprinting for a short time makes your slide destructive. Slidekicking enemies increases rate of fire and reload speed. Increases in power at each Level Up: 40 dmg / 10% fire rate -> 45 dmg / 20% fire rate -> 50 dmg / 30% fire rate -> 55 dmg / 40% fire rate -> 60 dmg / 50% fire rate" },
-  { id: "pollo", name: "Pollo", rarity: "Mythic", images: { base: polloBase, gold: polloBase, gummy: polloBase, galaxy: polloBase, holofoil: polloBase }, rates: { base: "TBD", gold: "N/A", gummy: "N/A", galaxy: "N/A", holofoil: "N/A", cube: "N/A" }, baseAbility: "Upon earning an elimination, slowly replenish shield for you and nearby squad members for a duration. Duration increases at each Level Up: 6 Seconds -> 7 Seconds -> 8 Seconds -> 9 Seconds -> 10 Seconds" },
-  { id: "dream", name: "Dream", rarity: "Legendary", images: { base: dreamBase, gold: dreamGold, gummy: dreamGummy, galaxy: dreamGalaxy, cube: cubeDream }, rates: { base: "2.63%", gold: "0.03%", gummy: "0.02%", galaxy: "0.01%", holofoil: "N/A", cube: "TBD" }, baseAbility: "Grants a random item at each level, exploding with legendary loot at Max Level. Loot value increases at each Level Up!" },
-  { id: "punk", name: "Punk", rarity: "Legendary", images: { base: punkBase, gold: punkGold, gummy: punkGummy, galaxy: punkGalaxy, cube: cubePunk }, rates: { base: "1.98%", gold: "0.02%", gummy: "0.01%", galaxy: "0.01%", holofoil: "N/A", cube: "TBD" }, baseAbility: "Does nothing until Level 5, in which it will always grant a buff for unlimited ammo." },
-  { id: "boss", name: "Boss", rarity: "Legendary", images: { base: bossBase, gold: bossGold, gummy: bossGummy, galaxy: bossGalaxy, cube: cubeBoss }, rates: { base: "2.63%", gold: "0.03%", gummy: "0.02%", galaxy: "0.01%", holofoil: "N/A", cube: "TBD" }, baseAbility: "Grants an increase to your max HP and Shield. Increases at each Level Up: 5 -> 10 -> 15 -> 20 -> 25 HP/Shield." },
-  { id: "grim", name: "Grim", rarity: "Legendary", images: { base: grimBase, gold: grimGold, gummy: grimGummy, galaxy: grimGalaxy, cube: cubeGrim }, rates: { base: "0.0098%", gold: "0.00012%", gummy: "0.00006%", galaxy: "0.00004%", holofoil: "N/A", cube: "TBD" }, baseAbility: "Players who attack you are marked for a duration. Duration at each Level Up: 3s -> 3.5s -> 4s -> 4.5s -> 5s." },
-  { id: "seven", name: "Seven", rarity: "Legendary", images: { base: sevenBase, gold: sevenGold, gummy: sevenGummy, galaxy: sevenGalaxy, holofoil: sevenHolofoil }, rates: { base: "2.63%", gold: "0.03%", gummy: "0.02%", galaxy: "0.01%", holofoil: "TBD", cube: "N/A" }, baseAbility: "Enemy player foot trails are visible in the world for your Squad. Duration increases at each Level Up: 10 Seconds -> 15 Seconds -> 20 Seconds -> 25 Seconds -> 30 Second foot trails." },
-  { id: "duck", name: "Duck", rarity: "Epic", images: { base: duckBase, gold: duckGold, gummy: duckGummy, galaxy: duckGalaxy }, rates: { base: "5.74%", gold: "0.07%", gummy: "0.04%", galaxy: "0.02%", holofoil: "N/A", cube: "N/A" }, baseAbility: "Emoting or Jamming replenishes shields. Increases in power at each Level Up: 2 -> 3 -> 4 -> 6 -> 8 Shield per tick." },
-  { id: "demon", name: "Demon", rarity: "Epic", images: { base: demonBase, gold: demonGold, gummy: demonGummy, galaxy: demonGalaxy }, rates: { base: "5.76%", gold: "0.07%", gummy: "0.04%", galaxy: "0.01%", holofoil: "N/A", cube: "N/A" }, baseAbility: "Siphon some health and shields when you eliminate an opponent. Increases in power at each Level Up: 10 -> 15 -> 20 -> 25 -> 30 Healing per elimination." },
-  { id: "ghost", name: "Ghost", rarity: "Epic", images: { base: ghostBase, gold: ghostGold, gummy: ghostGummy, galaxy: ghostGalaxy, holofoil: ghostHolofoil }, rates: { base: "5.74%", gold: "0.07%", gummy: "0.04%", galaxy: "0.02%", holofoil: "TBD", cube: "N/A" }, baseAbility: "Grants cloak for a duration upon reloading. Increases in duration at each Level Up: 3s -> 3.5s -> 4s -> 4.5s -> 5s." },
-  { id: "king", name: "King", rarity: "Epic", images: { base: kingBase, gold: kingGold, gummy: kingGummy, galaxy: kingGalaxy, holofoil: kingHolofoil }, rates: { base: "5.74%", gold: "0.07%", gummy: "0.04%", galaxy: "0.02%", holofoil: "TBD", cube: "N/A" }, baseAbility: "Your Pickaxe deals more damage. Increases in damage at each Level Up: 30 -> 40 -> 60 -> 80 -> 120 bonus damage." },
-  { id: "aura", name: "Aura", rarity: "Epic", images: { base: auraBase, gold: auraGold, gummy: auraGummy, galaxy: auraGalaxy }, rates: { base: "5.74%", gold: "0.07%", gummy: "0.04%", galaxy: "0.02%", holofoil: "N/A", cube: "N/A" }, baseAbility: "Gain a Shock Rock charge when you deal enough damage to enemies! Required damage decreases at each Level Up: 175 -> 150 -> 125 -> 100 -> 75 Damage to trigger." },
-  { id: "striker", name: "Striker", rarity: "Epic", images: { base: strikerBase, gold: strikerGold, gummy: strikerGummy, galaxy: strikerGalaxy, holofoil: strikerHolofoil }, rates: { base: "5.74%", gold: "0.07%", gummy: "0.04%", galaxy: "0.02%", holofoil: "TBD", cube: "N/A" }, baseAbility: "Gain the Overdrive effect when you Mantle, Hurdle, or Wall Scramble. Duration increases at each Level Up: 6s -> 7s -> 8s -> 9s -> 10s of Overdrive." },
-  { id: "water", name: "Water", rarity: "Rare", images: { base: waterBase, gold: waterGold, gummy: waterGummy, galaxy: waterGalaxy, holofoil: waterHolofoil }, rates: { base: "12.83%", gold: "0.70%", gummy: "0.28%", galaxy: "0.28%", holofoil: "TBD", cube: "N/A" }, baseAbility: "Replenish shields while standing in water! Increases in power at each Level Up: 2 -> 3 -> 4 -> 5 -> 6 Shield per tick." },
-  { id: "earth", name: "Earth", rarity: "Rare", images: { base: earthBase, gold: earthGold, gummy: earthGummy, galaxy: earthGalaxy, cube: cubeEarth }, rates: { base: "12.83%", gold: "0.70%", gummy: "0.28%", galaxy: "0.28%", holofoil: "N/A", cube: "TBD" }, baseAbility: "You have a chance to find additional rare items when opening chests. Chance increases at each Level Up: 10% -> 12.5% -> 15% -> 17.5% -> 20% chance." },
-  { id: "fire", name: "Fire", rarity: "Rare", images: { base: fireBase, gold: fireGold, gummy: fireGummy, galaxy: fireGalaxy, holofoil: fireHolofoil, cube: cubeFire }, rates: { base: "12.45%", gold: "0.68%", gummy: "0.68%", galaxy: "0.27%", holofoil: "TBD", cube: "TBD" }, baseAbility: "Creates a fiery burst when you deal enough damage to an enemy! Required damage decreases at each Level Up: 150 -> 125 -> 100 -> 75 -> 50 Damage to trigger." },
-  { id: "fishy", name: "Fishy", rarity: "Rare", images: { base: fishyBase, gold: fishyGold, gummy: fishyGummy, galaxy: fishyGalaxy, cube: cubeFishy }, rates: { base: "13.79%", gold: "0.17%", gummy: "0.08%", galaxy: "0.06%", holofoil: "N/A", cube: "TBD" }, baseAbility: "Swim speed greatly increased. Taking damage also briefly increases movement speed. Tiers: 25%/10% -> 50%/20% -> 100%/30% -> 150%/40% -> 200%/50% bonuses." },
-  { id: "air", name: "Air", rarity: "Rare", images: { base: airBase, gold: airGold, gummy: airGummy, galaxy: airGalaxy, holofoil: airHolofoil }, rates: { base: "12.83%", gold: "0.70%", gummy: "0.28%", galaxy: "0.28%", holofoil: "TBD", cube: "N/A" }, baseAbility: "Increases sprinting speed and jump height. Also nullifies fall damage. Jump height increased with each Level Up!" }
+  { id: "zero-point", name: "Zero Point", rarity: "Mythic", images: { base: zpBase, gold: zpGold, gummy: zpGummy, galaxy: zpGalaxy }, variants: ['base', 'gold', 'gummy', 'galaxy'], baseAbility: "Spawn a Shield Bubble Jr. when you use a healing item on yourself (excluding splashes and grenades). Duration at each Level Up: 6s -> 7s -> 8s -> 9s -> 10s." },
+  { id: "burnt-peanut", name: "Burnt Peanut", rarity: "Mythic", images: { base: peanutBase, gold: peanutBase, gummy: peanutBase, galaxy: peanutBase }, variants: ['base'], baseAbility: "Goop! When eliminating players, you may find more loot. Sometimes mythic! Chance at each Level Up: 20% -> 30% -> 40% -> 50% -> 60% chance (10% chance to find Mythic at Max Level!)." },
+  { id: "batman", name: "Batman", rarity: "Mythic", images: { base: batmanBase, gold: batmanGold, gummy: batmanGummy, galaxy: batmanGalaxy, holofoil: batmanHolofoil, cube: cubeBatman }, variants: ['base', 'gold', 'gummy', 'galaxy', 'holofoil', 'cube'], baseAbility: "Grants the ability to launch in the air and deploy the Bat Cape!" },
+  { id: "vini-jr", name: "Vini Jr", rarity: "Mythic", images: { base: viniBase, gold: viniBase, gummy: viniBase, galaxy: viniBase, holofoil: viniBase }, variants: ['base'], baseAbility: "Sprinting for a short time makes your slide destructive. Slidekicking enemies increases rate of fire and reload speed. Increases in power at each Level Up: 40 dmg / 10% fire rate -> 45 dmg / 20% fire rate -> 50 dmg / 30% fire rate -> 55 dmg / 40% fire rate -> 60 dmg / 50% fire rate" },
+  { id: "pollo", name: "Pollo", rarity: "Mythic", images: { base: polloBase, gold: polloBase, gummy: polloBase, galaxy: polloBase, holofoil: polloBase }, variants: ['base'], baseAbility: "Upon earning an elimination, slowly replenish shield for you and nearby squad members for a duration. Duration increases at each Level Up: 6 Seconds -> 7 Seconds -> 8 Seconds -> 9 Seconds -> 10 Seconds" },
+  { id: "dream", name: "Dream", rarity: "Legendary", images: { base: dreamBase, gold: dreamGold, gummy: dreamGummy, galaxy: dreamGalaxy, cube: cubeDream }, variants: ['base', 'gold', 'gummy', 'galaxy', 'cube'], baseAbility: "Grants a random item at each level, exploding with legendary loot at Max Level. Loot value increases at each Level Up!" },
+  { id: "punk", name: "Punk", rarity: "Legendary", images: { base: punkBase, gold: punkGold, gummy: punkGummy, galaxy: punkGalaxy, cube: cubePunk }, variants: ['base', 'gold', 'gummy', 'galaxy', 'cube'], baseAbility: "Does nothing until Level 5, in which it will always grant a buff for unlimited ammo." },
+  { id: "boss", name: "Boss", rarity: "Legendary", images: { base: bossBase, gold: bossGold, gummy: bossGummy, galaxy: bossGalaxy, cube: cubeBoss }, variants: ['base', 'gold', 'gummy', 'galaxy', 'cube'], baseAbility: "Grants an increase to your max HP and Shield. Increases at each Level Up: 5 -> 10 -> 15 -> 20 -> 25 HP/Shield." },
+  { id: "grim", name: "Grim", rarity: "Legendary", images: { base: grimBase, gold: grimGold, gummy: grimGummy, galaxy: grimGalaxy, cube: cubeGrim }, variants: ['base', 'gold', 'gummy', 'galaxy', 'cube'], baseAbility: "Players who attack you are marked for a duration. Duration at each Level Up: 3s -> 3.5s -> 4s -> 4.5s -> 5s." },
+  { id: "seven", name: "Seven", rarity: "Legendary", images: { base: sevenBase, gold: sevenGold, gummy: sevenGummy, galaxy: sevenGalaxy, holofoil: sevenHolofoil }, variants: ['base', 'gold', 'gummy', 'galaxy', 'holofoil'], baseAbility: "Enemy player foot trails are visible in the world for your Squad. Duration increases at each Level Up: 10 Seconds -> 15 Seconds -> 20 Seconds -> 25 Seconds -> 30 Second foot trails." },
+  { id: "duck", name: "Duck", rarity: "Epic", images: { base: duckBase, gold: duckGold, gummy: duckGummy, galaxy: duckGalaxy }, variants: ['base', 'gold', 'gummy', 'galaxy'], baseAbility: "Emoting or Jamming replenishes shields. Increases in power at each Level Up: 2 -> 3 -> 4 -> 6 -> 8 Shield per tick." },
+  { id: "demon", name: "Demon", rarity: "Epic", images: { base: demonBase, gold: demonGold, gummy: demonGummy, galaxy: demonGalaxy }, variants: ['base', 'gold', 'gummy', 'galaxy'], baseAbility: "Siphon some health and shields when you eliminate an opponent. Increases in power at each Level Up: 10 -> 15 -> 20 -> 25 -> 30 Healing per elimination." },
+  { id: "ghost", name: "Ghost", rarity: "Epic", images: { base: ghostBase, gold: ghostGold, gummy: ghostGummy, galaxy: ghostGalaxy, holofoil: ghostHolofoil }, variants: ['base', 'gold', 'gummy', 'galaxy', 'holofoil'], baseAbility: "Grants cloak for a duration upon reloading. Increases in duration at each Level Up: 3s -> 3.5s -> 4s -> 4.5s -> 5s." },
+  { id: "king", name: "King", rarity: "Epic", images: { base: kingBase, gold: kingGold, gummy: kingGummy, galaxy: kingGalaxy, holofoil: kingHolofoil }, variants: ['base', 'gold', 'gummy', 'galaxy', 'holofoil'], baseAbility: "Your Pickaxe deals more damage. Increases in damage at each Level Up: 30 -> 40 -> 60 -> 80 -> 120 bonus damage." },
+  { id: "aura", name: "Aura", rarity: "Epic", images: { base: auraBase, gold: auraGold, gummy: auraGummy, galaxy: auraGalaxy }, variants: ['base', 'gold', 'gummy', 'galaxy'], baseAbility: "Gain a Shock Rock charge when you deal enough damage to enemies! Required damage decreases at each Level Up: 175 -> 150 -> 125 -> 100 -> 75 Damage to trigger." },
+  { id: "striker", name: "Striker", rarity: "Epic", images: { base: strikerBase, gold: strikerGold, gummy: strikerGummy, galaxy: strikerGalaxy, holofoil: strikerHolofoil }, variants: ['base', 'gold', 'gummy', 'galaxy', 'holofoil'], baseAbility: "Gain the Overdrive effect when you Mantle, Hurdle, or Wall Scramble. Duration increases at each Level Up: 6s -> 7s -> 8s -> 9s -> 10s of Overdrive." },
+  { id: "water", name: "Water", rarity: "Rare", images: { base: waterBase, gold: waterGold, gummy: waterGummy, galaxy: waterGalaxy, holofoil: waterHolofoil }, variants: ['base', 'gold', 'gummy', 'galaxy', 'holofoil'], baseAbility: "Replenish shields while standing in water! Increases in power at each Level Up: 2 -> 3 -> 4 -> 5 -> 6 Shield per tick." },
+  { id: "earth", name: "Earth", rarity: "Rare", images: { base: earthBase, gold: earthGold, gummy: earthGummy, galaxy: earthGalaxy, cube: cubeEarth }, variants: ['base', 'gold', 'gummy', 'galaxy', 'cube'], baseAbility: "You have a chance to find additional rare items when opening chests. Chance increases at each Level Up: 10% -> 12.5% -> 15% -> 17.5% -> 20% chance." },
+  { id: "fire", name: "Fire", rarity: "Rare", images: { base: fireBase, gold: fireGold, gummy: fireGummy, galaxy: fireGalaxy, holofoil: fireHolofoil, cube: cubeFire }, variants: ['base', 'gold', 'gummy', 'galaxy', 'holofoil', 'cube'], baseAbility: "Creates a fiery burst when you deal enough damage to an enemy! Required damage decreases at each Level Up: 150 -> 125 -> 100 -> 75 -> 50 Damage to trigger." },
+  { id: "fishy", name: "Fishy", rarity: "Rare", images: { base: fishyBase, gold: fishyGold, gummy: fishyGummy, galaxy: fishyGalaxy, cube: cubeFishy }, variants: ['base', 'gold', 'gummy', 'galaxy', 'cube'], baseAbility: "Swim speed greatly increased. Taking damage also briefly increases movement speed. Tiers: 25%/10% -> 50%/20% -> 100%/30% -> 150%/40% -> 200%/50% bonuses." },
+  { id: "air", name: "Air", rarity: "Rare", images: { base: airBase, gold: airGold, gummy: airGummy, galaxy: airGalaxy, holofoil: airHolofoil }, variants: ['base', 'gold', 'gummy', 'galaxy', 'holofoil'], baseAbility: "Increases sprinting speed and jump height. Also nullifies fall damage. Jump height increased with each Level Up!" }
 ];
 
 const PATCH_NOTES = [
@@ -179,8 +178,7 @@ const PATCH_NOTES = [
 ];
 
 const totalPossibleStatic = SPRITES_DATABASE.reduce((acc, sprite) => {
-  const validCount = variantsList.filter(v => sprite.rates[v] !== "N/A").length;
-  return acc + validCount;
+  return acc + sprite.variants.length;
 }, 0);
 
 const PROFANITY_LIST = [
@@ -211,10 +209,10 @@ const RARITY_BG_GRADIENTS = {
 };
 
 const SUMMON_COST_MATRIX = {
-  Mythic: { base: "7,500", variant: "15,000" },
-  Legendary: { base: "5,000", variant: "10,000" },
-  Epic: { base: "3,000", variant: "6,000" },
-  Rare: { base: "2,000", variant: "4,000" }
+  Mythic: { base: "6,750", variant: "10,000" },
+  Legendary: { base: "4,500", variant: "6,750" },
+  Epic: { base: "2,700", variant: "4,000" },
+  Rare: { base: "1,800", variant: "2,700" }
 };
 
 function MainApp() {
@@ -371,7 +369,7 @@ function MainApp() {
 
             SPRITES_DATABASE.forEach(sprite => {
               const status = sprites[sprite.id] || {};
-              tCollected += variantsList.filter(v => sprite.rates[v] !== "N/A" && status[v]).length;
+              tCollected += sprite.variants.filter(v => status[v]).length;
             });
 
             const cRate = totalPossibleStatic > 0 ? Math.round((tCollected / totalPossibleStatic) * 100) : 0;
@@ -458,7 +456,7 @@ function MainApp() {
       const updated = { ...prev, [spriteId]: { ...currentSprite, [variant]: newVal } };
 
       const targetSprite = SPRITES_DATABASE.find(s => s.id === spriteId);
-      const targets = variantsList.filter(v => targetSprite.rates[v] !== "N/A");
+      const targets = targetSprite.variants;
       const allSelected = targets.every(v => updated[spriteId][v]);
 
       if (newVal && allSelected) {
@@ -717,13 +715,13 @@ function MainApp() {
 
   const totalCollected = SPRITES_DATABASE.reduce((acc, sprite) => {
     const status = collection[sprite.id] || {};
-    const validChecked = variantsList.filter(v => sprite.rates[v] !== "N/A" && status[v]).length;
+    const validChecked = sprite.variants.filter(v => status[v]).length;
     return acc + validChecked;
   }, 0);
 
   const totalMastered = SPRITES_DATABASE.reduce((acc, sprite) => {
     const status = mastery[sprite.id] || {};
-    const validMastered = variantsList.filter(v => sprite.rates[v] !== "N/A" && status[v]).length;
+    const validMastered = sprite.variants.filter(v => status[v]).length;
     return acc + validMastered;
   }, 0);
 
@@ -737,22 +735,22 @@ function MainApp() {
     const matchesSearch = sprite.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       sprite.baseAbility.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesRarity = rarityFilter === 'All' || sprite.rarity === rarityFilter;
-    const matchesVariant = variantFilter === 'All' || sprite.rates[displayVariantKey] !== "N/A";
+    const matchesVariant = variantFilter === 'All' || sprite.variants.includes(displayVariantKey);
 
     // Status Filter Logic
     let matchesStatus = true;
     if (statusFilter !== 'All') {
       if (isMasteryView) {
         if (statusFilter === 'Mastered') {
-          matchesStatus = variantFilter === 'All' ? variantsList.some(v => mastery[sprite.id]?.[v] === true) : mastery[sprite.id]?.[displayVariantKey] === true;
+          matchesStatus = variantFilter === 'All' ? sprite.variants.some(v => mastery[sprite.id]?.[v] === true) : mastery[sprite.id]?.[displayVariantKey] === true;
         } else if (statusFilter === 'Unmastered') {
-          matchesStatus = variantFilter === 'All' ? variantsList.some(v => collection[sprite.id]?.[v] === true && !mastery[sprite.id]?.[v]) : (collection[sprite.id]?.[displayVariantKey] === true && !mastery[sprite.id]?.[displayVariantKey]);
+          matchesStatus = variantFilter === 'All' ? sprite.variants.some(v => collection[sprite.id]?.[v] === true && !mastery[sprite.id]?.[v]) : (collection[sprite.id]?.[displayVariantKey] === true && !mastery[sprite.id]?.[displayVariantKey]);
         }
       } else {
         if (statusFilter === 'Collected') {
-          matchesStatus = variantFilter === 'All' ? variantsList.some(v => collection[sprite.id]?.[v] === true) : collection[sprite.id]?.[displayVariantKey] === true;
+          matchesStatus = variantFilter === 'All' ? sprite.variants.some(v => collection[sprite.id]?.[v] === true) : collection[sprite.id]?.[displayVariantKey] === true;
         } else if (statusFilter === 'Missing') {
-          matchesStatus = variantFilter === 'All' ? variantsList.some(v => sprite.rates[v] !== "N/A" && !collection[sprite.id]?.[v]) : (sprite.rates[displayVariantKey] !== "N/A" && !collection[sprite.id]?.[displayVariantKey]);
+          matchesStatus = variantFilter === 'All' ? sprite.variants.some(v => !collection[sprite.id]?.[v]) : (sprite.variants.includes(displayVariantKey) && !collection[sprite.id]?.[displayVariantKey]);
         }
       }
     }
@@ -760,7 +758,7 @@ function MainApp() {
     if (isMasteryView && statusFilter === 'All') {
       const status = collection[sprite.id] || {};
       const hasCollected = variantFilter === 'All'
-        ? variantsList.some(v => status[v] === true)
+        ? sprite.variants.some(v => status[v] === true)
         : status[displayVariantKey] === true;
       return matchesSearch && matchesRarity && matchesVariant && matchesStatus && hasCollected;
     }
@@ -775,6 +773,12 @@ function MainApp() {
     if (variantName === 'holofoil') return "Gain 5% increased chance of finding rare Sprites for yourself and entire squad";
     if (variantName === 'cube') return "Gain the Overdrive effect while in the storm";
     return null;
+  };
+
+  const getDynamicSummonCost = (rarity, variantName) => {
+    const rarityMatrix = SUMMON_COST_MATRIX[rarity];
+    if (!rarityMatrix) return "0";
+    return variantName === 'base' ? rarityMatrix.base : rarityMatrix.variant;
   };
 
   // --- INITIALIZATION SCREEN ---
@@ -882,7 +886,7 @@ function MainApp() {
         <div className="fixed inset-0 z-[70] flex items-center justify-center p-4 bg-black/90 backdrop-blur-md animate-in fade-in zoom-in-95 duration-200">
           {(() => {
             const sprite = SPRITES_DATABASE.find(s => s.id === selectedSprite.id);
-            const validVariants = variantsList.filter(v => sprite.rates[v] !== "N/A");
+            const validVariants = sprite.variants;
             const v = selectedSprite.variant;
             const vIndex = validVariants.indexOf(v);
 
@@ -950,6 +954,10 @@ function MainApp() {
                         {variantModifier}
                       </p>
                     )}
+                    <div className="flex items-center justify-between mt-3 pt-3 border-t border-slate-800/60">
+                      <span className="font-mono text-[10px] font-black text-emerald-400 uppercase tracking-wider">Summon Cost:</span>
+                      <span className="text-xs font-black text-white">{getDynamicSummonCost(sprite.rarity, v)} Dust</span>
+                    </div>
                   </div>
 
                   <div className="flex gap-2">
@@ -1081,7 +1089,7 @@ function MainApp() {
             </header>
             <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-4">
               {SPRITES_DATABASE.map(sprite => {
-                const validVariants = variantsList.filter(v => sprite.rates[v] !== "N/A" && !collection[sprite.id]?.[v]);
+                const validVariants = sprite.variants.filter(v => !collection[sprite.id]?.[v]);
                 if (validVariants.length === 0) return null;
 
                 return (
@@ -1219,7 +1227,7 @@ function MainApp() {
 
                   <div className="flex gap-1.5 sm:gap-2">
                     {variantsList.map(v => {
-                      if (sprite.rates[v] === "N/A") return null;
+                      if (!sprite.variants.includes(v)) return null;
                       const isCollected = friendStatus[v];
                       const isMastered = friendMastery[v];
 
@@ -1386,7 +1394,7 @@ function MainApp() {
               <div className="flex flex-col gap-2 animate-in fade-in duration-300">
                 {filteredSprites.map(sprite => {
                   const displayVariant = variantFilter === 'All' ? 'base' : variantFilter.toLowerCase();
-                  const validInitialVariant = sprite.rates[displayVariant] !== "N/A" ? displayVariant : 'base';
+                  const validInitialVariant = sprite.variants.includes(displayVariant) ? displayVariant : 'base';
 
                   const hasAnyVariant = variantsList.some(v => collection[sprite.id]?.[v]);
 
@@ -1409,7 +1417,7 @@ function MainApp() {
                       {/* Interactive Labeled Radio Dots Container */}
                       <div className="flex gap-1.5 sm:gap-2">
                         {variantsList.map(v => {
-                          if (sprite.rates[v] === "N/A") return null;
+                          if (!sprite.variants.includes(v)) return null;
                           const isCollected = collection[sprite.id]?.[v];
                           const isMastered = mastery[sprite.id]?.[v];
 
@@ -1629,6 +1637,7 @@ function MainApp() {
                   <span>Mini Sprites</span>
                   <ShoppingCart className="w-4 h-4 opacity-70" />
                 </a>
+
                 <a
                   href="https://amzn.to/4yzmyfD"
                   target="_blank"
