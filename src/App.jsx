@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import PrivacyPolicy from './PrivacyPolicy';
 import {
-  Search, CheckCircle, Circle, Volume2, VolumeX, Percent, RotateCcw, AlertTriangle, X, Eye, Crown, Users, UserPlus, ChevronLeft, ChevronRight, Check, XCircle, UserMinus, Target, Plus, FileText, Radio, Info, MessageSquare, Mail, Lock, List, Filter, ChevronDown, ChevronUp
+  Search, CheckCircle, Circle, Volume2, VolumeX, Percent, RotateCcw, AlertTriangle, X, Eye, Crown, Users, UserPlus, ChevronLeft, ChevronRight, Check, XCircle, UserMinus, Target, Plus, FileText, Radio, Info, MessageSquare, Mail, Lock, List, Filter, ChevronDown, ChevronUp, ShoppingCart
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { useAuth } from './AuthContext';
@@ -115,33 +115,55 @@ import batmanHolofoil from './assets/Batman holofoil.webp';
 import polloBase from './assets/Pollo Base.webp';
 import viniBase from './assets/Vini Jr Base.webp';
 
-const variantsList = ['base', 'gold', 'gummy', 'galaxy', 'holofoil'];
+// --- NEW CUBE IMPORTS ---
+import cubeBatman from './assets/Cube Batman.webp';
+import cubeEarth from './assets/Cube Earth.webp';
+import cubeFire from './assets/Cube Fire.webp';
+import cubeDream from './assets/Cube Dream.webp';
+import cubePunk from './assets/Cube Punk.webp';
+import cubeFishy from './assets/Cube Fishy.webp';
+import cubeBoss from './assets/Cube Boss.webp';
+import cubeGrim from './assets/Cube Grim.webp';
+
+
+const variantsList = ['base', 'gold', 'gummy', 'galaxy', 'holofoil', 'cube'];
 
 const SPRITES_DATABASE = [
-  { id: "zero-point", name: "Zero Point", rarity: "Mythic", images: { base: zpBase, gold: zpGold, gummy: zpGummy, galaxy: zpGalaxy }, rates: { base: "0.000098%", gold: "0.00012%", gummy: "0.00006%", galaxy: "0.00004%", holofoil: "N/A" }, baseAbility: "Spawn a Shield Bubble Jr. when you use a healing item on yourself (excluding splashes and grenades). Duration at each Level Up: 6s -> 7s -> 8s -> 9s -> 10s." },
-  { id: "burnt-peanut", name: "Burnt Peanut", rarity: "Mythic", images: { base: peanutBase, gold: peanutBase, gummy: peanutBase, galaxy: peanutBase }, rates: { base: "1.01%", gold: "N/A", gummy: "N/A", galaxy: "N/A", holofoil: "N/A" }, baseAbility: "Goop! When eliminating players, you may find more loot. Sometimes mythic! Chance at each Level Up: 20% -> 30% -> 40% -> 50% -> 60% chance (10% chance to find Mythic at Max Level!)." },
-  { id: "batman", name: "Batman", rarity: "Mythic", images: { base: batmanBase, gold: batmanGold, gummy: batmanGummy, galaxy: batmanGalaxy, holofoil: batmanHolofoil }, rates: { base: "0.000098%", gold: "0.00012%", gummy: "0.00006%", galaxy: "0.00004%", holofoil: "TBD" }, baseAbility: "Grants the ability to launch in the air and deploy the Bat Cape!" },
-  { id: "vini-jr", name: "Vini Jr", rarity: "Mythic", images: { base: viniBase, gold: viniBase, gummy: viniBase, galaxy: viniBase, holofoil: viniBase }, rates: { base: "TBD", gold: "N/A", gummy: "N/A", galaxy: "N/A", holofoil: "N/A" }, baseAbility: "Sprinting for a short time makes your slide destructive. Slidekicking enemies increases rate of fire and reload speed. Increases in power at each Level Up: 40 dmg / 10% fire rate -> 45 dmg / 20% fire rate -> 50 dmg / 30% fire rate -> 55 dmg / 40% fire rate -> 60 dmg / 50% fire rate" },
-  { id: "pollo", name: "Pollo", rarity: "Mythic", images: { base: polloBase, gold: polloBase, gummy: polloBase, galaxy: polloBase, holofoil: polloBase }, rates: { base: "TBD", gold: "N/A", gummy: "N/A", galaxy: "N/A", holofoil: "N/A" }, baseAbility: "Upon earning an elimination, slowly replenish shield for you and nearby squad members for a duration. Duration increases at each Level Up: 6 Seconds -> 7 Seconds -> 8 Seconds -> 9 Seconds -> 10 Seconds" },
-  { id: "dream", name: "Dream", rarity: "Legendary", images: { base: dreamBase, gold: dreamGold, gummy: dreamGummy, galaxy: dreamGalaxy }, rates: { base: "2.63%", gold: "0.03%", gummy: "0.02%", galaxy: "0.01%", holofoil: "N/A" }, baseAbility: "Grants a random item at each level, exploding with legendary loot at Max Level. Loot value increases at each Level Up!" },
-  { id: "punk", name: "Punk", rarity: "Legendary", images: { base: punkBase, gold: punkGold, gummy: punkGummy, galaxy: punkGalaxy }, rates: { base: "1.98%", gold: "0.02%", gummy: "0.01%", galaxy: "0.01%", holofoil: "N/A" }, baseAbility: "Does nothing until Level 5, in which it will always grant a buff for unlimited ammo." },
-  { id: "boss", name: "Boss", rarity: "Legendary", images: { base: bossBase, gold: bossGold, gummy: bossGummy, galaxy: bossGalaxy }, rates: { base: "2.63%", gold: "0.03%", gummy: "0.02%", galaxy: "0.01%", holofoil: "N/A" }, baseAbility: "Grants an increase to your max HP and Shield. Increases at each Level Up: 5 -> 10 -> 15 -> 20 -> 25 HP/Shield." },
-  { id: "grim", name: "Grim", rarity: "Legendary", images: { base: grimBase, gold: grimGold, gummy: grimGummy, galaxy: grimGalaxy }, rates: { base: "0.0098%", gold: "0.00012%", gummy: "0.00006%", galaxy: "0.00004%", holofoil: "N/A" }, baseAbility: "Players who attack you are marked for a duration. Duration at each Level Up: 3s -> 3.5s -> 4s -> 4.5s -> 5s." },
-  { id: "seven", name: "Seven", rarity: "Legendary", images: { base: sevenBase, gold: sevenGold, gummy: sevenGummy, galaxy: sevenGalaxy, holofoil: sevenHolofoil }, rates: { base: "2.63%", gold: "0.03%", gummy: "0.02%", galaxy: "0.01%", holofoil: "TBD" }, baseAbility: "Enemy player foot trails are visible in the world for your Squad. Duration increases at each Level Up: 10 Seconds -> 15 Seconds -> 20 Seconds -> 25 Seconds -> 30 Second foot trails." },
-  { id: "duck", name: "Duck", rarity: "Epic", images: { base: duckBase, gold: duckGold, gummy: duckGummy, galaxy: duckGalaxy }, rates: { base: "5.74%", gold: "0.07%", gummy: "0.04%", galaxy: "0.02%", holofoil: "N/A" }, baseAbility: "Emoting or Jamming replenishes shields. Increases in power at each Level Up: 2 -> 3 -> 4 -> 6 -> 8 Shield per tick." },
-  { id: "demon", name: "Demon", rarity: "Epic", images: { base: demonBase, gold: demonGold, gummy: demonGummy, galaxy: demonGalaxy }, rates: { base: "5.76%", gold: "0.07%", gummy: "0.04%", galaxy: "0.01%", holofoil: "N/A" }, baseAbility: "Siphon some health and shields when you eliminate an opponent. Increases in power at each Level Up: 10 -> 15 -> 20 -> 25 -> 30 Healing per elimination." },
-  { id: "ghost", name: "Ghost", rarity: "Epic", images: { base: ghostBase, gold: ghostGold, gummy: ghostGummy, galaxy: ghostGalaxy, holofoil: ghostHolofoil }, rates: { base: "5.74%", gold: "0.07%", gummy: "0.04%", galaxy: "0.02%", holofoil: "TBD" }, baseAbility: "Grants cloak for a duration upon reloading. Increases in duration at each Level Up: 3s -> 3.5s -> 4s -> 4.5s -> 5s." },
-  { id: "king", name: "King", rarity: "Epic", images: { base: kingBase, gold: kingGold, gummy: kingGummy, galaxy: kingGalaxy, holofoil: kingHolofoil }, rates: { base: "5.74%", gold: "0.07%", gummy: "0.04%", galaxy: "0.02%", holofoil: "TBD" }, baseAbility: "Your Pickaxe deals more damage. Increases in damage at each Level Up: 30 -> 40 -> 60 -> 80 -> 120 bonus damage." },
-  { id: "aura", name: "Aura", rarity: "Epic", images: { base: auraBase, gold: auraGold, gummy: auraGummy, galaxy: auraGalaxy }, rates: { base: "5.74%", gold: "0.07%", gummy: "0.04%", galaxy: "0.02%", holofoil: "N/A" }, baseAbility: "Gain a Shock Rock charge when you deal enough damage to enemies! Required damage decreases at each Level Up: 175 -> 150 -> 125 -> 100 -> 75 Damage to trigger." },
-  { id: "striker", name: "Striker", rarity: "Epic", images: { base: strikerBase, gold: strikerGold, gummy: strikerGummy, galaxy: strikerGalaxy, holofoil: strikerHolofoil }, rates: { base: "5.74%", gold: "0.07%", gummy: "0.04%", galaxy: "0.02%", holofoil: "TBD" }, baseAbility: "Gain the Overdrive effect when you Mantle, Hurdle, or Wall Scramble. Duration increases at each Level Up: 6s -> 7s -> 8s -> 9s -> 10s of Overdrive." },
-  { id: "water", name: "Water", rarity: "Rare", images: { base: waterBase, gold: waterGold, gummy: waterGummy, galaxy: waterGalaxy, holofoil: waterHolofoil }, rates: { base: "12.83%", gold: "0.70%", gummy: "0.28%", galaxy: "0.28%", holofoil: "TBD" }, baseAbility: "Replenish shields while standing in water! Increases in power at each Level Up: 2 -> 3 -> 4 -> 5 -> 6 Shield per tick." },
-  { id: "earth", name: "Earth", rarity: "Rare", images: { base: earthBase, gold: earthGold, gummy: earthGummy, galaxy: earthGalaxy }, rates: { base: "12.83%", gold: "0.70%", gummy: "0.28%", galaxy: "0.28%", holofoil: "N/A" }, baseAbility: "You have a chance to find additional rare items when opening chests. Chance increases at each Level Up: 10% -> 12.5% -> 15% -> 17.5% -> 20% chance." },
-  { id: "fire", name: "Fire", rarity: "Rare", images: { base: fireBase, gold: fireGold, gummy: fireGummy, galaxy: fireGalaxy, holofoil: fireHolofoil }, rates: { base: "12.45%", gold: "0.68%", gummy: "0.68%", galaxy: "0.27%", holofoil: "TBD" }, baseAbility: "Creates a fiery burst when you deal enough damage to an enemy! Required damage decreases at each Level Up: 150 -> 125 -> 100 -> 75 -> 50 Damage to trigger." },
-  { id: "fishy", name: "Fishy", rarity: "Rare", images: { base: fishyBase, gold: fishyGold, gummy: fishyGummy, galaxy: fishyGalaxy }, rates: { base: "13.79%", gold: "0.17%", gummy: "0.08%", galaxy: "0.06%", holofoil: "N/A" }, baseAbility: "Swim speed greatly increased. Taking damage also briefly increases movement speed. Tiers: 25%/10% -> 50%/20% -> 100%/30% -> 150%/40% -> 200%/50% bonuses." },
-  { id: "air", name: "Air", rarity: "Rare", images: { base: airBase, gold: airGold, gummy: airGummy, galaxy: airGalaxy, holofoil: airHolofoil }, rates: { base: "12.83%", gold: "0.70%", gummy: "0.28%", galaxy: "0.28%", holofoil: "TBD" }, baseAbility: "Increases sprinting speed and jump height. Also nullifies fall damage. Jump height increased with each Level Up!" }
+  { id: "zero-point", name: "Zero Point", rarity: "Mythic", images: { base: zpBase, gold: zpGold, gummy: zpGummy, galaxy: zpGalaxy }, rates: { base: "0.000098%", gold: "0.00012%", gummy: "0.00006%", galaxy: "0.00004%", holofoil: "N/A", cube: "N/A" }, baseAbility: "Spawn a Shield Bubble Jr. when you use a healing item on yourself (excluding splashes and grenades). Duration at each Level Up: 6s -> 7s -> 8s -> 9s -> 10s." },
+  { id: "burnt-peanut", name: "Burnt Peanut", rarity: "Mythic", images: { base: peanutBase, gold: peanutBase, gummy: peanutBase, galaxy: peanutBase }, rates: { base: "1.01%", gold: "N/A", gummy: "N/A", galaxy: "N/A", holofoil: "N/A", cube: "N/A" }, baseAbility: "Goop! When eliminating players, you may find more loot. Sometimes mythic! Chance at each Level Up: 20% -> 30% -> 40% -> 50% -> 60% chance (10% chance to find Mythic at Max Level!)." },
+  { id: "batman", name: "Batman", rarity: "Mythic", images: { base: batmanBase, gold: batmanGold, gummy: batmanGummy, galaxy: batmanGalaxy, holofoil: batmanHolofoil, cube: cubeBatman }, rates: { base: "0.000098%", gold: "0.00012%", gummy: "0.00006%", galaxy: "0.00004%", holofoil: "TBD", cube: "TBD" }, baseAbility: "Grants the ability to launch in the air and deploy the Bat Cape!" },
+  { id: "vini-jr", name: "Vini Jr", rarity: "Mythic", images: { base: viniBase, gold: viniBase, gummy: viniBase, galaxy: viniBase, holofoil: viniBase }, rates: { base: "TBD", gold: "N/A", gummy: "N/A", galaxy: "N/A", holofoil: "N/A", cube: "N/A" }, baseAbility: "Sprinting for a short time makes your slide destructive. Slidekicking enemies increases rate of fire and reload speed. Increases in power at each Level Up: 40 dmg / 10% fire rate -> 45 dmg / 20% fire rate -> 50 dmg / 30% fire rate -> 55 dmg / 40% fire rate -> 60 dmg / 50% fire rate" },
+  { id: "pollo", name: "Pollo", rarity: "Mythic", images: { base: polloBase, gold: polloBase, gummy: polloBase, galaxy: polloBase, holofoil: polloBase }, rates: { base: "TBD", gold: "N/A", gummy: "N/A", galaxy: "N/A", holofoil: "N/A", cube: "N/A" }, baseAbility: "Upon earning an elimination, slowly replenish shield for you and nearby squad members for a duration. Duration increases at each Level Up: 6 Seconds -> 7 Seconds -> 8 Seconds -> 9 Seconds -> 10 Seconds" },
+  { id: "dream", name: "Dream", rarity: "Legendary", images: { base: dreamBase, gold: dreamGold, gummy: dreamGummy, galaxy: dreamGalaxy, cube: cubeDream }, rates: { base: "2.63%", gold: "0.03%", gummy: "0.02%", galaxy: "0.01%", holofoil: "N/A", cube: "TBD" }, baseAbility: "Grants a random item at each level, exploding with legendary loot at Max Level. Loot value increases at each Level Up!" },
+  { id: "punk", name: "Punk", rarity: "Legendary", images: { base: punkBase, gold: punkGold, gummy: punkGummy, galaxy: punkGalaxy, cube: cubePunk }, rates: { base: "1.98%", gold: "0.02%", gummy: "0.01%", galaxy: "0.01%", holofoil: "N/A", cube: "TBD" }, baseAbility: "Does nothing until Level 5, in which it will always grant a buff for unlimited ammo." },
+  { id: "boss", name: "Boss", rarity: "Legendary", images: { base: bossBase, gold: bossGold, gummy: bossGummy, galaxy: bossGalaxy, cube: cubeBoss }, rates: { base: "2.63%", gold: "0.03%", gummy: "0.02%", galaxy: "0.01%", holofoil: "N/A", cube: "TBD" }, baseAbility: "Grants an increase to your max HP and Shield. Increases at each Level Up: 5 -> 10 -> 15 -> 20 -> 25 HP/Shield." },
+  { id: "grim", name: "Grim", rarity: "Legendary", images: { base: grimBase, gold: grimGold, gummy: grimGummy, galaxy: grimGalaxy, cube: cubeGrim }, rates: { base: "0.0098%", gold: "0.00012%", gummy: "0.00006%", galaxy: "0.00004%", holofoil: "N/A", cube: "TBD" }, baseAbility: "Players who attack you are marked for a duration. Duration at each Level Up: 3s -> 3.5s -> 4s -> 4.5s -> 5s." },
+  { id: "seven", name: "Seven", rarity: "Legendary", images: { base: sevenBase, gold: sevenGold, gummy: sevenGummy, galaxy: sevenGalaxy, holofoil: sevenHolofoil }, rates: { base: "2.63%", gold: "0.03%", gummy: "0.02%", galaxy: "0.01%", holofoil: "TBD", cube: "N/A" }, baseAbility: "Enemy player foot trails are visible in the world for your Squad. Duration increases at each Level Up: 10 Seconds -> 15 Seconds -> 20 Seconds -> 25 Seconds -> 30 Second foot trails." },
+  { id: "duck", name: "Duck", rarity: "Epic", images: { base: duckBase, gold: duckGold, gummy: duckGummy, galaxy: duckGalaxy }, rates: { base: "5.74%", gold: "0.07%", gummy: "0.04%", galaxy: "0.02%", holofoil: "N/A", cube: "N/A" }, baseAbility: "Emoting or Jamming replenishes shields. Increases in power at each Level Up: 2 -> 3 -> 4 -> 6 -> 8 Shield per tick." },
+  { id: "demon", name: "Demon", rarity: "Epic", images: { base: demonBase, gold: demonGold, gummy: demonGummy, galaxy: demonGalaxy }, rates: { base: "5.76%", gold: "0.07%", gummy: "0.04%", galaxy: "0.01%", holofoil: "N/A", cube: "N/A" }, baseAbility: "Siphon some health and shields when you eliminate an opponent. Increases in power at each Level Up: 10 -> 15 -> 20 -> 25 -> 30 Healing per elimination." },
+  { id: "ghost", name: "Ghost", rarity: "Epic", images: { base: ghostBase, gold: ghostGold, gummy: ghostGummy, galaxy: ghostGalaxy, holofoil: ghostHolofoil }, rates: { base: "5.74%", gold: "0.07%", gummy: "0.04%", galaxy: "0.02%", holofoil: "TBD", cube: "N/A" }, baseAbility: "Grants cloak for a duration upon reloading. Increases in duration at each Level Up: 3s -> 3.5s -> 4s -> 4.5s -> 5s." },
+  { id: "king", name: "King", rarity: "Epic", images: { base: kingBase, gold: kingGold, gummy: kingGummy, galaxy: kingGalaxy, holofoil: kingHolofoil }, rates: { base: "5.74%", gold: "0.07%", gummy: "0.04%", galaxy: "0.02%", holofoil: "TBD", cube: "N/A" }, baseAbility: "Your Pickaxe deals more damage. Increases in damage at each Level Up: 30 -> 40 -> 60 -> 80 -> 120 bonus damage." },
+  { id: "aura", name: "Aura", rarity: "Epic", images: { base: auraBase, gold: auraGold, gummy: auraGummy, galaxy: auraGalaxy }, rates: { base: "5.74%", gold: "0.07%", gummy: "0.04%", galaxy: "0.02%", holofoil: "N/A", cube: "N/A" }, baseAbility: "Gain a Shock Rock charge when you deal enough damage to enemies! Required damage decreases at each Level Up: 175 -> 150 -> 125 -> 100 -> 75 Damage to trigger." },
+  { id: "striker", name: "Striker", rarity: "Epic", images: { base: strikerBase, gold: strikerGold, gummy: strikerGummy, galaxy: strikerGalaxy, holofoil: strikerHolofoil }, rates: { base: "5.74%", gold: "0.07%", gummy: "0.04%", galaxy: "0.02%", holofoil: "TBD", cube: "N/A" }, baseAbility: "Gain the Overdrive effect when you Mantle, Hurdle, or Wall Scramble. Duration increases at each Level Up: 6s -> 7s -> 8s -> 9s -> 10s of Overdrive." },
+  { id: "water", name: "Water", rarity: "Rare", images: { base: waterBase, gold: waterGold, gummy: waterGummy, galaxy: waterGalaxy, holofoil: waterHolofoil }, rates: { base: "12.83%", gold: "0.70%", gummy: "0.28%", galaxy: "0.28%", holofoil: "TBD", cube: "N/A" }, baseAbility: "Replenish shields while standing in water! Increases in power at each Level Up: 2 -> 3 -> 4 -> 5 -> 6 Shield per tick." },
+  { id: "earth", name: "Earth", rarity: "Rare", images: { base: earthBase, gold: earthGold, gummy: earthGummy, galaxy: earthGalaxy, cube: cubeEarth }, rates: { base: "12.83%", gold: "0.70%", gummy: "0.28%", galaxy: "0.28%", holofoil: "N/A", cube: "TBD" }, baseAbility: "You have a chance to find additional rare items when opening chests. Chance increases at each Level Up: 10% -> 12.5% -> 15% -> 17.5% -> 20% chance." },
+  { id: "fire", name: "Fire", rarity: "Rare", images: { base: fireBase, gold: fireGold, gummy: fireGummy, galaxy: fireGalaxy, holofoil: fireHolofoil, cube: cubeFire }, rates: { base: "12.45%", gold: "0.68%", gummy: "0.68%", galaxy: "0.27%", holofoil: "TBD", cube: "TBD" }, baseAbility: "Creates a fiery burst when you deal enough damage to an enemy! Required damage decreases at each Level Up: 150 -> 125 -> 100 -> 75 -> 50 Damage to trigger." },
+  { id: "fishy", name: "Fishy", rarity: "Rare", images: { base: fishyBase, gold: fishyGold, gummy: fishyGummy, galaxy: fishyGalaxy, cube: cubeFishy }, rates: { base: "13.79%", gold: "0.17%", gummy: "0.08%", galaxy: "0.06%", holofoil: "N/A", cube: "TBD" }, baseAbility: "Swim speed greatly increased. Taking damage also briefly increases movement speed. Tiers: 25%/10% -> 50%/20% -> 100%/30% -> 150%/40% -> 200%/50% bonuses." },
+  { id: "air", name: "Air", rarity: "Rare", images: { base: airBase, gold: airGold, gummy: airGummy, galaxy: airGalaxy, holofoil: airHolofoil }, rates: { base: "12.83%", gold: "0.70%", gummy: "0.28%", galaxy: "0.28%", holofoil: "TBD", cube: "N/A" }, baseAbility: "Increases sprinting speed and jump height. Also nullifies fall damage. Jump height increased with each Level Up!" }
 ];
 
 const PATCH_NOTES = [
+  {
+    version: "v1.6.0",
+    date: "07/23/2026",
+    title: "Cube Variants & Interface Separation",
+    changes: [
+      "New Variants: The elusive Cube variant has been discovered for 8 Sprites! Track them in your collection today.",
+      "Interface Separation: The Sprites tab is now exclusively for tracking collection. The Mastery Vault securely handles all Level 5 crown progression independently.",
+      "Mastery Overlays: Crowns now brilliantly overlay onto their respective variant radio dots within the Mastery Vault.",
+      "Support Feature: Added a way to support the app directly through the Feedback & Support tab."
+    ]
+  },
   {
     version: "v1.5.0",
     date: "07/16/2026",
@@ -152,15 +174,6 @@ const PATCH_NOTES = [
       "New Sprites: Welcome the Air (Rare), Seven (Legendary), Batman (Mythic), Vini Jr (Mythic), and Pollo (Mythic) Sprites to the tracking pool!",
       "Filter Dropdown: We've added a clean new filter menu so you can easily sort by Rarity, Variant, and Collection Status.",
       "In-App Feedback: Send feedback directly to the developer from within the app."
-    ]
-  },
-  {
-    version: "v1.4.1",
-    date: "07/15/2026",
-    title: "UX Streamline Update",
-    changes: [
-      "Streamlined List View: The main screen is now a pure collection log. The list format is the default and only view for maximum clarity.",
-      "Accidental Click Prevention: Radio dots on the main list are now read-only indicators to prevent accidental unchecking while scrolling."
     ]
   }
 ];
@@ -179,7 +192,8 @@ const VARIANT_INFO = {
   gold: { name: "Gold", color: "text-amber-400", bgColor: "bg-amber-400" },
   gummy: { name: "Gummy", color: "text-pink-500", bgColor: "bg-pink-500" },
   galaxy: { name: "Galaxy", color: "text-purple-400", bgColor: "bg-purple-400" },
-  holofoil: { name: "Holofoil", color: "text-sky-400", bgColor: "bg-sky-400" }
+  holofoil: { name: "Holofoil", color: "text-sky-400", bgColor: "bg-sky-400" },
+  cube: { name: "Cube", color: "text-violet-500", bgColor: "bg-violet-500" }
 };
 
 const RARITY_COLORS = {
@@ -429,7 +443,7 @@ function MainApp() {
     const newVal = !currentVal;
 
     if (newVal) {
-      if (variant === 'holofoil') playBeep(1200, 'square', 0.15);
+      if (variant === 'holofoil' || variant === 'cube') playBeep(1200, 'square', 0.15);
       else if (variant === 'galaxy') playBeep(880, 'triangle', 0.15);
       else if (variant === 'gold') playBeep(659, 'sine', 0.1);
       else if (variant === 'gummy') playBeep(587, 'sine', 0.1);
@@ -738,7 +752,6 @@ function MainApp() {
         if (statusFilter === 'Collected') {
           matchesStatus = variantFilter === 'All' ? variantsList.some(v => collection[sprite.id]?.[v] === true) : collection[sprite.id]?.[displayVariantKey] === true;
         } else if (statusFilter === 'Missing') {
-          // To be missing, it must be available to collect but NOT collected.
           matchesStatus = variantFilter === 'All' ? variantsList.some(v => sprite.rates[v] !== "N/A" && !collection[sprite.id]?.[v]) : (sprite.rates[displayVariantKey] !== "N/A" && !collection[sprite.id]?.[displayVariantKey]);
         }
       }
@@ -760,14 +773,8 @@ function MainApp() {
     if (variantName === 'gummy') return "Gain 20% more Sprite Dust upon Extraction";
     if (variantName === 'galaxy') return "Gain 30% more Ammunition when looting";
     if (variantName === 'holofoil') return "Gain 5% increased chance of finding rare Sprites for yourself and entire squad";
+    if (variantName === 'cube') return "Gain the Overdrive effect while in the storm";
     return null;
-  };
-
-  const getDynamicSummonCost = (rarity, variantName) => {
-    if (variantName === 'holofoil') return "4,000";
-    const rarityMatrix = SUMMON_COST_MATRIX[rarity];
-    if (!rarityMatrix) return "0";
-    return variantName === 'base' ? rarityMatrix.base : rarityMatrix.variant;
   };
 
   // --- INITIALIZATION SCREEN ---
@@ -906,7 +913,6 @@ function MainApp() {
                     </button>
                   )}
 
-                  {/* Fixed scaling parameters to prevent blurry upscaling of webp images */}
                   <img
                     src={sprite.images[v]}
                     className="w-32 h-32 sm:w-40 sm:h-40 object-contain drop-shadow-[0_0_20px_rgba(255,255,255,0.2)]"
@@ -947,7 +953,6 @@ function MainApp() {
                   </div>
 
                   <div className="flex gap-2">
-                    {/* Only show 'Collect' button if in Sprites View */}
                     {!isMasteryView && (
                       <button
                         onClick={() => handleToggleCheck(sprite.id, v)}
@@ -958,7 +963,6 @@ function MainApp() {
                       </button>
                     )}
 
-                    {/* Only show 'Master' button if in Mastery View */}
                     {isMasteryView && (
                       <button
                         onClick={() => toggleMastery(sprite.id, v)}
@@ -1029,6 +1033,11 @@ function MainApp() {
                 <p className="text-sm sm:text-base text-slate-300 leading-relaxed">
                   Spritedex is your ultimate companion for tracking Battle Royale Sprites. Sync your collection across devices, coordinate in-game trades with your Sprite Squad using Extraction Targets, and keep track of your Mastery crowns all in one secure, real-time interface.
                 </p>
+                <div className="mt-4 pt-3 border-t border-purple-500/30">
+                  <p className="text-xs text-slate-300 leading-relaxed italic">
+                    You've collected them in-game, now collect them in real life! Grab some physical Sprites <a href="https://amzn.to/3ThkM2y" target="_blank" rel="noopener noreferrer" className="text-purple-400 font-bold hover:underline">here</a>. <br /><span className="text-[10px] text-slate-500">(As an Amazon Associate I earn from qualifying purchases.)</span>
+                  </p>
+                </div>
               </section>
 
               {/* --- UPDATE TIMELINE --- */}
@@ -1078,7 +1087,7 @@ function MainApp() {
                 return (
                   <div key={sprite.id} className="bg-slate-900 border border-slate-800 rounded-xl p-3">
                     <span className="text-sm font-black text-white uppercase italic mb-2 block">{sprite.name}</span>
-                    <div className="grid grid-cols-5 gap-2">
+                    <div className="grid grid-cols-6 gap-2">
                       {validVariants.map(v => (
                         <button
                           key={v}
@@ -1142,7 +1151,7 @@ function MainApp() {
         </div>
       )}
 
-      {/* --- LAYER: READ ONLY FRIEND COLLECTION INSPECTOR --- */}
+      {/* --- LAYER: NEW READ-ONLY FRIEND COLLECTION INSPECTOR --- */}
       {activeViewingFriend && (
         <div className="fixed inset-0 z-50 bg-[#0b0c10] flex flex-col animate-in slide-in-from-bottom duration-300 overflow-y-auto pb-12">
 
@@ -1189,110 +1198,49 @@ function MainApp() {
             </div>
           )}
 
-          <div className="max-w-md w-full mx-auto p-4 flex flex-col gap-4">
+          <div className="max-w-md w-full mx-auto p-4 flex flex-col gap-2">
             {SPRITES_DATABASE.map(sprite => {
               const friendStatus = activeViewingFriend.sprites[sprite.id] || {};
               const friendMastery = activeViewingFriend.mastery[sprite.id] || {};
-              const validVariantsInRow = variantsList.filter(v => sprite.rates[v] !== "N/A");
 
-              const currentTab = viewingTabs[`inspect_${sprite.id}`] || 'base';
-
-              const handleInspectPrev = (e) => {
-                e.stopPropagation();
-                const currentIndex = validVariantsInRow.indexOf(currentTab);
-                const newIndex = currentIndex === 0 ? validVariantsInRow.length - 1 : currentIndex - 1;
-                setViewingTabs(prev => ({ ...prev, [`inspect_${sprite.id}`]: validVariantsInRow[newIndex] }));
-              };
-
-              const handleInspectNext = (e) => {
-                e.stopPropagation();
-                const currentIndex = validVariantsInRow.indexOf(currentTab);
-                const newIndex = currentIndex === validVariantsInRow.length - 1 ? 0 : currentIndex + 1;
-                setViewingTabs(prev => ({ ...prev, [`inspect_${sprite.id}`]: validVariantsInRow[newIndex] }));
-              };
-
-              const isMatchHighlight = extractionTargets.includes(`${sprite.id}_${currentTab}`) && friendStatus[currentTab];
+              const hasAnyVariant = variantsList.some(v => friendStatus[v]);
+              const displayVariant = 'base';
 
               return (
-                <article key={sprite.id} className="bg-[#151722] rounded-2xl overflow-hidden border-2 border-slate-800/90 flex flex-col">
-                  <div className="p-4 flex gap-4">
-
-                    <div className="flex flex-col gap-2 w-24 sm:w-28 flex-shrink-0">
-                      <div className={`w-24 h-24 sm:w-28 sm:h-28 bg-gradient-to-b ${RARITY_BG_GRADIENTS[sprite.rarity]} rounded-xl p-0.5 border-2 relative overflow-hidden z-0 transition-all duration-300 ${isMatchHighlight ? 'border-cyan-400 shadow-[0_0_20px_rgba(34,211,238,0.6)] animate-pulse' : friendMastery[currentTab] ? 'border-yellow-400' : 'border-white/10'}`}>
-
-                        {isMatchHighlight && (
-                          <div className="absolute top-0 left-0 right-0 bg-cyan-500 text-black text-[8px] sm:text-[9px] font-black uppercase text-center z-40 py-0.5 tracking-widest">
-                            Match
-                          </div>
-                        )}
-
-                        {friendMastery[currentTab] && !isMatchHighlight && (
-                          <div className="absolute top-1 right-1 z-40 bg-black/60 rounded-full p-0.5 border border-yellow-500/50">
-                            <Crown className="w-4 h-4 text-yellow-400" />
-                          </div>
-                        )}
-
-                        {variantsList.map(v => {
-                          if (sprite.rates[v] === "N/A") return null;
-                          const isVisible = currentTab === v;
-                          return (
-                            <img
-                              key={v}
-                              src={sprite.images[v]}
-                              alt=""
-                              className={`absolute inset-0 w-full h-full object-contain p-1 z-10 transition-opacity duration-150 ${isVisible ? 'opacity-100' : 'opacity-0'}`}
-                            />
-                          );
-                        })}
-                      </div>
-
-                      {validVariantsInRow.length > 1 && (
-                        <div className="flex items-center justify-between bg-black/40 rounded-md border border-slate-800/50 p-0.5">
-                          <button onClick={handleInspectPrev} className="p-1 hover:bg-slate-700 rounded transition-colors"><ChevronLeft className="w-3.5 h-3.5 text-slate-400 hover:text-white" /></button>
-                          <span className={`text-[8px] sm:text-[9px] font-black uppercase ${VARIANT_INFO[currentTab]?.color}`}>{currentTab}</span>
-                          <button onClick={handleInspectNext} className="p-1 hover:bg-slate-700 rounded transition-colors"><ChevronRight className="w-3.5 h-3.5 text-slate-400 hover:text-white" /></button>
-                        </div>
-                      )}
-
-                      {friendStatus[currentTab] && (
-                        <div className={`w-full py-1.5 rounded-lg text-[9px] sm:text-[10px] font-black uppercase text-center border flex items-center justify-center gap-1 ${friendMastery[currentTab] ? 'bg-yellow-500/10 border-yellow-500/30 text-yellow-400' : 'bg-slate-900 border-slate-800 text-slate-400'}`}>
-                          {friendMastery[currentTab] ? <><Crown className="w-3 h-3" /> Mastered</> : <><CheckCircle className="w-3 h-3" /> Collected</>}
-                        </div>
-                      )}
+                <div key={sprite.id} className="flex items-center justify-between bg-[#151722] border border-slate-800/90 rounded-xl p-3">
+                  <div className="flex items-center gap-3">
+                    <div className={`w-12 h-12 rounded-lg p-1 border-2 transition-all flex-shrink-0 ${hasAnyVariant ? 'bg-indigo-950/40 border-indigo-500/50' : 'bg-slate-900 border-slate-800 grayscale opacity-60'}`}>
+                      <img src={sprite.images[displayVariant]} className="w-full h-full object-contain drop-shadow-md" alt="" />
                     </div>
-
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center justify-between">
-                        <h4 className="font-black text-lg sm:text-xl text-white uppercase italic tracking-tight">{sprite.name}</h4>
-                      </div>
-                      <div className="mt-2 bg-black/20 rounded-lg p-2 border border-slate-800/40 text-sm sm:text-base text-slate-300 leading-snug">
-                        {sprite.baseAbility}
-                      </div>
+                    <div className="flex flex-col">
+                      <span className="font-black text-sm sm:text-base text-white uppercase italic tracking-tight">{sprite.name}</span>
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-5 border-t border-slate-800 bg-black/20">
+                  <div className="flex gap-1.5 sm:gap-2">
                     {variantsList.map(v => {
-                      if (sprite.rates[v] === "N/A") return <div key={v} className="py-2 text-center text-[9px] text-slate-800 font-bold border-r border-slate-800/40 last:border-r-0">N/A</div>;
+                      if (sprite.rates[v] === "N/A") return null;
+                      const isCollected = friendStatus[v];
+                      const isMastered = friendMastery[v];
+
+                      const isMatch = extractionTargets.includes(`${sprite.id}_${v}`) && isCollected;
 
                       return (
-                        <div
-                          key={v}
-                          className={`py-3 flex flex-col items-center gap-1.5 text-[7px] sm:text-[8px] font-bold uppercase tracking-wider border-r border-slate-800/40 last:border-r-0 transition-colors ${currentTab === v ? 'bg-slate-800/40 text-white' : 'text-slate-600'}`}
-                        >
-                          {v}
-                          {friendMastery[v] ? (
-                            <Crown className="w-4 h-4 text-yellow-400 drop-shadow-[0_0_5px_rgba(255,215,0,0.5)]" />
-                          ) : friendStatus[v] ? (
-                            <CheckCircle className="w-4 h-4 text-indigo-400" />
-                          ) : (
-                            <div className="w-4 h-4" />
-                          )}
+                        <div key={v} className="flex flex-col items-center gap-1">
+                          <div className={`w-5 h-5 sm:w-6 sm:h-6 rounded-full flex items-center justify-center border transition-all relative ${isMatch ? 'bg-cyan-900/40 border-cyan-400 shadow-[0_0_8px_rgba(34,211,238,0.6)] animate-pulse' : isMastered ? 'bg-yellow-900/40 border-yellow-400' : isCollected ? `bg-slate-900 border-${VARIANT_INFO[v]?.color.split('-')[1]}-500/70` : 'bg-black border-slate-800'}`}>
+                            {isCollected && (
+                              <div className={`w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full ${isMatch ? 'bg-cyan-400' : VARIANT_INFO[v]?.bgColor} ${isMastered && !isMatch ? 'opacity-30' : 'opacity-100'}`} />
+                            )}
+                            {isMastered && !isMatch && (
+                              <Crown className="w-3.5 h-3.5 text-yellow-400 drop-shadow-[0_0_2px_rgba(255,215,0,0.8)] absolute z-10" />
+                            )}
+                          </div>
+                          <span className="text-[7px] font-bold uppercase text-slate-500">{v === 'holofoil' ? 'Holo' : v}</span>
                         </div>
-                      );
+                      )
                     })}
                   </div>
-                </article>
+                </div>
               );
             })}
           </div>
@@ -1404,7 +1352,7 @@ function MainApp() {
                   <div>
                     <span className="text-[9px] text-slate-500 font-black uppercase tracking-widest mb-1.5 block">Variant Type</span>
                     <div className="flex flex-wrap gap-1.5">
-                      {['All', 'Base', 'Gold', 'Gummy', 'Galaxy', 'Holofoil'].map(variant => (
+                      {['All', 'Base', 'Gold', 'Gummy', 'Galaxy', 'Holofoil', 'Cube'].map(variant => (
                         <button key={variant} onClick={() => setVariantFilter(variant)} className={`px-3 py-1.5 text-[10px] font-black tracking-wider rounded-lg border uppercase ${variantFilter === variant ? 'bg-purple-500 text-white border-purple-400' : 'bg-black/40 text-slate-400 border-slate-800'}`}>
                           {variant}
                         </button>
@@ -1439,7 +1387,8 @@ function MainApp() {
                 {filteredSprites.map(sprite => {
                   const displayVariant = variantFilter === 'All' ? 'base' : variantFilter.toLowerCase();
                   const validInitialVariant = sprite.rates[displayVariant] !== "N/A" ? displayVariant : 'base';
-                  const isCollectedMain = collection[sprite.id]?.[validInitialVariant];
+
+                  const hasAnyVariant = variantsList.some(v => collection[sprite.id]?.[v]);
 
                   return (
                     <div
@@ -1448,7 +1397,7 @@ function MainApp() {
                       className="flex items-center justify-between bg-[#151722] border border-slate-800/90 rounded-xl p-3 hover:bg-slate-800/80 transition-colors cursor-pointer"
                     >
                       <div className="flex items-center gap-3">
-                        <div className={`w-12 h-12 rounded-lg p-1 border-2 transition-all flex-shrink-0 ${isCollectedMain ? 'bg-cyan-950/40 border-cyan-500/50' : 'bg-slate-900 border-slate-800 grayscale opacity-60'}`}>
+                        <div className={`w-12 h-12 rounded-lg p-1 border-2 transition-all flex-shrink-0 ${hasAnyVariant ? 'bg-cyan-950/40 border-cyan-500/50' : 'bg-slate-900 border-slate-800 grayscale opacity-60'}`}>
                           <img src={sprite.images[validInitialVariant]} className="w-full h-full object-contain drop-shadow-md" alt="" />
                         </div>
                         <div className="flex flex-col">
@@ -1457,19 +1406,26 @@ function MainApp() {
                         </div>
                       </div>
 
-                      {/* Non-Interactive Labeled Radio Dots Container */}
+                      {/* Interactive Labeled Radio Dots Container */}
                       <div className="flex gap-1.5 sm:gap-2">
                         {variantsList.map(v => {
                           if (sprite.rates[v] === "N/A") return null;
                           const isCollected = collection[sprite.id]?.[v];
                           const isMastered = mastery[sprite.id]?.[v];
 
+                          if (statusFilter === 'Missing' && isCollected && !isMasteryView) return null;
+
                           return (
                             <div key={v} className="flex flex-col items-center gap-1">
                               <div
-                                className={`w-5 h-5 sm:w-6 sm:h-6 rounded-full flex items-center justify-center border transition-all ${isMastered ? 'bg-yellow-900/40 border-yellow-400' : isCollected ? `bg-slate-900 border-${VARIANT_INFO[v]?.color.split('-')[1]}-500/70` : 'bg-black border-slate-800'}`}
+                                className={`w-5 h-5 sm:w-6 sm:h-6 rounded-full flex items-center justify-center border transition-all relative ${isMasteryView && isMastered ? 'bg-yellow-900/40 border-yellow-400' : isCollected ? `bg-slate-900 border-${VARIANT_INFO[v]?.color.split('-')[1]}-500/70` : 'bg-black border-slate-800'}`}
                               >
-                                {isMastered ? <Crown className="w-3 h-3 text-yellow-400 drop-shadow-[0_0_2px_rgba(255,215,0,0.8)]" /> : isCollected ? <div className={`w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full ${VARIANT_INFO[v]?.bgColor}`} /> : null}
+                                {isCollected && (
+                                  <div className={`w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full ${VARIANT_INFO[v]?.bgColor} ${(isMasteryView && isMastered) ? 'opacity-30' : 'opacity-100'}`} />
+                                )}
+                                {isMasteryView && isMastered && (
+                                  <Crown className="w-3.5 h-3.5 text-yellow-400 drop-shadow-[0_0_2px_rgba(255,215,0,0.8)] absolute z-10" />
+                                )}
                               </div>
                               <span className="text-[7px] font-bold uppercase text-slate-500">{v === 'holofoil' ? 'Holo' : v}</span>
                             </div>
@@ -1651,6 +1607,42 @@ function MainApp() {
                 </button>
                 {feedbackStatus === 'error' && <p className="text-red-400 text-xs text-center font-bold mt-1">Failed to send. Please try again.</p>}
               </form>
+            </div>
+
+            {/* --- AFFILIATE / SUPPORT APP SECTION --- */}
+            <div className="mt-4 p-5 bg-gradient-to-r from-purple-900/30 to-fuchsia-900/20 border border-purple-500/40 rounded-2xl flex flex-col items-center text-center shadow-[0_0_15px_rgba(168,85,247,0.15)] animate-in fade-in duration-500">
+              <div className="w-12 h-12 bg-purple-900/50 rounded-full border border-purple-400/50 flex items-center justify-center mb-3">
+                <Info className="w-6 h-6 text-purple-400" />
+              </div>
+              <h4 className="text-lg font-black text-purple-400 uppercase italic mb-2 tracking-wider">Support the Tracker</h4>
+              <p className="text-xs sm:text-sm text-slate-300 leading-relaxed mb-4 max-w-[280px]">
+                You've collected them in-game, now collect them in real life! Grab some physical Sprites online and help keep this app running.
+              </p>
+
+              <div className="flex flex-col gap-2.5 w-full max-w-[280px]">
+                <a
+                  href="https://amzn.to/3ThkM2y"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-between bg-purple-900/40 hover:bg-purple-600 border border-purple-500/50 text-white font-black uppercase tracking-widest py-3 px-4 rounded-xl text-xs sm:text-sm transition-all shadow-md"
+                >
+                  <span>Mini Sprites</span>
+                  <ShoppingCart className="w-4 h-4 opacity-70" />
+                </a>
+                <a
+                  href="https://amzn.to/4yzmyfD"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-between bg-purple-900/40 hover:bg-purple-600 border border-purple-500/50 text-white font-black uppercase tracking-widest py-3 px-4 rounded-xl text-xs sm:text-sm transition-all shadow-md"
+                >
+                  <span>Sprite Plush</span>
+                  <ShoppingCart className="w-4 h-4 opacity-70" />
+                </a>
+              </div>
+
+              <p className="text-[9px] text-slate-500 mt-5 italic font-mono tracking-tight max-w-[240px]">
+                As an Amazon Associate I earn from qualifying purchases.
+              </p>
             </div>
           </section>
         )}
