@@ -160,7 +160,7 @@ const PATCH_NOTES = [
       "New Variants: The elusive Cube variant has been discovered for 8 Sprites! Track them in your collection today.",
       "Interface Separation: The Sprites tab is now exclusively for tracking collection. The Mastery Vault securely handles all Level 5 crown progression independently.",
       "Mastery Overlays: Crowns now brilliantly overlay onto their respective variant radio dots within the Mastery Vault.",
-      "Support Feature: Added a way to support the app directly through the Feedback & Support tab."
+      "Support Feature: Added a way to support the app directly through the Support tab."
     ]
   },
   {
@@ -273,6 +273,11 @@ function MainApp() {
   // --- EXTRACTION TARGET SELECTION SCREEN STATES ---
   const [showTargetSelector, setShowTargetSelector] = useState(false);
   const [targetSlotIndex, setTargetSlotIndex] = useState(null);
+
+  // Update Document Title
+  useEffect(() => {
+    document.title = "Spritedex";
+  }, []);
 
   // Pre-load images
   useEffect(() => {
@@ -466,6 +471,7 @@ function MainApp() {
           origin: { y: 0.6 },
           colors: ['#00f0ff', '#ffe600', '#ff007f', '#8a2be2', '#38bdf8']
         });
+        setTimeout(() => confetti.reset(), 3000);
       }
 
       if (user) {
@@ -487,6 +493,7 @@ function MainApp() {
 
       if (newVal) {
         confetti({ particleCount: 120, spread: 90, origin: { y: 0.5 }, colors: ['#FFD700', '#FFA500', '#DAA520', '#FFF8DC'] });
+        setTimeout(() => confetti.reset(), 3000);
         playBeep(1046.50, 'sine', 0.2);
       } else {
         playBeep(220, 'sawtooth', 0.1);
@@ -537,7 +544,7 @@ function MainApp() {
       await addDoc(firestoreCollection(db, "mail"), {
         to: "prosyncts@gmail.com",
         message: {
-          subject: "Spritedex App Feedback",
+          subject: "Spritedex App Support",
           text: `Sprite ID: ${spriteId || "Anonymous"}\n\nMessage:\n${feedbackText}`,
         }
       });
@@ -709,7 +716,11 @@ function MainApp() {
   const handleAcknowledgeTransmission = async () => {
     setShowTransmission(false);
     if (user) {
-      await updateDoc(doc(db, "users", user.uid), { lastSeenVersion: PATCH_NOTES[0].version }, { merge: true });
+      try {
+        await setDoc(doc(db, "users", user.uid), { lastSeenVersion: PATCH_NOTES[0].version }, { merge: true });
+      } catch (err) {
+        console.error("Failed to save transmission state:", err);
+      }
     }
   };
 
@@ -1302,7 +1313,7 @@ function MainApp() {
             )}
 
             {isMasteryView && (
-              <section className="bg-gradient-to-r from-yellow-900/40 to-amber-900/20 border-2 border-yellow-500/50 rounded-2xl p-5 mb-2">
+              <section className="sticky top-[86px] sm:top-[94px] z-40 bg-gradient-to-r from-yellow-900/95 to-amber-900/95 backdrop-blur-md border-2 border-yellow-500/50 rounded-2xl p-5 mb-2 shadow-xl">
                 <div className="flex items-center gap-3 mb-2">
                   <Crown className="w-6 h-6 sm:w-7 sm:h-7 text-yellow-400" />
                   <h2 className="text-xl sm:text-2xl font-black text-yellow-400 uppercase italic">Mastery Vault</h2>
@@ -1591,7 +1602,7 @@ function MainApp() {
           </div>
         )}
 
-        {/* --- FEEDBACK TAB VIEW --- */}
+        {/* --- SUPPORT TAB VIEW --- */}
         {currentView === 'feedback' && (
           <section className="flex flex-col gap-4 animate-in fade-in duration-300 pt-2">
             <div className="bg-[#12141f] border-2 border-emerald-500/40 rounded-2xl p-5 shadow-[0_0_20px_rgba(16,185,129,0.1)]">
@@ -1685,7 +1696,7 @@ function MainApp() {
 
           <button onClick={() => { setCurrentView('feedback'); setActiveViewingFriend(null); playBeep(659, 'sine', 0.05); }} className={`flex-1 flex flex-col items-center gap-1 py-1 transition-colors ${currentView === 'feedback' && !activeViewingFriend ? 'text-emerald-400' : 'text-slate-600'}`}>
             <MessageSquare className="w-5 h-5 sm:w-6 sm:h-6" />
-            <span className="text-[9px] sm:text-[10px] font-black uppercase tracking-wider">Feedback</span>
+            <span className="text-[9px] sm:text-[10px] font-black uppercase tracking-wider">Support</span>
           </button>
 
         </div>
