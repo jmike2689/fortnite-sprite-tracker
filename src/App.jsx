@@ -12,9 +12,33 @@ import { auth, db } from './firebase';
 
 import { translations } from './locales';
 
-import johnWickBase from './assets/John Wick Base.webp';
+// --- NEW SPRITES & VARIANTS IMPORTS ---
+import ironMouseBase from './assets/Iron Mouse Base.webp';
+
 import peelyBase from './assets/Peely Base.webp';
+import peelyGold from './assets/Gold Peely.webp';
+import peelyGummy from './assets/Gummy Peely.webp';
+import peelyGalaxy from './assets/Galaxy Peely.webp';
+import peelyHolofoil from './assets/Holofoil Peely.webp';
+
 import llamaBase from './assets/Llama Base.webp';
+import llamaGold from './assets/Gold Llama.webp';
+import llamaGummy from './assets/Gummy Llama.webp';
+import llamaGalaxy from './assets/Galaxy Llama.webp';
+import llamaGem from './assets/Gem Llama.webp';
+
+import zpHolofoil from './assets/Holofoil Zero Point.webp';
+import zpCube from './assets/Cube Zero Point.webp';
+
+import waterQuack from './assets/Quack Water.webp';
+import earthQuack from './assets/Quack Earth.webp';
+import fireQuack from './assets/Quack Fire.webp';
+
+import grimGem from './assets/Gem Grim.webp';
+import grimHolofoil from './assets/Holofoil Grim.webp';
+
+// --- EXISTING IMPORTS ---
+import johnWickBase from './assets/John Wick Base.webp';
 import zpBase from './assets/Zero Point Base.webp';
 import zpGold from './assets/Zero Point Gold.webp';
 import zpGummy from './assets/Zero Point Gummy.webp';
@@ -123,10 +147,11 @@ const isVariantLocked = (spriteId, variant) => {
 };
 
 const SPRITES_DATABASE = [
+  { id: "iron-mouse", name: "Iron Mouse", rarity: "Mythic", images: { base: ironMouseBase }, variants: ['base'], baseAbility: { en: "Regenerate health over time when low. While regenerating, gain Cloak and low gravity! Health regenerated to increases at each Level Up: 60 Health -> 70 Health -> 80 Health -> 90 Health -> 100 Health", es: "Regenera salud con el tiempo cuando está baja. ¡Mientras te regeneras, obtienes Camuflaje y baja gravedad! La salud regenerada aumenta en cada Nivel: 60 Salud -> 70 Salud -> 80 Salud -> 90 Salud -> 100 Salud" } },
   { id: "john-wick", name: "John Wick", rarity: "Mythic", images: { base: johnWickBase }, variants: ['base'], baseAbility: { en: "Reveals nearby enemies after you knock or eliminate another player. Sprite level stays exactly as found. Only Sprite usable in Fortnite Reload (Simpsons Reload Mode). Claiming in Reload unlocks it for Battle Royale and other modes.", es: "Revela enemigos cercanos después de derribar o eliminar a otro jugador. Su nivel se mantiene exactamente como se encontró. Es el único Sprite utilizable en Fortnite Recarga. Reclamarlo en Recarga lo desbloquea para Battle Royale y otros modos." } },
-  { id: "peely", name: "Peely", rarity: "Unknown", images: { base: peelyBase }, variants: ['base'], baseAbility: { en: "TBD", es: "Por determinar" } },
-  { id: "llama", name: "Llama", rarity: "Unknown", images: { base: llamaBase }, variants: ['base'], baseAbility: { en: "TBD", es: "Por determinar" } },
-  { id: "zero-point", name: "Zero Point", rarity: "Mythic", images: { base: zpBase, gold: zpGold, gummy: zpGummy, galaxy: zpGalaxy, gem: gemZeroPoint, quack: quackZeroPoint }, variants: ['base', 'gold', 'gummy', 'galaxy', 'gem', 'quack'], baseAbility: { en: "Spawn a Shield Bubble Jr. when you use a healing item on yourself (excluding splashes and grenades). Duration at each Level Up: 6s -> 7s -> 8s -> 9s -> 10s.", es: "Genera una Burbuja Escudo Jr. cuando usas un objeto de curación en ti mismo (excluyendo salpicones y granadas). Duración por nivel: 6s -> 7s -> 8s -> 9s -> 10s." } },
+  { id: "peely", name: "Peely", rarity: "Legendary", images: { base: peelyBase, gold: peelyGold, gummy: peelyGummy, galaxy: peelyGalaxy, holofoil: peelyHolofoil }, variants: ['base', 'gold', 'gummy', 'galaxy', 'holofoil'], baseAbility: { en: "Emits a ping for players with rare sprites nearby, but marks you on the map. Ping radius increases at each Level Up: 40m -> 50m -> 60m -> 70m -> 80m", es: "Emite un ping para los jugadores con sprites raros cercanos, pero te marca en el mapa. El radio del ping aumenta en cada Nivel: 40m -> 50m -> 60m -> 70m -> 80m" } },
+  { id: "llama", name: "Llama", rarity: "Legendary", images: { base: llamaBase, gold: llamaGold, gummy: llamaGummy, galaxy: llamaGalaxy, gem: llamaGem }, variants: ['base', 'gold', 'gummy', 'galaxy', 'gem'], baseAbility: { en: "Opening ammo boxes has a chance to grant a weapon upgrade. Chance increases at each Level Up: 5% -> 10% -> 15% -> 17% -> 20%", es: "Abrir cajas de munición tiene la posibilidad de otorgar una mejora de arma. La probabilidad aumenta en cada Nivel: 5% -> 10% -> 15% -> 17% -> 20%" } },
+  { id: "zero-point", name: "Zero Point", rarity: "Mythic", images: { base: zpBase, gold: zpGold, gummy: zpGummy, galaxy: zpGalaxy, holofoil: zpHolofoil, cube: zpCube, gem: gemZeroPoint, quack: quackZeroPoint }, variants: ['base', 'gold', 'gummy', 'galaxy', 'holofoil', 'cube', 'gem', 'quack'], baseAbility: { en: "Spawn a Shield Bubble Jr. when you use a healing item on yourself (excluding splashes and grenades). Duration at each Level Up: 6s -> 7s -> 8s -> 9s -> 10s.", es: "Genera una Burbuja Escudo Jr. cuando usas un objeto de curación en ti mismo (excluyendo salpicones y granadas). Duración por nivel: 6s -> 7s -> 8s -> 9s -> 10s." } },
   { id: "burnt-peanut", name: "Burnt Peanut", rarity: "Mythic", images: { base: peanutBase, gold: peanutBase, gummy: peanutBase, galaxy: peanutBase }, variants: ['base'], baseAbility: { en: "Goop! When eliminating players, you may find more loot. Sometimes mythic! Chance at each Level Up: 20% -> 30% -> 40% -> 50% -> 60% chance (10% chance to find Mythic at Max Level!).", es: "¡Pringue! Al eliminar jugadores, puedes encontrar más botín. ¡A veces mítico! Probabilidad por nivel: 20% -> 30% -> 40% -> 50% -> 60% (¡10% de encontrar Mítico al Nivel Máximo!)." } },
   { id: "batman", name: "Batman", rarity: "Mythic", images: { base: batmanBase, gold: batmanGold, gummy: batmanGummy, galaxy: batmanGalaxy, holofoil: batmanHolofoil, cube: cubeBatman }, variants: ['base', 'gold', 'gummy', 'galaxy', 'holofoil', 'cube'], baseAbility: { en: "Grants the ability to launch in the air and deploy the Bat Cape!", es: "¡Otorga la habilidad de lanzarte en el aire y desplegar la capa de murciélago!" } },
   { id: "vini-jr", name: "Vini Jr", rarity: "Mythic", images: { base: viniBase, gold: viniBase, gummy: viniBase, galaxy: viniBase, holofoil: viniBase }, variants: ['base'], baseAbility: { en: "Sprinting for a short time makes your slide destructive. Slidekicking enemies increases rate of fire and reload speed. Increases in power at each Level Up: 40 dmg / 10% fire rate -> 45 dmg / 20% fire rate -> 50 dmg / 30% fire rate -> 55 dmg / 40% fire rate -> 60 dmg / 50% fire rate", es: "Esprintar por poco tiempo hace que tu deslizamiento sea destructivo. Patear enemigos deslizándote aumenta la cadencia de fuego y recarga. Aumentos: 40 daño / 10% cadencia -> 45 / 20% -> 50 / 30% -> 55 / 40% -> 60 / 50%." } },
@@ -134,7 +159,7 @@ const SPRITES_DATABASE = [
   { id: "dream", name: "Dream", rarity: "Legendary", images: { base: dreamBase, gold: dreamGold, gummy: dreamGummy, galaxy: dreamGalaxy, cube: cubeDream }, variants: ['base', 'gold', 'gummy', 'galaxy', 'cube'], baseAbility: { en: "Grants a random item at each level, exploding with legendary loot at Max Level. Loot value increases at each Level Up!", es: "Otorga un objeto aleatorio en cada nivel, explotando con botín legendario en el Nivel Máximo. ¡El valor del botín aumenta!" } },
   { id: "punk", name: "Punk", rarity: "Legendary", images: { base: punkBase, gold: punkGold, gummy: punkGummy, galaxy: punkGalaxy, cube: cubePunk, gem: gemPunk }, variants: ['base', 'gold', 'gummy', 'galaxy', 'cube', 'gem'], baseAbility: { en: "Does nothing until Level 5, in which it will always grant a buff for unlimited ammo.", es: "No hace nada hasta el Nivel 5, en el que siempre otorgará un potenciador de munición ilimitada." } },
   { id: "boss", name: "Boss", rarity: "Legendary", images: { base: bossBase, gold: bossGold, gummy: bossGummy, galaxy: bossGalaxy, cube: cubeBoss }, variants: ['base', 'gold', 'gummy', 'galaxy', 'cube'], baseAbility: { en: "Grants an increase to your max HP and Shield. Increases at each Level Up: 5 -> 10 -> 15 -> 20 -> 25 HP/Shield.", es: "Otorga un aumento a tu vida máxima y Escudo. Aumenta: 5 -> 10 -> 15 -> 20 -> 25 PV/Escudo." } },
-  { id: "grim", name: "Grim", rarity: "Legendary", images: { base: grimBase, gold: grimGold, gummy: grimGummy, galaxy: grimGalaxy, cube: cubeGrim }, variants: ['base', 'gold', 'gummy', 'galaxy', 'cube'], baseAbility: { en: "Players who attack you are marked for a duration. Duration at each Level Up: 3s -> 3.5s -> 4s -> 4.5s -> 5s.", es: "Los jugadores que te ataquen quedan marcados. Duración: 3s -> 3.5s -> 4s -> 4.5s -> 5s." } },
+  { id: "grim", name: "Grim", rarity: "Legendary", images: { base: grimBase, gold: grimGold, gummy: grimGummy, galaxy: grimGalaxy, holofoil: grimHolofoil, cube: cubeGrim, gem: grimGem }, variants: ['base', 'gold', 'gummy', 'galaxy', 'holofoil', 'cube', 'gem'], baseAbility: { en: "Players who attack you are marked for a duration. Duration at each Level Up: 3s -> 3.5s -> 4s -> 4.5s -> 5s.", es: "Los jugadores que te ataquen quedan marcados. Duración: 3s -> 3.5s -> 4s -> 4.5s -> 5s." } },
   { id: "seven", name: "Seven", rarity: "Legendary", images: { base: sevenBase, gold: sevenGold, gummy: sevenGummy, galaxy: sevenGalaxy, holofoil: sevenHolofoil }, variants: ['base', 'gold', 'gummy', 'galaxy', 'holofoil'], baseAbility: { en: "Enemy player foot trails are visible in the world for your Squad. Duration increases at each Level Up: 10 Seconds -> 15 Seconds -> 20 Seconds -> 25 Seconds -> 30 Second foot trails.", es: "Los rastros de los jugadores enemigos son visibles para tu Escuadrón. Duración: 10s -> 15s -> 20s -> 25s -> 30s." } },
   { id: "duck", name: "Duck", rarity: "Epic", images: { base: duckBase, gold: duckGold, gummy: duckGummy, galaxy: duckGalaxy, gem: gemDuck }, variants: ['base', 'gold', 'gummy', 'galaxy', 'gem'], baseAbility: { en: "Emoting or Jamming replenishes shields. Increases in power at each Level Up: 2 -> 3 -> 4 -> 6 -> 8 Shield per tick.", es: "Hacer un gesto o improvisar repone los escudos. Poder: 2 -> 3 -> 4 -> 6 -> 8 Escudo por tick." } },
   { id: "demon", name: "Demon", rarity: "Epic", images: { base: demonBase, gold: demonGold, gummy: demonGummy, galaxy: demonGalaxy, gem: gemDemon }, variants: ['base', 'gold', 'gummy', 'galaxy', 'gem'], baseAbility: { en: "Siphon some health and shields when you eliminate an opponent. Increases in power at each Level Up: 10 -> 15 -> 20 -> 25 -> 30 Healing per elimination.", es: "Sifón de salud y escudo cuando eliminas a un oponente. Poder: 10 -> 15 -> 20 -> 25 -> 30 Curación." } },
@@ -142,20 +167,20 @@ const SPRITES_DATABASE = [
   { id: "king", name: "King", rarity: "Epic", images: { base: kingBase, gold: kingGold, gummy: kingGummy, galaxy: kingGalaxy, holofoil: kingHolofoil }, variants: ['base', 'gold', 'gummy', 'galaxy', 'holofoil'], baseAbility: { en: "Your Pickaxe deals more damage. Increases in damage at each Level Up: 30 -> 40 -> 60 -> 80 -> 120 bonus damage.", es: "Tu pico inflige más daño. Daño: 30 -> 40 -> 60 -> 80 -> 120 daño adicional." } },
   { id: "aura", name: "Aura", rarity: "Epic", images: { base: auraBase, gold: auraGold, gummy: auraGummy, galaxy: auraGalaxy, gem: gemAura }, variants: ['base', 'gold', 'gummy', 'galaxy', 'gem'], baseAbility: { en: "Gain a Shock Rock charge when you deal enough damage to enemies! Required damage decreases at each Level Up: 175 -> 150 -> 125 -> 100 -> 75 Damage to trigger.", es: "¡Obtén una carga de Roca de Choque al infligir suficiente daño a enemigos! Daño requerido: 175 -> 150 -> 125 -> 100 -> 75 Daño." } },
   { id: "striker", name: "Striker", rarity: "Epic", images: { base: strikerBase, gold: strikerGold, gummy: strikerGummy, galaxy: strikerGalaxy, holofoil: strikerHolofoil }, variants: ['base', 'gold', 'gummy', 'galaxy', 'holofoil'], baseAbility: { en: "Gain the Overdrive effect when you Mantle, Hurdle, or Wall Scramble. Duration increases at each Level Up: 6s -> 7s -> 8s -> 9s -> 10s of Overdrive.", es: "Obtén el efecto Sobrecarga cuando trepas, saltas o te encaramas. Duración: 6s -> 7s -> 8s -> 9s -> 10s." } },
-  { id: "water", name: "Water", rarity: "Rare", images: { base: waterBase, gold: waterGold, gummy: waterGummy, galaxy: waterGalaxy, holofoil: waterHolofoil, gem: gemWater }, variants: ['base', 'gold', 'gummy', 'galaxy', 'holofoil', 'gem'], baseAbility: { en: "Replenish shields while standing in water! Increases in power at each Level Up: 2 -> 3 -> 4 -> 5 -> 6 Shield per tick.", es: "¡Repón escudos mientras estás en el agua! Poder: 2 -> 3 -> 4 -> 5 -> 6 Escudo por tick." } },
-  { id: "earth", name: "Earth", rarity: "Rare", images: { base: earthBase, gold: earthGold, gummy: earthGummy, galaxy: earthGalaxy, cube: cubeEarth, gem: gemEarth }, variants: ['base', 'gold', 'gummy', 'galaxy', 'cube', 'gem'], baseAbility: { en: "You have a chance to find additional rare items when opening chests. Chance increases at each Level Up: 10% -> 12.5% -> 15% -> 17.5% -> 20% chance.", es: "Tienes la posibilidad de encontrar objetos raros adicionales al abrir cofres. Probabilidad: 10% -> 12.5% -> 15% -> 17.5% -> 20%." } },
-  { id: "fire", name: "Fire", rarity: "Rare", images: { base: fireBase, gold: fireGold, gummy: fireGummy, galaxy: fireGalaxy, holofoil: fireHolofoil, cube: cubeFire }, variants: ['base', 'gold', 'gummy', 'galaxy', 'holofoil', 'cube'], baseAbility: { en: "Creates a fiery burst when you deal enough damage to an enemy! Required damage decreases at each Level Up: 150 -> 125 -> 100 -> 75 -> 50 Damage to trigger.", es: "¡Crea un estallido ardiente cuando infliges suficiente daño a un enemigo! Daño requerido: 150 -> 125 -> 100 -> 75 -> 50 Daño." } },
+  { id: "water", name: "Water", rarity: "Rare", images: { base: waterBase, gold: waterGold, gummy: waterGummy, galaxy: waterGalaxy, holofoil: waterHolofoil, gem: gemWater, quack: waterQuack }, variants: ['base', 'gold', 'gummy', 'galaxy', 'holofoil', 'gem', 'quack'], baseAbility: { en: "Replenish shields while standing in water! Increases in power at each Level Up: 2 -> 3 -> 4 -> 5 -> 6 Shield per tick.", es: "¡Repón escudos mientras estás en el agua! Poder: 2 -> 3 -> 4 -> 5 -> 6 Escudo por tick." } },
+  { id: "earth", name: "Earth", rarity: "Rare", images: { base: earthBase, gold: earthGold, gummy: earthGummy, galaxy: earthGalaxy, cube: cubeEarth, gem: gemEarth, quack: earthQuack }, variants: ['base', 'gold', 'gummy', 'galaxy', 'cube', 'gem', 'quack'], baseAbility: { en: "You have a chance to find additional rare items when opening chests. Chance increases at each Level Up: 10% -> 12.5% -> 15% -> 17.5% -> 20% chance.", es: "Tienes la posibilidad de encontrar objetos raros adicionales al abrir cofres. Probabilidad: 10% -> 12.5% -> 15% -> 17.5% -> 20%." } },
+  { id: "fire", name: "Fire", rarity: "Rare", images: { base: fireBase, gold: fireGold, gummy: fireGummy, galaxy: fireGalaxy, holofoil: fireHolofoil, cube: cubeFire, quack: fireQuack }, variants: ['base', 'gold', 'gummy', 'galaxy', 'holofoil', 'cube', 'quack'], baseAbility: { en: "Creates a fiery burst when you deal enough damage to an enemy! Required damage decreases at each Level Up: 150 -> 125 -> 100 -> 75 -> 50 Damage to trigger.", es: "¡Crea un estallido ardiente cuando infliges suficiente daño a un enemigo! Daño requerido: 150 -> 125 -> 100 -> 75 -> 50 Daño." } },
   { id: "fishy", name: "Fishy", rarity: "Rare", images: { base: fishyBase, gold: fishyGold, gummy: fishyGummy, galaxy: fishyGalaxy, cube: cubeFishy }, variants: ['base', 'gold', 'gummy', 'galaxy', 'cube'], baseAbility: { en: "Swim speed greatly increased. Taking damage also briefly increases movement speed. Tiers: 25%/10% -> 50%/20% -> 100%/30% -> 150%/40% -> 200%/50% bonuses.", es: "Aumenta enormemente la velocidad de nado. Recibir daño también aumenta brevemente la velocidad de movimiento. Bonificaciones: 25%/10% -> 50%/20% -> 100%/30% -> 150%/40% -> 200%/50%." } },
   { id: "air", name: "Air", rarity: "Rare", images: { base: airBase, gold: airGold, gummy: airGummy, galaxy: airGalaxy, holofoil: airHolofoil }, variants: ['base', 'gold', 'gummy', 'galaxy', 'holofoil'], baseAbility: { en: "Increases sprinting speed and jump height. Also nullifies fall damage. Jump height increased with each Level Up!", es: "Aumenta la velocidad de esprint y la altura de salto. También anula el daño por caída. ¡Altura de salto aumentada con cada nivel!" } }
 ];
 
 const PATCH_NOTES = [
   {
-    version: "v1.5.0",
+    version: "v1.5.1",
     date: "07/31/2026",
-    title: "Localization, Settings & New Sprites!",
+    title: "New Sprites!",
     changes: [
-      "New Sprites Dropped: Added the Mythic John Wick Sprite, alongside newly discovered Llama and Peely Sprites.",
+      "New Sprites Dropped: Added the Mythic John Wick Sprite, alongside newly discovered Llama, Iron Mouse, and Peely Sprites.",
       "Gem & Quack Sprites Unlocked: All variants are now live in-game and ready to be checked off in your collection!",
       "Language Support: Added full Spanish translation via the new Settings Menu.",
       "Cloud Accounts: Spritedex securely syncs your collection to the cloud so you never lose your progress.",
@@ -294,6 +319,7 @@ function MainApp() {
     const unsubUser = onSnapshot(userDocRef, (docSnap) => {
       if (docSnap.exists()) {
         const data = docSnap.data();
+
         setCollection(data.sprites || {});
         setMastery(data.mastery || {});
         setExtractionTargets(data.extractionTargets || []);
@@ -566,8 +592,8 @@ function MainApp() {
     if (variantName === 'galaxy') return lang === 'es' ? "Gana un 30% más de munición al saquear" : "Gain 30% more Ammunition when looting";
     if (variantName === 'holofoil') return lang === 'es' ? "Gana un 5% más de probabilidad de encontrar Sprites raros" : "Gain 5% increased chance of finding rare Sprites for yourself and entire squad";
     if (variantName === 'cube') return lang === 'es' ? "Obtén el efecto Sobrecarga estando en la tormenta" : "Gain the Overdrive effect while in the storm";
-    if (variantName === 'gem') return lang === 'es' ? "Gana un 15% más de Regeneración de Escudo sin recibir daño" : "Gain 15% increased Shield Regeneration rate when not taking damage";
-    if (variantName === 'quack') return lang === 'es' ? "Efecto Por determinar" : "Effect TBD";
+    if (variantName === 'gem') return lang === 'es' ? "Recibe un 30% menos de daño por caída" : "Take 30% less fall damage";
+    if (variantName === 'quack') return lang === 'es' ? "Otorga un 50% más de XP de Sprite a otros Sprites en tu inventario" : "Grants 50% more Sprite XP to other Sprites in your inventory";
     return null;
   };
 

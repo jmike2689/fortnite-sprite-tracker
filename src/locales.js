@@ -41,9 +41,6 @@ export const translations = {
         summon_cost: "Summon Cost:",
         modifier: "Modifier:",
         locked_until_release: "Locked",
-        sync_required: "Cloud Sync Required",
-        sync_prompt: "Create a free account to sync your collection, claim your unique Sprite ID, and view your squad's extraction targets!",
-        login_signup: "Login / Sign Up",
         logout: "Logout",
         sprites: "Sprites",
         mastery: "Mastery",
@@ -67,15 +64,35 @@ export const translations = {
         support_tracker: "Support the Tracker",
         buy_merch: "You've collected them in-game, now collect them in real life! Grab some physical Sprites online and help keep this app running.",
         settings: "Settings",
-        sign_in_email: "Sign in with email",
-        sync_desc: "Claim your Sprite ID and back up your collection to the cloud.",
         language: "Language",
         whats_new: "What's new",
         about: "About",
         logged_in_as: "Logged in as",
         close: "Close",
         app_desc: "Spritedex is your ultimate companion for tracking Battle Royale Sprites. Sync your collection across devices, coordinate in-game drops by viewing your Sprite Squad's Extraction Targets, and keep track of your Mastery crowns all in one secure, real-time interface.",
-        disclaimer: "Unofficial product. Not affiliated with, authorized or endorsed by Epic Games or Fortnite. All materials used are trademarks and/or copyrighted works of Epic Games, Inc."
+        disclaimer: "Unofficial product. Not affiliated with, authorized or endorsed by Epic Games or Fortnite. All materials used are trademarks and/or copyrighted works of Epic Games, Inc.",
+
+        // Auth Strings
+        loading: "Loading...",
+        sign_in: "Sign In",
+        create_account: "Create Account",
+        dont_have_account: "Don't have an account?",
+        already_have_account: "Already have an account?",
+        sign_up: "Sign Up",
+        forgot_password: "Forgot Password?",
+        reset_link_sent: "Reset link sent!",
+        email_address: "Email Address",
+        password: "Password",
+        master_collection: "Master your collection",
+
+        // Modifier Strings
+        mod_gold: "Gain 3x bonus XP from eliminations",
+        mod_gummy: "Gain 20% more Sprite Dust upon Extraction",
+        mod_galaxy: "Gain 30% more Ammunition when looting",
+        mod_holofoil: "Gain 5% increased chance of finding rare Sprites for yourself and entire squad",
+        mod_cube: "Gain the Overdrive effect while in the storm",
+        mod_gem: "Take 30% less fall damage",
+        mod_quack: "Grants 50% more Sprite XP to other Sprites in your inventory"
     },
     es: {
         sprite_progress: "PROGRESO DE SPRITES",
@@ -119,9 +136,6 @@ export const translations = {
         summon_cost: "Costo de Invocación:",
         modifier: "Modificador:",
         locked_until_release: "Bloqueado",
-        sync_required: "Sincronización Requerida",
-        sync_prompt: "¡Crea una cuenta gratis para sincronizar tu colección, reclamar tu ID de Sprite único y ver los objetivos de tu escuadrón!",
-        login_signup: "Iniciar Sesión / Registro",
         logout: "Cerrar Sesión",
         sprites: "Sprites",
         mastery: "Maestría",
@@ -145,14 +159,34 @@ export const translations = {
         support_tracker: "Apoya el Proyecto",
         buy_merch: "¡Los has coleccionado en el juego, ahora colecciónalos en la vida real! Consigue Sprites físicos y ayuda a mantener esta app.",
         settings: "Ajustes",
-        sign_in_email: "Iniciar sesión con email",
-        sync_desc: "Reclama tu ID de Sprite y guarda tu colección en la nube.",
         language: "Idioma",
         whats_new: "Novedades",
         about: "Acerca de",
         logged_in_as: "Sesión iniciada como",
         close: "Cerrar",
         app_desc: "Spritedex es tu compañero definitivo para rastrear Sprites de Battle Royale. Sincroniza tu colección en varios dispositivos, coordina en el juego viendo los Objetivos de Extracción de tu Escuadrón Sprite y mantén un registro de tus coronas de Maestría en una interfaz segura y en tiempo real.",
-        disclaimer: "Producto no oficial. No está afiliado, autorizado ni respaldado por Epic Games o Fortnite. Todos los materiales utilizados son marcas comerciales y/o obras protegidas por derechos de autor de Epic Games, Inc."
+        disclaimer: "Producto no oficial. No está afiliado, autorizado ni respaldado por Epic Games o Fortnite. Todos los materiales utilizados son marcas comerciales y/o obras protegidas por derechos de autor de Epic Games, Inc.",
+
+        // Auth Strings
+        loading: "Cargando...",
+        sign_in: "Iniciar Sesión",
+        create_account: "Crear Cuenta",
+        dont_have_account: "¿No tienes cuenta?",
+        already_have_account: "¿Ya tienes una cuenta?",
+        sign_up: "Regístrate",
+        forgot_password: "¿Olvidaste tu contraseña?",
+        reset_link_sent: "¡Enlace enviado!",
+        email_address: "Correo Electrónico",
+        password: "Contraseña",
+        master_collection: "Domina tu colección",
+
+        // Modifier Strings
+        mod_gold: "Gana 3x de XP de bonificación por eliminaciones",
+        mod_gummy: "Gana un 20% más de Polvo al extraer",
+        mod_galaxy: "Gana un 30% más de munición al saquear",
+        mod_holofoil: "Gana un 5% más de probabilidad de encontrar Sprites raros",
+        mod_cube: "Obtén el efecto Sobrecarga estando en la tormenta",
+        mod_gem: "Recibe un 30% menos de daño por caída",
+        mod_quack: "Otorga un 50% más de XP de Sprite a otros Sprites en tu inventario"
     }
 };
