@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import PrivacyPolicy from './PrivacyPolicy';
 import {
-  Search, CheckCircle, Circle, Volume2, VolumeX, Percent, RotateCcw, AlertTriangle, X, Eye, Crown, Users, UserPlus, ChevronLeft, ChevronRight, Check, XCircle, UserMinus, Target, Plus, FileText, Radio, Info, MessageSquare, Mail, Lock, List, Filter, ChevronDown, ChevronUp, ShoppingCart, Smartphone, Globe, Settings, LogOut, History, AtSign
+  Search, CheckCircle, Circle, Volume2, VolumeX, Percent, RotateCcw, AlertTriangle, X, Eye, Crown, Users, UserPlus, ChevronLeft, ChevronRight, Check, XCircle, UserMinus, Target, Plus, FileText, Radio, Info, MessageSquare, Mail, Lock, List, Filter, ChevronDown, ChevronUp, ShoppingCart, Smartphone, Globe, Settings, LogOut, History, AtSign, User as UserIcon, Edit3, Save, Tv, Gamepad2, Calendar, Award, Video, Music, Play
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { useAuth } from './AuthContext';
@@ -143,6 +143,8 @@ const variantsList = ['base', 'gold', 'gummy', 'galaxy', 'holofoil', 'cube', 'ge
 const LOCKED_VARIANTS = {};
 
 const isVariantLocked = (spriteId, variant) => {
+  if (spriteId === 'iron-mouse') return true;
+  if (variant === 'gem') return true;
   return LOCKED_VARIANTS[spriteId]?.includes(variant) || false;
 };
 
@@ -175,6 +177,18 @@ const SPRITES_DATABASE = [
 ];
 
 const PATCH_NOTES = [
+  {
+    version: "v1.6.0",
+    date: "08/02/2026",
+    title: "Player Profiles & Squad Upgrades!",
+    changes: [
+      "Custom Player Profiles: Edit your bio, show off your Epic ID, and link your Twitch, Kick, YouTube, and TikTok channels!",
+      "Trophy Case: Feature up to 4 of your favorite or rarest Sprites on your profile for everyone to see.",
+      "Glowing Milestone Themes: Unlock vibrant, glowing profile cards as you master Sprites and complete your collection.",
+      "Pulsing Extraction Matches: Target matches now glow with bright cyan across entire friend cards for instant clarity.",
+      "Vault Balancing: Iron Mouse and Gem variants are locked until their official drop on 8/6/26 so completion stats stay 100% accurate!"
+    ]
+  },
   {
     version: "v1.5.1",
     date: "07/31/2026",
@@ -213,6 +227,32 @@ const PATCH_NOTES = [
 ];
 
 const totalPossibleStatic = SPRITES_DATABASE.reduce((acc, sprite) => acc + sprite.variants.filter(v => !isVariantLocked(sprite.id, v)).length, 0);
+
+// --- MILESTONES FOR DOSSIER UNLOCKS ---
+const MILESTONES = [
+  { type: 'mastery', count: 10, name: "Bronze Initiate", bg: "bg-gradient-to-br from-amber-900/40 to-orange-900/20 border-amber-700/50", glow: "shadow-[0_0_20px_rgba(180,83,9,0.8)] border-amber-500" },
+  { type: 'mastery', count: 25, name: "Silver Hunter", bg: "bg-gradient-to-br from-slate-400/20 to-slate-300/10 border-slate-400/50", glow: "shadow-[0_0_20px_rgba(148,163,184,0.8)] border-slate-400" },
+  { type: 'mastery', count: 50, name: "Gold Striker", bg: "bg-gradient-to-br from-yellow-500/20 to-amber-500/10 border-yellow-400/50", glow: "shadow-[0_0_20px_rgba(250,204,21,0.8)] border-yellow-400" },
+  { type: 'mastery', count: 100, name: "Diamond Master", bg: "bg-gradient-to-br from-cyan-400/20 to-blue-500/10 border-cyan-400/50", glow: "shadow-[0_0_25px_rgba(34,211,238,0.8)] border-cyan-400" },
+  { type: 'collection', count: 100, isPercent: true, name: "The Collector", bg: "bg-gradient-to-br from-purple-600/20 to-fuchsia-500/10 border-purple-500/50", glow: "shadow-[0_0_25px_rgba(168,85,247,0.8)] border-purple-400" },
+  { type: 'mastery', count: 100, isPercent: true, name: "True Perfection", bg: "bg-gradient-to-br from-rose-500/20 via-purple-500/20 to-cyan-500/20 border-rose-400/50", glow: "shadow-[0_0_30px_rgba(244,63,94,0.8)] border-rose-400" }
+];
+
+const getUnlockedMilestone = (collectedCount, masteredCount) => {
+  let highest = null;
+  const colPercent = totalPossibleStatic > 0 ? Math.round((collectedCount / totalPossibleStatic) * 100) : 0;
+  const mastPercent = totalPossibleStatic > 0 ? Math.round((masteredCount / totalPossibleStatic) * 100) : 0;
+
+  if (masteredCount >= 10) highest = MILESTONES[0];
+  if (masteredCount >= 25) highest = MILESTONES[1];
+  if (masteredCount >= 50) highest = MILESTONES[2];
+  if (masteredCount >= 100) highest = MILESTONES[3];
+  if (colPercent >= 100) highest = MILESTONES[4];
+  if (mastPercent >= 100) highest = MILESTONES[5];
+
+  return highest;
+};
+
 const PROFANITY_LIST = ['fuck', 'shit', 'bitch', 'asshole', 'cunt', 'dick', 'pussy', 'whore', 'slut', 'fag', 'nigger', 'nigga', 'cock', 'bastard', 'crap'];
 
 const VARIANT_INFO = {
@@ -278,20 +318,36 @@ function MainApp() {
   const [collection, setCollection] = useState({});
   const [mastery, setMastery] = useState({});
   const [extractionTargets, setExtractionTargets] = useState([]);
+  const [profileData, setProfileData] = useState({ bio: '', epicName: '', twitchName: '', tiktokName: '', youtubeName: '', kickName: '', trophies: [null, null, null, null] });
+  const [isEditingProfile, setIsEditingProfile] = useState(false);
   const [feedbackText, setFeedbackText] = useState("");
   const [feedbackStatus, setFeedbackStatus] = useState("idle");
 
+  const [squadSearchQuery, setSquadSearchQuery] = useState('');
+
+  const [showAddFriendInput, setShowAddFriendInput] = useState(false);
   const [friendSearchQuery, setFriendSearchQuery] = useState('');
   const [friendSearchResult, setFriendSearchResult] = useState(null);
   const [friendSearchStatus, setFriendSearchStatus] = useState('');
+
   const [pendingRequests, setPendingRequests] = useState([]);
   const [sentRequests, setSentRequests] = useState([]);
   const [friendsList, setFriendsList] = useState([]);
   const [richFriends, setRichFriends] = useState([]);
   const [activeViewingFriend, setActiveViewingFriend] = useState(null);
 
+  const [fSearchQuery, setFSearchQuery] = useState('');
+  const [showFFilters, setShowFFilters] = useState(false);
+  const [fRarityFilter, setFRarityFilter] = useState('All');
+  const [fVariantFilter, setFVariantFilter] = useState('All');
+  const [fStatusFilter, setFStatusFilter] = useState('All');
+  const [fSortBy, setFSortBy] = useState('A-Z');
+
   const [showTargetSelector, setShowTargetSelector] = useState(false);
   const [targetSlotIndex, setTargetSlotIndex] = useState(null);
+
+  const [showTrophySelector, setShowTrophySelector] = useState(false);
+  const [trophySlotIndex, setTrophySlotIndex] = useState(null);
 
   useEffect(() => { document.title = "Spritedex"; }, []);
 
@@ -305,6 +361,7 @@ function MainApp() {
       setCollection({});
       setMastery({});
       setExtractionTargets([]);
+      setProfileData({ bio: '', epicName: '', twitchName: '', tiktokName: '', youtubeName: '', kickName: '', trophies: [null, null, null, null] });
       setSpriteId(null);
       setFriendsList([]);
       setPendingRequests([]);
@@ -323,6 +380,7 @@ function MainApp() {
         setCollection(data.sprites || {});
         setMastery(data.mastery || {});
         setExtractionTargets(data.extractionTargets || []);
+        setProfileData(data.profile || { bio: '', epicName: '', twitchName: '', tiktokName: '', youtubeName: '', kickName: '', trophies: [null, null, null, null] });
         setFriendsList(data.friends || []);
 
         if (data.spriteId) {
@@ -359,12 +417,17 @@ function MainApp() {
           if (docSnap.exists()) {
             const data = docSnap.data();
             let tCollected = 0;
-            SPRITES_DATABASE.forEach(sprite => { tCollected += sprite.variants.filter(v => !isVariantLocked(sprite.id, v) && (data.sprites || {})[sprite.id]?.[v]).length; });
+            let tMastered = 0;
+            SPRITES_DATABASE.forEach(sprite => {
+              tCollected += sprite.variants.filter(v => !isVariantLocked(sprite.id, v) && (data.sprites || {})[sprite.id]?.[v]).length;
+              tMastered += sprite.variants.filter(v => !isVariantLocked(sprite.id, v) && (data.mastery || {})[sprite.id]?.[v]).length;
+            });
             const cRate = totalPossibleStatic > 0 ? Math.round((tCollected / totalPossibleStatic) * 100) : 0;
-            return { ...friend, completionRate: cRate, sprites: data.sprites || {}, extractionTargets: data.extractionTargets || [] };
+            const mRate = totalPossibleStatic > 0 ? Math.round((tMastered / totalPossibleStatic) * 100) : 0;
+            return { ...friend, completionRate: cRate, masteryRate: mRate, sprites: data.sprites || {}, profile: data.profile || {}, creationTime: data.creationTime || null, extractionTargets: data.extractionTargets || [] };
           }
         } catch (e) { }
-        return { ...friend, completionRate: 0, sprites: {}, extractionTargets: [] };
+        return { ...friend, completionRate: 0, masteryRate: 0, sprites: {}, profile: {}, extractionTargets: [] };
       });
       const results = await Promise.all(promises);
       setRichFriends(results.filter(Boolean).sort((a, b) => b.completionRate - a.completionRate));
@@ -400,7 +463,8 @@ function MainApp() {
       if (isLoginMode) {
         await logIn(sanitizedEmail, password);
       } else {
-        await signUp(sanitizedEmail, password);
+        const userCred = await signUp(sanitizedEmail, password);
+        await setDoc(doc(db, "users", userCred.user.uid), { creationTime: new Date().toISOString() }, { merge: true });
       }
     } catch (err) {
       if (err.code === 'auth/email-already-in-use') {
@@ -505,7 +569,7 @@ function MainApp() {
     if (!friendSearchResult) return;
     try {
       await setDoc(doc(db, "friend_requests", `${user.uid}_${friendSearchResult.id}`), { senderId: user.uid, senderSpriteId: spriteId, receiverId: friendSearchResult.id, receiverSpriteId: friendSearchResult.spriteId, status: 'pending', timestamp: new Date() });
-      alert('Friend request sent!'); setFriendSearchResult(null); setFriendSearchQuery(''); setFriendSearchStatus('');
+      alert('Friend request sent!'); setFriendSearchResult(null); setFriendSearchQuery(''); setFriendSearchStatus(''); setShowAddFriendInput(false);
     } catch (e) { }
   };
 
@@ -527,7 +591,36 @@ function MainApp() {
   const inspectFriendLibrary = async (friendObj) => {
     try {
       const docSnap = await getDoc(doc(db, "users", friendObj.uid));
-      if (docSnap.exists()) setActiveViewingFriend({ spriteId: friendObj.spriteId, completionRate: friendObj.completionRate || 0, sprites: docSnap.data().sprites || {}, mastery: docSnap.data().mastery || {}, extractionTargets: docSnap.data().extractionTargets || [] });
+      if (docSnap.exists()) {
+        const data = docSnap.data();
+        let tCollected = 0;
+        let tMastered = 0;
+        SPRITES_DATABASE.forEach(s => {
+          tCollected += s.variants.filter(v => !isVariantLocked(s.id, v) && (data.sprites || {})[s.id]?.[v]).length;
+          tMastered += s.variants.filter(v => !isVariantLocked(s.id, v) && (data.mastery || {})[s.id]?.[v]).length;
+        });
+        const cRate = totalPossibleStatic > 0 ? Math.round((tCollected / totalPossibleStatic) * 100) : 0;
+        const mRate = totalPossibleStatic > 0 ? Math.round((tMastered / totalPossibleStatic) * 100) : 0;
+
+        setActiveViewingFriend({
+          spriteId: friendObj.spriteId,
+          completionRate: cRate,
+          masteryRate: mRate,
+          sprites: data.sprites || {},
+          mastery: data.mastery || {},
+          extractionTargets: data.extractionTargets || [],
+          profile: data.profile || { bio: '', epicName: '', twitchName: '', tiktokName: '', youtubeName: '', kickName: '', trophies: [null, null, null, null] },
+          creationTime: data.creationTime || null
+        });
+
+        // Reset Profile filters just in case
+        setFSearchQuery('');
+        setFRarityFilter('All');
+        setFVariantFilter('All');
+        setFStatusFilter('All');
+        setFSortBy('A-Z');
+        setShowFFilters(false);
+      }
     } catch (e) { }
   };
 
@@ -539,6 +632,28 @@ function MainApp() {
   const handleRemoveTarget = async (index, e) => {
     e.stopPropagation(); const newTargets = [...extractionTargets]; newTargets.splice(index, 1); setExtractionTargets(newTargets);
     await updateDoc(doc(db, "users", user.uid), { extractionTargets: newTargets });
+  };
+
+  const handleSetTrophy = async (targetSpriteId, variant) => {
+    const newTrophies = [...(profileData.trophies || [null, null, null, null])];
+    newTrophies[trophySlotIndex] = `${targetSpriteId}_${variant}`;
+    setProfileData({ ...profileData, trophies: newTrophies });
+    setShowTrophySelector(false);
+  };
+
+  const handleRemoveTrophy = (index, e) => {
+    e.stopPropagation();
+    const newTrophies = [...(profileData.trophies || [null, null, null, null])];
+    newTrophies[index] = null;
+    setProfileData({ ...profileData, trophies: newTrophies });
+  };
+
+  const handleSaveProfile = async () => {
+    setIsEditingProfile(false);
+    try {
+      await updateDoc(doc(db, "users", user.uid), { profile: profileData });
+      playBeep(880, 'sine', 0.1);
+    } catch (e) { }
   };
 
   const isMutualMatch = (friendObj) => {
@@ -558,12 +673,36 @@ function MainApp() {
     );
   };
 
+  const renderTrophySlot = (targetKey, index, isSelf, isEditing, userMasteryData) => {
+    if (!targetKey) {
+      if (isEditing) {
+        return (<button key={index} onClick={() => { setTrophySlotIndex(index); setShowTrophySelector(true); }} className="flex-1 aspect-square border-2 border-dashed border-slate-700 rounded-xl flex items-center justify-center bg-black/40 hover:bg-black/60 transition-colors"><Plus className="w-5 h-5 text-slate-600" /></button>);
+      }
+      return (<div key={index} className="flex-1 aspect-square border-2 border-dashed border-slate-800/50 rounded-xl flex items-center justify-center bg-black/20 opacity-50"><Eye className="w-4 h-4 text-slate-700" /></div>);
+    }
+
+    const spriteId = targetKey.split('_')[0];
+    const v = targetKey.split('_')[1];
+    const sprite = SPRITES_DATABASE.find(s => s.id === spriteId);
+    const isMastered = userMasteryData[spriteId]?.[v];
+
+    return (
+      <div key={index} className={`flex-1 aspect-square border-2 ${isMastered ? 'border-yellow-500 shadow-[0_0_10px_rgba(234,179,8,0.3)] bg-yellow-950/20' : 'border-slate-700 bg-slate-900/50'} rounded-xl relative flex flex-col items-center justify-center overflow-hidden`}>
+        {isEditing && <button onClick={(e) => handleRemoveTrophy(index, e)} className="absolute top-1 right-1 bg-black/80 rounded-full p-0.5 text-slate-400 hover:text-white z-20"><X className="w-3 h-3" /></button>}
+        {isMastered && <Crown className="absolute top-1 left-1 w-3.5 h-3.5 text-yellow-400 drop-shadow-[0_0_2px_rgba(255,215,0,0.8)] z-20" />}
+        <img src={sprite?.images[v]} className="w-10 h-10 sm:w-12 sm:h-12 object-contain z-10" alt="" />
+        <span className={`text-[8px] sm:text-[9px] font-black uppercase mt-1 z-10 ${VARIANT_INFO[v]?.color}`}>{t(v)}</span>
+      </div>
+    );
+  };
+
   const handleAcknowledgeTransmission = async () => { setShowTransmission(false); if (user) { try { await setDoc(doc(db, "users", user.uid), { lastSeenVersion: PATCH_NOTES[0].version }, { merge: true }); } catch (err) { } } };
 
   const totalCollected = SPRITES_DATABASE.reduce((acc, sprite) => acc + sprite.variants.filter(v => !isVariantLocked(sprite.id, v) && (collection[sprite.id] || {})[v]).length, 0);
   const totalMastered = SPRITES_DATABASE.reduce((acc, sprite) => acc + sprite.variants.filter(v => !isVariantLocked(sprite.id, v) && (mastery[sprite.id] || {})[v]).length, 0);
   const completionRate = totalPossibleStatic > 0 ? Math.round((totalCollected / totalPossibleStatic) * 100) : 0;
   const masteryRate = totalPossibleStatic > 0 ? Math.round((totalMastered / totalPossibleStatic) * 100) : 0;
+
   const isMasteryView = currentView === 'mastery';
   const displayVariantKey = variantFilter === 'All' ? 'All' : variantFilter.toLowerCase();
 
@@ -586,6 +725,43 @@ function MainApp() {
     return a.name.localeCompare(b.name);
   });
 
+  const filteredFriendSprites = [...SPRITES_DATABASE].filter(sprite => {
+    if (!activeViewingFriend) return false;
+    const matchesSearch = sprite.name.toLowerCase().includes(fSearchQuery.toLowerCase());
+    const matchesRarity = fRarityFilter === 'All' || sprite.rarity === fRarityFilter;
+    const matchesVariant = fVariantFilter === 'All' || sprite.variants.includes(fVariantFilter === 'All' ? 'base' : fVariantFilter.toLowerCase());
+
+    let matchesStatus = true;
+    if (fStatusFilter !== 'All') {
+      const displayV = fVariantFilter === 'All' ? 'All' : fVariantFilter.toLowerCase();
+      const friendStatus = activeViewingFriend.sprites[sprite.id] || {};
+      const friendMastery = activeViewingFriend.mastery[sprite.id] || {};
+
+      if (fStatusFilter === 'Mastered') {
+        matchesStatus = displayV === 'All' ? sprite.variants.some(v => friendMastery[v]) : friendMastery[displayV];
+      } else if (fStatusFilter === 'Collected') {
+        matchesStatus = displayV === 'All' ? sprite.variants.some(v => friendStatus[v]) : friendStatus[displayV];
+      } else if (fStatusFilter === 'Missing') {
+        matchesStatus = displayV === 'All' ? sprite.variants.some(v => !friendStatus[v]) : (sprite.variants.includes(displayV) && !friendStatus[displayV]);
+      }
+    }
+    return matchesSearch && matchesRarity && matchesVariant && matchesStatus;
+  }).sort((a, b) => {
+    if (fSortBy === 'A-Z') return a.name.localeCompare(b.name);
+    if (fSortBy === 'Z-A') return b.name.localeCompare(a.name);
+    if (fSortBy === 'Rarity (High to Low)') return RARITY_WEIGHT[b.rarity] - RARITY_WEIGHT[a.rarity];
+    if (fSortBy === 'Rarity (Low to High)') return RARITY_WEIGHT[a.rarity] - RARITY_WEIGHT[b.rarity];
+    return a.name.localeCompare(b.name);
+  });
+
+  const filteredSquad = richFriends.filter(f =>
+    (f.spriteId || '').toLowerCase().includes(squadSearchQuery.toLowerCase())
+  ).sort((a, b) => {
+    if (b.completionRate !== a.completionRate) return b.completionRate - a.completionRate;
+    if (b.masteryRate !== a.masteryRate) return (b.masteryRate || 0) - (a.masteryRate || 0);
+    return (a.spriteId || '').localeCompare(b.spriteId || '');
+  });
+
   const getVariantModifierText = (variantName) => {
     if (variantName === 'gold') return lang === 'es' ? "Gana 3x de XP de bonificación por eliminaciones" : "Gain 3x bonus XP from eliminations";
     if (variantName === 'gummy') return lang === 'es' ? "Gana un 20% más de Polvo al extraer" : "Gain 20% more Sprite Dust upon Extraction";
@@ -600,6 +776,129 @@ function MainApp() {
   const getDynamicSummonCost = (rarity, variantName, spriteId = null) => {
     if (spriteId && isVariantLocked(spriteId, variantName)) return "TBD";
     return variantName === 'base' ? SUMMON_COST_MATRIX[rarity].base : SUMMON_COST_MATRIX[rarity].variant;
+  };
+
+  const formatJoinDate = (timestamp) => {
+    if (!timestamp) return 'Unknown';
+    const d = new Date(timestamp);
+    return d.toLocaleDateString(lang === 'en' ? 'en-US' : 'es-ES', { month: 'short', year: 'numeric' });
+  };
+
+  const renderProfileCard = (id, profData, colRate, mastRate, joinTime, isSelf, masteriesObj) => {
+    const unlockedBg = getUnlockedMilestone(Math.round((colRate / 100) * totalPossibleStatic), Math.round((mastRate / 100) * totalPossibleStatic));
+    const bgClass = unlockedBg ? unlockedBg.bg : "bg-slate-900 border-slate-800";
+    const glowClass = unlockedBg ? unlockedBg.glow : "";
+
+    return (
+      <div className="relative mt-2 mb-4">
+        {unlockedBg && (
+          <div className={`absolute inset-0 rounded-2xl border-2 ${glowClass} animate-pulse pointer-events-none opacity-90`}></div>
+        )}
+        <div className={`rounded-2xl border-2 p-5 relative overflow-hidden transition-all ${bgClass}`}>
+          <div className="flex items-start justify-between mb-4">
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 bg-black/40 rounded-full border-2 border-white/10 flex items-center justify-center">
+                <UserIcon className="w-6 h-6 text-slate-300" />
+              </div>
+              <div>
+                <div className="flex items-center gap-2">
+                  <h2 className="text-xl sm:text-2xl font-black text-white uppercase italic tracking-tight">@{id}</h2>
+                  {unlockedBg && <span className="text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md border bg-black/40 text-slate-200 border-white/20">{unlockedBg.name}</span>}
+                </div>
+                <span className="text-[10px] font-mono text-slate-400 flex items-center gap-1 mt-0.5"><Calendar className="w-3 h-3" /> Joined {formatJoinDate(joinTime)}</span>
+              </div>
+            </div>
+            {isSelf && (
+              <button onClick={() => isEditingProfile ? handleSaveProfile() : setIsEditingProfile(true)} className="p-2 bg-black/40 hover:bg-black/60 rounded-xl border border-white/10 text-white transition-colors">
+                {isEditingProfile ? <Save className="w-5 h-5 text-emerald-400" /> : <Edit3 className="w-5 h-5" />}
+              </button>
+            )}
+          </div>
+
+          <div className="flex gap-2 mb-4">
+            <div className="flex-1 bg-black/30 border border-white/5 rounded-xl p-2 text-center">
+              <span className="block text-xl font-black text-cyan-400">{colRate}%</span>
+              <span className="block text-[8px] font-mono uppercase text-slate-500 tracking-wider">Collected</span>
+            </div>
+            <div className="flex-1 bg-black/30 border border-white/5 rounded-xl p-2 text-center">
+              <span className="block text-xl font-black text-yellow-400">{mastRate}%</span>
+              <span className="block text-[8px] font-mono uppercase text-slate-500 tracking-wider">Mastered</span>
+            </div>
+          </div>
+
+          {isEditingProfile ? (
+            <div className="space-y-3 mb-4">
+              <textarea value={profileData.bio} onChange={(e) => setProfileData({ ...profileData, bio: e.target.value.substring(0, 100) })} placeholder="Enter bio (max 100 chars)..." className="w-full bg-black/40 border border-white/10 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-cyan-500 resize-none h-20" />
+              <div className="grid grid-cols-2 gap-2">
+                <div className="relative">
+                  <Gamepad2 className="w-4 h-4 text-slate-500 absolute left-3 top-2.5" />
+                  <input type="text" value={profileData.epicName} onChange={(e) => setProfileData({ ...profileData, epicName: e.target.value })} placeholder="Epic Name" className="w-full bg-black/40 border border-white/10 rounded-xl pl-9 pr-3 py-2 text-sm text-white focus:outline-none focus:border-cyan-500" />
+                </div>
+                <div className="relative">
+                  <Tv className="w-4 h-4 text-purple-500 absolute left-3 top-2.5" />
+                  <input type="text" value={profileData.twitchName} onChange={(e) => setProfileData({ ...profileData, twitchName: e.target.value })} placeholder="Twitch Username" className="w-full bg-black/40 border border-white/10 rounded-xl pl-9 pr-3 py-2 text-sm text-white focus:outline-none focus:border-purple-500" />
+                </div>
+                <div className="relative">
+                  <Music className="w-4 h-4 text-pink-500 absolute left-3 top-2.5" />
+                  <input type="text" value={profileData.tiktokName} onChange={(e) => setProfileData({ ...profileData, tiktokName: e.target.value })} placeholder="TikTok Username" className="w-full bg-black/40 border border-white/10 rounded-xl pl-9 pr-3 py-2 text-sm text-white focus:outline-none focus:border-pink-500" />
+                </div>
+                <div className="relative">
+                  <Video className="w-4 h-4 text-red-500 absolute left-3 top-2.5" />
+                  <input type="text" value={profileData.youtubeName} onChange={(e) => setProfileData({ ...profileData, youtubeName: e.target.value })} placeholder="YouTube Handle" className="w-full bg-black/40 border border-white/10 rounded-xl pl-9 pr-3 py-2 text-sm text-white focus:outline-none focus:border-red-500" />
+                </div>
+                <div className="relative col-span-2">
+                  <Play className="w-4 h-4 text-green-500 absolute left-3 top-2.5" />
+                  <input type="text" value={profileData.kickName} onChange={(e) => setProfileData({ ...profileData, kickName: e.target.value })} placeholder="Kick Channel" className="w-full bg-black/40 border border-white/10 rounded-xl pl-9 pr-3 py-2 text-sm text-white focus:outline-none focus:border-green-500" />
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div className="mb-4">
+              {profData.bio && <p className="text-sm text-slate-300 italic mb-3 bg-black/20 p-3 rounded-xl border-l-2 border-indigo-500">"{profData.bio}"</p>}
+              <div className="flex flex-wrap gap-2">
+                {profData.epicName && (
+                  <div className="bg-blue-900/30 border border-blue-500/30 text-blue-300 px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5">
+                    <Gamepad2 className="w-3.5 h-3.5 text-blue-400" />
+                    <span className="text-[10px] uppercase font-mono text-slate-400">Epic ID:</span> {profData.epicName}
+                  </div>
+                )}
+                {profData.twitchName && (
+                  <a href={`https://www.twitch.tv/${profData.twitchName}`} target="_blank" rel="noopener noreferrer" className="bg-purple-900/30 hover:bg-purple-600/40 border border-purple-500/30 text-purple-300 px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-colors">
+                    <Tv className="w-3.5 h-3.5 text-purple-400" />
+                    Twitch
+                  </a>
+                )}
+                {profData.tiktokName && (
+                  <a href={`https://tiktok.com/@${profData.tiktokName}`} target="_blank" rel="noopener noreferrer" className="bg-pink-900/30 hover:bg-pink-600/40 border border-pink-500/30 text-pink-300 px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-colors">
+                    <Music className="w-3.5 h-3.5 text-pink-400" />
+                    TikTok
+                  </a>
+                )}
+                {profData.youtubeName && (
+                  <a href={`https://youtube.com/@${profData.youtubeName}`} target="_blank" rel="noopener noreferrer" className="bg-red-900/30 hover:bg-red-600/40 border border-red-500/30 text-red-300 px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-colors">
+                    <Video className="w-3.5 h-3.5 text-red-400" />
+                    YouTube
+                  </a>
+                )}
+                {profData.kickName && (
+                  <a href={`https://kick.com/${profData.kickName}`} target="_blank" rel="noopener noreferrer" className="bg-green-900/30 hover:bg-green-600/40 border border-green-500/30 text-green-300 px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-colors">
+                    <Play className="w-3.5 h-3.5 text-green-400" />
+                    Kick
+                  </a>
+                )}
+              </div>
+            </div>
+          )}
+
+          <div>
+            <h3 className="text-xs font-black text-slate-400 uppercase tracking-wider mb-2 flex items-center gap-1.5"><Award className="w-4 h-4" /> Trophy Case</h3>
+            <div className="flex gap-2">
+              {[0, 1, 2, 3].map(index => renderTrophySlot(profData.trophies?.[index], index, isSelf, isEditingProfile, masteriesObj))}
+            </div>
+          </div>
+        </div>
+      </div>
+    );
   };
 
   // --- INITIALIZATION SCREEN ---
@@ -843,24 +1142,30 @@ function MainApp() {
         </div>
       )}
 
-      {/* --- SELECTION SCREEN: TARGET SELECTOR --- */}
-      {showTargetSelector && (
+      {/* --- SELECTION SCREEN: TARGET/TROPHY SELECTOR --- */}
+      {(showTargetSelector || showTrophySelector) && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90 backdrop-blur-md animate-in fade-in duration-200">
           <div className="bg-[#12141f] border-2 border-cyan-500/60 rounded-2xl flex flex-col max-w-sm w-full h-[75vh] relative overflow-hidden">
             <header className="p-4 border-b border-slate-800 flex justify-between items-center bg-[#0e1017]">
-              <h3 className="text-md sm:text-lg font-black tracking-tight text-cyan-400 uppercase italic flex items-center gap-2"><Target className="w-5 h-5" /> Select Target</h3>
-              <button onClick={() => setShowTargetSelector(false)} className="text-slate-400 hover:text-white"><X className="w-6 h-6" /></button>
+              <h3 className="text-md sm:text-lg font-black tracking-tight text-cyan-400 uppercase italic flex items-center gap-2"><Target className="w-5 h-5" /> Select {showTrophySelector ? 'Trophy' : 'Target'}</h3>
+              <button onClick={() => { setShowTargetSelector(false); setShowTrophySelector(false); }} className="text-slate-400 hover:text-white"><X className="w-6 h-6" /></button>
             </header>
             <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-4">
               {SPRITES_DATABASE.map(sprite => {
-                const validVariants = sprite.variants.filter(v => !collection[sprite.id]?.[v] && !isVariantLocked(sprite.id, v));
+                let validVariants = [];
+                if (showTrophySelector) {
+                  validVariants = sprite.variants.filter(v => collection[sprite.id]?.[v]);
+                } else {
+                  validVariants = sprite.variants.filter(v => !collection[sprite.id]?.[v] && !isVariantLocked(sprite.id, v));
+                }
+
                 if (validVariants.length === 0) return null;
                 return (
                   <div key={sprite.id} className="bg-slate-900 border border-slate-800 rounded-xl p-3">
                     <span className="text-sm font-black text-white uppercase italic mb-2 block">{sprite.name}</span>
                     <div className="grid grid-cols-6 gap-2">
                       {validVariants.map(v => (
-                        <button key={v} onClick={() => handleSetTarget(sprite.id, v)} className="flex flex-col items-center p-2 rounded-lg border border-slate-700 bg-black/40 hover:bg-slate-800 transition-colors">
+                        <button key={v} onClick={() => { showTrophySelector ? handleSetTrophy(sprite.id, v) : handleSetTarget(sprite.id, v) }} className="flex flex-col items-center p-2 rounded-lg border border-slate-700 bg-black/40 hover:bg-slate-800 transition-colors">
                           <img src={sprite.images[v]} className="w-8 h-8 object-contain mb-1" alt="" />
                           <span className={`text-[7px] sm:text-[8px] font-black uppercase ${VARIANT_INFO[v]?.color}`}>{t(v)}</span>
                         </button>
@@ -906,37 +1211,111 @@ function MainApp() {
         </div>
       )}
 
-      {/* --- LAYER: NEW READ-ONLY FRIEND COLLECTION INSPECTOR --- */}
+      {/* --- LAYER: NEW READ-ONLY FRIEND COLLECTION INSPECTOR (PROFILE) --- */}
       {activeViewingFriend && (
         <div className="fixed inset-0 z-50 bg-[#0b0c10] flex flex-col animate-in slide-in-from-bottom duration-300 overflow-y-auto pb-12">
-          <header className="bg-[#0e1017]/95 backdrop-blur-md border-b-2 border-indigo-500 p-4 sticky top-0 z-50 shadow-[0_4px_20px_rgba(99,102,241,0.15)]">
-            <div className="max-w-md mx-auto w-full flex items-center justify-between">
-              <div>
-                <span className="text-xs font-mono font-black text-indigo-400 uppercase tracking-widest block">INSPECTING ARCHIVE</span>
-                <div className="flex items-center gap-2">
-                  <h2 className="text-2xl sm:text-3xl font-black italic uppercase text-white">@{activeViewingFriend.spriteId}</h2>
-                  <span className="bg-indigo-900/40 border border-indigo-500/30 text-indigo-300 text-[10px] sm:text-xs font-black px-2 py-0.5 rounded-md">{activeViewingFriend.completionRate}%</span>
-                </div>
-              </div>
-              <button onClick={() => setActiveViewingFriend(null)} className="flex items-center gap-1 bg-slate-900 border border-slate-700 px-3 py-1.5 rounded-xl text-xs sm:text-sm font-black text-slate-300 hover:text-white transition-colors"><X className="w-4 h-4" /> CLOSE</button>
-            </div>
+          <header className="bg-[#0e1017]/95 backdrop-blur-md border-b-2 border-indigo-500 p-4 sticky top-0 z-50 shadow-[0_4px_20px_rgba(99,102,241,0.15)] flex justify-between items-center">
+            <h2 className="text-xl sm:text-2xl font-black italic uppercase text-white tracking-tight flex items-center gap-2"><UserIcon className="w-5 h-5 text-indigo-400" /> PROFILE</h2>
+            <button onClick={() => setActiveViewingFriend(null)} className="flex items-center gap-1 bg-slate-900 border border-slate-700 px-3 py-1.5 rounded-xl text-xs sm:text-sm font-black text-slate-300 hover:text-white transition-colors"><X className="w-4 h-4" /> CLOSE</button>
           </header>
 
-          <div className="max-w-md w-full mx-auto p-4 flex flex-col gap-4">
-            {SPRITES_DATABASE.map(sprite => {
+          <div className="max-w-md w-full mx-auto p-4 flex flex-col gap-4 mt-2">
+            {renderProfileCard(activeViewingFriend.spriteId, activeViewingFriend.profile, activeViewingFriend.completionRate, activeViewingFriend.masteryRate, activeViewingFriend.creationTime, false, activeViewingFriend.mastery)}
+
+            <div className="h-px w-full bg-gradient-to-r from-transparent via-slate-700 to-transparent my-2" />
+
+            {/* Profile Filter & Search UI */}
+            <section className="flex flex-col gap-2 bg-[#151722] p-3 rounded-xl border border-slate-800">
+              <div className="flex gap-2">
+                <div className="relative flex-1">
+                  <Search className="w-4 h-4 text-indigo-400/70 absolute left-3 top-3" />
+                  <input type="text" placeholder="Search Archive..." value={fSearchQuery} onChange={(e) => setFSearchQuery(e.target.value)} className="w-full bg-black/50 border-2 border-slate-800 rounded-xl pl-9 pr-3 py-2 text-sm sm:text-base text-white focus:outline-none focus:border-indigo-500" />
+                </div>
+                <button onClick={() => setShowFFilters(!showFFilters)} className={`px-4 flex items-center gap-2 rounded-xl border-2 transition-all font-black text-xs uppercase tracking-wider ${showFFilters ? 'bg-indigo-900/40 border-indigo-500 text-indigo-400' : 'bg-slate-900 border-slate-800 text-slate-400 hover:bg-slate-800'}`}>
+                  <Filter className="w-4 h-4" /> {t('filters')} {showFFilters ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                </button>
+              </div>
+
+              {showFFilters && (
+                <div className="flex flex-col gap-4 mt-3 pt-3 border-t border-slate-800/80 animate-in slide-in-from-top-2">
+                  <div>
+                    <span className="text-[9px] text-slate-500 font-black uppercase tracking-widest mb-1.5 block">{t('sort_by')}</span>
+                    <div className="flex flex-wrap gap-1.5">
+                      {['A-Z', 'Z-A', 'Rarity (High to Low)', 'Rarity (Low to High)'].map(sort => (
+                        <button key={sort} onClick={() => setFSortBy(sort)} className={`px-3 py-1.5 text-[10px] font-black tracking-wider rounded-lg border uppercase ${fSortBy === sort ? 'bg-indigo-500 text-white border-indigo-400' : 'bg-black/40 text-slate-400 border-slate-800'}`}>
+                          {sort === 'A-Z' ? t('az_order') : sort === 'Z-A' ? t('za_order') : sort === 'Rarity (High to Low)' ? t('rarity_desc') : t('rarity_asc')}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                  <div>
+                    <span className="text-[9px] text-slate-500 font-black uppercase tracking-widest mb-1.5 block">{t('rarity')}</span>
+                    <div className="flex flex-wrap gap-1.5">
+                      {['All', 'Mythic', 'Legendary', 'Epic', 'Rare', 'Unknown'].map(rarity => (
+                        <button key={rarity} onClick={() => setFRarityFilter(rarity)} className={`px-3 py-1.5 text-[10px] font-black tracking-wider rounded-lg border uppercase ${fRarityFilter === rarity ? 'bg-cyan-400 text-black border-cyan-300' : 'bg-black/40 text-slate-400 border-slate-800'}`}>
+                          {t(rarity.toLowerCase())}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                  <div>
+                    <span className="text-[9px] text-slate-500 font-black uppercase tracking-widest mb-1.5 block">{t('variant_type')}</span>
+                    <div className="flex flex-wrap gap-1.5">
+                      {['All', 'Base', 'Gold', 'Gummy', 'Galaxy', 'Holofoil', 'Cube', 'Gem', 'Quack'].map(variant => (
+                        <button key={variant} onClick={() => setFVariantFilter(variant)} className={`px-3 py-1.5 text-[10px] font-black tracking-wider rounded-lg border uppercase ${fVariantFilter === variant ? 'bg-purple-500 text-white border-purple-400' : 'bg-black/40 text-slate-400 border-slate-800'}`}>
+                          {t(variant.toLowerCase())}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                  <div>
+                    <span className="text-[9px] text-slate-500 font-black uppercase tracking-widest mb-1.5 block">{t('collection_status')}</span>
+                    <div className="flex flex-wrap gap-1.5">
+                      {['All', 'Collected', 'Missing'].map(status => (
+                        <button key={status} onClick={() => setFStatusFilter(status)} className={`px-3 py-1.5 text-[10px] font-black tracking-wider rounded-lg border uppercase ${fStatusFilter === status ? 'bg-emerald-500 text-white border-emerald-400' : 'bg-black/40 text-slate-400 border-slate-800'}`}>
+                          {t(status.toLowerCase())}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
+            </section>
+
+            {filteredFriendSprites.length === 0 && (
+              <div className="text-center p-8 bg-[#12141f] rounded-2xl border border-slate-800">
+                <p className="text-sm text-slate-400 font-bold uppercase tracking-widest">No matching Sprites</p>
+              </div>
+            )}
+
+            {filteredFriendSprites.map(sprite => {
               const friendStatus = activeViewingFriend.sprites[sprite.id] || {};
               const friendMastery = activeViewingFriend.mastery[sprite.id] || {};
+
+              const displayVariant = fVariantFilter === 'All' ? 'base' : fVariantFilter.toLowerCase();
+              const validInitialVariant = sprite.variants.includes(displayVariant) ? displayVariant : 'base';
               const hasAnyVariant = variantsList.some(v => friendStatus[v]);
-              const displayVariant = 'base';
+              const isCardMatch = variantsList.some(v => extractionTargets.includes(`${sprite.id}_${v}`) && friendStatus[v]);
+
+              const cardClass = isCardMatch
+                ? 'bg-cyan-950/40 border-2 border-cyan-400 shadow-[0_0_15px_rgba(34,211,238,0.5)] animate-pulse'
+                : 'bg-[#151722] border border-slate-800/90 shadow-sm';
+
+              const imageBoxClass = hasAnyVariant
+                ? (isCardMatch ? 'bg-cyan-950/50 border-cyan-500/50' : 'bg-indigo-950/40 border-indigo-500/50')
+                : 'bg-slate-900 border-slate-800 grayscale opacity-60';
 
               return (
-                <div key={sprite.id} className="flex items-center gap-4 bg-[#151722] border border-slate-800/90 rounded-[20px] p-4 sm:p-5">
-                  <div className={`w-20 h-20 sm:w-24 sm:h-24 rounded-2xl p-2 border-2 transition-all shrink-0 ${hasAnyVariant ? 'bg-indigo-950/40 border-indigo-500/50' : 'bg-slate-900 border-slate-800 grayscale opacity-60'}`}>
-                    <img src={sprite.images[displayVariant]} className="w-full h-full object-contain drop-shadow-lg" alt="" />
+                <div key={sprite.id} className={`flex items-center gap-4 rounded-2xl p-4 hover:bg-slate-800/80 transition-all ${cardClass}`}>
+                  <div className={`w-14 h-14 sm:w-16 sm:h-16 rounded-xl p-1.5 border-2 transition-all shrink-0 ${imageBoxClass}`}>
+                    <img src={sprite.images[validInitialVariant]} className="w-full h-full object-contain drop-shadow-md" alt="" />
                   </div>
                   <div className="flex-1 flex flex-col justify-center min-w-0">
-                    <span className="font-black text-lg sm:text-xl text-white uppercase italic tracking-tight truncate mb-3">{sprite.name}</span>
-                    <div className="flex flex-wrap gap-x-4 gap-y-3">
+                    <div className="flex flex-col mb-2.5">
+                      <span className="font-black text-base sm:text-lg text-white uppercase italic tracking-tight truncate">{sprite.name}</span>
+                      <span className={`text-[8px] sm:text-[9px] font-black uppercase tracking-widest ${VARIANT_INFO[validInitialVariant]?.color}`}>{t(validInitialVariant)}</span>
+                    </div>
+                    <div className="flex flex-wrap gap-x-3 gap-y-2">
                       {variantsList.map(v => {
                         if (!sprite.variants.includes(v)) return null;
                         const isLocked = isVariantLocked(sprite.id, v);
@@ -944,17 +1323,19 @@ function MainApp() {
                         const isMastered = friendMastery[v];
                         const isMatch = extractionTargets.includes(`${sprite.id}_${v}`) && isCollected;
 
+                        if (fStatusFilter === 'Missing' && isCollected) return null;
+
                         return (
-                          <div key={v} className="flex flex-col items-center gap-1.5">
-                            <div className={`w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center border-2 transition-all relative ${isLocked ? 'bg-slate-950/80 border-slate-800/50 opacity-50' : isMatch ? 'bg-cyan-900/40 border-cyan-400 shadow-[0_0_8px_rgba(34,211,238,0.6)] animate-pulse' : isMastered ? 'bg-yellow-900/40 border-yellow-400' : isCollected ? `bg-slate-900 border-${VARIANT_INFO[v]?.color.split('-')[1]}-500/70` : 'bg-black border-slate-800'}`}>
-                              {isLocked ? <Lock className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-slate-600" /> : (
+                          <div key={v} className="flex flex-col items-center gap-1">
+                            <div className={`w-5 h-5 sm:w-6 sm:h-6 rounded-full flex items-center justify-center border-2 transition-all relative ${isLocked ? 'bg-slate-950/80 border-slate-800/60 opacity-60' : isMastered ? 'bg-yellow-900/40 border-yellow-400' : isCollected ? `bg-slate-900 border-${VARIANT_INFO[v]?.color.split('-')[1]}-500/70` : 'bg-black border-slate-800'}`}>
+                              {isLocked ? <Lock className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-slate-600" /> : (
                                 <>
-                                  {isCollected && <div className={`w-3.5 h-3.5 sm:w-4 sm:h-4 rounded-full ${isMatch ? 'bg-cyan-400' : VARIANT_INFO[v]?.bgColor} ${isMastered && !isMatch ? 'opacity-30' : 'opacity-100'}`} />}
-                                  {isMastered && !isMatch && <Crown className="w-4 h-4 sm:w-5 sm:h-5 text-yellow-400 drop-shadow-[0_0_2px_rgba(255,215,0,0.8)] absolute z-10" />}
+                                  {isCollected && <div className={`w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full ${VARIANT_INFO[v]?.bgColor} ${isMastered ? 'opacity-30' : 'opacity-100'}`} />}
+                                  {isMastered && <Crown className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-yellow-400 drop-shadow-[0_0_2px_rgba(255,215,0,0.8)] absolute z-10" />}
                                 </>
                               )}
                             </div>
-                            <span className="text-[9px] sm:text-[10px] font-bold uppercase text-slate-500 tracking-wider whitespace-nowrap">{v === 'holofoil' ? 'Holo' : t(v)}</span>
+                            <span className="text-[7px] sm:text-[8px] font-bold uppercase text-slate-500 tracking-wider whitespace-nowrap">{v === 'holofoil' ? 'Holo' : t(v)}</span>
                           </div>
                         )
                       })}
@@ -967,7 +1348,7 @@ function MainApp() {
         </div>
       )}
 
-      {/* --- HEADER (SIMPLIFIED FOR SETTINGS MENU) --- */}
+      {/* --- HEADER --- */}
       <header className="sticky top-0 z-50 bg-[#0e1017]/95 backdrop-blur-md border-b-2 border-cyan-500/80 shadow-[0_4px_20px_rgba(0,240,255,0.15)] px-4 py-4">
         <div className="max-w-md mx-auto flex items-center justify-between">
           <div>
@@ -976,7 +1357,12 @@ function MainApp() {
             </h1>
             {user && <p className="text-[10px] sm:text-xs font-mono text-slate-400 uppercase tracking-widest mt-0.5">ID: {spriteId}</p>}
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2.5">
+            {user && (
+              <button onClick={() => { setCurrentView('profile'); setActiveViewingFriend(null); }} className={`p-2 rounded-xl border-2 transition-colors shadow-sm ${currentView === 'profile' ? 'bg-indigo-900 border-indigo-500' : 'bg-slate-900 border-slate-700/60 hover:bg-slate-800'}`}>
+                <UserIcon className={`w-5 h-5 sm:w-6 sm:h-6 ${currentView === 'profile' ? 'text-indigo-400' : 'text-slate-300'}`} />
+              </button>
+            )}
             <button onClick={() => setShowSettingsModal(true)} className="p-2 rounded-xl bg-slate-900 border-2 border-slate-700/60 hover:bg-slate-800 transition-colors shadow-sm">
               <Settings className="w-5 h-5 sm:w-6 sm:h-6 text-slate-300" />
             </button>
@@ -985,6 +1371,51 @@ function MainApp() {
       </header>
 
       <main className="flex-1 max-w-md w-full mx-auto p-4 flex flex-col gap-5 pb-24">
+
+        {/* --- PROFILE VIEW --- */}
+        {currentView === 'profile' && user && (
+          <div className="flex flex-col gap-5 animate-in fade-in duration-300">
+            {renderProfileCard(spriteId, profileData, completionRate, masteryRate, user.metadata?.creationTime, true, mastery)}
+
+            <div className="bg-[#12141f] rounded-2xl border border-slate-800 p-5 shadow-xl">
+              <h3 className="text-sm font-black text-white uppercase italic tracking-wider mb-4 flex items-center gap-2"><Eye className="w-4 h-4 text-cyan-400" /> Milestone Unlocks</h3>
+              <p className="text-xs text-slate-400 leading-relaxed mb-4">Grind Masteries and full collections to automatically unlock prestigious backgrounds for your Profile.</p>
+
+              <div className="space-y-3">
+                {MILESTONES.map((stone, idx) => {
+                  let isUnlocked = false;
+                  let progress = 0;
+
+                  if (stone.isPercent) {
+                    const currentRate = stone.type === 'mastery' ? masteryRate : completionRate;
+                    isUnlocked = currentRate >= stone.count;
+                    progress = currentRate;
+                  } else {
+                    isUnlocked = totalMastered >= stone.count;
+                    progress = Math.min(totalMastered, stone.count);
+                  }
+
+                  return (
+                    <div key={idx} className={`p-3 rounded-xl border ${isUnlocked ? stone.bg : 'bg-black/40 border-slate-800 opacity-60'} flex items-center gap-3 transition-all`}>
+                      <div className="w-10 h-10 rounded-full bg-black/40 flex items-center justify-center shrink-0 border border-white/10">
+                        {isUnlocked ? <CheckCircle className="w-5 h-5 text-white" /> : <Lock className="w-5 h-5 text-slate-500" />}
+                      </div>
+                      <div className="flex-1">
+                        <span className={`block font-black text-sm uppercase ${isUnlocked ? 'text-white' : 'text-slate-400'}`}>{stone.name}</span>
+                        <span className="block text-[10px] font-mono text-slate-500 uppercase tracking-widest">{stone.isPercent ? `${stone.count}% ${stone.type}` : `${stone.count} Mastered`}</span>
+                      </div>
+                      {!isUnlocked && (
+                        <div className="text-right">
+                          <span className="text-xs font-black text-slate-500 font-mono">{progress} / {stone.count}{stone.isPercent ? '%' : ''}</span>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* --- MAIN VIEWS (SPRITES / MASTERY) --- */}
         {(currentView === 'sprites' || currentView === 'mastery') && (
@@ -1162,20 +1593,31 @@ function MainApp() {
             </section>
 
             <section className="bg-[#12141f] rounded-2xl border border-slate-800 p-4">
-              <h3 className="text-sm font-black text-slate-400 uppercase tracking-wider mb-3">{t('add_friend')}</h3>
-              <div className="flex gap-2">
-                <div className="relative flex-1">
-                  <Search className="w-4 h-4 sm:w-5 sm:h-5 text-slate-500 absolute left-3 top-3" />
-                  <input type="text" value={friendSearchQuery} onChange={(e) => setFriendSearchQuery(e.target.value)} placeholder={t('search_id')} className="w-full bg-black border-2 border-slate-800 rounded-xl pl-9 sm:pl-10 pr-3 py-2 text-sm sm:text-base text-white focus:outline-none focus:border-indigo-500" />
-                </div>
-                <button onClick={handleSearchFriend} className="bg-indigo-600 hover:bg-indigo-500 text-white px-4 rounded-xl transition-colors"><Search className="w-5 h-5" /></button>
-              </div>
-              {friendSearchStatus === 'searching' && <p className="text-sm text-slate-400 mt-3">Searching...</p>}
-              {friendSearchStatus === 'not-found' && <p className="text-sm text-red-400 mt-3 font-bold">Sprite ID not found.</p>}
-              {friendSearchStatus === 'found' && friendSearchResult && (
-                <div className="mt-4 p-3 bg-indigo-950/30 border border-indigo-500/30 rounded-xl flex justify-between items-center animate-in zoom-in-95">
-                  <span className="text-base sm:text-lg font-bold text-white">@{friendSearchResult.spriteId}</span>
-                  <button onClick={handleSendFriendRequest} className="bg-indigo-500 px-3 py-1.5 rounded-lg text-xs sm:text-sm font-bold text-white flex items-center gap-1 hover:bg-indigo-400"><UserPlus className="w-4 h-4" /> {t('request')}</button>
+              {!showAddFriendInput ? (
+                <button onClick={() => setShowAddFriendInput(true)} className="w-full flex items-center justify-center gap-2 bg-indigo-900/40 hover:bg-indigo-900/60 border border-indigo-500/50 text-indigo-400 py-3 rounded-xl font-black uppercase tracking-wider transition-colors">
+                  <Plus className="w-5 h-5" /> {t('add_friend')}
+                </button>
+              ) : (
+                <div className="animate-in fade-in zoom-in-95">
+                  <div className="flex items-center justify-between mb-3">
+                    <h3 className="text-sm font-black text-slate-400 uppercase tracking-wider">{t('add_friend')}</h3>
+                    <button onClick={() => { setShowAddFriendInput(false); setFriendSearchQuery(''); setFriendSearchResult(null); setFriendSearchStatus(''); }} className="text-slate-500 hover:text-white"><X className="w-4 h-4" /></button>
+                  </div>
+                  <div className="flex gap-2">
+                    <div className="relative flex-1">
+                      <Search className="w-4 h-4 sm:w-5 sm:h-5 text-slate-500 absolute left-3 top-3" />
+                      <input type="text" value={friendSearchQuery} onChange={(e) => setFriendSearchQuery(e.target.value)} placeholder={t('search_id')} className="w-full bg-black border-2 border-slate-800 rounded-xl pl-9 sm:pl-10 pr-3 py-2 text-sm sm:text-base text-white focus:outline-none focus:border-indigo-500" />
+                    </div>
+                    <button onClick={handleSearchFriend} className="bg-indigo-600 hover:bg-indigo-500 text-white px-4 rounded-xl transition-colors"><Search className="w-5 h-5" /></button>
+                  </div>
+                  {friendSearchStatus === 'searching' && <p className="text-sm text-slate-400 mt-3">Searching...</p>}
+                  {friendSearchStatus === 'not-found' && <p className="text-sm text-red-400 mt-3 font-bold">Sprite ID not found.</p>}
+                  {friendSearchStatus === 'found' && friendSearchResult && (
+                    <div className="mt-4 p-3 bg-indigo-950/30 border border-indigo-500/30 rounded-xl flex justify-between items-center animate-in zoom-in-95">
+                      <span className="text-base sm:text-lg font-bold text-white">@{friendSearchResult.spriteId}</span>
+                      <button onClick={handleSendFriendRequest} className="bg-indigo-500 px-3 py-1.5 rounded-lg text-xs sm:text-sm font-bold text-white flex items-center gap-1 hover:bg-indigo-400"><UserPlus className="w-4 h-4" /> {t('request')}</button>
+                    </div>
+                  )}
                 </div>
               )}
             </section>
@@ -1205,14 +1647,25 @@ function MainApp() {
             )}
 
             <section className="bg-[#12141f] rounded-2xl border border-slate-800 p-4">
-              <h3 className="text-sm font-black text-slate-400 uppercase tracking-wider mb-3">{t('sprite_squad')} ({richFriends.length})</h3>
-              {richFriends.length === 0 ? (
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="text-sm font-black text-slate-400 uppercase tracking-wider">{t('sprite_squad')} ({richFriends.length})</h3>
+              </div>
+
+              <div className="flex flex-col gap-2 mb-4">
+                <div className="relative w-full">
+                  <Search className="w-4 h-4 text-indigo-500/70 absolute left-3 top-3" />
+                  <input type="text" placeholder="Search Squad..." value={squadSearchQuery} onChange={(e) => setSquadSearchQuery(e.target.value)} className="w-full bg-black/50 border-2 border-slate-800 rounded-xl pl-9 pr-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500" />
+                </div>
+              </div>
+
+              {filteredSquad.length === 0 ? (
                 <div className="text-center py-6">
                   <Users className="w-10 h-10 sm:w-12 sm:h-12 text-slate-700 mx-auto mb-3" />
+                  <p className="text-sm text-slate-500 font-bold uppercase tracking-wider">No Squad Members Found</p>
                 </div>
               ) : (
                 <div className="flex flex-col gap-2">
-                  {richFriends.map((friend, index) => {
+                  {filteredSquad.map((friend, index) => {
                     const matchFound = isMutualMatch(friend);
                     const cardClass = matchFound ? "bg-cyan-950/40 border-2 border-cyan-400 shadow-[0_0_15px_rgba(34,211,238,0.5)]" : "bg-slate-900 border border-slate-800/80";
                     return (
@@ -1222,7 +1675,7 @@ function MainApp() {
                           <div className="flex flex-col">
                             <span className="text-sm sm:text-base font-bold text-white tracking-wider flex items-center gap-1">@{friend.spriteId || 'Unknown'}</span>
                             {matchFound ? (
-                              <span className="text-[9px] sm:text-[10px] font-black text-cyan-400 font-mono tracking-widest mt-0.5 animate-pulse uppercase flex items-center gap-1"><Target className="w-3 h-3" /> Match</span>
+                              <span className="text-[9px] sm:text-[10px] font-black text-cyan-400 font-mono tracking-widest mt-0.5 animate-pulse uppercase flex items-center gap-1"><Target className="w-3 h-3" /> Extraction Match</span>
                             ) : (
                               <span className="text-[10px] sm:text-[11px] font-black text-indigo-400 font-mono tracking-widest">{friend.completionRate}% COMPLETE</span>
                             )}
