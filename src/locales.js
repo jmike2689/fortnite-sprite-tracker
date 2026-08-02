@@ -45,9 +45,11 @@ export const translations = {
         sprites: "Sprites",
         mastery: "Mastery",
         friends: "Friends",
+        profile: "Profile", // NEW
         support: "Support",
         sprite_squad: "Sprite Squad",
         extraction_targets: "Extraction Targets",
+        extraction_match: "Extraction Match", // NEW
         add_friend: "Add Friend",
         search_id: "Search Sprite ID...",
         request: "Request",
@@ -71,6 +73,13 @@ export const translations = {
         close: "Close",
         app_desc: "Spritedex is your ultimate companion for tracking Battle Royale Sprites. Sync your collection across devices, coordinate in-game drops by viewing your Sprite Squad's Extraction Targets, and keep track of your Mastery crowns all in one secure, real-time interface.",
         disclaimer: "Unofficial product. Not affiliated with, authorized or endorsed by Epic Games or Fortnite. All materials used are trademarks and/or copyrighted works of Epic Games, Inc.",
+
+        // Profile & Dossier Strings (NEW)
+        trophy_case: "Trophy Case",
+        milestone_unlocks: "Milestone Unlocks",
+        milestone_desc: "Grind Masteries and full collections to automatically unlock prestigious backgrounds for your Profile.",
+        full_archive: "Full Archive",
+        joined: "Joined",
 
         // Auth Strings
         loading: "Loading...",
@@ -140,9 +149,11 @@ export const translations = {
         sprites: "Sprites",
         mastery: "Maestría",
         friends: "Amigos",
+        profile: "Perfil", // NEW
         support: "Soporte",
         sprite_squad: "Escuadrón Sprite",
         extraction_targets: "Objetivos de Extracción",
+        extraction_match: "Extracción Mutua", // NEW
         add_friend: "Añadir Amigo",
         search_id: "Buscar ID de Sprite...",
         request: "Solicitar",
@@ -166,6 +177,13 @@ export const translations = {
         close: "Cerrar",
         app_desc: "Spritedex es tu compañero definitivo para rastrear Sprites de Battle Royale. Sincroniza tu colección en varios dispositivos, coordina en el juego viendo los Objetivos de Extracción de tu Escuadrón Sprite y mantén un registro de tus coronas de Maestría en una interfaz segura y en tiempo real.",
         disclaimer: "Producto no oficial. No está afiliado, autorizado ni respaldado por Epic Games o Fortnite. Todos los materiales utilizados son marcas comerciales y/o obras protegidas por derechos de autor de Epic Games, Inc.",
+
+        // Profile & Dossier Strings (NEW)
+        trophy_case: "Vitrina de Trofeos",
+        milestone_unlocks: "Hitos Desbloqueados",
+        milestone_desc: "Domina Sprites y colecciones completas para desbloquear automáticamente fondos prestigiosos para tu Perfil.",
+        full_archive: "Archivo Completo",
+        joined: "Se unió en",
 
         // Auth Strings
         loading: "Cargando...",
