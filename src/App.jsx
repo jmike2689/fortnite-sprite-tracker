@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import PrivacyPolicy from './PrivacyPolicy';
+import { App as CapApp } from '@capacitor/app';
 import {
   Search, CheckCircle, Circle, Volume2, VolumeX, Percent, RotateCcw, AlertTriangle, X, Eye, Crown, Users, UserPlus, ChevronLeft, ChevronRight, Check, XCircle, UserMinus, Target, Plus, FileText, Radio, Info, MessageSquare, Mail, Lock, List, Filter, ChevronDown, ChevronUp, ShoppingCart, Smartphone, Globe, Settings, LogOut, History, AtSign, User as UserIcon, Edit3, Save, Tv, Gamepad2, Calendar, Award, Video, Music, Play
 } from 'lucide-react';
@@ -143,7 +144,6 @@ const variantsList = ['base', 'gold', 'gummy', 'galaxy', 'holofoil', 'cube', 'ge
 const LOCKED_VARIANTS = {};
 
 const isVariantLocked = (spriteId, variant) => {
-  if (spriteId === 'iron-mouse') return true;
   if (variant === 'gem') return true;
   return LOCKED_VARIANTS[spriteId]?.includes(variant) || false;
 };
@@ -177,6 +177,16 @@ const SPRITES_DATABASE = [
 ];
 
 const PATCH_NOTES = [
+  {
+    version: "v1.6.1",
+    date: "08/03/2026",
+    title: "Friend Comparisons & Navigation Tweaks!",
+    changes: [
+      "Squad Comparisons: We added 'I Need' and 'They Need' filters when viewing a friend's profile to easily see which Sprites you can trade or hunt together.",
+      "Smooth Navigation: Full support for the native Android hardware back button and swipe-to-go-back gestures has been added for seamless app browsing.",
+      "Iron Mouse Unlocked: The Mythic Iron Mouse Sprite is now officially live and available to check off in your collection!"
+    ]
+  },
   {
     version: "v1.6.0",
     date: "08/02/2026",
@@ -351,6 +361,33 @@ function MainApp() {
 
   useEffect(() => { document.title = "Spritedex"; }, []);
 
+  // --- HARDWARE BACK BUTTON LOGIC ---
+  useEffect(() => {
+    const handleBackButton = ({ canGoBack }) => {
+      if (showSettingsModal) return setShowSettingsModal(false);
+      if (showAboutModal) return setShowAboutModal(false);
+      if (selectedSprite) return setSelectedSprite(null);
+      if (showPatchNotes) return setShowPatchNotes(false);
+      if (showTransmission) return setShowTransmission(false);
+      if (showTargetSelector) return setShowTargetSelector(false);
+      if (showTrophySelector) return setShowTrophySelector(false);
+      if (showUnfriendConfirm) return setShowUnfriendConfirm(null);
+      if (showResetConfirm) return setShowResetConfirm(false);
+      if (showAddFriendInput) return setShowAddFriendInput(false);
+      if (activeViewingFriend) return setActiveViewingFriend(null);
+
+      // Navigate back to the Sprites tab if currently in another section
+      if (currentView !== 'sprites') return setCurrentView('sprites');
+
+      // If nothing is open and we are on the main tab, minimize the app
+      if (canGoBack) window.history.back();
+    };
+
+    const listener = CapApp.addListener('backButton', handleBackButton);
+    return () => { listener.then(handle => handle.remove()); };
+  }, [showSettingsModal, showAboutModal, selectedSprite, showPatchNotes, showTransmission, showTargetSelector, showTrophySelector, showUnfriendConfirm, showResetConfirm, showAddFriendInput, activeViewingFriend, currentView]);
+
+
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, () => { setIsInitializing(false); });
     return unsubscribe;
@@ -382,6 +419,12 @@ function MainApp() {
         setExtractionTargets(data.extractionTargets || []);
         setProfileData(data.profile || { bio: '', epicName: '', twitchName: '', tiktokName: '', youtubeName: '', kickName: '', trophies: [null, null, null, null] });
         setFriendsList(data.friends || []);
+
+        // --- NEW: Self-healing script for legacy accounts ---
+        if (!data.creationTime && user.metadata?.creationTime) {
+          updateDoc(userDocRef, { creationTime: user.metadata.creationTime }).catch(e => { });
+        }
+        // ----------------------------------------------------
 
         if (data.spriteId) {
           setSpriteId(data.spriteId);
@@ -743,6 +786,10 @@ function MainApp() {
         matchesStatus = displayV === 'All' ? sprite.variants.some(v => friendStatus[v]) : friendStatus[displayV];
       } else if (fStatusFilter === 'Missing') {
         matchesStatus = displayV === 'All' ? sprite.variants.some(v => !friendStatus[v]) : (sprite.variants.includes(displayV) && !friendStatus[displayV]);
+      } else if (fStatusFilter === 'I Need') {
+        matchesStatus = displayV === 'All' ? sprite.variants.some(v => friendStatus[v] && !collection[sprite.id]?.[v]) : (friendStatus[displayV] && !collection[sprite.id]?.[displayV]);
+      } else if (fStatusFilter === 'They Need') {
+        matchesStatus = displayV === 'All' ? sprite.variants.some(v => collection[sprite.id]?.[v] && !friendStatus[v]) : (collection[sprite.id]?.[displayV] && !friendStatus[displayV]);
       }
     }
     return matchesSearch && matchesRarity && matchesVariant && matchesStatus;
@@ -1271,9 +1318,9 @@ function MainApp() {
                   <div>
                     <span className="text-[9px] text-slate-500 font-black uppercase tracking-widest mb-1.5 block">{t('collection_status')}</span>
                     <div className="flex flex-wrap gap-1.5">
-                      {['All', 'Collected', 'Missing'].map(status => (
+                      {['All', 'Collected', 'Missing', 'I Need', 'They Need'].map(status => (
                         <button key={status} onClick={() => setFStatusFilter(status)} className={`px-3 py-1.5 text-[10px] font-black tracking-wider rounded-lg border uppercase ${fStatusFilter === status ? 'bg-emerald-500 text-white border-emerald-400' : 'bg-black/40 text-slate-400 border-slate-800'}`}>
-                          {t(status.toLowerCase())}
+                          {t(status.replace(' ', '_').toLowerCase())}
                         </button>
                       ))}
                     </div>
@@ -1324,6 +1371,8 @@ function MainApp() {
                         const isMatch = extractionTargets.includes(`${sprite.id}_${v}`) && isCollected;
 
                         if (fStatusFilter === 'Missing' && isCollected) return null;
+                        if (fStatusFilter === 'I Need' && (!isCollected || collection[sprite.id]?.[v])) return null;
+                        if (fStatusFilter === 'They Need' && (isCollected || !collection[sprite.id]?.[v])) return null;
 
                         return (
                           <div key={v} className="flex flex-col items-center gap-1">

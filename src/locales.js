@@ -32,6 +32,8 @@ export const translations = {
         collected: "Collected",
         collect: "Collect",
         missing: "Missing",
+        i_need: "I Need",
+        they_need: "They Need",
         mastered: "Mastered",
         unmastered: "Unmastered",
         set_lvl_5: "Set Lvl 5",
@@ -45,11 +47,11 @@ export const translations = {
         sprites: "Sprites",
         mastery: "Mastery",
         friends: "Friends",
-        profile: "Profile", // NEW
+        profile: "Profile",
         support: "Support",
         sprite_squad: "Sprite Squad",
         extraction_targets: "Extraction Targets",
-        extraction_match: "Extraction Match", // NEW
+        extraction_match: "Extraction Match",
         add_friend: "Add Friend",
         search_id: "Search Sprite ID...",
         request: "Request",
@@ -74,7 +76,7 @@ export const translations = {
         app_desc: "Spritedex is your ultimate companion for tracking Battle Royale Sprites. Sync your collection across devices, coordinate in-game drops by viewing your Sprite Squad's Extraction Targets, and keep track of your Mastery crowns all in one secure, real-time interface.",
         disclaimer: "Unofficial product. Not affiliated with, authorized or endorsed by Epic Games or Fortnite. All materials used are trademarks and/or copyrighted works of Epic Games, Inc.",
 
-        // Profile & Dossier Strings (NEW)
+        // Profile & Dossier Strings 
         trophy_case: "Trophy Case",
         milestone_unlocks: "Milestone Unlocks",
         milestone_desc: "Grind Masteries and full collections to automatically unlock prestigious backgrounds for your Profile.",
@@ -136,6 +138,8 @@ export const translations = {
         collected: "Coleccionado",
         collect: "Coleccionar",
         missing: "Faltante",
+        i_need: "Necesito",
+        they_need: "Necesitan",
         mastered: "Dominado",
         unmastered: "Sin Dominar",
         set_lvl_5: "Nivel 5",
@@ -149,11 +153,11 @@ export const translations = {
         sprites: "Sprites",
         mastery: "Maestría",
         friends: "Amigos",
-        profile: "Perfil", // NEW
+        profile: "Perfil",
         support: "Soporte",
         sprite_squad: "Escuadrón Sprite",
         extraction_targets: "Objetivos de Extracción",
-        extraction_match: "Extracción Mutua", // NEW
+        extraction_match: "Extracción Mutua",
         add_friend: "Añadir Amigo",
         search_id: "Buscar ID de Sprite...",
         request: "Solicitar",
@@ -178,7 +182,7 @@ export const translations = {
         app_desc: "Spritedex es tu compañero definitivo para rastrear Sprites de Battle Royale. Sincroniza tu colección en varios dispositivos, coordina en el juego viendo los Objetivos de Extracción de tu Escuadrón Sprite y mantén un registro de tus coronas de Maestría en una interfaz segura y en tiempo real.",
         disclaimer: "Producto no oficial. No está afiliado, autorizado ni respaldado por Epic Games o Fortnite. Todos los materiales utilizados son marcas comerciales y/o obras protegidas por derechos de autor de Epic Games, Inc.",
 
-        // Profile & Dossier Strings (NEW)
+        // Profile & Dossier Strings
         trophy_case: "Vitrina de Trofeos",
         milestone_unlocks: "Hitos Desbloqueados",
         milestone_desc: "Domina Sprites y colecciones completas para desbloquear automáticamente fondos prestigiosos para tu Perfil.",
