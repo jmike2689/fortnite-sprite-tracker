@@ -144,7 +144,6 @@ const variantsList = ['base', 'gold', 'gummy', 'galaxy', 'holofoil', 'cube', 'ge
 const LOCKED_VARIANTS = {};
 
 const isVariantLocked = (spriteId, variant) => {
-  if (variant === 'gem') return true;
   return LOCKED_VARIANTS[spriteId]?.includes(variant) || false;
 };
 
@@ -177,6 +176,16 @@ const SPRITES_DATABASE = [
 ];
 
 const PATCH_NOTES = [
+  {
+    version: "v1.7.0",
+    date: "08/05/2026",
+    title: "Gems Officially Unlocked!",
+    changes: [
+      "Gems Unlocked: The vault doors are open! All Gem variants are now officially live and available to check off in your collection.",
+      "Backend Integration: Live analytics and database syncing are now running fully in the cloud.",
+      "Stats Integrity: All Vault stats and progression trackers have been refreshed to accommodate the official drop!"
+    ]
+  },
   {
     version: "v1.6.1",
     date: "08/03/2026",
