@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import PrivacyPolicy from './PrivacyPolicy';
 import { App as CapApp } from '@capacitor/app';
@@ -750,73 +750,86 @@ function MainApp() {
 
   const handleAcknowledgeTransmission = async () => { setShowTransmission(false); if (user) { try { await setDoc(doc(db, "users", user.uid), { lastSeenVersion: PATCH_NOTES[0].version }, { merge: true }); } catch (err) { } } };
 
-  const totalCollected = SPRITES_DATABASE.reduce((acc, sprite) => acc + sprite.variants.filter(v => !isVariantLocked(sprite.id, v) && (collection[sprite.id] || {})[v]).length, 0);
-  const totalMastered = SPRITES_DATABASE.reduce((acc, sprite) => acc + sprite.variants.filter(v => !isVariantLocked(sprite.id, v) && (mastery[sprite.id] || {})[v]).length, 0);
-  const completionRate = totalPossibleStatic > 0 ? Math.round((totalCollected / totalPossibleStatic) * 100) : 0;
-  const masteryRate = totalPossibleStatic > 0 ? Math.round((totalMastered / totalPossibleStatic) * 100) : 0;
+  // --- OPTIMIZATION: Memoized Stats Calculations ---
+  const { totalCollected, totalMastered, completionRate, masteryRate } = useMemo(() => {
+    const tCol = SPRITES_DATABASE.reduce((acc, sprite) => acc + sprite.variants.filter(v => !isVariantLocked(sprite.id, v) && (collection[sprite.id] || {})[v]).length, 0);
+    const tMast = SPRITES_DATABASE.reduce((acc, sprite) => acc + sprite.variants.filter(v => !isVariantLocked(sprite.id, v) && (mastery[sprite.id] || {})[v]).length, 0);
+    const cRate = totalPossibleStatic > 0 ? Math.round((tCol / totalPossibleStatic) * 100) : 0;
+    const mRate = totalPossibleStatic > 0 ? Math.round((tMast / totalPossibleStatic) * 100) : 0;
+    return { totalCollected: tCol, totalMastered: tMast, completionRate: cRate, masteryRate: mRate };
+  }, [collection, mastery]);
 
   const isMasteryView = currentView === 'mastery';
   const displayVariantKey = variantFilter === 'All' ? 'All' : variantFilter.toLowerCase();
 
-  const filteredSprites = [...SPRITES_DATABASE].filter(sprite => {
-    const matchesSearch = sprite.name.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesRarity = rarityFilter === 'All' || sprite.rarity === rarityFilter;
-    const matchesVariant = variantFilter === 'All' || sprite.variants.includes(displayVariantKey);
-    let matchesStatus = true;
-    if (statusFilter !== 'All') {
-      if (isMasteryView) matchesStatus = statusFilter === 'Mastered' ? (variantFilter === 'All' ? sprite.variants.some(v => mastery[sprite.id]?.[v] === true) : mastery[sprite.id]?.[displayVariantKey] === true) : (variantFilter === 'All' ? sprite.variants.some(v => collection[sprite.id]?.[v] === true && !mastery[sprite.id]?.[v]) : (collection[sprite.id]?.[displayVariantKey] === true && !mastery[sprite.id]?.[displayVariantKey]));
-      else matchesStatus = statusFilter === 'Collected' ? (variantFilter === 'All' ? sprite.variants.some(v => collection[sprite.id]?.[v] === true) : collection[sprite.id]?.[displayVariantKey] === true) : (variantFilter === 'All' ? sprite.variants.some(v => !collection[sprite.id]?.[v]) : (sprite.variants.includes(displayVariantKey) && !collection[sprite.id]?.[displayVariantKey]));
-    }
-    if (isMasteryView && statusFilter === 'All') return matchesSearch && matchesRarity && matchesVariant && matchesStatus && (variantFilter === 'All' ? sprite.variants.some(v => (collection[sprite.id] || {})[v] === true) : (collection[sprite.id] || {})[displayVariantKey] === true);
-    return matchesSearch && matchesRarity && matchesVariant && matchesStatus;
-  }).sort((a, b) => {
-    if (sortBy === 'A-Z') return a.name.localeCompare(b.name);
-    if (sortBy === 'Z-A') return b.name.localeCompare(a.name);
-    if (sortBy === 'Rarity (High to Low)') return RARITY_WEIGHT[b.rarity] - RARITY_WEIGHT[a.rarity];
-    if (sortBy === 'Rarity (Low to High)') return RARITY_WEIGHT[a.rarity] - RARITY_WEIGHT[b.rarity];
-    return a.name.localeCompare(b.name);
-  });
-
-  const filteredFriendSprites = [...SPRITES_DATABASE].filter(sprite => {
-    if (!activeViewingFriend) return false;
-    const matchesSearch = sprite.name.toLowerCase().includes(fSearchQuery.toLowerCase());
-    const matchesRarity = fRarityFilter === 'All' || sprite.rarity === fRarityFilter;
-    const matchesVariant = fVariantFilter === 'All' || sprite.variants.includes(fVariantFilter === 'All' ? 'base' : fVariantFilter.toLowerCase());
-
-    let matchesStatus = true;
-    if (fStatusFilter !== 'All') {
-      const displayV = fVariantFilter === 'All' ? 'All' : fVariantFilter.toLowerCase();
-      const friendStatus = activeViewingFriend.sprites[sprite.id] || {};
-      const friendMastery = activeViewingFriend.mastery[sprite.id] || {};
-
-      if (fStatusFilter === 'Mastered') {
-        matchesStatus = displayV === 'All' ? sprite.variants.some(v => friendMastery[v]) : friendMastery[displayV];
-      } else if (fStatusFilter === 'Collected') {
-        matchesStatus = displayV === 'All' ? sprite.variants.some(v => friendStatus[v]) : friendStatus[displayV];
-      } else if (fStatusFilter === 'Missing') {
-        matchesStatus = displayV === 'All' ? sprite.variants.some(v => !friendStatus[v]) : (sprite.variants.includes(displayV) && !friendStatus[displayV]);
-      } else if (fStatusFilter === 'I Need') {
-        matchesStatus = displayV === 'All' ? sprite.variants.some(v => friendStatus[v] && !collection[sprite.id]?.[v]) : (friendStatus[displayV] && !collection[sprite.id]?.[displayV]);
-      } else if (fStatusFilter === 'They Need') {
-        matchesStatus = displayV === 'All' ? sprite.variants.some(v => collection[sprite.id]?.[v] && !friendStatus[v]) : (collection[sprite.id]?.[displayV] && !friendStatus[displayV]);
+  // --- OPTIMIZATION: Memoized Main Vault Rendering Array ---
+  const filteredSprites = useMemo(() => {
+    return [...SPRITES_DATABASE].filter(sprite => {
+      const matchesSearch = sprite.name.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesRarity = rarityFilter === 'All' || sprite.rarity === rarityFilter;
+      const matchesVariant = variantFilter === 'All' || sprite.variants.includes(displayVariantKey);
+      let matchesStatus = true;
+      if (statusFilter !== 'All') {
+        if (isMasteryView) matchesStatus = statusFilter === 'Mastered' ? (variantFilter === 'All' ? sprite.variants.some(v => mastery[sprite.id]?.[v] === true) : mastery[sprite.id]?.[displayVariantKey] === true) : (variantFilter === 'All' ? sprite.variants.some(v => collection[sprite.id]?.[v] === true && !mastery[sprite.id]?.[v]) : (collection[sprite.id]?.[displayVariantKey] === true && !mastery[sprite.id]?.[displayVariantKey]));
+        else matchesStatus = statusFilter === 'Collected' ? (variantFilter === 'All' ? sprite.variants.some(v => collection[sprite.id]?.[v] === true) : collection[sprite.id]?.[displayVariantKey] === true) : (variantFilter === 'All' ? sprite.variants.some(v => !collection[sprite.id]?.[v]) : (sprite.variants.includes(displayVariantKey) && !collection[sprite.id]?.[displayVariantKey]));
       }
-    }
-    return matchesSearch && matchesRarity && matchesVariant && matchesStatus;
-  }).sort((a, b) => {
-    if (fSortBy === 'A-Z') return a.name.localeCompare(b.name);
-    if (fSortBy === 'Z-A') return b.name.localeCompare(a.name);
-    if (fSortBy === 'Rarity (High to Low)') return RARITY_WEIGHT[b.rarity] - RARITY_WEIGHT[a.rarity];
-    if (fSortBy === 'Rarity (Low to High)') return RARITY_WEIGHT[a.rarity] - RARITY_WEIGHT[b.rarity];
-    return a.name.localeCompare(b.name);
-  });
+      if (isMasteryView && statusFilter === 'All') return matchesSearch && matchesRarity && matchesVariant && matchesStatus && (variantFilter === 'All' ? sprite.variants.some(v => (collection[sprite.id] || {})[v] === true) : (collection[sprite.id] || {})[displayVariantKey] === true);
+      return matchesSearch && matchesRarity && matchesVariant && matchesStatus;
+    }).sort((a, b) => {
+      if (sortBy === 'A-Z') return a.name.localeCompare(b.name);
+      if (sortBy === 'Z-A') return b.name.localeCompare(a.name);
+      if (sortBy === 'Rarity (High to Low)') return RARITY_WEIGHT[b.rarity] - RARITY_WEIGHT[a.rarity];
+      if (sortBy === 'Rarity (Low to High)') return RARITY_WEIGHT[a.rarity] - RARITY_WEIGHT[b.rarity];
+      return a.name.localeCompare(b.name);
+    });
+  }, [searchQuery, rarityFilter, variantFilter, statusFilter, sortBy, isMasteryView, displayVariantKey, collection, mastery]);
 
-  const filteredSquad = richFriends.filter(f =>
-    (f.spriteId || '').toLowerCase().includes(squadSearchQuery.toLowerCase())
-  ).sort((a, b) => {
-    if (b.completionRate !== a.completionRate) return b.completionRate - a.completionRate;
-    if (b.masteryRate !== a.masteryRate) return (b.masteryRate || 0) - (a.masteryRate || 0);
-    return (a.spriteId || '').localeCompare(b.spriteId || '');
-  });
+  // --- OPTIMIZATION: Memoized Friend Vault Rendering Array ---
+  const filteredFriendSprites = useMemo(() => {
+    return [...SPRITES_DATABASE].filter(sprite => {
+      if (!activeViewingFriend) return false;
+      const matchesSearch = sprite.name.toLowerCase().includes(fSearchQuery.toLowerCase());
+      const matchesRarity = fRarityFilter === 'All' || sprite.rarity === fRarityFilter;
+      const matchesVariant = fVariantFilter === 'All' || sprite.variants.includes(fVariantFilter === 'All' ? 'base' : fVariantFilter.toLowerCase());
+
+      let matchesStatus = true;
+      if (fStatusFilter !== 'All') {
+        const displayV = fVariantFilter === 'All' ? 'All' : fVariantFilter.toLowerCase();
+        const friendStatus = activeViewingFriend.sprites[sprite.id] || {};
+        const friendMastery = activeViewingFriend.mastery[sprite.id] || {};
+
+        if (fStatusFilter === 'Mastered') {
+          matchesStatus = displayV === 'All' ? sprite.variants.some(v => friendMastery[v]) : friendMastery[displayV];
+        } else if (fStatusFilter === 'Collected') {
+          matchesStatus = displayV === 'All' ? sprite.variants.some(v => friendStatus[v]) : friendStatus[displayV];
+        } else if (fStatusFilter === 'Missing') {
+          matchesStatus = displayV === 'All' ? sprite.variants.some(v => !friendStatus[v]) : (sprite.variants.includes(displayV) && !friendStatus[displayV]);
+        } else if (fStatusFilter === 'I Need') {
+          matchesStatus = displayV === 'All' ? sprite.variants.some(v => friendStatus[v] && !collection[sprite.id]?.[v]) : (friendStatus[displayV] && !collection[sprite.id]?.[displayV]);
+        } else if (fStatusFilter === 'They Need') {
+          matchesStatus = displayV === 'All' ? sprite.variants.some(v => collection[sprite.id]?.[v] && !friendStatus[v]) : (collection[sprite.id]?.[displayV] && !friendStatus[displayV]);
+        }
+      }
+      return matchesSearch && matchesRarity && matchesVariant && matchesStatus;
+    }).sort((a, b) => {
+      if (fSortBy === 'A-Z') return a.name.localeCompare(b.name);
+      if (fSortBy === 'Z-A') return b.name.localeCompare(a.name);
+      if (fSortBy === 'Rarity (High to Low)') return RARITY_WEIGHT[b.rarity] - RARITY_WEIGHT[a.rarity];
+      if (fSortBy === 'Rarity (Low to High)') return RARITY_WEIGHT[a.rarity] - RARITY_WEIGHT[b.rarity];
+      return a.name.localeCompare(b.name);
+    });
+  }, [activeViewingFriend, fSearchQuery, fRarityFilter, fVariantFilter, fStatusFilter, fSortBy, collection]);
+
+  // --- OPTIMIZATION: Memoized Squad Rendering Array ---
+  const filteredSquad = useMemo(() => {
+    return richFriends.filter(f =>
+      (f.spriteId || '').toLowerCase().includes(squadSearchQuery.toLowerCase())
+    ).sort((a, b) => {
+      if (b.completionRate !== a.completionRate) return b.completionRate - a.completionRate;
+      if (b.masteryRate !== a.masteryRate) return (b.masteryRate || 0) - (a.masteryRate || 0);
+      return (a.spriteId || '').localeCompare(b.spriteId || '');
+    });
+  }, [richFriends, squadSearchQuery]);
 
   const getVariantModifierText = (variantName) => {
     if (variantName === 'gold') return lang === 'es' ? "Gana 3x de XP de bonificación por eliminaciones" : "Gain 3x bonus XP from eliminations";
@@ -1364,7 +1377,7 @@ function MainApp() {
               return (
                 <div key={sprite.id} className={`flex items-center gap-4 rounded-2xl p-4 hover:bg-slate-800/80 transition-all ${cardClass}`}>
                   <div className={`w-14 h-14 sm:w-16 sm:h-16 rounded-xl p-1.5 border-2 transition-all shrink-0 ${imageBoxClass}`}>
-                    <img src={sprite.images[validInitialVariant]} className="w-full h-full object-contain drop-shadow-md" alt="" />
+                    <img src={sprite.images[validInitialVariant]} loading="lazy" className="w-full h-full object-contain drop-shadow-md" alt="" />
                   </div>
                   <div className="flex-1 flex flex-col justify-center min-w-0">
                     <div className="flex flex-col mb-2.5">
@@ -1591,7 +1604,7 @@ function MainApp() {
                   return (
                     <div key={sprite.id} onClick={() => setSelectedSprite({ id: sprite.id, variant: validInitialVariant })} className="flex items-center gap-4 bg-[#151722] border border-slate-800/90 rounded-2xl p-4 hover:bg-slate-800/80 transition-colors cursor-pointer shadow-sm">
                       <div className={`w-14 h-14 sm:w-16 sm:h-16 rounded-xl p-1.5 border-2 transition-all shrink-0 ${hasAnyVariant ? 'bg-cyan-950/40 border-cyan-500/50' : 'bg-slate-900 border-slate-800 grayscale opacity-60'}`}>
-                        <img src={sprite.images[validInitialVariant]} className="w-full h-full object-contain drop-shadow-md" alt="" />
+                        <img src={sprite.images[validInitialVariant]} loading="lazy" className="w-full h-full object-contain drop-shadow-md" alt="" />
                       </div>
                       <div className="flex-1 flex flex-col justify-center min-w-0">
                         <div className="flex flex-col mb-2.5">
