@@ -429,11 +429,26 @@ function MainApp() {
         setProfileData(data.profile || { bio: '', epicName: '', twitchName: '', tiktokName: '', youtubeName: '', kickName: '', trophies: [null, null, null, null] });
         setFriendsList(data.friends || []);
 
-        // --- NEW: Self-healing script for legacy accounts ---
+        // --- SELF-HEALING & ACTIVITY TRACKER ---
+        const now = new Date();
+        const todayString = now.toISOString().split('T')[0]; // Gets "YYYY-MM-DD"
+        const updates = {};
+
+        // Fix missing creation times for legacy users
         if (!data.creationTime && user.metadata?.creationTime) {
-          updateDoc(userDocRef, { creationTime: user.metadata.creationTime }).catch(e => { });
+          updates.creationTime = user.metadata.creationTime;
         }
-        // ----------------------------------------------------
+
+        // Track Daily Activity (Only updates once per day to save database writes)
+        if (!data.lastActive || data.lastActive.split('T')[0] !== todayString) {
+          updates.lastActive = now.toISOString();
+        }
+
+        // Push silent updates to database if needed
+        if (Object.keys(updates).length > 0) {
+          updateDoc(userDocRef, updates).catch(e => { });
+        }
+        // ----------------------------------------
 
         if (data.spriteId) {
           setSpriteId(data.spriteId);
