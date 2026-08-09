@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "122885949651",
+    "project_id": "fortnite-sprite-tracker-20889",
+    "storage_bucket": "fortnite-sprite-tracker-20889.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:122885949651:android:94523ae0531aafde742c26",
+        "android_client_info": {
+          "package_name": "com.prosynctech.spritedex"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDBWGFnCc0LViblgn6uA2fSwypGT0pyV8Q"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
