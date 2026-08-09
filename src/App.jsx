@@ -2,12 +2,14 @@ import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import PrivacyPolicy from './PrivacyPolicy';
 import { App as CapApp } from '@capacitor/app';
+import { Haptics, ImpactStyle } from '@capacitor/haptics';
+import { PushNotifications } from '@capacitor/push-notifications';
 import {
   Search, CheckCircle, Circle, Volume2, VolumeX, Percent, RotateCcw, AlertTriangle, X, Eye, Crown, Users, UserPlus, ChevronLeft, ChevronRight, Check, XCircle, UserMinus, Target, Plus, FileText, Radio, Info, MessageSquare, Mail, Lock, List, Filter, ChevronDown, ChevronUp, ShoppingCart, Smartphone, Globe, Settings, LogOut, History, AtSign, User as UserIcon, Edit3, Save, Tv, Gamepad2, Calendar, Award, Video, Music, Play
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { useAuth } from './AuthContext';
-import { doc, getDoc, setDoc, updateDoc, collection as firestoreCollection, query, where, getDocs, arrayUnion, arrayRemove, deleteDoc, onSnapshot, addDoc } from 'firebase/firestore';
+import { doc, getDoc, setDoc, updateDoc, collection as firestoreCollection, query, where, getDocs, arrayUnion, arrayRemove, deleteDoc, onSnapshot, addDoc, serverTimestamp, runTransaction } from 'firebase/firestore';
 import { sendPasswordResetEmail, onAuthStateChanged } from 'firebase/auth';
 import { auth, db } from './firebase';
 
@@ -177,6 +179,17 @@ const SPRITES_DATABASE = [
 
 const PATCH_NOTES = [
   {
+    version: "v1.8.0",
+    date: "08/09/2026",
+    title: "Daily Radar, AI Intel & Squad Alerts!",
+    changes: [
+      "Squad Alerts: Get instant push notifications when a friend extracts a Sprite you've targeted.",
+      "Daily Radar Sweep: Initiate a daily scan to recover Fragments for the upcoming Profile Shop.",
+      "Decrypted AI Intel: The Radar now intercepts secure, AI-generated transmissions about live global stats.",
+      "Squad Leaderboard Upgrades: Player names now glow with their unlocked Milestone colors, while unranked names are dimmed to make your achievements pop."
+    ]
+  },
+  {
     version: "v1.7.0",
     date: "08/05/2026",
     title: "Gems Officially Unlocked!",
@@ -249,12 +262,12 @@ const totalPossibleStatic = SPRITES_DATABASE.reduce((acc, sprite) => acc + sprit
 
 // --- MILESTONES FOR DOSSIER UNLOCKS ---
 const MILESTONES = [
-  { type: 'mastery', count: 10, name: "Bronze Initiate", bg: "bg-gradient-to-br from-amber-900/40 to-orange-900/20 border-amber-700/50", glow: "shadow-[0_0_20px_rgba(180,83,9,0.8)] border-amber-500" },
-  { type: 'mastery', count: 25, name: "Silver Hunter", bg: "bg-gradient-to-br from-slate-400/20 to-slate-300/10 border-slate-400/50", glow: "shadow-[0_0_20px_rgba(148,163,184,0.8)] border-slate-400" },
-  { type: 'mastery', count: 50, name: "Gold Striker", bg: "bg-gradient-to-br from-yellow-500/20 to-amber-500/10 border-yellow-400/50", glow: "shadow-[0_0_20px_rgba(250,204,21,0.8)] border-yellow-400" },
-  { type: 'mastery', count: 100, name: "Diamond Master", bg: "bg-gradient-to-br from-cyan-400/20 to-blue-500/10 border-cyan-400/50", glow: "shadow-[0_0_25px_rgba(34,211,238,0.8)] border-cyan-400" },
-  { type: 'collection', count: 100, isPercent: true, name: "The Collector", bg: "bg-gradient-to-br from-purple-600/20 to-fuchsia-500/10 border-purple-500/50", glow: "shadow-[0_0_25px_rgba(168,85,247,0.8)] border-purple-400" },
-  { type: 'mastery', count: 100, isPercent: true, name: "True Perfection", bg: "bg-gradient-to-br from-rose-500/20 via-purple-500/20 to-cyan-500/20 border-rose-400/50", glow: "shadow-[0_0_30px_rgba(244,63,94,0.8)] border-rose-400" }
+  { type: 'mastery', count: 10, name: "Bronze Initiate", bg: "bg-gradient-to-br from-amber-900/40 to-orange-900/20 border-amber-700/50", glow: "shadow-[0_0_20px_rgba(180,83,9,0.8)] border-amber-500", textColor: "text-amber-500" },
+  { type: 'mastery', count: 25, name: "Silver Hunter", bg: "bg-gradient-to-br from-slate-400/20 to-slate-300/10 border-slate-400/50", glow: "shadow-[0_0_20px_rgba(148,163,184,0.8)] border-slate-400", textColor: "text-slate-400" },
+  { type: 'mastery', count: 50, name: "Gold Striker", bg: "bg-gradient-to-br from-yellow-500/20 to-amber-500/10 border-yellow-400/50", glow: "shadow-[0_0_20px_rgba(250,204,21,0.8)] border-yellow-400", textColor: "text-yellow-400" },
+  { type: 'mastery', count: 100, name: "Diamond Master", bg: "bg-gradient-to-br from-cyan-400/20 to-blue-500/10 border-cyan-400/50", glow: "shadow-[0_0_25px_rgba(34,211,238,0.8)] border-cyan-400", textColor: "text-cyan-400" },
+  { type: 'collection', count: 100, isPercent: true, name: "The Collector", bg: "bg-gradient-to-br from-purple-600/20 to-fuchsia-500/10 border-purple-500/50", glow: "shadow-[0_0_25px_rgba(168,85,247,0.8)] border-purple-400", textColor: "text-purple-400" },
+  { type: 'mastery', count: 100, isPercent: true, name: "True Perfection", bg: "bg-gradient-to-br from-rose-500/20 via-purple-500/20 to-cyan-500/20 border-rose-400/50", glow: "shadow-[0_0_30px_rgba(244,63,94,0.8)] border-rose-400", textColor: "text-rose-400" }
 ];
 
 const getUnlockedMilestone = (collectedCount, masteredCount) => {
@@ -362,6 +375,18 @@ function MainApp() {
   const [fStatusFilter, setFStatusFilter] = useState('All');
   const [fSortBy, setFSortBy] = useState('A-Z');
 
+  // --- NEW RADAR SWEEP STATE & PRESS-AND-HOLD ---
+  const [fragments, setFragments] = useState(0);
+  const [lastRadarSweep, setLastRadarSweep] = useState(null);
+  const [isSweeping, setIsSweeping] = useState(false);
+  const [sweepResult, setSweepResult] = useState("");
+  const [showRadarModal, setShowRadarModal] = useState(false);
+  const [dailyIntel, setDailyIntel] = useState("");
+
+  const holdTimerRef = useRef(null);
+  const [holdProgress, setHoldProgress] = useState(0);
+  const canSweepToday = !(lastRadarSweep && lastRadarSweep.toDateString() === new Date().toDateString());
+
   const [showTargetSelector, setShowTargetSelector] = useState(false);
   const [targetSlotIndex, setTargetSlotIndex] = useState(null);
 
@@ -383,6 +408,7 @@ function MainApp() {
       if (showUnfriendConfirm) return setShowUnfriendConfirm(null);
       if (showResetConfirm) return setShowResetConfirm(false);
       if (showAddFriendInput) return setShowAddFriendInput(false);
+      if (showRadarModal) return setShowRadarModal(false);
       if (activeViewingFriend) return setActiveViewingFriend(null);
 
       // Navigate back to the Sprites tab if currently in another section
@@ -394,7 +420,7 @@ function MainApp() {
 
     const listener = CapApp.addListener('backButton', handleBackButton);
     return () => { listener.then(handle => handle.remove()); };
-  }, [showSettingsModal, showAboutModal, selectedSprite, showPatchNotes, showTransmission, showTargetSelector, showTrophySelector, showUnfriendConfirm, showResetConfirm, showAddFriendInput, activeViewingFriend, currentView]);
+  }, [showSettingsModal, showAboutModal, selectedSprite, showPatchNotes, showTransmission, showTargetSelector, showTrophySelector, showUnfriendConfirm, showResetConfirm, showAddFriendInput, showRadarModal, activeViewingFriend, currentView]);
 
 
   useEffect(() => {
@@ -415,8 +441,48 @@ function MainApp() {
       setRichFriends([]);
       setActiveViewingFriend(null);
       setHasCheckedVersion(false);
+      setFragments(0);
+      setLastRadarSweep(null);
       return;
     }
+
+    // --- NEW: PUSH NOTIFICATION SETUP ---
+    const setupPushNotifications = async () => {
+      // Push notifications only work on native devices, not the web browser
+      const platform = await CapApp.getInfo();
+      if (platform.platform === 'web') return;
+
+      try {
+        let permStatus = await PushNotifications.checkPermissions();
+
+        if (permStatus.receive === 'prompt') {
+          permStatus = await PushNotifications.requestPermissions();
+        }
+
+        if (permStatus.receive !== 'granted') {
+          console.log('User denied push permissions');
+          return;
+        }
+
+        // Register the device with Google/Apple
+        await PushNotifications.register();
+
+        // Listen for the unique device token and save it to Firestore
+        PushNotifications.addListener('registration', async (token) => {
+          try {
+            await updateDoc(doc(db, "users", user.uid), { fcmToken: token.value });
+          } catch (e) {
+            console.error("Failed to save FCM token", e);
+          }
+        });
+
+      } catch (e) {
+        console.error("Push Notification Setup Failed", e);
+      }
+    };
+
+    setupPushNotifications();
+    // ------------------------------------
 
     const userDocRef = doc(db, "users", user.uid);
     const unsubUser = onSnapshot(userDocRef, (docSnap) => {
@@ -428,6 +494,8 @@ function MainApp() {
         setExtractionTargets(data.extractionTargets || []);
         setProfileData(data.profile || { bio: '', epicName: '', twitchName: '', tiktokName: '', youtubeName: '', kickName: '', trophies: [null, null, null, null] });
         setFriendsList(data.friends || []);
+        setFragments(data.fragments || 0);
+        setLastRadarSweep(data.lastRadarSweep && typeof data.lastRadarSweep.toDate === 'function' ? data.lastRadarSweep.toDate() : null);
 
         // --- SELF-HEALING & ACTIVITY TRACKER ---
         const now = new Date();
@@ -721,6 +789,120 @@ function MainApp() {
       await updateDoc(doc(db, "users", user.uid), { profile: profileData });
       playBeep(880, 'sine', 0.1);
     } catch (e) { }
+  };
+
+  // --- RADAR SWEEP PRESS & HOLD LOGIC ---
+  const startHold = () => {
+    if (!canSweepToday || isSweeping) return;
+    setHoldProgress(0);
+    const duration = 2000; // 2 seconds to hold
+    const interval = 50;
+    const step = (interval / duration) * 100;
+    let currentProgress = 0;
+
+    try { Haptics.impact({ style: ImpactStyle.Light }); } catch (e) { }
+
+    holdTimerRef.current = setInterval(() => {
+      currentProgress += step;
+      if (currentProgress >= 100) {
+        currentProgress = 100;
+        clearInterval(holdTimerRef.current);
+        setHoldProgress(100);
+        initiateRadarSweep();
+      } else {
+        setHoldProgress(currentProgress);
+        // Trigger a light haptic pulse periodically while holding
+        if (Math.round(currentProgress) % 15 === 0) {
+          try { Haptics.impact({ style: ImpactStyle.Light }); } catch (e) { }
+        }
+      }
+    }, interval);
+  };
+
+  const endHold = () => {
+    if (holdTimerRef.current) {
+      clearInterval(holdTimerRef.current);
+    }
+    if (holdProgress < 100 && !isSweeping) {
+      setHoldProgress(0);
+    }
+  };
+
+  const initiateRadarSweep = async () => {
+    if (!user) return;
+
+    setIsSweeping(true);
+    setSweepResult("");
+    setDailyIntel("");
+
+    try {
+      await Haptics.impact({ style: ImpactStyle.Heavy });
+    } catch (e) { /* Ignore if on web */ }
+
+    const userRef = doc(db, 'users', user.uid);
+
+    try {
+      await runTransaction(db, async (transaction) => {
+        const userDoc = await transaction.get(userRef);
+        if (!userDoc.exists()) throw "User document does not exist!";
+
+        const data = userDoc.data();
+        const lastSweepData = data.lastRadarSweep;
+        const lastSweep = lastSweepData && typeof lastSweepData.toDate === 'function' ? lastSweepData.toDate() : null;
+        const now = new Date();
+
+        if (lastSweep && lastSweep.toDateString() === now.toDateString()) {
+          throw "Sweep already completed today.";
+        }
+
+        const roll = Math.random() * 100;
+        let payout = 100;
+        let sweepMessage = "Sweep Complete. Recovered 100 Fragments.";
+
+        if (roll > 80 && roll <= 95) {
+          payout = 250;
+          sweepMessage = "Deep Sweep! Recovered 250 Fragments.";
+        } else if (roll > 95) {
+          payout = 500;
+          sweepMessage = "Anomaly Detected! Recovered 500 Fragments.";
+        }
+
+        const currentFragments = data.fragments || 0;
+
+        transaction.update(userRef, {
+          fragments: currentFragments + payout,
+          lastRadarSweep: serverTimestamp()
+        });
+
+        setSweepResult(sweepMessage);
+      });
+      playBeep(880, 'square', 0.2);
+
+      // Fetch the daily intel from Gemini!
+      try {
+        const intelDocRef = doc(db, "system", "daily_intel");
+        const intelDoc = await getDoc(intelDocRef);
+        if (intelDoc.exists()) {
+          const facts = intelDoc.data().facts || [];
+          if (facts.length > 0) {
+            const randomFact = facts[Math.floor(Math.random() * facts.length)];
+            setDailyIntel(randomFact);
+          }
+        }
+      } catch (intelError) {
+        console.error("Failed to fetch intel:", intelError);
+      }
+
+    } catch (error) {
+      console.error("Sweep failed: ", error);
+      setSweepResult(typeof error === 'string' ? error : "Sweep failed. Try again.");
+    } finally {
+      setTimeout(() => {
+        setIsSweeping(false);
+        setHoldProgress(0); // Reset the button width
+        setTimeout(() => setSweepResult(""), 4000);
+      }, 2000);
+    }
   };
 
   const isMutualMatch = (friendObj) => {
@@ -1105,6 +1287,92 @@ function MainApp() {
         </div>
       )}
 
+      {/* --- RADAR SWEEP MODAL --- */}
+      {showRadarModal && (
+        <div className="fixed inset-0 z-[90] flex flex-col justify-end sm:justify-center items-center bg-black/80 backdrop-blur-sm animate-in fade-in">
+          <div className="bg-[#12141f] w-full max-w-md rounded-t-3xl sm:rounded-3xl border-t-2 sm:border-2 border-slate-800 p-6 shadow-2xl animate-in slide-in-from-bottom-10 relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-cyan-500/10 rounded-full blur-[50px] pointer-events-none" />
+
+            <div className="flex justify-between items-start mb-6 relative z-10">
+              <div>
+                <h2 className="text-2xl font-black text-cyan-400 uppercase italic flex items-center">
+                  <Radio className="w-6 h-6 mr-2" /> Daily Radar
+                </h2>
+                <p className="text-xs text-slate-400 font-medium mt-1">
+                  {canSweepToday ? "Scanner ready. Initiate sweep to recover fragments." : "Radar cooling down. Check back tomorrow."}
+                </p>
+              </div>
+              <button onClick={() => setShowRadarModal(false)} className="p-2 bg-black/40 rounded-full text-slate-400 hover:text-white transition-colors">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="bg-black/40 border border-slate-800 rounded-2xl p-4 mb-6 flex justify-between items-center relative z-10 shadow-inner">
+              <span className="text-xs font-bold text-slate-500 uppercase tracking-widest">Total Fragments</span>
+              <span className="text-2xl font-mono font-black text-white">{fragments}</span>
+            </div>
+
+            {canSweepToday ? (
+              <div className="relative z-10 mb-6 touch-none select-none">
+                <div className="relative w-full h-14 bg-slate-900 rounded-xl overflow-hidden border-2 border-cyan-800 shadow-[0_0_15px_rgba(34,211,238,0.15)]">
+                  <div
+                    className="absolute top-0 left-0 h-full bg-cyan-600 transition-all duration-75"
+                    style={{ width: `${holdProgress}%` }}
+                  />
+                  <button
+                    onMouseDown={startHold}
+                    onMouseUp={endHold}
+                    onMouseLeave={endHold}
+                    onTouchStart={startHold}
+                    onTouchEnd={endHold}
+                    disabled={isSweeping}
+                    className="absolute inset-0 w-full h-full flex items-center justify-center text-white font-black text-sm uppercase tracking-widest z-10 outline-none"
+                  >
+                    {isSweeping ? "SCANNING..." : holdProgress > 0 ? "HOLDING..." : "PRESS & HOLD TO SWEEP"}
+                  </button>
+                </div>
+                <p className="text-center text-[10px] text-cyan-500/70 uppercase tracking-widest font-bold mt-2">Hold for 2 seconds</p>
+              </div>
+            ) : (
+              <div className="relative z-10 mb-6 bg-slate-900/50 border border-slate-800 rounded-xl py-4 text-center">
+                <span className="text-sm font-black text-slate-600 uppercase tracking-widest">Sweep on Cooldown</span>
+              </div>
+            )}
+
+            {sweepResult && (
+              <div className="mb-6 p-3 bg-cyan-950/40 rounded-xl border border-cyan-500/30 text-center animate-in zoom-in-95 duration-200 relative z-10">
+                <p className="text-xs font-black text-cyan-300 uppercase tracking-wider">{sweepResult}</p>
+              </div>
+            )}
+
+            {/* NEW AI INTEL BLOCK */}
+            {dailyIntel && (
+              <div className="mb-6 p-4 bg-indigo-950/40 rounded-xl border border-indigo-500/30 text-center animate-in zoom-in-95 duration-500 relative z-10 shadow-[0_0_15px_rgba(99,102,241,0.15)]">
+                <div className="flex items-center justify-center gap-2 mb-2">
+                  <Radio className="w-4 h-4 text-indigo-400 animate-pulse" />
+                  <span className="text-[10px] font-black text-indigo-400 uppercase tracking-widest">Decrypted AI Intel</span>
+                </div>
+                <p className="text-xs text-slate-300 font-medium leading-relaxed italic">"{dailyIntel}"</p>
+              </div>
+            )}
+
+            {/* The Hype Teaser */}
+            <div className="p-4 bg-slate-900/80 rounded-xl border border-slate-700/60 flex items-start relative z-10">
+              <div className="text-amber-400 mr-3 mt-0.5 shrink-0">
+                <Lock className="w-5 h-5" />
+              </div>
+              <div>
+                <p className="text-xs font-black text-amber-400 mb-1 tracking-wider">HOARD YOUR FRAGMENTS!</p>
+                <p className="text-[10px] sm:text-xs text-slate-400 leading-relaxed font-medium">
+                  The Vault expands soon. Save up to unlock Profile Auras, extra Trophy slots, and tactical upgrades in the upcoming Profile Shop.
+                </p>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      )}
+
       {/* --- MODAL: ABOUT --- */}
       {showAboutModal && (
         <div className="fixed inset-0 z-[90] flex items-center justify-center p-4 bg-black/90 backdrop-blur-md animate-in fade-in duration-200">
@@ -1444,11 +1712,27 @@ function MainApp() {
             {user && <p className="text-[10px] sm:text-xs font-mono text-slate-400 uppercase tracking-widest mt-0.5">ID: {spriteId}</p>}
           </div>
           <div className="flex items-center gap-2.5">
+            {/* NEW DAILY RADAR SWEEP BUTTON */}
+            {user && (
+              <button
+                onClick={() => setShowRadarModal(true)}
+                className={`p-2 rounded-xl border-2 transition-all duration-300 shadow-sm ${canSweepToday
+                  ? 'bg-cyan-950/60 border-cyan-500 text-cyan-400 animate-pulse shadow-[0_0_15px_rgba(34,211,238,0.4)]'
+                  : 'bg-slate-900 border-slate-800 text-slate-600'
+                  }`}
+              >
+                <Radio className="w-5 h-5 sm:w-6 sm:h-6" />
+              </button>
+            )}
+
+            {/* PROFILE ICON */}
             {user && (
               <button onClick={() => { setCurrentView('profile'); setActiveViewingFriend(null); }} className={`p-2 rounded-xl border-2 transition-colors shadow-sm ${currentView === 'profile' ? 'bg-indigo-900 border-indigo-500' : 'bg-slate-900 border-slate-700/60 hover:bg-slate-800'}`}>
                 <UserIcon className={`w-5 h-5 sm:w-6 sm:h-6 ${currentView === 'profile' ? 'text-indigo-400' : 'text-slate-300'}`} />
               </button>
             )}
+
+            {/* SETTINGS ICON */}
             <button onClick={() => setShowSettingsModal(true)} className="p-2 rounded-xl bg-slate-900 border-2 border-slate-700/60 hover:bg-slate-800 transition-colors shadow-sm">
               <Settings className="w-5 h-5 sm:w-6 sm:h-6 text-slate-300" />
             </button>
@@ -1461,6 +1745,56 @@ function MainApp() {
         {/* --- PROFILE VIEW --- */}
         {currentView === 'profile' && user && (
           <div className="flex flex-col gap-5 animate-in fade-in duration-300">
+
+            {/* Radar Sweep Container */}
+            <div className="bg-[#12141f] p-5 rounded-2xl border border-slate-800 shadow-xl relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-cyan-500/10 rounded-full blur-[50px] pointer-events-none" />
+              <div className="flex justify-between items-center mb-4 relative z-10">
+                <h3 className="text-xl font-black text-cyan-400 flex items-center italic uppercase">
+                  <Radio className="w-5 h-5 mr-2" />
+                  Daily Radar
+                </h3>
+                <div className="text-right">
+                  <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest">Fragments</p>
+                  <p className="text-xl font-mono font-black text-white">{fragments}</p>
+                </div>
+              </div>
+
+              <div className="relative z-10">
+                <button
+                  onClick={initiateRadarSweep}
+                  disabled={isSweeping || (lastRadarSweep && lastRadarSweep.toDateString() === new Date().toDateString())}
+                  className={`w-full py-3.5 rounded-xl font-black text-sm uppercase tracking-wider transition-all duration-300 flex items-center justify-center border-2 ${isSweeping
+                    ? "bg-cyan-950/60 border-cyan-500 text-cyan-400 animate-pulse"
+                    : (lastRadarSweep && lastRadarSweep.toDateString() === new Date().toDateString())
+                      ? "bg-slate-900 border-slate-800 text-slate-600 cursor-not-allowed"
+                      : "bg-cyan-600 border-cyan-400 hover:bg-cyan-500 text-white active:scale-[0.98] shadow-[0_0_20px_rgba(34,211,238,0.3)]"
+                    }`}
+                >
+                  {isSweeping ? "SCANNING..." : (lastRadarSweep && lastRadarSweep.toDateString() === new Date().toDateString()) ? "SWEEP ON COOLDOWN" : "INITIATE SWEEP"}
+                </button>
+              </div>
+
+              {sweepResult && (
+                <div className="mt-4 p-3 bg-cyan-950/40 rounded-xl border border-cyan-500/30 text-center animate-in zoom-in-95 duration-200">
+                  <p className="text-xs font-black text-cyan-300 uppercase tracking-wider">{sweepResult}</p>
+                </div>
+              )}
+
+              {/* The Hype Teaser */}
+              <div className="mt-4 p-3.5 bg-slate-900/80 rounded-xl border border-slate-700/60 flex items-start relative z-10">
+                <div className="text-amber-400 mr-3 mt-0.5 shrink-0">
+                  <Lock className="w-5 h-5" />
+                </div>
+                <div>
+                  <p className="text-xs font-black text-amber-400 mb-1 tracking-wider">HOARD YOUR FRAGMENTS!</p>
+                  <p className="text-[10px] sm:text-xs text-slate-400 leading-relaxed font-medium">
+                    The Vault expands soon. Save up to unlock Profile Auras, extra Trophy slots, and tactical upgrades in the upcoming Profile Shop.
+                  </p>
+                </div>
+              </div>
+            </div>
+
             {renderProfileCard(spriteId, profileData, completionRate, masteryRate, user.metadata?.creationTime, true, mastery)}
 
             <div className="bg-[#12141f] rounded-2xl border border-slate-800 p-5 shadow-xl">
@@ -1754,12 +2088,21 @@ function MainApp() {
                   {filteredSquad.map((friend, index) => {
                     const matchFound = isMutualMatch(friend);
                     const cardClass = matchFound ? "bg-cyan-950/40 border-2 border-cyan-400 shadow-[0_0_15px_rgba(34,211,238,0.5)]" : "bg-slate-900 border border-slate-800/80";
+
+                    // Calculate their current milestone to apply name colors
+                    const friendColCount = Math.round((friend.completionRate / 100) * totalPossibleStatic);
+                    const friendMastCount = Math.round((friend.masteryRate / 100) * totalPossibleStatic);
+                    const milestone = getUnlockedMilestone(friendColCount, friendMastCount);
+
+                    // Default to white text if they have no milestone unlocked
+                    const nameColor = milestone ? milestone.textColor : "text-slate-500";
+
                     return (
                       <div key={index} className={`p-3 rounded-xl flex items-center justify-between transition-all duration-300 ${cardClass}`}>
                         <div className="flex items-center gap-3">
                           <div className={`w-6 h-6 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-[10px] sm:text-xs font-black ${matchFound ? 'bg-cyan-900/50 border-cyan-400 text-cyan-400' : 'bg-indigo-900/50 border-indigo-500/50 text-indigo-400'}`}>#{index + 1}</div>
                           <div className="flex flex-col">
-                            <span className="text-sm sm:text-base font-bold text-white tracking-wider flex items-center gap-1">@{friend.spriteId || 'Unknown'}</span>
+                            <span className={`text-sm sm:text-base font-bold tracking-wider flex items-center gap-1 ${nameColor}`}>@{friend.spriteId || 'Unknown'}</span>
                             {matchFound ? (
                               <span className="text-[9px] sm:text-[10px] font-black text-cyan-400 font-mono tracking-widest mt-0.5 animate-pulse uppercase flex items-center gap-1"><Target className="w-3 h-3" /> Extraction Match</span>
                             ) : (

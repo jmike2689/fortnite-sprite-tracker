@@ -14,6 +14,8 @@
     "@capacitor/app": "^8.1.1",
     "@capacitor/cli": "^8.4.1",
     "@capacitor/core": "^8.4.1",
+    "@capacitor/haptics": "^8.0.2",
+    "@capacitor/push-notifications": "^8.1.2",
     "canvas-confetti": "^1.9.4",
     "firebase": "^12.15.0",
     "firebase-admin": "^14.2.0",
