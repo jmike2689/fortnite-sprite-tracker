@@ -186,7 +186,7 @@ const PATCH_NOTES = [
       "Squad Alerts: Get instant push notifications when a friend extracts a Sprite you've targeted.",
       "Daily Radar Sweep: Initiate a daily scan to recover Fragments for the upcoming Profile Shop.",
       "Decrypted AI Intel: The Radar now intercepts secure, AI-generated transmissions about live global stats.",
-      "Squad Leaderboard Upgrades: Player names now glow with their unlocked Milestone colors, while unranked names are dimmed to make your achievements pop."
+      "Leaderboard Tweaks: Squad names now light up to match your unlocked Profile Milestones! Unranked players are dimmed so your true ranks stand out."
     ]
   },
   {
@@ -446,38 +446,35 @@ function MainApp() {
       return;
     }
 
-    // --- NEW: PUSH NOTIFICATION SETUP ---
+    // --- SAFE PUSH NOTIFICATION SETUP ---
     const setupPushNotifications = async () => {
-      // Push notifications only work on native devices, not the web browser
-      const platform = await CapApp.getInfo();
-      if (platform.platform === 'web') return;
-
       try {
-        let permStatus = await PushNotifications.checkPermissions();
+        const platform = await CapApp.getInfo();
+        if (platform.platform === 'web') return;
 
+        // Ensure the plugin exists before calling
+        if (!PushNotifications) return;
+
+        let permStatus = await PushNotifications.checkPermissions();
         if (permStatus.receive === 'prompt') {
           permStatus = await PushNotifications.requestPermissions();
         }
 
-        if (permStatus.receive !== 'granted') {
-          console.log('User denied push permissions');
-          return;
-        }
+        if (permStatus.receive !== 'granted') return;
 
-        // Register the device with Google/Apple
         await PushNotifications.register();
 
-        // Listen for the unique device token and save it to Firestore
         PushNotifications.addListener('registration', async (token) => {
           try {
-            await updateDoc(doc(db, "users", user.uid), { fcmToken: token.value });
+            if (user?.uid) {
+              await updateDoc(doc(db, "users", user.uid), { fcmToken: token.value });
+            }
           } catch (e) {
             console.error("Failed to save FCM token", e);
           }
         });
-
       } catch (e) {
-        console.error("Push Notification Setup Failed", e);
+        console.log("Push notifications not supported in this environment", e);
       }
     };
 
@@ -1717,8 +1714,8 @@ function MainApp() {
               <button
                 onClick={() => setShowRadarModal(true)}
                 className={`p-2 rounded-xl border-2 transition-all duration-300 shadow-sm ${canSweepToday
-                  ? 'bg-cyan-950/60 border-cyan-500 text-cyan-400 animate-pulse shadow-[0_0_15px_rgba(34,211,238,0.4)]'
-                  : 'bg-slate-900 border-slate-800 text-slate-600'
+                    ? 'bg-cyan-950/60 border-cyan-500 text-cyan-400 animate-pulse shadow-[0_0_15px_rgba(34,211,238,0.4)]'
+                    : 'bg-slate-900 border-slate-800 text-slate-600'
                   }`}
               >
                 <Radio className="w-5 h-5 sm:w-6 sm:h-6" />
@@ -1765,10 +1762,10 @@ function MainApp() {
                   onClick={initiateRadarSweep}
                   disabled={isSweeping || (lastRadarSweep && lastRadarSweep.toDateString() === new Date().toDateString())}
                   className={`w-full py-3.5 rounded-xl font-black text-sm uppercase tracking-wider transition-all duration-300 flex items-center justify-center border-2 ${isSweeping
-                    ? "bg-cyan-950/60 border-cyan-500 text-cyan-400 animate-pulse"
-                    : (lastRadarSweep && lastRadarSweep.toDateString() === new Date().toDateString())
-                      ? "bg-slate-900 border-slate-800 text-slate-600 cursor-not-allowed"
-                      : "bg-cyan-600 border-cyan-400 hover:bg-cyan-500 text-white active:scale-[0.98] shadow-[0_0_20px_rgba(34,211,238,0.3)]"
+                      ? "bg-cyan-950/60 border-cyan-500 text-cyan-400 animate-pulse"
+                      : (lastRadarSweep && lastRadarSweep.toDateString() === new Date().toDateString())
+                        ? "bg-slate-900 border-slate-800 text-slate-600 cursor-not-allowed"
+                        : "bg-cyan-600 border-cyan-400 hover:bg-cyan-500 text-white active:scale-[0.98] shadow-[0_0_20px_rgba(34,211,238,0.3)]"
                     }`}
                 >
                   {isSweeping ? "SCANNING..." : (lastRadarSweep && lastRadarSweep.toDateString() === new Date().toDateString()) ? "SWEEP ON COOLDOWN" : "INITIATE SWEEP"}
@@ -2094,7 +2091,7 @@ function MainApp() {
                     const friendMastCount = Math.round((friend.masteryRate / 100) * totalPossibleStatic);
                     const milestone = getUnlockedMilestone(friendColCount, friendMastCount);
 
-                    // Default to white text if they have no milestone unlocked
+                    // Default to dimmed slate text if they have no milestone unlocked
                     const nameColor = milestone ? milestone.textColor : "text-slate-500";
 
                     return (
