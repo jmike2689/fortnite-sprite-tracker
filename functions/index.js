@@ -1,13 +1,12 @@
-const functions = require("firebase-functions/v1"); // <-- Updated to explicitly use v1
+const functions = require("firebase-functions/v1");
 const admin = require("firebase-admin");
-const { GoogleGenerativeAI } = require("@google/generative-ai");
+const { GoogleGenAI } = require("@google/genai"); // <-- Updated to the new SDK
 
 admin.initializeApp();
 const db = admin.firestore();
 
 // IMPORTANT: Replace this with your actual key!
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
-const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
 
 // --- 1. SQUAD PUSH NOTIFICATION TRIGGER ---
 exports.notifySquadOnExtraction = functions.firestore
@@ -83,50 +82,106 @@ exports.generateDailyIntel = functions.pubsub.schedule("0 0 * * *")
     .timeZone("America/Chicago")
     .onRun(async (context) => {
 
-        // 1. Fetch raw data
-        const usersSnap = await db.collection("users").get();
-        const totalUsers = usersSnap.size;
-
-        let ironMouseMastered = 0;
-        let holofoilPeelyHunters = 0;
-        let gemWaterCount = 0;
-
-        usersSnap.forEach(doc => {
-            const data = doc.data();
-            if (data.mastery?.["iron-mouse"]?.["base"]) ironMouseMastered++;
-            if (data.extractionTargets?.includes("peely_holofoil")) holofoilPeelyHunters++;
-            if (data.sprites?.["water"]?.["gem"]) gemWaterCount++;
-        });
-
-        // 2. Prompt Gemini to write the Intel
         try {
-            const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+            // 1. Fetch raw user data
+            const usersSnap = await db.collection("users").get();
+            const totalUsers = usersSnap.size;
+
+            if (totalUsers === 0) return null;
+
+            const spriteCounts = {};
+            const targetCounts = {};
+
+            // 2. Aggregate stats across ALL users dynamically
+            usersSnap.forEach(doc => {
+                const data = doc.data();
+
+                // Aggregate collected sprites
+                if (data.sprites) {
+                    Object.entries(data.sprites).forEach(([spriteId, variants]) => {
+                        if (typeof variants === "object") {
+                            Object.entries(variants).forEach(([variantName, isCollected]) => {
+                                if (isCollected) {
+                                    const formattedName = `${variantName.toUpperCase()} ${spriteId.replace("-", " ")}`;
+                                    spriteCounts[formattedName] = (spriteCounts[formattedName] || 0) + 1;
+                                }
+                            });
+                        }
+                    });
+                }
+
+                // Aggregate extraction targets
+                if (Array.isArray(data.extractionTargets)) {
+                    data.extractionTargets.forEach(target => {
+                        const formattedTarget = target.replace("_", " ").replace("-", " ");
+                        targetCounts[formattedTarget] = (targetCounts[formattedTarget] || 0) + 1;
+                    });
+                }
+            });
+
+            // 3. Randomly pick a sample of dynamic stats for today's prompt
+            const selectedHighlights = [];
+
+            // Pick 2 random sprite collection stats
+            const availableSprites = Object.keys(spriteCounts);
+            if (availableSprites.length > 0) {
+                const shuffledSprites = availableSprites.sort(() => 0.5 - Math.random());
+                const chosenSprites = shuffledSprites.slice(0, 2);
+                chosenSprites.forEach(sprite => {
+                    const count = spriteCounts[sprite];
+                    const percentage = ((count / totalUsers) * 100).toFixed(1);
+                    selectedHighlights.push(`${count} players (${percentage}% of total users) have collected ${sprite}`);
+                });
+            }
+
+            // Pick 1 random extraction target stat
+            const availableTargets = Object.keys(targetCounts);
+            if (availableTargets.length > 0) {
+                const randomTarget = availableTargets[Math.floor(Math.random() * availableTargets.length)];
+                selectedHighlights.push(`${targetCounts[randomTarget]} collectors currently have "${randomTarget}" set as an active target`);
+            }
+
+            // 4. Send the randomized, structured stats to Gemini
+            const ai = new GoogleGenAI({ apiKey: GEMINI_API_KEY });
 
             const prompt = `
-        You are the tactical AI announcer for an app called Spritedex. 
-        Here are the global stats for today:
-        - Total Users: ${totalUsers}
-        - Players who mastered Iron Mouse: ${ironMouseMastered}
-        - Players hunting Holofoil Peely: ${holofoilPeelyHunters}
-        - Players who found Gem Water: ${gemWaterCount}
+        You are a clean, modern analytics copywriter for an app called Spritedex. 
+        Here are today's randomized global highlights:
+        - Total Registered Users: ${totalUsers}
+        ${selectedHighlights.map(h => `- ${h}`).join("\n")}
 
-        Write exactly 5 short, punchy, exciting 1-sentence intel broadcasts to show players the app is alive. Make them sound like a futuristic radio transmission. Do not use bullet points or numbers. Just return 5 sentences separated by a new line.
+        Write exactly 5 short, punchy, exciting 1-sentence community facts to show players the app is active. 
+
+        Structure them precisely as follows (one sentence per line, exactly 5 lines total):
+        - Line 1: A community growth stat using the total user count.
+        - Line 2: A collection highlight based on one of the provided sprite stats.
+        - Line 3: A rarity percentage highlight based on one of the provided stats.
+        - Line 4: A spotlight on the extraction target stat provided.
+        - Line 5: A helpful gameplay or app feature tip for using Spritedex.
+
+        Strict Rules:
+        1. Keep them extremely concise and direct (under 15 words each).
+        2. Do NOT use sci-fi, military, or tactical jargon (avoid words like "operatives", "agents", "grid", "combat", "transmission", "alert", or "network").
+        3. Do not use bullet points or numbers. Just return the 5 sentences separated by a new line.
       `;
 
-            const result = await model.generateContent(prompt);
-            const response = await result.response;
-            const text = response.text();
+            const response = await ai.models.generateContent({
+                model: 'gemini-3.6-flash',
+                contents: prompt
+            });
+
+            const text = response.text;
 
             // Clean up the text and split into an array
             const intelArray = text.split('\n').filter(line => line.trim().length > 0);
 
-            // 3. Save the AI-generated array to the database
+            // 5. Save the AI-generated array to Firestore
             await db.collection("system").doc("daily_intel").set({
                 facts: intelArray,
                 lastUpdated: admin.firestore.FieldValue.serverTimestamp()
             });
 
-            console.log("AI Daily Intel generated successfully!");
+            console.log("Dynamic mixed-format AI Daily Intel generated successfully!");
 
         } catch (error) {
             console.error("Failed to generate AI Intel:", error);
