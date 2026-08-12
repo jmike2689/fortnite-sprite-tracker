@@ -179,6 +179,17 @@ const SPRITES_DATABASE = [
 
 const PATCH_NOTES = [
   {
+    version: "v1.9.0",
+    date: "08/12/2026",
+    title: "Streaks, Live Timers & Long-Press Controls!",
+    changes: [
+      "Daily Streaks & Timers: The Daily Radar now tracks your consecutive sweeps with a glowing streak badge. Plus, a live 24-hour countdown tells you exactly when your next sweep is ready.",
+      "Permanent AI Intel: Decrypted transmissions about the appnow permanently pin to your radar screen until your next sweep instead of resetting.",
+      "Long-Press Quick Action: Speed up your tracking! Long-press any variant dot from the main menu to instantly collect or master it",
+      "Fractional Progress: Vault and Completion progress bars now display your exact fractional counts alongside your percentages."
+    ]
+  },
+  {
     version: "v1.8.0",
     date: "08/09/2026",
     title: "Daily Radar, AI Intel & Squad Alerts!",
@@ -375,17 +386,24 @@ function MainApp() {
   const [fStatusFilter, setFStatusFilter] = useState('All');
   const [fSortBy, setFSortBy] = useState('A-Z');
 
-  // --- NEW RADAR SWEEP STATE & PRESS-AND-HOLD ---
+  // --- RADAR SWEEP STATE & PRESS-AND-HOLD ---
   const [fragments, setFragments] = useState(0);
   const [lastRadarSweep, setLastRadarSweep] = useState(null);
+  const [sweepStreak, setSweepStreak] = useState(0);
+  const [dailyIntel, setDailyIntel] = useState("");
+
   const [isSweeping, setIsSweeping] = useState(false);
   const [sweepResult, setSweepResult] = useState("");
   const [showRadarModal, setShowRadarModal] = useState(false);
-  const [dailyIntel, setDailyIntel] = useState("");
+  const [timeUntilNextSweep, setTimeUntilNextSweep] = useState("");
+  const [canSweepToday, setCanSweepToday] = useState(false);
+
+  // --- LONG PRESS STATE FOR RADIO DOTS ---
+  const [activeHoldId, setActiveHoldId] = useState(null);
+  const dotHoldTimer = useRef(null);
 
   const holdTimerRef = useRef(null);
   const [holdProgress, setHoldProgress] = useState(0);
-  const canSweepToday = !(lastRadarSweep && lastRadarSweep.toDateString() === new Date().toDateString());
 
   const [showTargetSelector, setShowTargetSelector] = useState(false);
   const [targetSlotIndex, setTargetSlotIndex] = useState(null);
@@ -394,6 +412,34 @@ function MainApp() {
   const [trophySlotIndex, setTrophySlotIndex] = useState(null);
 
   useEffect(() => { document.title = "Spritedex"; }, []);
+
+  // --- LIVE 24H COOLDOWN TRACKER ---
+  useEffect(() => {
+    if (!lastRadarSweep) {
+      setCanSweepToday(true);
+      return;
+    }
+    const checkCooldown = () => {
+      const now = new Date().getTime();
+      const nextSweepTime = lastRadarSweep.getTime() + 24 * 60 * 60 * 1000;
+      const diff = nextSweepTime - now;
+
+      if (diff <= 0) {
+        setCanSweepToday(true);
+        setTimeUntilNextSweep("");
+      } else {
+        setCanSweepToday(false);
+        const h = Math.floor((diff / (1000 * 60 * 60)));
+        const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+        const s = Math.floor((diff % (1000 * 60)) / 1000);
+        setTimeUntilNextSweep(`${h}h ${m}m ${s}s`);
+      }
+    };
+
+    checkCooldown();
+    const interval = setInterval(checkCooldown, 1000);
+    return () => clearInterval(interval);
+  }, [lastRadarSweep]);
 
   // --- HARDWARE BACK BUTTON LOGIC ---
   useEffect(() => {
@@ -443,6 +489,8 @@ function MainApp() {
       setHasCheckedVersion(false);
       setFragments(0);
       setLastRadarSweep(null);
+      setSweepStreak(0);
+      setDailyIntel("");
       return;
     }
 
@@ -451,8 +499,6 @@ function MainApp() {
       try {
         const platform = await CapApp.getInfo();
         if (platform.platform === 'web') return;
-
-        // Ensure the plugin exists before calling
         if (!PushNotifications) return;
 
         let permStatus = await PushNotifications.checkPermissions();
@@ -461,25 +507,17 @@ function MainApp() {
         }
 
         if (permStatus.receive !== 'granted') return;
-
         await PushNotifications.register();
 
         PushNotifications.addListener('registration', async (token) => {
           try {
-            if (user?.uid) {
-              await updateDoc(doc(db, "users", user.uid), { fcmToken: token.value });
-            }
-          } catch (e) {
-            console.error("Failed to save FCM token", e);
-          }
+            if (user?.uid) await updateDoc(doc(db, "users", user.uid), { fcmToken: token.value });
+          } catch (e) { }
         });
-      } catch (e) {
-        console.log("Push notifications not supported in this environment", e);
-      }
+      } catch (e) { }
     };
 
     setupPushNotifications();
-    // ------------------------------------
 
     const userDocRef = doc(db, "users", user.uid);
     const unsubUser = onSnapshot(userDocRef, (docSnap) => {
@@ -493,33 +531,20 @@ function MainApp() {
         setFriendsList(data.friends || []);
         setFragments(data.fragments || 0);
         setLastRadarSweep(data.lastRadarSweep && typeof data.lastRadarSweep.toDate === 'function' ? data.lastRadarSweep.toDate() : null);
+        setSweepStreak(data.sweepStreak || 0);
+        setDailyIntel(data.dailyIntel || "");
 
-        // --- SELF-HEALING & ACTIVITY TRACKER ---
         const now = new Date();
-        const todayString = now.toISOString().split('T')[0]; // Gets "YYYY-MM-DD"
+        const todayString = now.toISOString().split('T')[0];
         const updates = {};
 
-        // Fix missing creation times for legacy users
-        if (!data.creationTime && user.metadata?.creationTime) {
-          updates.creationTime = user.metadata.creationTime;
-        }
+        if (!data.creationTime && user.metadata?.creationTime) updates.creationTime = user.metadata.creationTime;
+        if (!data.lastActive || data.lastActive.split('T')[0] !== todayString) updates.lastActive = now.toISOString();
 
-        // Track Daily Activity (Only updates once per day to save database writes)
-        if (!data.lastActive || data.lastActive.split('T')[0] !== todayString) {
-          updates.lastActive = now.toISOString();
-        }
+        if (Object.keys(updates).length > 0) updateDoc(userDocRef, updates).catch(e => { });
 
-        // Push silent updates to database if needed
-        if (Object.keys(updates).length > 0) {
-          updateDoc(userDocRef, updates).catch(e => { });
-        }
-        // ----------------------------------------
-
-        if (data.spriteId) {
-          setSpriteId(data.spriteId);
-        } else {
-          setIsSettingSpriteId(true);
-        }
+        if (data.spriteId) setSpriteId(data.spriteId);
+        else setIsSettingSpriteId(true);
 
         if (!hasCheckedVersion && !isSettingSpriteId) {
           const userVersion = data.lastSeenVersion || "v1.0.0";
@@ -590,7 +615,6 @@ function MainApp() {
     e.preventDefault();
     setIsAuthLoading(true);
     const sanitizedEmail = email.trim().toLowerCase();
-
     try {
       if (isLoginMode) {
         await logIn(sanitizedEmail, password);
@@ -665,6 +689,32 @@ function MainApp() {
       return updated;
     });
   };
+
+  // --- RADIO DOT LONG PRESS LOGIC ---
+  const handleDotPressStart = (e, spriteId, variant) => {
+    e.stopPropagation();
+    setActiveHoldId(`${spriteId}_${variant}`);
+
+    try { Haptics.impact({ style: ImpactStyle.Light }); } catch (err) { }
+
+    dotHoldTimer.current = setTimeout(() => {
+      setActiveHoldId(null);
+      try { Haptics.impact({ style: ImpactStyle.Heavy }); } catch (err) { }
+
+      if (isMasteryView) {
+        toggleMastery(spriteId, variant);
+      } else {
+        handleToggleCheck(spriteId, variant);
+      }
+    }, 700);
+  };
+
+  const handleDotPressEnd = (e) => {
+    e.stopPropagation();
+    if (dotHoldTimer.current) clearTimeout(dotHoldTimer.current);
+    setActiveHoldId(null);
+  };
+
 
   const handleAbsoluteReset = () => {
     setCollection({}); setMastery({}); setShowResetConfirm(false);
@@ -745,7 +795,6 @@ function MainApp() {
           creationTime: data.creationTime || null
         });
 
-        // Reset Profile filters just in case
         setFSearchQuery('');
         setFRarityFilter('All');
         setFVariantFilter('All');
@@ -792,7 +841,7 @@ function MainApp() {
   const startHold = () => {
     if (!canSweepToday || isSweeping) return;
     setHoldProgress(0);
-    const duration = 2000; // 2 seconds to hold
+    const duration = 2000;
     const interval = 50;
     const step = (interval / duration) * 100;
     let currentProgress = 0;
@@ -808,7 +857,6 @@ function MainApp() {
         initiateRadarSweep();
       } else {
         setHoldProgress(currentProgress);
-        // Trigger a light haptic pulse periodically while holding
         if (Math.round(currentProgress) % 15 === 0) {
           try { Haptics.impact({ style: ImpactStyle.Light }); } catch (e) { }
         }
@@ -817,12 +865,8 @@ function MainApp() {
   };
 
   const endHold = () => {
-    if (holdTimerRef.current) {
-      clearInterval(holdTimerRef.current);
-    }
-    if (holdProgress < 100 && !isSweeping) {
-      setHoldProgress(0);
-    }
+    if (holdTimerRef.current) clearInterval(holdTimerRef.current);
+    if (holdProgress < 100 && !isSweeping) setHoldProgress(0);
   };
 
   const initiateRadarSweep = async () => {
@@ -830,11 +874,22 @@ function MainApp() {
 
     setIsSweeping(true);
     setSweepResult("");
-    setDailyIntel("");
 
+    try { await Haptics.impact({ style: ImpactStyle.Heavy }); } catch (e) { }
+
+    // Pre-fetch intel outside of the transaction to keep it fast
+    let newFact = "Signal lost. No intel recovered.";
     try {
-      await Haptics.impact({ style: ImpactStyle.Heavy });
-    } catch (e) { /* Ignore if on web */ }
+      const intelDoc = await getDoc(doc(db, "system", "daily_intel"));
+      if (intelDoc.exists() && intelDoc.data().facts?.length > 0) {
+        const facts = intelDoc.data().facts;
+        newFact = facts[Math.floor(Math.random() * facts.length)];
+      } else {
+        console.warn("The document exists, but the 'facts' array is missing or empty.");
+      }
+    } catch (e) {
+      console.error("FAILED TO FETCH INTEL:", e);
+    }
 
     const userRef = doc(db, 'users', user.uid);
 
@@ -848,8 +903,24 @@ function MainApp() {
         const lastSweep = lastSweepData && typeof lastSweepData.toDate === 'function' ? lastSweepData.toDate() : null;
         const now = new Date();
 
-        if (lastSweep && lastSweep.toDateString() === now.toDateString()) {
-          throw "Sweep already completed today.";
+        // Extra safety check in transaction
+        if (lastSweep && (now.getTime() - lastSweep.getTime() < 24 * 60 * 60 * 1000)) {
+          throw "Sweep already on 24h cooldown.";
+        }
+
+        // --- STREAK CALCULATION ---
+        let currentStreak = data.sweepStreak || 0;
+        if (lastSweep) {
+          const hoursSince = (now.getTime() - lastSweep.getTime()) / (1000 * 60 * 60);
+          // If they swept within 48 hours of their last sweep, they keep their streak!
+          // (24h cooldown + a 24h window to return)
+          if (hoursSince < 48) {
+            currentStreak += 1;
+          } else {
+            currentStreak = 1;
+          }
+        } else {
+          currentStreak = 1;
         }
 
         const roll = Math.random() * 100;
@@ -868,35 +939,22 @@ function MainApp() {
 
         transaction.update(userRef, {
           fragments: currentFragments + payout,
-          lastRadarSweep: serverTimestamp()
+          lastRadarSweep: serverTimestamp(),
+          sweepStreak: currentStreak,
+          dailyIntel: newFact
         });
 
         setSweepResult(sweepMessage);
       });
+
       playBeep(880, 'square', 0.2);
-
-      // Fetch the daily intel from Gemini!
-      try {
-        const intelDocRef = doc(db, "system", "daily_intel");
-        const intelDoc = await getDoc(intelDocRef);
-        if (intelDoc.exists()) {
-          const facts = intelDoc.data().facts || [];
-          if (facts.length > 0) {
-            const randomFact = facts[Math.floor(Math.random() * facts.length)];
-            setDailyIntel(randomFact);
-          }
-        }
-      } catch (intelError) {
-        console.error("Failed to fetch intel:", intelError);
-      }
-
     } catch (error) {
       console.error("Sweep failed: ", error);
       setSweepResult(typeof error === 'string' ? error : "Sweep failed. Try again.");
     } finally {
       setTimeout(() => {
         setIsSweeping(false);
-        setHoldProgress(0); // Reset the button width
+        setHoldProgress(0);
         setTimeout(() => setSweepResult(""), 4000);
       }, 2000);
     }
@@ -1295,9 +1353,16 @@ function MainApp() {
                 <h2 className="text-2xl font-black text-cyan-400 uppercase italic flex items-center">
                   <Radio className="w-6 h-6 mr-2" /> Daily Radar
                 </h2>
-                <p className="text-xs text-slate-400 font-medium mt-1">
-                  {canSweepToday ? "Scanner ready. Initiate sweep to recover fragments." : "Radar cooling down. Check back tomorrow."}
-                </p>
+                <div className="flex items-center gap-2 mt-1">
+                  <p className="text-xs text-slate-400 font-medium">
+                    {canSweepToday ? "Scanner ready. Initiate sweep." : "Radar cooling down."}
+                  </p>
+                  {sweepStreak >= 1 && (
+                    <span className="text-[9px] font-black uppercase px-2 py-0.5 rounded-md bg-orange-950/40 border border-orange-500/50 text-orange-400 flex items-center gap-1">
+                      🔥 {sweepStreak} Day Streak
+                    </span>
+                  )}
+                </div>
               </div>
               <button onClick={() => setShowRadarModal(false)} className="p-2 bg-black/40 rounded-full text-slate-400 hover:text-white transition-colors">
                 <X className="w-5 h-5" />
@@ -1331,8 +1396,9 @@ function MainApp() {
                 <p className="text-center text-[10px] text-cyan-500/70 uppercase tracking-widest font-bold mt-2">Hold for 2 seconds</p>
               </div>
             ) : (
-              <div className="relative z-10 mb-6 bg-slate-900/50 border border-slate-800 rounded-xl py-4 text-center">
-                <span className="text-sm font-black text-slate-600 uppercase tracking-widest">Sweep on Cooldown</span>
+              <div className="relative z-10 mb-6 bg-slate-900/50 border border-slate-800 rounded-xl py-4 flex flex-col items-center justify-center gap-1">
+                <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Sweep on Cooldown</span>
+                <span className="text-lg font-mono font-black text-slate-300">{timeUntilNextSweep}</span>
               </div>
             )}
 
@@ -1342,7 +1408,7 @@ function MainApp() {
               </div>
             )}
 
-            {/* NEW AI INTEL BLOCK */}
+            {/* AI INTEL BLOCK - NOW PERSISTENT! */}
             {dailyIntel && (
               <div className="mb-6 p-4 bg-indigo-950/40 rounded-xl border border-indigo-500/30 text-center animate-in zoom-in-95 duration-500 relative z-10 shadow-[0_0_15px_rgba(99,102,241,0.15)]">
                 <div className="flex items-center justify-center gap-2 mb-2">
@@ -1678,11 +1744,11 @@ function MainApp() {
 
                         return (
                           <div key={v} className="flex flex-col items-center gap-1">
-                            <div className={`w-5 h-5 sm:w-6 sm:h-6 rounded-full flex items-center justify-center border-2 transition-all relative ${isLocked ? 'bg-slate-950/80 border-slate-800/60 opacity-60' : isMastered ? 'bg-yellow-900/40 border-yellow-400' : isCollected ? `bg-slate-900 border-${VARIANT_INFO[v]?.color.split('-')[1]}-500/70` : 'bg-black border-slate-800'}`}>
-                              {isLocked ? <Lock className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-slate-600" /> : (
+                            <div className={`w-6 h-6 sm:w-8 sm:h-8 rounded-full flex items-center justify-center border-2 transition-all relative ${isLocked ? 'bg-slate-950/80 border-slate-800/60 opacity-60' : isMastered ? 'bg-yellow-900/40 border-yellow-400' : isCollected ? `bg-slate-900 border-${VARIANT_INFO[v]?.color.split('-')[1]}-500/70` : 'bg-black border-slate-800'}`}>
+                              {isLocked ? <Lock className="w-3 h-3 sm:w-4 sm:h-4 text-slate-600" /> : (
                                 <>
-                                  {isCollected && <div className={`w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full ${VARIANT_INFO[v]?.bgColor} ${isMastered ? 'opacity-30' : 'opacity-100'}`} />}
-                                  {isMastered && <Crown className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-yellow-400 drop-shadow-[0_0_2px_rgba(255,215,0,0.8)] absolute z-10" />}
+                                  {isCollected && <div className={`w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full ${VARIANT_INFO[v]?.bgColor} ${isMastered ? 'opacity-30' : 'opacity-100'}`} />}
+                                  {isMastered && <Crown className="w-4 h-4 sm:w-5 sm:h-5 text-yellow-400 drop-shadow-[0_0_2px_rgba(255,215,0,0.8)] absolute z-10" />}
                                 </>
                               )}
                             </div>
@@ -1713,12 +1779,17 @@ function MainApp() {
             {user && (
               <button
                 onClick={() => setShowRadarModal(true)}
-                className={`p-2 rounded-xl border-2 transition-all duration-300 shadow-sm ${canSweepToday
-                    ? 'bg-cyan-950/60 border-cyan-500 text-cyan-400 animate-pulse shadow-[0_0_15px_rgba(34,211,238,0.4)]'
-                    : 'bg-slate-900 border-slate-800 text-slate-600'
+                className={`relative p-2 rounded-xl border-2 transition-all duration-300 shadow-sm ${canSweepToday
+                  ? 'bg-cyan-950/60 border-cyan-500 text-cyan-400 animate-pulse shadow-[0_0_15px_rgba(34,211,238,0.4)]'
+                  : 'bg-slate-900 border-slate-800 text-slate-600'
                   }`}
               >
                 <Radio className="w-5 h-5 sm:w-6 sm:h-6" />
+                {!canSweepToday && sweepStreak >= 1 && (
+                  <div className="absolute -top-1.5 -right-1.5 bg-orange-500 text-black text-[9px] font-black w-4 h-4 rounded-full flex items-center justify-center shadow-md">
+                    🔥
+                  </div>
+                )}
               </button>
             )}
 
@@ -1747,10 +1818,17 @@ function MainApp() {
             <div className="bg-[#12141f] p-5 rounded-2xl border border-slate-800 shadow-xl relative overflow-hidden">
               <div className="absolute top-0 right-0 w-32 h-32 bg-cyan-500/10 rounded-full blur-[50px] pointer-events-none" />
               <div className="flex justify-between items-center mb-4 relative z-10">
-                <h3 className="text-xl font-black text-cyan-400 flex items-center italic uppercase">
-                  <Radio className="w-5 h-5 mr-2" />
-                  Daily Radar
-                </h3>
+                <div>
+                  <h3 className="text-xl font-black text-cyan-400 flex items-center italic uppercase">
+                    <Radio className="w-5 h-5 mr-2" />
+                    Daily Radar
+                  </h3>
+                  {sweepStreak >= 1 && (
+                    <span className="text-[10px] font-black uppercase tracking-widest mt-1 block text-orange-400 flex items-center gap-1">
+                      🔥 {sweepStreak} Day Streak
+                    </span>
+                  )}
+                </div>
                 <div className="text-right">
                   <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest">Fragments</p>
                   <p className="text-xl font-mono font-black text-white">{fragments}</p>
@@ -1760,15 +1838,15 @@ function MainApp() {
               <div className="relative z-10">
                 <button
                   onClick={initiateRadarSweep}
-                  disabled={isSweeping || (lastRadarSweep && lastRadarSweep.toDateString() === new Date().toDateString())}
+                  disabled={isSweeping || !canSweepToday}
                   className={`w-full py-3.5 rounded-xl font-black text-sm uppercase tracking-wider transition-all duration-300 flex items-center justify-center border-2 ${isSweeping
-                      ? "bg-cyan-950/60 border-cyan-500 text-cyan-400 animate-pulse"
-                      : (lastRadarSweep && lastRadarSweep.toDateString() === new Date().toDateString())
-                        ? "bg-slate-900 border-slate-800 text-slate-600 cursor-not-allowed"
-                        : "bg-cyan-600 border-cyan-400 hover:bg-cyan-500 text-white active:scale-[0.98] shadow-[0_0_20px_rgba(34,211,238,0.3)]"
+                    ? "bg-cyan-950/60 border-cyan-500 text-cyan-400 animate-pulse"
+                    : (!canSweepToday)
+                      ? "bg-slate-900 border-slate-800 text-slate-600 cursor-not-allowed"
+                      : "bg-cyan-600 border-cyan-400 hover:bg-cyan-500 text-white active:scale-[0.98] shadow-[0_0_20px_rgba(34,211,238,0.3)]"
                     }`}
                 >
-                  {isSweeping ? "SCANNING..." : (lastRadarSweep && lastRadarSweep.toDateString() === new Date().toDateString()) ? "SWEEP ON COOLDOWN" : "INITIATE SWEEP"}
+                  {isSweeping ? "SCANNING..." : (!canSweepToday) ? `COOLDOWN: ${timeUntilNextSweep}` : "INITIATE SWEEP"}
                 </button>
               </div>
 
@@ -1847,7 +1925,10 @@ function MainApp() {
                   </button>
                 </div>
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-[10px] sm:text-xs text-slate-400 font-mono">{t('completion')}</span>
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] sm:text-xs text-slate-400 font-mono">{t('completion')}</span>
+                    <span className="text-[9px] sm:text-[10px] font-black text-cyan-400/80 tracking-widest bg-cyan-950/50 px-2 py-0.5 rounded-md border border-cyan-900/50">{totalCollected}/{totalPossibleStatic}</span>
+                  </div>
                   <span className="text-2xl sm:text-3xl font-black text-cyan-400 font-mono">{completionRate}%</span>
                 </div>
                 <div className="w-full bg-black/60 h-4 sm:h-5 rounded-md overflow-hidden p-0.5 border border-slate-700/50">
@@ -1864,7 +1945,10 @@ function MainApp() {
                 </div>
                 <div className="mt-2">
                   <div className="flex items-center justify-between mb-1.5">
-                    <span className="text-[10px] sm:text-xs text-yellow-500/80 font-mono font-bold tracking-wider">{t('vault_completion')}</span>
+                    <div className="flex items-center gap-2">
+                      <span className="text-[10px] sm:text-xs text-yellow-500/80 font-mono font-bold tracking-wider">{t('vault_completion')}</span>
+                      <span className="text-[9px] sm:text-[10px] font-black text-yellow-400/80 tracking-widest bg-yellow-950/50 px-2 py-0.5 rounded-md border border-yellow-700/50">{totalMastered}/{totalPossibleStatic}</span>
+                    </div>
                     <span className="text-lg sm:text-xl font-black text-yellow-400 font-mono">{masteryRate}%</span>
                   </div>
                   <div className="w-full bg-black/60 h-2.5 sm:h-3 rounded-full overflow-hidden p-0.5 border border-yellow-900/50">
@@ -1940,7 +2024,7 @@ function MainApp() {
                 </div>
               )}
 
-              {/* LIST VIEW (CLEAN WRAPPING DOTS, REVERTED SIZES) */}
+              {/* LIST VIEW (CLEAN WRAPPING DOTS, ENHANCED LONG PRESS SIZES) */}
               <div className="flex flex-col gap-4 animate-in fade-in duration-300">
                 {filteredSprites.map(sprite => {
                   const displayVariant = variantFilter === 'All' ? 'base' : variantFilter.toLowerCase();
@@ -1967,11 +2051,21 @@ function MainApp() {
 
                             return (
                               <div key={v} className="flex flex-col items-center gap-1">
-                                <div className={`w-5 h-5 sm:w-6 sm:h-6 rounded-full flex items-center justify-center border-2 transition-all relative ${isLocked ? 'bg-slate-950/80 border-slate-800/60 opacity-60' : isMasteryView && isMastered ? 'bg-yellow-900/40 border-yellow-400' : isCollected ? `bg-slate-900 border-${VARIANT_INFO[v]?.color.split('-')[1]}-500/70` : 'bg-black border-slate-800'}`}>
-                                  {isLocked ? <Lock className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-slate-600" /> : (
+                                <div
+                                  onMouseDown={(e) => handleDotPressStart(e, sprite.id, v)}
+                                  onMouseUp={handleDotPressEnd}
+                                  onMouseLeave={handleDotPressEnd}
+                                  onTouchStart={(e) => handleDotPressStart(e, sprite.id, v)}
+                                  onTouchEnd={handleDotPressEnd}
+                                  onClick={(e) => e.stopPropagation()}
+                                  className={`w-6 h-6 sm:w-8 sm:h-8 rounded-full flex items-center justify-center border-2 transition-all duration-300 relative select-none cursor-pointer 
+                                    ${activeHoldId === `${sprite.id}_${v}` ? 'scale-[1.3] ring-2 ring-cyan-400 shadow-[0_0_20px_rgba(34,211,238,0.8)]' : ''}
+                                    ${isLocked ? 'bg-slate-950/80 border-slate-800/60 opacity-60' : isMasteryView && isMastered ? 'bg-yellow-900/40 border-yellow-400' : isCollected ? `bg-slate-900 border-${VARIANT_INFO[v]?.color.split('-')[1]}-500/70` : 'bg-black border-slate-800'}`}
+                                >
+                                  {isLocked ? <Lock className="w-3 h-3 sm:w-4 sm:h-4 text-slate-600" /> : (
                                     <>
-                                      {isCollected && <div className={`w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full ${VARIANT_INFO[v]?.bgColor} ${(isMasteryView && isMastered) ? 'opacity-30' : 'opacity-100'}`} />}
-                                      {isMasteryView && isMastered && <Crown className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-yellow-400 drop-shadow-[0_0_2px_rgba(255,215,0,0.8)] absolute z-10" />}
+                                      {isCollected && <div className={`w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full ${VARIANT_INFO[v]?.bgColor} ${(isMasteryView && isMastered) ? 'opacity-30' : 'opacity-100'}`} />}
+                                      {isMasteryView && isMastered && <Crown className="w-4 h-4 sm:w-5 sm:h-5 text-yellow-400 drop-shadow-[0_0_2px_rgba(255,215,0,0.8)] absolute z-10" />}
                                     </>
                                   )}
                                 </div>
