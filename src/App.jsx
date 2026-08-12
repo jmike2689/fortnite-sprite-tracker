@@ -1766,7 +1766,7 @@ function MainApp() {
       )}
 
       {/* --- HEADER --- */}
-      <header className="sticky top-0 z-50 bg-[#0e1017]/95 backdrop-blur-md border-b-2 border-cyan-500/80 shadow-[0_4px_20px_rgba(0,240,255,0.15)] px-4 py-4">
+      <header className="sticky top-0 z-50 bg-[#0e1017]/95 backdrop-blur-md border-b-2 border-cyan-500/80 shadow-[0_4px_20px_rgba(0,240,255,0.15)] px-4 pb-4 pt-[max(1rem,env(safe-area-inset-top))]">
         <div className="max-w-md mx-auto flex items-center justify-between">
           <div>
             <h1 className="text-2xl sm:text-3xl font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-yellow-400 to-pink-500 uppercase italic">
