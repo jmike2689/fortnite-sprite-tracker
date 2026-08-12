@@ -1,6 +1,7 @@
 import { initializeApp } from "firebase/app";
-import { getAuth } from "firebase/auth";
+import { getAuth, initializeAuth, indexedDBLocalPersistence } from "firebase/auth";
 import { getFirestore, enableIndexedDbPersistence } from "firebase/firestore";
+import { Capacitor } from '@capacitor/core';
 
 const firebaseConfig = {
     apiKey: "AIzaSyBV4B67As_DNPzkk95kPcjI6JkQn5AbYuc",
@@ -14,7 +15,17 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 
-export const auth = getAuth(app);
+// Bypass the iframe crash on native mobile devices while preserving web functionality
+let auth;
+if (Capacitor.isNativePlatform()) {
+    auth = initializeAuth(app, {
+        persistence: indexedDBLocalPersistence
+    });
+} else {
+    auth = getAuth(app);
+}
+
+export { auth };
 export const db = getFirestore(app);
 
 // Enable offline persistence
