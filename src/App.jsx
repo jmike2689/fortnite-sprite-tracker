@@ -4,6 +4,7 @@ import PrivacyPolicy from './PrivacyPolicy';
 import { App as CapApp } from '@capacitor/app';
 import { Haptics, ImpactStyle } from '@capacitor/haptics';
 import { PushNotifications } from '@capacitor/push-notifications';
+import { Capacitor } from '@capacitor/core';
 import {
   Search, CheckCircle, Circle, Volume2, VolumeX, Percent, RotateCcw, AlertTriangle, X, Eye, Crown, Users, UserPlus, ChevronLeft, ChevronRight, Check, XCircle, UserMinus, Target, Plus, FileText, Radio, Info, MessageSquare, Mail, Lock, List, Filter, ChevronDown, ChevronUp, ShoppingCart, Smartphone, Globe, Settings, LogOut, History, AtSign, User as UserIcon, Edit3, Save, Tv, Gamepad2, Calendar, Award, Video, Music, Play
 } from 'lucide-react';
@@ -184,7 +185,7 @@ const PATCH_NOTES = [
     title: "Streaks, Live Timers & Long-Press Controls!",
     changes: [
       "Daily Streaks & Timers: The Daily Radar now tracks your consecutive sweeps with a glowing streak badge. Plus, a live 24-hour countdown tells you exactly when your next sweep is ready.",
-      "Permanent AI Intel: Decrypted transmissions about the appnow permanently pin to your radar screen until your next sweep instead of resetting.",
+      "Permanent AI Intel: Decrypted transmissions about the app now permanently pin to your radar screen until your next sweep instead of resetting.",
       "Long-Press Quick Action: Speed up your tracking! Long-press any variant dot from the main menu to instantly collect or master it",
       "Fractional Progress: Vault and Completion progress bars now display your exact fractional counts alongside your percentages."
     ]
@@ -1629,7 +1630,7 @@ function MainApp() {
       {/* --- LAYER: NEW READ-ONLY FRIEND COLLECTION INSPECTOR (PROFILE) --- */}
       {activeViewingFriend && (
         <div className="fixed inset-0 z-50 bg-[#0b0c10] flex flex-col animate-in slide-in-from-bottom duration-300 overflow-y-auto pb-12">
-          <header className="bg-[#0e1017]/95 backdrop-blur-md border-b-2 border-indigo-500 p-4 sticky top-0 z-50 shadow-[0_4px_20px_rgba(99,102,241,0.15)] flex justify-between items-center">
+          <header className={`bg-[#0e1017]/95 backdrop-blur-md border-b-2 border-indigo-500 px-4 pb-4 ${Capacitor.getPlatform() === 'ios' ? 'pt-14' : 'pt-4'} sticky top-0 z-50 shadow-[0_4px_20px_rgba(99,102,241,0.15)] flex justify-between items-center`}>
             <h2 className="text-xl sm:text-2xl font-black italic uppercase text-white tracking-tight flex items-center gap-2"><UserIcon className="w-5 h-5 text-indigo-400" /> PROFILE</h2>
             <button onClick={() => setActiveViewingFriend(null)} className="flex items-center gap-1 bg-slate-900 border border-slate-700 px-3 py-1.5 rounded-xl text-xs sm:text-sm font-black text-slate-300 hover:text-white transition-colors"><X className="w-4 h-4" /> CLOSE</button>
           </header>
@@ -1766,7 +1767,7 @@ function MainApp() {
       )}
 
       {/* --- HEADER --- */}
-      <header className="sticky top-0 z-50 bg-[#0e1017]/95 backdrop-blur-md border-b-2 border-cyan-500/80 shadow-[0_4px_20px_rgba(0,240,255,0.15)] px-4 pb-4 pt-[max(1rem,env(safe-area-inset-top))]">
+      <header className={`sticky top-0 z-50 bg-[#0e1017]/95 backdrop-blur-md border-b-2 border-cyan-500/80 shadow-[0_4px_20px_rgba(0,240,255,0.15)] px-4 pb-4 ${Capacitor.getPlatform() === 'ios' ? 'pt-14' : 'pt-4'}`}>
         <div className="max-w-md mx-auto flex items-center justify-between">
           <div>
             <h1 className="text-2xl sm:text-3xl font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-yellow-400 to-pink-500 uppercase italic">
