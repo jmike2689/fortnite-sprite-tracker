@@ -163,7 +163,7 @@ const SPRITES_DATABASE = [
   { id: "dream", name: "Dream", rarity: "Legendary", images: { base: dreamBase, gold: dreamGold, gummy: dreamGummy, galaxy: dreamGalaxy, cube: cubeDream }, variants: ['base', 'gold', 'gummy', 'galaxy', 'cube'], baseAbility: { en: "Grants a random item at each level, exploding with legendary loot at Max Level. Loot value increases at each Level Up!", es: "Otorga un objeto aleatorio en cada nivel, explotando con botín legendario en el Nivel Máximo. ¡El valor del botín aumenta!" } },
   { id: "punk", name: "Punk", rarity: "Legendary", images: { base: punkBase, gold: punkGold, gummy: punkGummy, galaxy: punkGalaxy, cube: cubePunk, gem: gemPunk }, variants: ['base', 'gold', 'gummy', 'galaxy', 'cube'], baseAbility: { en: "Does nothing until Level 5, in which it will always grant a buff for unlimited ammo.", es: "No hace nada hasta el Nivel 5, en el que siempre otorgará un potenciador de munición ilimitada." } },
   { id: "boss", name: "Boss", rarity: "Legendary", images: { base: bossBase, gold: bossGold, gummy: bossGummy, galaxy: bossGalaxy, cube: cubeBoss }, variants: ['base', 'gold', 'gummy', 'galaxy', 'cube'], baseAbility: { en: "Grants an increase to your max HP and Shield. Increases at each Level Up: 5 -> 10 -> 15 -> 20 -> 25 HP/Shield.", es: "Otorga un aumento a tu vida máxima y Escudo. Aumenta: 5 -> 10 -> 15 -> 20 -> 25 PV/Escudo." } },
-  { id: "grim", name: "Grim", rarity: "Legendary", images: { base: grimBase, gold: grimGold, gummy: grimGummy, galaxy: grimGalaxy, holofoil: grimHolofoil, cube: cubeGrim, gem: grimGem }, variants: ['base', 'gold', 'gummy', 'galaxy', 'holofoil', 'cube', 'gem'], baseAbility: { en: "Players who attack you are marked for a duration. Duration at each Level Up: 3s -> 3.5s -> 4s -> 4.5s -> 5s.", es: "Los jugadores que te ataquen quedan marcados. Duración: 3s -> 3.5s -> 4s -> 4.5s -> 5s." } },
+  { id: "grim", name: "Grim", rarity: "Mythic", images: { base: grimBase, gold: grimGold, gummy: grimGummy, galaxy: grimGalaxy, holofoil: grimHolofoil, cube: cubeGrim, gem: grimGem }, variants: ['base', 'gold', 'gummy', 'galaxy', 'holofoil', 'cube', 'gem'], baseAbility: { en: "Players who attack you are marked for a duration. Duration at each Level Up: 3s -> 3.5s -> 4s -> 4.5s -> 5s.", es: "Los jugadores que te ataquen quedan marcados. Duración: 3s -> 3.5s -> 4s -> 4.5s -> 5s." } },
   { id: "seven", name: "Seven", rarity: "Legendary", images: { base: sevenBase, gold: sevenGold, gummy: sevenGummy, galaxy: sevenGalaxy, holofoil: sevenHolofoil }, variants: ['base', 'gold', 'gummy', 'galaxy', 'holofoil'], baseAbility: { en: "Enemy player foot trails are visible in the world for your Squad. Duration increases at each Level Up: 10 Seconds -> 15 Seconds -> 20 Seconds -> 25 Seconds -> 30 Second foot trails.", es: "Los rastros de los jugadores enemigos son visibles para tu Escuadrón. Duración: 10s -> 15s -> 20s -> 25s -> 30s." } },
   { id: "duck", name: "Duck", rarity: "Epic", images: { base: duckBase, gold: duckGold, gummy: duckGummy, galaxy: duckGalaxy, gem: gemDuck }, variants: ['base', 'gold', 'gummy', 'galaxy', 'gem'], baseAbility: { en: "Emoting or Jamming replenishes shields. Increases in power at each Level Up: 2 -> 3 -> 4 -> 6 -> 8 Shield per tick.", es: "Hacer un gesto o improvisar repone los escudos. Poder: 2 -> 3 -> 4 -> 6 -> 8 Escudo por tick." } },
   { id: "demon", name: "Demon", rarity: "Epic", images: { base: demonBase, gold: demonGold, gummy: demonGummy, galaxy: demonGalaxy, gem: gemDemon }, variants: ['base', 'gold', 'gummy', 'galaxy', 'gem'], baseAbility: { en: "Siphon some health and shields when you eliminate an opponent. Increases in power at each Level Up: 10 -> 15 -> 20 -> 25 -> 30 Healing per elimination.", es: "Sifón de salud y escudo cuando eliminas a un oponente. Poder: 10 -> 15 -> 20 -> 25 -> 30 Curación." } },
@@ -762,18 +762,44 @@ function MainApp() {
   };
 
   const acceptFriendRequest = async (req) => {
-    try { await updateDoc(doc(db, "users", user.uid), { friends: arrayUnion({ uid: req.senderId, spriteId: req.senderSpriteId }) }); await updateDoc(doc(db, "users", req.senderId), { friends: arrayUnion({ uid: user.uid, spriteId: spriteId }) }); await deleteDoc(doc(db, "friend_requests", req.id)); playBeep(880, 'sine', 0.1); } catch (e) { }
+    // 1. Update the current user's friend list
+    try {
+      await updateDoc(doc(db, "users", user.uid), { friends: arrayUnion({ uid: req.senderId, spriteId: req.senderSpriteId }) });
+    } catch (e) { console.error("Self update failed:", e); }
+
+    // 2. Attempt to update the sender's friend list (May be blocked by Firebase Rules)
+    try {
+      await updateDoc(doc(db, "users", req.senderId), { friends: arrayUnion({ uid: user.uid, spriteId: spriteId }) });
+    } catch (e) { console.error("Sender update failed:", e); }
+
+    // 3. Delete the request and play the success sound regardless
+    try {
+      await deleteDoc(doc(db, "friend_requests", req.id));
+      playBeep(880, 'sine', 0.1);
+    } catch (e) { console.error("Request deletion failed:", e); }
   };
 
   const cancelFriendRequest = async (reqId) => { try { await deleteDoc(doc(db, "friend_requests", reqId)); } catch (e) { } };
 
   const handleUnfriendExecution = async () => {
     if (!showUnfriendConfirm) return;
+
+    const targetUid = showUnfriendConfirm.uid;
+    const targetSpriteId = showUnfriendConfirm.spriteId;
+
+    // 1. Close the modal instantly to fix the UI freeze
+    setShowUnfriendConfirm(null);
+
+    // 2. Remove the friend from the current user's list
     try {
-      await updateDoc(doc(db, "users", user.uid), { friends: arrayRemove({ uid: showUnfriendConfirm.uid, spriteId: showUnfriendConfirm.spriteId }) });
-      await updateDoc(doc(db, "users", showUnfriendConfirm.uid), { friends: arrayRemove({ uid: user.uid, spriteId: spriteId }) });
-      setShowUnfriendConfirm(null); playBeep(220, 'sawtooth', 0.15);
-    } catch (e) { }
+      await updateDoc(doc(db, "users", user.uid), { friends: arrayRemove({ uid: targetUid, spriteId: targetSpriteId }) });
+      playBeep(220, 'sawtooth', 0.15);
+    } catch (e) { console.error("Self removal failed:", e); }
+
+    // 3. Attempt to remove the current user from the other person's list
+    try {
+      await updateDoc(doc(db, "users", targetUid), { friends: arrayRemove({ uid: user.uid, spriteId: spriteId }) });
+    } catch (e) { console.error("Target removal failed:", e); }
   };
 
   const inspectFriendLibrary = async (friendObj) => {
@@ -1123,17 +1149,12 @@ function MainApp() {
         )}
         <div className={`rounded-2xl border-2 p-5 relative overflow-hidden transition-all ${bgClass}`}>
           <div className="flex items-start justify-between mb-4">
-            <div className="flex items-center gap-3">
-              <div className="w-12 h-12 bg-black/40 rounded-full border-2 border-white/10 flex items-center justify-center">
-                <UserIcon className="w-6 h-6 text-slate-300" />
+            <div>
+              <div className="flex items-center gap-2">
+                <h2 className="text-xl sm:text-2xl font-black text-white uppercase italic tracking-tight">@{id}</h2>
+                {unlockedBg && <span className="text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md border bg-black/40 text-slate-200 border-white/20">{unlockedBg.name}</span>}
               </div>
-              <div>
-                <div className="flex items-center gap-2">
-                  <h2 className="text-xl sm:text-2xl font-black text-white uppercase italic tracking-tight">@{id}</h2>
-                  {unlockedBg && <span className="text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md border bg-black/40 text-slate-200 border-white/20">{unlockedBg.name}</span>}
-                </div>
-                <span className="text-[10px] font-mono text-slate-400 flex items-center gap-1 mt-0.5"><Calendar className="w-3 h-3" /> Joined {formatJoinDate(joinTime)}</span>
-              </div>
+              <span className="text-[10px] font-mono text-slate-400 flex items-center gap-1 mt-0.5"><Calendar className="w-3 h-3" /> Joined {formatJoinDate(joinTime)}</span>
             </div>
             {isSelf && (
               <button onClick={() => isEditingProfile ? handleSaveProfile() : setIsEditingProfile(true)} className="p-2 bg-black/40 hover:bg-black/60 rounded-xl border border-white/10 text-white transition-colors">
@@ -1157,9 +1178,9 @@ function MainApp() {
             <div className="space-y-3 mb-4">
               <textarea value={profileData.bio} onChange={(e) => setProfileData({ ...profileData, bio: e.target.value.substring(0, 100) })} placeholder="Enter bio (max 100 chars)..." className={`w-full bg-black/40 border border-white/10 rounded-xl p-3 ${inputSizeClass} text-white focus:outline-none focus:border-cyan-500 resize-none h-20`} />
               <div className="grid grid-cols-2 gap-2">
-                <div className="relative">
-                  <Gamepad2 className="w-4 h-4 text-slate-500 absolute left-3 top-2.5" />
-                  <input type="text" value={profileData.epicName} onChange={(e) => setProfileData({ ...profileData, epicName: e.target.value })} placeholder="Epic Name" className={`w-full bg-black/40 border border-white/10 rounded-xl pl-9 pr-3 py-2 ${inputSizeClass} text-white focus:outline-none focus:border-cyan-500`} />
+                <div className="relative col-span-2">
+                  <Gamepad2 className="w-4 h-4 text-blue-500 absolute left-3 top-2.5" />
+                  <input type="text" value={profileData.epicName} onChange={(e) => setProfileData({ ...profileData, epicName: e.target.value })} placeholder="Epic Name" className={`w-full bg-black/40 border border-white/10 rounded-xl pl-9 pr-3 py-2 ${inputSizeClass} text-white focus:outline-none focus:border-blue-500`} />
                 </div>
                 <div className="relative">
                   <Tv className="w-4 h-4 text-purple-500 absolute left-3 top-2.5" />
@@ -1173,7 +1194,7 @@ function MainApp() {
                   <Video className="w-4 h-4 text-red-500 absolute left-3 top-2.5" />
                   <input type="text" value={profileData.youtubeName} onChange={(e) => setProfileData({ ...profileData, youtubeName: e.target.value })} placeholder="YouTube Handle" className={`w-full bg-black/40 border border-white/10 rounded-xl pl-9 pr-3 py-2 ${inputSizeClass} text-white focus:outline-none focus:border-red-500`} />
                 </div>
-                <div className="relative col-span-2">
+                <div className="relative">
                   <Play className="w-4 h-4 text-green-500 absolute left-3 top-2.5" />
                   <input type="text" value={profileData.kickName} onChange={(e) => setProfileData({ ...profileData, kickName: e.target.value })} placeholder="Kick Channel" className={`w-full bg-black/40 border border-white/10 rounded-xl pl-9 pr-3 py-2 ${inputSizeClass} text-white focus:outline-none focus:border-green-500`} />
                 </div>
@@ -1182,37 +1203,40 @@ function MainApp() {
           ) : (
             <div className="mb-4">
               {profData.bio && <p className="text-sm text-slate-300 italic mb-3 bg-black/20 p-3 rounded-xl border-l-2 border-indigo-500">"{profData.bio}"</p>}
-              <div className="flex flex-wrap gap-2">
+
+              <div className="flex flex-col gap-2">
                 {profData.epicName && (
-                  <div className="bg-blue-900/30 border border-blue-500/30 text-blue-300 px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5">
-                    <Gamepad2 className="w-3.5 h-3.5 text-blue-400" />
-                    <span className="text-[10px] uppercase font-mono text-slate-400">Epic ID:</span> {profData.epicName}
+                  <div className="w-full bg-blue-950/40 border border-blue-500/30 p-3 rounded-xl flex items-center justify-between shadow-inner">
+                    <div className="flex items-center gap-2">
+                      <Gamepad2 className="w-5 h-5 text-blue-400" />
+                      <span className="text-[10px] font-mono text-blue-300 uppercase tracking-widest">Epic ID</span>
+                    </div>
+                    <span className="text-sm font-black text-white">{profData.epicName}</span>
                   </div>
                 )}
-                {profData.twitchName && (
-                  <a href={`https://www.twitch.tv/${profData.twitchName}`} target="_blank" rel="noopener noreferrer" className="bg-purple-900/30 hover:bg-purple-600/40 border border-purple-500/30 text-purple-300 px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-colors">
-                    <Tv className="w-3.5 h-3.5 text-purple-400" />
-                    Twitch
-                  </a>
-                )}
-                {profData.tiktokName && (
-                  <a href={`https://tiktok.com/@${profData.tiktokName}`} target="_blank" rel="noopener noreferrer" className="bg-pink-900/30 hover:bg-pink-600/40 border border-pink-500/30 text-pink-300 px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-colors">
-                    <Music className="w-3.5 h-3.5 text-pink-400" />
-                    TikTok
-                  </a>
-                )}
-                {profData.youtubeName && (
-                  <a href={`https://youtube.com/@${profData.youtubeName}`} target="_blank" rel="noopener noreferrer" className="bg-red-900/30 hover:bg-red-600/40 border border-red-500/30 text-red-300 px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-colors">
-                    <Video className="w-3.5 h-3.5 text-red-400" />
-                    YouTube
-                  </a>
-                )}
-                {profData.kickName && (
-                  <a href={`https://kick.com/${profData.kickName}`} target="_blank" rel="noopener noreferrer" className="bg-green-900/30 hover:bg-green-600/40 border border-green-500/30 text-green-300 px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-colors">
-                    <Play className="w-3.5 h-3.5 text-green-400" />
-                    Kick
-                  </a>
-                )}
+
+                <div className="grid grid-cols-2 gap-2">
+                  {profData.twitchName && (
+                    <a href={`https://www.twitch.tv/${profData.twitchName}`} target="_blank" rel="noopener noreferrer" className="bg-purple-900/30 hover:bg-purple-800/40 border border-purple-500/30 text-purple-300 p-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-colors">
+                      <Tv className="w-4 h-4 text-purple-400" /> Twitch
+                    </a>
+                  )}
+                  {profData.tiktokName && (
+                    <a href={`https://tiktok.com/@${profData.tiktokName}`} target="_blank" rel="noopener noreferrer" className="bg-pink-900/30 hover:bg-pink-800/40 border border-pink-500/30 text-pink-300 p-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-colors">
+                      <Music className="w-4 h-4 text-pink-400" /> TikTok
+                    </a>
+                  )}
+                  {profData.youtubeName && (
+                    <a href={`https://youtube.com/@${profData.youtubeName}`} target="_blank" rel="noopener noreferrer" className="bg-red-900/30 hover:bg-red-800/40 border border-red-500/30 text-red-300 p-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-colors">
+                      <Video className="w-4 h-4 text-red-400" /> YouTube
+                    </a>
+                  )}
+                  {profData.kickName && (
+                    <a href={`https://kick.com/${profData.kickName}`} target="_blank" rel="noopener noreferrer" className="bg-green-900/30 hover:bg-green-800/40 border border-green-500/30 text-green-300 p-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-colors">
+                      <Play className="w-4 h-4 text-green-400" /> Kick
+                    </a>
+                  )}
+                </div>
               </div>
             </div>
           )}
@@ -1364,7 +1388,7 @@ function MainApp() {
                     {canSweepToday ? "Scanner ready. Initiate sweep." : "Radar cooling down."}
                   </p>
                   {sweepStreak >= 1 && (
-                    <span className="text-[9px] font-black uppercase px-2 py-0.5 rounded-md bg-orange-950/40 border border-orange-500/50 text-orange-400 flex items-center gap-1">
+                    <span className="text-[9px] font-black uppercase px-2 py-0.5 rounded-md bg-gradient-to-br from-red-900/60 to-orange-900/40 border border-red-500/50 text-red-400 flex items-center gap-1 shadow-[0_0_10px_rgba(239,68,68,0.3)]">
                       🔥 {sweepStreak} Day Streak
                     </span>
                   )}
@@ -1375,9 +1399,16 @@ function MainApp() {
               </button>
             </div>
 
-            <div className="bg-black/40 border border-slate-800 rounded-2xl p-4 mb-6 flex justify-between items-center relative z-10 shadow-inner">
-              <span className="text-xs font-bold text-slate-500 uppercase tracking-widest">Total Fragments</span>
-              <span className="text-2xl font-mono font-black text-white">{fragments}</span>
+            <div className="bg-black/80 border-y-2 border-slate-800 p-6 mb-6 flex flex-col items-center justify-center relative shadow-[inset_0_0_30px_rgba(0,0,0,1)] rounded-xl z-10">
+              <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2">Vaulted Fragments</span>
+              <div className="flex items-center gap-3">
+                <svg viewBox="0 0 24 24" fill="currentColor" className="w-8 h-8 text-cyan-400 drop-shadow-[0_0_10px_rgba(34,211,238,0.8)] animate-pulse">
+                  <path d="M12 2L2 12l10 10 10-10L12 2zM12 5.83L18.17 12 12 18.17 5.83 12 12 5.83z" />
+                </svg>
+                <span className="text-4xl font-mono font-black text-cyan-50 drop-shadow-[0_0_8px_rgba(255,255,255,0.5)]">
+                  {fragments}
+                </span>
+              </div>
             </div>
 
             {canSweepToday ? (
@@ -1414,7 +1445,7 @@ function MainApp() {
               </div>
             )}
 
-            {/* AI INTEL BLOCK - NOW PERSISTENT! */}
+            {/* AI INTEL BLOCK */}
             {dailyIntel && (
               <div className="mb-6 p-4 bg-indigo-950/40 rounded-xl border border-indigo-500/30 text-center animate-in zoom-in-95 duration-500 relative z-10 shadow-[0_0_15px_rgba(99,102,241,0.15)]">
                 <div className="flex items-center justify-center gap-2 mb-2">
@@ -1791,9 +1822,12 @@ function MainApp() {
                   }`}
               >
                 <Radio className="w-5 h-5 sm:w-6 sm:h-6" />
+
+                {/* UPDATED STREAK PILL INDICATOR */}
                 {!canSweepToday && sweepStreak >= 1 && (
-                  <div className="absolute -top-1.5 -right-1.5 bg-orange-500 text-black text-[9px] font-black w-4 h-4 rounded-full flex items-center justify-center shadow-md">
-                    🔥
+                  <div className="absolute -top-2 -right-3 bg-[#0b0c10] border border-orange-500 shadow-[0_0_12px_rgba(249,115,22,0.6)] text-orange-400 text-[10px] font-black px-1.5 py-0.5 rounded-full flex items-center justify-center gap-0.5 z-10">
+                    <span className="drop-shadow-[0_0_5px_rgba(249,115,22,0.8)]">🔥</span>
+                    {sweepStreak}
                   </div>
                 )}
               </button>
@@ -1830,14 +1864,19 @@ function MainApp() {
                     Daily Radar
                   </h3>
                   {sweepStreak >= 1 && (
-                    <span className="text-[10px] font-black uppercase tracking-widest mt-1 block text-orange-400 flex items-center gap-1">
+                    <span className="text-[9px] font-black uppercase px-2 py-0.5 rounded-md bg-gradient-to-br from-red-900/60 to-orange-900/40 border border-red-500/50 text-red-400 flex items-center gap-1 shadow-[0_0_10px_rgba(239,68,68,0.3)] mt-1 w-max">
                       🔥 {sweepStreak} Day Streak
                     </span>
                   )}
                 </div>
-                <div className="text-right">
-                  <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest">Fragments</p>
-                  <p className="text-xl font-mono font-black text-white">{fragments}</p>
+                <div className="text-right flex flex-col items-end">
+                  <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mb-1">Fragments</p>
+                  <div className="flex items-center gap-2">
+                    <svg viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5 text-cyan-400 drop-shadow-[0_0_8px_rgba(34,211,238,0.8)] animate-pulse">
+                      <path d="M12 2L2 12l10 10 10-10L12 2zM12 5.83L18.17 12 12 18.17 5.83 12 12 5.83z" />
+                    </svg>
+                    <p className="text-xl font-mono font-black text-white">{fragments}</p>
+                  </div>
                 </div>
               </div>
 
