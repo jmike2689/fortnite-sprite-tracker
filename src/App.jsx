@@ -316,6 +316,11 @@ const SUMMON_COST_MATRIX = { Mythic: { base: "6,750", variant: "10,000" }, Legen
 const RARITY_WEIGHT = { Mythic: 4, Legendary: 3, Epic: 2, Rare: 1, Unknown: 0 };
 
 function MainApp() {
+  // PLATFORM CHECK FOR IOS ZOOM FIX
+  const isIOS = Capacitor.getPlatform() === 'ios';
+  const inputSizeClass = isIOS ? 'text-base' : 'text-sm';
+  const responsiveInputSizeClass = isIOS ? 'text-base' : 'text-sm sm:text-base';
+
   const { user, signUp, logIn, logOut } = useAuth();
 
   const [lang, setLang] = useState(localStorage.getItem('spritedex_lang') || 'en');
@@ -1150,27 +1155,27 @@ function MainApp() {
 
           {isEditingProfile ? (
             <div className="space-y-3 mb-4">
-              <textarea value={profileData.bio} onChange={(e) => setProfileData({ ...profileData, bio: e.target.value.substring(0, 100) })} placeholder="Enter bio (max 100 chars)..." className="w-full bg-black/40 border border-white/10 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-cyan-500 resize-none h-20" />
+              <textarea value={profileData.bio} onChange={(e) => setProfileData({ ...profileData, bio: e.target.value.substring(0, 100) })} placeholder="Enter bio (max 100 chars)..." className={`w-full bg-black/40 border border-white/10 rounded-xl p-3 ${inputSizeClass} text-white focus:outline-none focus:border-cyan-500 resize-none h-20`} />
               <div className="grid grid-cols-2 gap-2">
                 <div className="relative">
                   <Gamepad2 className="w-4 h-4 text-slate-500 absolute left-3 top-2.5" />
-                  <input type="text" value={profileData.epicName} onChange={(e) => setProfileData({ ...profileData, epicName: e.target.value })} placeholder="Epic Name" className="w-full bg-black/40 border border-white/10 rounded-xl pl-9 pr-3 py-2 text-sm text-white focus:outline-none focus:border-cyan-500" />
+                  <input type="text" value={profileData.epicName} onChange={(e) => setProfileData({ ...profileData, epicName: e.target.value })} placeholder="Epic Name" className={`w-full bg-black/40 border border-white/10 rounded-xl pl-9 pr-3 py-2 ${inputSizeClass} text-white focus:outline-none focus:border-cyan-500`} />
                 </div>
                 <div className="relative">
                   <Tv className="w-4 h-4 text-purple-500 absolute left-3 top-2.5" />
-                  <input type="text" value={profileData.twitchName} onChange={(e) => setProfileData({ ...profileData, twitchName: e.target.value })} placeholder="Twitch Username" className="w-full bg-black/40 border border-white/10 rounded-xl pl-9 pr-3 py-2 text-sm text-white focus:outline-none focus:border-purple-500" />
+                  <input type="text" value={profileData.twitchName} onChange={(e) => setProfileData({ ...profileData, twitchName: e.target.value })} placeholder="Twitch Username" className={`w-full bg-black/40 border border-white/10 rounded-xl pl-9 pr-3 py-2 ${inputSizeClass} text-white focus:outline-none focus:border-purple-500`} />
                 </div>
                 <div className="relative">
                   <Music className="w-4 h-4 text-pink-500 absolute left-3 top-2.5" />
-                  <input type="text" value={profileData.tiktokName} onChange={(e) => setProfileData({ ...profileData, tiktokName: e.target.value })} placeholder="TikTok Username" className="w-full bg-black/40 border border-white/10 rounded-xl pl-9 pr-3 py-2 text-sm text-white focus:outline-none focus:border-pink-500" />
+                  <input type="text" value={profileData.tiktokName} onChange={(e) => setProfileData({ ...profileData, tiktokName: e.target.value })} placeholder="TikTok Username" className={`w-full bg-black/40 border border-white/10 rounded-xl pl-9 pr-3 py-2 ${inputSizeClass} text-white focus:outline-none focus:border-pink-500`} />
                 </div>
                 <div className="relative">
                   <Video className="w-4 h-4 text-red-500 absolute left-3 top-2.5" />
-                  <input type="text" value={profileData.youtubeName} onChange={(e) => setProfileData({ ...profileData, youtubeName: e.target.value })} placeholder="YouTube Handle" className="w-full bg-black/40 border border-white/10 rounded-xl pl-9 pr-3 py-2 text-sm text-white focus:outline-none focus:border-red-500" />
+                  <input type="text" value={profileData.youtubeName} onChange={(e) => setProfileData({ ...profileData, youtubeName: e.target.value })} placeholder="YouTube Handle" className={`w-full bg-black/40 border border-white/10 rounded-xl pl-9 pr-3 py-2 ${inputSizeClass} text-white focus:outline-none focus:border-red-500`} />
                 </div>
                 <div className="relative col-span-2">
                   <Play className="w-4 h-4 text-green-500 absolute left-3 top-2.5" />
-                  <input type="text" value={profileData.kickName} onChange={(e) => setProfileData({ ...profileData, kickName: e.target.value })} placeholder="Kick Channel" className="w-full bg-black/40 border border-white/10 rounded-xl pl-9 pr-3 py-2 text-sm text-white focus:outline-none focus:border-green-500" />
+                  <input type="text" value={profileData.kickName} onChange={(e) => setProfileData({ ...profileData, kickName: e.target.value })} placeholder="Kick Channel" className={`w-full bg-black/40 border border-white/10 rounded-xl pl-9 pr-3 py-2 ${inputSizeClass} text-white focus:outline-none focus:border-green-500`} />
                 </div>
               </div>
             </div>
@@ -1254,13 +1259,13 @@ function MainApp() {
           <form onSubmit={handleAuth} className="space-y-5">
             <div>
               <label className="block text-slate-300 text-xs font-medium uppercase tracking-wide mb-2">Email Address</label>
-              <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} className="w-full bg-slate-900/60 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-all text-sm" placeholder="name@example.com" required />
+              <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} className={`w-full bg-slate-900/60 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-all ${inputSizeClass}`} placeholder="name@example.com" required />
             </div>
             <div>
               <div className="flex justify-between items-center mb-2">
                 <label className="block text-slate-300 text-xs font-medium uppercase tracking-wide">Password</label>
               </div>
-              <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} className="w-full bg-slate-900/60 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-all text-sm" placeholder="••••••••" required />
+              <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} className={`w-full bg-slate-900/60 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-all ${inputSizeClass}`} placeholder="••••••••" required />
             </div>
             <button type="submit" disabled={isAuthLoading} className="w-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-medium rounded-xl py-3 px-4 shadow-lg shadow-purple-900/30 transition-all duration-200 transform active:scale-[0.98] mt-2 text-sm disabled:opacity-50">
               {isAuthLoading ? (lang === 'es' ? 'Cargando...' : 'Loading...') : (isLoginMode ? (lang === 'es' ? 'Iniciar Sesión' : 'Sign In') : (lang === 'es' ? 'Crear Cuenta' : 'Create Account'))}
@@ -1298,7 +1303,7 @@ function MainApp() {
           <p className="text-sm sm:text-base text-slate-400 mb-6">We're launching new social features! Set your unique public Sprite ID so your friends can find you.</p>
           <form onSubmit={handleSaveSpriteId} className="space-y-4">
             <div>
-              <input type="text" value={desiredSpriteId} onChange={(e) => setDesiredSpriteId(e.target.value.replace(/[^a-zA-Z0-9]/g, ''))} placeholder="e.g. ImBearKat" className="w-full bg-black border-2 border-slate-700 rounded-xl px-4 py-3 text-white text-center font-bold tracking-wider focus:border-cyan-500 focus:outline-none" />
+              <input type="text" value={desiredSpriteId} onChange={(e) => setDesiredSpriteId(e.target.value.replace(/[^a-zA-Z0-9]/g, ''))} placeholder="e.g. ImBearKat" className={`w-full bg-black border-2 border-slate-700 rounded-xl px-4 py-3 text-white text-center font-bold tracking-wider focus:border-cyan-500 focus:outline-none ${inputSizeClass}`} />
               {spriteIdError && <p className="text-red-400 text-xs mt-2 font-bold">{spriteIdError}</p>}
             </div>
             <button type="submit" className="w-full bg-cyan-600 hover:bg-cyan-500 text-white font-black uppercase rounded-xl py-3 transition-colors">Lock it in</button>
@@ -1645,7 +1650,7 @@ function MainApp() {
               <div className="flex gap-2">
                 <div className="relative flex-1">
                   <Search className="w-4 h-4 text-indigo-400/70 absolute left-3 top-3" />
-                  <input type="text" placeholder="Search Archive..." value={fSearchQuery} onChange={(e) => setFSearchQuery(e.target.value)} className="w-full bg-black/50 border-2 border-slate-800 rounded-xl pl-9 pr-3 py-2 text-sm sm:text-base text-white focus:outline-none focus:border-indigo-500" />
+                  <input type="text" placeholder="Search Archive..." value={fSearchQuery} onChange={(e) => setFSearchQuery(e.target.value)} className={`w-full bg-black/50 border-2 border-slate-800 rounded-xl pl-9 pr-3 py-2 ${responsiveInputSizeClass} text-white focus:outline-none focus:border-indigo-500`} />
                 </div>
                 <button onClick={() => setShowFFilters(!showFFilters)} className={`px-4 flex items-center gap-2 rounded-xl border-2 transition-all font-black text-xs uppercase tracking-wider ${showFFilters ? 'bg-indigo-900/40 border-indigo-500 text-indigo-400' : 'bg-slate-900 border-slate-800 text-slate-400 hover:bg-slate-800'}`}>
                   <Filter className="w-4 h-4" /> {t('filters')} {showFFilters ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
@@ -1964,7 +1969,7 @@ function MainApp() {
               <div className="flex gap-2">
                 <div className="relative flex-1">
                   <Search className="w-4 h-4 text-cyan-500/70 absolute left-3 top-3" />
-                  <input type="text" placeholder={t('search')} value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="w-full bg-black/50 border-2 border-slate-800 rounded-xl pl-9 pr-3 py-2 text-sm sm:text-base text-white focus:outline-none focus:border-cyan-500" />
+                  <input type="text" placeholder={t('search')} value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className={`w-full bg-black/50 border-2 border-slate-800 rounded-xl pl-9 pr-3 py-2 ${responsiveInputSizeClass} text-white focus:outline-none focus:border-cyan-500`} />
                 </div>
                 <button onClick={() => setShowFilters(!showFilters)} className={`px-4 flex items-center gap-2 rounded-xl border-2 transition-all font-black text-xs uppercase tracking-wider ${showFilters ? 'bg-cyan-900/40 border-cyan-500 text-cyan-400' : 'bg-slate-900 border-slate-800 text-slate-400 hover:bg-slate-800'}`}>
                   <Filter className="w-4 h-4" /> {t('filters')} {showFilters ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
@@ -2118,7 +2123,7 @@ function MainApp() {
                   <div className="flex gap-2">
                     <div className="relative flex-1">
                       <Search className="w-4 h-4 sm:w-5 sm:h-5 text-slate-500 absolute left-3 top-3" />
-                      <input type="text" value={friendSearchQuery} onChange={(e) => setFriendSearchQuery(e.target.value)} placeholder={t('search_id')} className="w-full bg-black border-2 border-slate-800 rounded-xl pl-9 sm:pl-10 pr-3 py-2 text-sm sm:text-base text-white focus:outline-none focus:border-indigo-500" />
+                      <input type="text" value={friendSearchQuery} onChange={(e) => setFriendSearchQuery(e.target.value)} placeholder={t('search_id')} className={`w-full bg-black border-2 border-slate-800 rounded-xl pl-9 sm:pl-10 pr-3 py-2 ${responsiveInputSizeClass} text-white focus:outline-none focus:border-indigo-500`} />
                     </div>
                     <button onClick={handleSearchFriend} className="bg-indigo-600 hover:bg-indigo-500 text-white px-4 rounded-xl transition-colors"><Search className="w-5 h-5" /></button>
                   </div>
@@ -2166,7 +2171,7 @@ function MainApp() {
               <div className="flex flex-col gap-2 mb-4">
                 <div className="relative w-full">
                   <Search className="w-4 h-4 text-indigo-500/70 absolute left-3 top-3" />
-                  <input type="text" placeholder="Search Squad..." value={squadSearchQuery} onChange={(e) => setSquadSearchQuery(e.target.value)} className="w-full bg-black/50 border-2 border-slate-800 rounded-xl pl-9 pr-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500" />
+                  <input type="text" placeholder="Search Squad..." value={squadSearchQuery} onChange={(e) => setSquadSearchQuery(e.target.value)} className={`w-full bg-black/50 border-2 border-slate-800 rounded-xl pl-9 pr-3 py-2 ${inputSizeClass} text-white focus:outline-none focus:border-indigo-500`} />
                 </div>
               </div>
 
@@ -2231,7 +2236,7 @@ function MainApp() {
               <p className="text-sm sm:text-base text-slate-400 mb-6">{t('feedback_prompt')}</p>
 
               <form onSubmit={handleFeedbackSubmit} className="flex flex-col gap-3">
-                <textarea value={feedbackText} onChange={(e) => setFeedbackText(e.target.value)} placeholder={t('tell_us')} className="w-full bg-black/50 border-2 border-slate-800 rounded-xl p-3 text-sm sm:text-base text-white focus:outline-none focus:border-emerald-500 min-h-[120px] resize-y" required />
+                <textarea value={feedbackText} onChange={(e) => setFeedbackText(e.target.value)} placeholder={t('tell_us')} className={`w-full bg-black/50 border-2 border-slate-800 rounded-xl p-3 ${responsiveInputSizeClass} text-white focus:outline-none focus:border-emerald-500 min-h-[120px] resize-y`} required />
                 <button type="submit" disabled={feedbackStatus === 'submitting'} className="w-full flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 disabled:hover:bg-emerald-600 text-white font-black uppercase tracking-wider py-3 rounded-xl transition-colors">
                   {feedbackStatus === 'submitting' ? t('sending') : feedbackStatus === 'success' ? <><CheckCircle className="w-5 h-5" /> {t('sent')}</> : <><Mail className="w-5 h-5" /> {t('send_feedback')}</>}
                 </button>
