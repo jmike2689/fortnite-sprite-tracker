@@ -4,13 +4,14 @@ import PrivacyPolicy from './PrivacyPolicy';
 import { App as CapApp } from '@capacitor/app';
 import { Haptics, ImpactStyle } from '@capacitor/haptics';
 import { PushNotifications } from '@capacitor/push-notifications';
+import { LocalNotifications } from '@capacitor/local-notifications';
 import { Capacitor } from '@capacitor/core';
 import {
-  Search, CheckCircle, Circle, Volume2, VolumeX, Percent, RotateCcw, AlertTriangle, X, Eye, Crown, Users, UserPlus, ChevronLeft, ChevronRight, Check, XCircle, UserMinus, Target, Plus, FileText, Radio, Info, MessageSquare, Mail, Lock, List, Filter, ChevronDown, ChevronUp, ShoppingCart, Smartphone, Globe, Settings, LogOut, History, AtSign, User as UserIcon, Edit3, Save, Tv, Gamepad2, Calendar, Award, Video, Music, Play
+  Search, CheckCircle, Circle, Volume2, VolumeX, Percent, RotateCcw, AlertTriangle, X, Eye, Crown, Users, UserPlus, ChevronLeft, ChevronRight, Check, XCircle, UserMinus, Target, Plus, FileText, Radar, Newspaper, Info, MessageSquare, Mail, Lock, List, Filter, ChevronDown, ChevronUp, ShoppingCart, Smartphone, Globe, Settings, LogOut, History, AtSign, User as UserIcon, Edit3, Save, Tv, Gamepad2, Calendar, Award, Video, Music, Play
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { useAuth } from './AuthContext';
-import { doc, getDoc, setDoc, updateDoc, collection as firestoreCollection, query, where, getDocs, arrayUnion, arrayRemove, deleteDoc, onSnapshot, addDoc, serverTimestamp, runTransaction } from 'firebase/firestore';
+import { doc, getDoc, setDoc, updateDoc, collection as firestoreCollection, query, where, getDocs, arrayUnion, arrayRemove, deleteDoc, onSnapshot, addDoc, serverTimestamp, runTransaction, orderBy, limit } from 'firebase/firestore';
 import { sendPasswordResetEmail, onAuthStateChanged } from 'firebase/auth';
 import { auth, db } from './firebase';
 
@@ -180,6 +181,16 @@ const SPRITES_DATABASE = [
 
 const PATCH_NOTES = [
   {
+    version: "v1.10.0",
+    date: "08/16/2026",
+    title: "Official Live News & UI Upgrades!",
+    changes: [
+      "Live News & Intel: Added a dedicated, standalone news terminal that pulls official Fortnite MOTD (Message of the Day) updates directly from Epic Games in real-time.",
+      "Dynamic Intel Cards: Overhauled the newsfeed UI with dynamic scaling, full-length transmission text, and high-res background banners.",
+      "UI Optimization: Added a dedicated quick-access button to the top navigation bar to open the news terminal from anywhere."
+    ]
+  },
+  {
     version: "v1.9.0",
     date: "08/12/2026",
     title: "Streaks, Live Timers & Long-Press Controls!",
@@ -316,7 +327,6 @@ const SUMMON_COST_MATRIX = { Mythic: { base: "6,750", variant: "10,000" }, Legen
 const RARITY_WEIGHT = { Mythic: 4, Legendary: 3, Epic: 2, Rare: 1, Unknown: 0 };
 
 function MainApp() {
-  // PLATFORM CHECK FOR IOS ZOOM FIX
   const isIOS = Capacitor.getPlatform() === 'ios';
   const inputSizeClass = isIOS ? 'text-base' : 'text-sm';
   const responsiveInputSizeClass = isIOS ? 'text-base' : 'text-sm sm:text-base';
@@ -336,6 +346,7 @@ function MainApp() {
   const [isAuthLoading, setIsAuthLoading] = useState(false);
   const [showSettingsModal, setShowSettingsModal] = useState(false);
   const [showAboutModal, setShowAboutModal] = useState(false);
+  const [showNewsModal, setShowNewsModal] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [resetSent, setResetSent] = useState(false);
@@ -392,11 +403,12 @@ function MainApp() {
   const [fStatusFilter, setFStatusFilter] = useState('All');
   const [fSortBy, setFSortBy] = useState('A-Z');
 
-  // --- RADAR SWEEP STATE & PRESS-AND-HOLD ---
   const [fragments, setFragments] = useState(0);
   const [lastRadarSweep, setLastRadarSweep] = useState(null);
   const [sweepStreak, setSweepStreak] = useState(0);
   const [dailyIntel, setDailyIntel] = useState("");
+
+  const [newsFeed, setNewsFeed] = useState([]);
 
   const [isSweeping, setIsSweeping] = useState(false);
   const [sweepResult, setSweepResult] = useState("");
@@ -404,7 +416,6 @@ function MainApp() {
   const [timeUntilNextSweep, setTimeUntilNextSweep] = useState("");
   const [canSweepToday, setCanSweepToday] = useState(false);
 
-  // --- LONG PRESS STATE FOR RADIO DOTS ---
   const [activeHoldId, setActiveHoldId] = useState(null);
   const dotHoldTimer = useRef(null);
 
@@ -419,7 +430,6 @@ function MainApp() {
 
   useEffect(() => { document.title = "Spritedex"; }, []);
 
-  // --- LIVE 24H COOLDOWN TRACKER ---
   useEffect(() => {
     if (!lastRadarSweep) {
       setCanSweepToday(true);
@@ -447,11 +457,11 @@ function MainApp() {
     return () => clearInterval(interval);
   }, [lastRadarSweep]);
 
-  // --- HARDWARE BACK BUTTON LOGIC ---
   useEffect(() => {
     const handleBackButton = ({ canGoBack }) => {
       if (showSettingsModal) return setShowSettingsModal(false);
       if (showAboutModal) return setShowAboutModal(false);
+      if (showNewsModal) return setShowNewsModal(false);
       if (selectedSprite) return setSelectedSprite(null);
       if (showPatchNotes) return setShowPatchNotes(false);
       if (showTransmission) return setShowTransmission(false);
@@ -463,17 +473,13 @@ function MainApp() {
       if (showRadarModal) return setShowRadarModal(false);
       if (activeViewingFriend) return setActiveViewingFriend(null);
 
-      // Navigate back to the Sprites tab if currently in another section
       if (currentView !== 'sprites') return setCurrentView('sprites');
-
-      // If nothing is open and we are on the main tab, minimize the app
       if (canGoBack) window.history.back();
     };
 
     const listener = CapApp.addListener('backButton', handleBackButton);
     return () => { listener.then(handle => handle.remove()); };
-  }, [showSettingsModal, showAboutModal, selectedSprite, showPatchNotes, showTransmission, showTargetSelector, showTrophySelector, showUnfriendConfirm, showResetConfirm, showAddFriendInput, showRadarModal, activeViewingFriend, currentView]);
-
+  }, [showSettingsModal, showAboutModal, showNewsModal, selectedSprite, showPatchNotes, showTransmission, showTargetSelector, showTrophySelector, showUnfriendConfirm, showResetConfirm, showAddFriendInput, showRadarModal, activeViewingFriend, currentView]);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, () => { setIsInitializing(false); });
@@ -497,10 +503,10 @@ function MainApp() {
       setLastRadarSweep(null);
       setSweepStreak(0);
       setDailyIntel("");
+      setNewsFeed([]);
       return;
     }
 
-    // --- SAFE PUSH NOTIFICATION SETUP ---
     const setupPushNotifications = async () => {
       try {
         const platform = await CapApp.getInfo();
@@ -564,10 +570,18 @@ function MainApp() {
 
     const reqsQuery = query(firestoreCollection(db, "friend_requests"), where("receiverId", "==", user.uid));
     const unsubReqs = onSnapshot(reqsQuery, (snapshot) => setPendingRequests(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))));
+
     const sentReqsQuery = query(firestoreCollection(db, "friend_requests"), where("senderId", "==", user.uid));
     const unsubSentReqs = onSnapshot(sentReqsQuery, (snapshot) => setSentRequests(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))));
 
-    return () => { unsubUser(); unsubReqs(); unsubSentReqs(); };
+    const newsQuery = query(firestoreCollection(db, "news_feed"), limit(20));
+    const unsubNews = onSnapshot(newsQuery, (snapshot) => {
+      const items = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      items.sort((a, b) => (b.sortTime || 0) - (a.sortTime || 0));
+      setNewsFeed(items.slice(0, 10));
+    });
+
+    return () => { unsubUser(); unsubReqs(); unsubSentReqs(); unsubNews(); };
   }, [user, hasCheckedVersion, isSettingSpriteId]);
 
   useEffect(() => {
@@ -696,7 +710,6 @@ function MainApp() {
     });
   };
 
-  // --- RADIO DOT LONG PRESS LOGIC ---
   const handleDotPressStart = (e, spriteId, variant) => {
     e.stopPropagation();
     setActiveHoldId(`${spriteId}_${variant}`);
@@ -720,7 +733,6 @@ function MainApp() {
     if (dotHoldTimer.current) clearTimeout(dotHoldTimer.current);
     setActiveHoldId(null);
   };
-
 
   const handleAbsoluteReset = () => {
     setCollection({}); setMastery({}); setShowResetConfirm(false);
@@ -762,17 +774,14 @@ function MainApp() {
   };
 
   const acceptFriendRequest = async (req) => {
-    // 1. Update the current user's friend list
     try {
       await updateDoc(doc(db, "users", user.uid), { friends: arrayUnion({ uid: req.senderId, spriteId: req.senderSpriteId }) });
     } catch (e) { console.error("Self update failed:", e); }
 
-    // 2. Attempt to update the sender's friend list (May be blocked by Firebase Rules)
     try {
       await updateDoc(doc(db, "users", req.senderId), { friends: arrayUnion({ uid: user.uid, spriteId: spriteId }) });
     } catch (e) { console.error("Sender update failed:", e); }
 
-    // 3. Delete the request and play the success sound regardless
     try {
       await deleteDoc(doc(db, "friend_requests", req.id));
       playBeep(880, 'sine', 0.1);
@@ -787,16 +796,13 @@ function MainApp() {
     const targetUid = showUnfriendConfirm.uid;
     const targetSpriteId = showUnfriendConfirm.spriteId;
 
-    // 1. Close the modal instantly to fix the UI freeze
     setShowUnfriendConfirm(null);
 
-    // 2. Remove the friend from the current user's list
     try {
       await updateDoc(doc(db, "users", user.uid), { friends: arrayRemove({ uid: targetUid, spriteId: targetSpriteId }) });
       playBeep(220, 'sawtooth', 0.15);
     } catch (e) { console.error("Self removal failed:", e); }
 
-    // 3. Attempt to remove the current user from the other person's list
     try {
       await updateDoc(doc(db, "users", targetUid), { friends: arrayRemove({ uid: user.uid, spriteId: spriteId }) });
     } catch (e) { console.error("Target removal failed:", e); }
@@ -869,7 +875,37 @@ function MainApp() {
     } catch (e) { }
   };
 
-  // --- RADAR SWEEP PRESS & HOLD LOGIC ---
+  const scheduleStreakReminder = async (currentStreak) => {
+    if (Capacitor.getPlatform() === 'web') return;
+    try {
+      let permStatus = await LocalNotifications.checkPermissions();
+      if (permStatus.display === 'prompt') {
+        permStatus = await LocalNotifications.requestPermissions();
+      }
+      if (permStatus.display !== 'granted') return;
+
+      const pending = await LocalNotifications.getPending();
+      if (pending.notifications.length > 0) {
+        await LocalNotifications.cancel({ notifications: pending.notifications });
+      }
+
+      const triggerDate = new Date(Date.now() + 22 * 60 * 60 * 1000);
+
+      await LocalNotifications.schedule({
+        notifications: [
+          {
+            title: "⚠️ Streak at Risk!",
+            body: `Your Daily Radar is fully charged. Sweep now to protect your ${currentStreak}-Day Streak!`,
+            id: 1001,
+            schedule: { at: triggerDate, allowWhileIdle: true }
+          }
+        ]
+      });
+    } catch (e) {
+      console.error("Local Notification Error", e);
+    }
+  };
+
   const startHold = () => {
     if (!canSweepToday || isSweeping) return;
     setHoldProgress(0);
@@ -909,7 +945,6 @@ function MainApp() {
 
     try { await Haptics.impact({ style: ImpactStyle.Heavy }); } catch (e) { }
 
-    // Pre-fetch intel outside of the transaction to keep it fast
     let newFact = "Signal lost. No intel recovered.";
     try {
       const intelDoc = await getDoc(doc(db, "system", "daily_intel"));
@@ -926,7 +961,7 @@ function MainApp() {
     const userRef = doc(db, 'users', user.uid);
 
     try {
-      await runTransaction(db, async (transaction) => {
+      const txResult = await runTransaction(db, async (transaction) => {
         const userDoc = await transaction.get(userRef);
         if (!userDoc.exists()) throw "User document does not exist!";
 
@@ -935,17 +970,13 @@ function MainApp() {
         const lastSweep = lastSweepData && typeof lastSweepData.toDate === 'function' ? lastSweepData.toDate() : null;
         const now = new Date();
 
-        // Extra safety check in transaction
         if (lastSweep && (now.getTime() - lastSweep.getTime() < 24 * 60 * 60 * 1000)) {
           throw "Sweep already on 24h cooldown.";
         }
 
-        // --- STREAK CALCULATION ---
         let currentStreak = data.sweepStreak || 0;
         if (lastSweep) {
           const hoursSince = (now.getTime() - lastSweep.getTime()) / (1000 * 60 * 60);
-          // If they swept within 48 hours of their last sweep, they keep their streak!
-          // (24h cooldown + a 24h window to return)
           if (hoursSince < 48) {
             currentStreak += 1;
           } else {
@@ -976,10 +1007,12 @@ function MainApp() {
           dailyIntel: newFact
         });
 
-        setSweepResult(sweepMessage);
+        return { currentStreak, sweepMessage };
       });
 
+      setSweepResult(txResult.sweepMessage);
       playBeep(880, 'square', 0.2);
+      scheduleStreakReminder(txResult.currentStreak);
     } catch (error) {
       console.error("Sweep failed: ", error);
       setSweepResult(typeof error === 'string' ? error : "Sweep failed. Try again.");
@@ -1034,7 +1067,6 @@ function MainApp() {
 
   const handleAcknowledgeTransmission = async () => { setShowTransmission(false); if (user) { try { await setDoc(doc(db, "users", user.uid), { lastSeenVersion: PATCH_NOTES[0].version }, { merge: true }); } catch (err) { } } };
 
-  // --- OPTIMIZATION: Memoized Stats Calculations ---
   const { totalCollected, totalMastered, completionRate, masteryRate } = useMemo(() => {
     const tCol = SPRITES_DATABASE.reduce((acc, sprite) => acc + sprite.variants.filter(v => !isVariantLocked(sprite.id, v) && (collection[sprite.id] || {})[v]).length, 0);
     const tMast = SPRITES_DATABASE.reduce((acc, sprite) => acc + sprite.variants.filter(v => !isVariantLocked(sprite.id, v) && (mastery[sprite.id] || {})[v]).length, 0);
@@ -1046,7 +1078,6 @@ function MainApp() {
   const isMasteryView = currentView === 'mastery';
   const displayVariantKey = variantFilter === 'All' ? 'All' : variantFilter.toLowerCase();
 
-  // --- OPTIMIZATION: Memoized Main Vault Rendering Array ---
   const filteredSprites = useMemo(() => {
     return [...SPRITES_DATABASE].filter(sprite => {
       const matchesSearch = sprite.name.toLowerCase().includes(searchQuery.toLowerCase());
@@ -1068,7 +1099,6 @@ function MainApp() {
     });
   }, [searchQuery, rarityFilter, variantFilter, statusFilter, sortBy, isMasteryView, displayVariantKey, collection, mastery]);
 
-  // --- OPTIMIZATION: Memoized Friend Vault Rendering Array ---
   const filteredFriendSprites = useMemo(() => {
     return [...SPRITES_DATABASE].filter(sprite => {
       if (!activeViewingFriend) return false;
@@ -1104,7 +1134,6 @@ function MainApp() {
     });
   }, [activeViewingFriend, fSearchQuery, fRarityFilter, fVariantFilter, fStatusFilter, fSortBy, collection]);
 
-  // --- OPTIMIZATION: Memoized Squad Rendering Array ---
   const filteredSquad = useMemo(() => {
     return richFriends.filter(f =>
       (f.spriteId || '').toLowerCase().includes(squadSearchQuery.toLowerCase())
@@ -1217,7 +1246,7 @@ function MainApp() {
 
                 <div className="grid grid-cols-2 gap-2">
                   {profData.twitchName && (
-                    <a href={`https://www.twitch.tv/${profData.twitchName}`} target="_blank" rel="noopener noreferrer" className="bg-purple-900/30 hover:bg-purple-800/40 border border-purple-500/30 text-purple-300 p-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-colors">
+                    <a href={`https://twitch.tv/${profData.twitchName}`} target="_blank" rel="noopener noreferrer" className="bg-purple-900/30 hover:bg-purple-800/40 border border-purple-500/30 text-purple-300 p-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-colors">
                       <Tv className="w-4 h-4 text-purple-400" /> Twitch
                     </a>
                   )}
@@ -1252,7 +1281,6 @@ function MainApp() {
     );
   };
 
-  // --- INITIALIZATION SCREEN ---
   if (isInitializing) {
     return (
       <div className="min-h-screen w-full flex items-center justify-center bg-slate-950 overflow-hidden relative font-sans px-4">
@@ -1263,7 +1291,6 @@ function MainApp() {
     );
   }
 
-  // --- LOGIN UI (FULL SCREEN GATE) ---
   if (!user) {
     return (
       <div className="min-h-screen w-full flex items-center justify-center bg-slate-950 overflow-hidden relative font-sans px-4">
@@ -1317,7 +1344,6 @@ function MainApp() {
     );
   }
 
-  // --- SPRITE ID ONBOARDING OVERLAY ---
   if (user && isSettingSpriteId) {
     return (
       <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center p-4">
@@ -1340,7 +1366,7 @@ function MainApp() {
   return (
     <div className="min-h-screen bg-[#0b0c10] text-gray-100 flex flex-col font-sans select-none relative">
 
-      {/* --- NEW MAIN SETTINGS MODAL --- */}
+      {/* --- SETTINGS MODAL --- */}
       {showSettingsModal && (
         <div className="fixed inset-0 z-[80] flex flex-col justify-end sm:justify-center items-center bg-black/80 backdrop-blur-sm animate-in fade-in">
           <div className="bg-[#12141f] w-full max-w-md rounded-t-3xl sm:rounded-3xl border-t-2 sm:border-2 border-slate-800 p-6 shadow-2xl animate-in slide-in-from-bottom-10">
@@ -1372,6 +1398,49 @@ function MainApp() {
         </div>
       )}
 
+      {/* --- STANDALONE NEWS FEED MODAL --- */}
+      {showNewsModal && (
+        <div className="fixed inset-0 z-[80] flex flex-col justify-end sm:justify-center items-center bg-black/80 backdrop-blur-sm animate-in fade-in">
+          <div className="bg-[#12141f] w-full max-w-md h-[85vh] rounded-t-3xl sm:rounded-3xl border-t-2 sm:border-2 border-cyan-500/50 p-6 shadow-2xl animate-in slide-in-from-bottom-10 flex flex-col overflow-hidden">
+            <div className="flex justify-between items-center mb-4 shrink-0">
+              <h2 className="text-xl font-black text-white uppercase italic flex items-center gap-2">
+                <Newspaper className="w-6 h-6 text-cyan-400" /> Live News & Intel
+              </h2>
+              <button onClick={() => setShowNewsModal(false)} className="p-2 bg-black/40 rounded-full text-slate-400 hover:text-white"><X className="w-5 h-5" /></button>
+            </div>
+
+            <div className="flex-1 overflow-y-auto pr-1 flex flex-col gap-4">
+              {newsFeed.length === 0 ? (
+                <div className="flex-1 flex flex-col items-center justify-center text-center p-8">
+                  <Newspaper className="w-12 h-12 text-slate-700 mb-3" />
+                  <p className="text-sm text-slate-400 font-bold uppercase tracking-wider">No News Broadcasts Available</p>
+                </div>
+              ) : (
+                newsFeed.map((news) => (
+                  <div key={news.id} className="relative w-full shrink-0 bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-lg">
+                    {news.imageUrl && (
+                      <img src={news.imageUrl} alt="" className="absolute inset-0 w-full h-full object-cover" />
+                    )}
+                    <div className={`relative z-10 w-full flex flex-col justify-end p-4 min-h-[160px] sm:min-h-[180px] ${news.imageUrl ? 'bg-gradient-to-t from-black/95 via-black/80 to-transparent pt-28' : 'bg-black/50'}`}>
+                      <div className="flex justify-between items-center mb-1.5">
+                        <span className="text-[9px] font-black text-cyan-400 uppercase tracking-widest drop-shadow-md">{news.author}</span>
+                        {news.timestamp && (
+                          <span className="text-[9px] font-mono text-slate-300 drop-shadow-md">
+                            {new Date(news.timestamp.toDate()).toLocaleDateString()}
+                          </span>
+                        )}
+                      </div>
+                      <h3 className="text-base sm:text-lg font-black text-white uppercase italic tracking-tight drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] leading-tight">{news.title}</h3>
+                      {news.text && <p className="text-xs text-slate-200 leading-relaxed mt-2 drop-shadow-[0_1px_3px_rgba(0,0,0,0.8)]">{news.text}</p>}
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* --- RADAR SWEEP MODAL --- */}
       {showRadarModal && (
         <div className="fixed inset-0 z-[90] flex flex-col justify-end sm:justify-center items-center bg-black/80 backdrop-blur-sm animate-in fade-in">
@@ -1381,7 +1450,7 @@ function MainApp() {
             <div className="flex justify-between items-start mb-6 relative z-10">
               <div>
                 <h2 className="text-2xl font-black text-cyan-400 uppercase italic flex items-center">
-                  <Radio className="w-6 h-6 mr-2" /> Daily Radar
+                  <Radar className="w-6 h-6 mr-2" /> Daily Radar
                 </h2>
                 <div className="flex items-center gap-2 mt-1">
                   <p className="text-xs text-slate-400 font-medium">
@@ -1445,18 +1514,16 @@ function MainApp() {
               </div>
             )}
 
-            {/* AI INTEL BLOCK */}
             {dailyIntel && (
               <div className="mb-6 p-4 bg-indigo-950/40 rounded-xl border border-indigo-500/30 text-center animate-in zoom-in-95 duration-500 relative z-10 shadow-[0_0_15px_rgba(99,102,241,0.15)]">
                 <div className="flex items-center justify-center gap-2 mb-2">
-                  <Radio className="w-4 h-4 text-indigo-400 animate-pulse" />
+                  <Radar className="w-4 h-4 text-indigo-400 animate-pulse" />
                   <span className="text-[10px] font-black text-indigo-400 uppercase tracking-widest">Decrypted AI Intel</span>
                 </div>
                 <p className="text-xs text-slate-300 font-medium leading-relaxed italic">"{dailyIntel}"</p>
               </div>
             )}
 
-            {/* The Hype Teaser */}
             <div className="p-4 bg-slate-900/80 rounded-xl border border-slate-700/60 flex items-start relative z-10">
               <div className="text-amber-400 mr-3 mt-0.5 shrink-0">
                 <Lock className="w-5 h-5" />
@@ -1473,7 +1540,7 @@ function MainApp() {
         </div>
       )}
 
-      {/* --- MODAL: ABOUT --- */}
+      {/* --- ABOUT MODAL --- */}
       {showAboutModal && (
         <div className="fixed inset-0 z-[90] flex items-center justify-center p-4 bg-black/90 backdrop-blur-md animate-in fade-in duration-200">
           <div className="bg-[#12141f] border-2 border-slate-700 rounded-2xl flex flex-col max-w-sm w-full relative overflow-hidden shadow-2xl">
@@ -1556,7 +1623,7 @@ function MainApp() {
           <div className="bg-[#12141f] border-2 border-cyan-500 shadow-[0_0_40px_rgba(34,211,238,0.2)] rounded-2xl max-w-sm w-full relative overflow-hidden flex flex-col">
             <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-cyan-400 to-transparent animate-pulse"></div>
             <header className="p-5 border-b border-cyan-900/50 flex flex-col items-center text-center">
-              <div className="w-12 h-12 bg-cyan-950/50 rounded-full border border-cyan-500/40 flex items-center justify-center mb-3"><Radio className="w-6 h-6 text-cyan-400 animate-pulse" /></div>
+              <div className="w-12 h-12 bg-cyan-950/50 rounded-full border border-cyan-500/40 flex items-center justify-center mb-3"><Radar className="w-6 h-6 text-cyan-400 animate-pulse" /></div>
               <h2 className="text-xl sm:text-2xl font-black text-cyan-400 uppercase italic tracking-wider">Incoming Transmission</h2>
               <span className="text-[10px] sm:text-xs font-mono text-cyan-600 uppercase tracking-widest mt-1">Update {PATCH_NOTES[0].version} Deployed</span>
             </header>
@@ -1594,7 +1661,7 @@ function MainApp() {
         </div>
       )}
 
-      {/* --- SELECTION SCREEN: TARGET/TROPHY SELECTOR --- */}
+      {/* --- TARGET/TROPHY SELECTOR MODAL --- */}
       {(showTargetSelector || showTrophySelector) && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90 backdrop-blur-md animate-in fade-in duration-200">
           <div className="bg-[#12141f] border-2 border-cyan-500/60 rounded-2xl flex flex-col max-w-sm w-full h-[75vh] relative overflow-hidden">
@@ -1631,7 +1698,7 @@ function MainApp() {
         </div>
       )}
 
-      {/* --- MENU: ABSOLUTE DATA RESET --- */}
+      {/* --- RESET DATA CONFIRMATION MODAL --- */}
       {showResetConfirm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-200">
           <div className="bg-[#12141f] border-2 border-red-500/60 rounded-2xl p-6 max-w-sm w-full text-center relative">
@@ -1647,7 +1714,7 @@ function MainApp() {
         </div>
       )}
 
-      {/* --- MENU: THEMED UNFRIEND CONFIRMATION --- */}
+      {/* --- UNFRIEND CONFIRMATION MODAL --- */}
       {showUnfriendConfirm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-200">
           <div className="bg-[#12141f] border-2 border-amber-500/60 rounded-2xl p-6 max-w-sm w-full text-center relative">
@@ -1663,7 +1730,7 @@ function MainApp() {
         </div>
       )}
 
-      {/* --- LAYER: NEW READ-ONLY FRIEND COLLECTION INSPECTOR (PROFILE) --- */}
+      {/* --- READ-ONLY FRIEND COLLECTION INSPECTOR --- */}
       {activeViewingFriend && (
         <div className="fixed inset-0 z-50 bg-[#0b0c10] flex flex-col animate-in slide-in-from-bottom duration-300 overflow-y-auto pb-12">
           <header className={`bg-[#0e1017]/95 backdrop-blur-md border-b-2 border-indigo-500 px-4 pb-4 ${Capacitor.getPlatform() === 'ios' ? 'pt-14' : 'pt-4'} sticky top-0 z-50 shadow-[0_4px_20px_rgba(99,102,241,0.15)] flex justify-between items-center`}>
@@ -1676,7 +1743,6 @@ function MainApp() {
 
             <div className="h-px w-full bg-gradient-to-r from-transparent via-slate-700 to-transparent my-2" />
 
-            {/* Profile Filter & Search UI */}
             <section className="flex flex-col gap-2 bg-[#151722] p-3 rounded-xl border border-slate-800">
               <div className="flex gap-2">
                 <div className="relative flex-1">
@@ -1812,7 +1878,6 @@ function MainApp() {
             {user && <p className="text-[10px] sm:text-xs font-mono text-slate-400 uppercase tracking-widest mt-0.5">ID: {spriteId}</p>}
           </div>
           <div className="flex items-center gap-2.5">
-            {/* NEW DAILY RADAR SWEEP BUTTON */}
             {user && (
               <button
                 onClick={() => setShowRadarModal(true)}
@@ -1821,9 +1886,8 @@ function MainApp() {
                   : 'bg-slate-900 border-slate-800 text-slate-600'
                   }`}
               >
-                <Radio className="w-5 h-5 sm:w-6 sm:h-6" />
+                <Radar className="w-5 h-5 sm:w-6 sm:h-6" />
 
-                {/* UPDATED STREAK PILL INDICATOR */}
                 {!canSweepToday && sweepStreak >= 1 && (
                   <div className="absolute -top-2 -right-3 bg-[#0b0c10] border border-orange-500 shadow-[0_0_12px_rgba(249,115,22,0.6)] text-orange-400 text-[10px] font-black px-1.5 py-0.5 rounded-full flex items-center justify-center gap-0.5 z-10">
                     <span className="drop-shadow-[0_0_5px_rgba(249,115,22,0.8)]">🔥</span>
@@ -1833,14 +1897,17 @@ function MainApp() {
               </button>
             )}
 
-            {/* PROFILE ICON */}
             {user && (
               <button onClick={() => { setCurrentView('profile'); setActiveViewingFriend(null); }} className={`p-2 rounded-xl border-2 transition-colors shadow-sm ${currentView === 'profile' ? 'bg-indigo-900 border-indigo-500' : 'bg-slate-900 border-slate-700/60 hover:bg-slate-800'}`}>
                 <UserIcon className={`w-5 h-5 sm:w-6 sm:h-6 ${currentView === 'profile' ? 'text-indigo-400' : 'text-slate-300'}`} />
               </button>
             )}
 
-            {/* SETTINGS ICON */}
+            {/* NEW STANDALONE NEWSFEED BUTTON (Between Profile & Settings) */}
+            <button onClick={() => setShowNewsModal(true)} className="p-2 rounded-xl bg-slate-900 border-2 border-slate-700/60 hover:bg-slate-800 transition-colors shadow-sm">
+              <Newspaper className="w-5 h-5 sm:w-6 sm:h-6 text-slate-300" />
+            </button>
+
             <button onClick={() => setShowSettingsModal(true)} className="p-2 rounded-xl bg-slate-900 border-2 border-slate-700/60 hover:bg-slate-800 transition-colors shadow-sm">
               <Settings className="w-5 h-5 sm:w-6 sm:h-6 text-slate-300" />
             </button>
@@ -1860,7 +1927,7 @@ function MainApp() {
               <div className="flex justify-between items-center mb-4 relative z-10">
                 <div>
                   <h3 className="text-xl font-black text-cyan-400 flex items-center italic uppercase">
-                    <Radio className="w-5 h-5 mr-2" />
+                    <Radar className="w-5 h-5 mr-2" />
                     Daily Radar
                   </h3>
                   {sweepStreak >= 1 && (
@@ -1901,7 +1968,6 @@ function MainApp() {
                 </div>
               )}
 
-              {/* The Hype Teaser */}
               <div className="mt-4 p-3.5 bg-slate-900/80 rounded-xl border border-slate-700/60 flex items-start relative z-10">
                 <div className="text-amber-400 mr-3 mt-0.5 shrink-0">
                   <Lock className="w-5 h-5" />
@@ -2069,7 +2135,6 @@ function MainApp() {
                 </div>
               )}
 
-              {/* LIST VIEW (CLEAN WRAPPING DOTS, ENHANCED LONG PRESS SIZES) */}
               <div className="flex flex-col gap-4 animate-in fade-in duration-300">
                 {filteredSprites.map(sprite => {
                   const displayVariant = variantFilter === 'All' ? 'base' : variantFilter.toLowerCase();
@@ -2225,12 +2290,9 @@ function MainApp() {
                     const matchFound = isMutualMatch(friend);
                     const cardClass = matchFound ? "bg-cyan-950/40 border-2 border-cyan-400 shadow-[0_0_15px_rgba(34,211,238,0.5)]" : "bg-slate-900 border border-slate-800/80";
 
-                    // Calculate their current milestone to apply name colors
                     const friendColCount = Math.round((friend.completionRate / 100) * totalPossibleStatic);
                     const friendMastCount = Math.round((friend.masteryRate / 100) * totalPossibleStatic);
                     const milestone = getUnlockedMilestone(friendColCount, friendMastCount);
-
-                    // Default to dimmed slate text if they have no milestone unlocked
                     const nameColor = milestone ? milestone.textColor : "text-slate-500";
 
                     return (
@@ -2296,7 +2358,7 @@ function MainApp() {
 
       </main>
 
-      {/* --- EXTENDED BOTTOM NAVIGATION BAR --- */}
+      {/* --- BOTTOM NAVIGATION BAR --- */}
       <nav className="fixed bottom-4 left-0 right-0 z-50 flex justify-center px-4">
         <div className="bg-[#0e1017]/95 backdrop-blur-md border border-slate-800 rounded-2xl w-full max-w-sm px-2 py-2 flex justify-between shadow-2xl">
           <button onClick={() => { setCurrentView('sprites'); setActiveViewingFriend(null); playBeep(440, 'sine', 0.05); }} className={`flex-1 flex flex-col items-center gap-1 py-1 transition-colors ${currentView === 'sprites' && !activeViewingFriend ? 'text-cyan-400' : 'text-slate-600'}`}>

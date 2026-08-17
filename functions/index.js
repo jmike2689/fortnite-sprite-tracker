@@ -1,11 +1,11 @@
 const functions = require("firebase-functions/v1");
 const admin = require("firebase-admin");
-const { GoogleGenAI } = require("@google/genai"); // <-- Updated to the new SDK
+const { GoogleGenAI } = require("@google/genai");
+const https = require('https');
 
 admin.initializeApp();
 const db = admin.firestore();
 
-// IMPORTANT: Replace this with your actual key!
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 
 // --- 1. SQUAD PUSH NOTIFICATION TRIGGER ---
@@ -83,7 +83,6 @@ exports.generateDailyIntel = functions.pubsub.schedule("0 0 * * *")
     .onRun(async (context) => {
 
         try {
-            // 1. Fetch raw user data
             const usersSnap = await db.collection("users").get();
             const totalUsers = usersSnap.size;
 
@@ -92,11 +91,9 @@ exports.generateDailyIntel = functions.pubsub.schedule("0 0 * * *")
             const spriteCounts = {};
             const targetCounts = {};
 
-            // 2. Aggregate stats across ALL users dynamically
             usersSnap.forEach(doc => {
                 const data = doc.data();
 
-                // Aggregate collected sprites
                 if (data.sprites) {
                     Object.entries(data.sprites).forEach(([spriteId, variants]) => {
                         if (typeof variants === "object") {
@@ -110,7 +107,6 @@ exports.generateDailyIntel = functions.pubsub.schedule("0 0 * * *")
                     });
                 }
 
-                // Aggregate extraction targets
                 if (Array.isArray(data.extractionTargets)) {
                     data.extractionTargets.forEach(target => {
                         const formattedTarget = target.replace("_", " ").replace("-", " ");
@@ -119,10 +115,8 @@ exports.generateDailyIntel = functions.pubsub.schedule("0 0 * * *")
                 }
             });
 
-            // 3. Randomly pick a sample of dynamic stats for today's prompt
             const selectedHighlights = [];
 
-            // Pick 2 random sprite collection stats
             const availableSprites = Object.keys(spriteCounts);
             if (availableSprites.length > 0) {
                 const shuffledSprites = availableSprites.sort(() => 0.5 - Math.random());
@@ -134,14 +128,12 @@ exports.generateDailyIntel = functions.pubsub.schedule("0 0 * * *")
                 });
             }
 
-            // Pick 1 random extraction target stat
             const availableTargets = Object.keys(targetCounts);
             if (availableTargets.length > 0) {
                 const randomTarget = availableTargets[Math.floor(Math.random() * availableTargets.length)];
                 selectedHighlights.push(`${targetCounts[randomTarget]} collectors currently have "${randomTarget}" set as an active target`);
             }
 
-            // 4. Send the randomized, structured stats to Gemini
             const ai = new GoogleGenAI({ apiKey: GEMINI_API_KEY });
 
             const prompt = `
@@ -171,11 +163,8 @@ exports.generateDailyIntel = functions.pubsub.schedule("0 0 * * *")
             });
 
             const text = response.text;
-
-            // Clean up the text and split into an array
             const intelArray = text.split('\n').filter(line => line.trim().length > 0);
 
-            // 5. Save the AI-generated array to Firestore
             await db.collection("system").doc("daily_intel").set({
                 facts: intelArray,
                 lastUpdated: admin.firestore.FieldValue.serverTimestamp()
@@ -185,6 +174,168 @@ exports.generateDailyIntel = functions.pubsub.schedule("0 0 * * *")
 
         } catch (error) {
             console.error("Failed to generate AI Intel:", error);
+        }
+
+        return null;
+    });
+
+// --- 3. 7-DAY INACTIVITY REACTIVATION ---
+exports.inactivityReactivation = functions.pubsub.schedule("0 12 * * *")
+    .timeZone("America/Chicago")
+    .onRun(async (context) => {
+        const targetDate = new Date();
+        targetDate.setDate(targetDate.getDate() - 7);
+        const targetDayString = targetDate.toISOString().split('T')[0];
+
+        const usersSnap = await db.collection("users")
+            .where("lastActive", ">=", targetDayString + "T00:00:00.000Z")
+            .where("lastActive", "<=", targetDayString + "T23:59:59.999Z")
+            .get();
+
+        if (usersSnap.empty) return null;
+
+        const notifications = [];
+
+        for (const doc of usersSnap.docs) {
+            const data = doc.data();
+            const friendsList = data.friends || [];
+            const deviceToken = data.fcmToken;
+
+            if (!deviceToken || friendsList.length === 0) continue;
+
+            let friendsTotalSprites = 0;
+            for (const friend of friendsList) {
+                const fDoc = await db.collection("users").doc(friend.uid).get();
+                if (fDoc.exists) {
+                    const fData = fDoc.data();
+                    if (fData.sprites) {
+                        for (const variants of Object.values(fData.sprites)) {
+                            for (const isCollected of Object.values(variants)) {
+                                if (isCollected) friendsTotalSprites++;
+                            }
+                        }
+                    }
+                }
+            }
+
+            const payload = {
+                token: deviceToken,
+                notification: {
+                    title: "👋 Your Squad is pulling ahead!",
+                    body: `Your friends have collected ${friendsTotalSprites} total Sprites! Jump back in to see their progress and claim your Daily Radar.`,
+                },
+                data: { route: "friends" }
+            };
+            notifications.push(admin.messaging().send(payload));
+        }
+
+        if (notifications.length > 0) await Promise.allSettled(notifications);
+        return null;
+    });
+
+// --- 4. SQUAD NEEDS YOU ALERT ---
+exports.squadNeedsYouAlert = functions.pubsub.schedule("0 15 * * 5")
+    .timeZone("America/Chicago")
+    .onRun(async (context) => {
+        const usersSnap = await db.collection("users").get();
+        if (usersSnap.empty) return null;
+
+        const notifications = [];
+
+        for (const doc of usersSnap.docs) {
+            const userData = doc.data();
+            const deviceToken = userData.fcmToken;
+            const friendsList = userData.friends || [];
+            const userSprites = userData.sprites || {};
+
+            if (!deviceToken || friendsList.length === 0) continue;
+
+            let matchFound = false;
+
+            for (const friend of friendsList) {
+                if (matchFound) break;
+
+                const friendDoc = await db.collection("users").doc(friend.uid).get();
+                if (!friendDoc.exists) continue;
+
+                const friendData = friendDoc.data();
+                const friendTargets = friendData.extractionTargets || [];
+                const friendName = friendData.spriteId || "A friend";
+
+                for (const target of friendTargets) {
+                    if (!target) continue;
+                    const [spriteId, variantName] = target.split("_");
+
+                    if (userSprites[spriteId] && userSprites[spriteId][variantName]) {
+                        const formattedVariant = variantName.charAt(0).toUpperCase() + variantName.slice(1);
+                        const formattedSprite = spriteId.replace("-", " ");
+
+                        const payload = {
+                            token: deviceToken,
+                            notification: {
+                                title: "🤝 Squad Assist!",
+                                body: `@${friendName} is hunting the ${formattedVariant} ${formattedSprite} you currently own. Reach out to coordinate!`,
+                            },
+                            data: { route: "friends" }
+                        };
+                        notifications.push(admin.messaging().send(payload));
+                        matchFound = true;
+                        break;
+                    }
+                }
+            }
+        }
+
+        if (notifications.length > 0) await Promise.allSettled(notifications);
+        return null;
+    });
+
+// --- 5. OFFICIAL FORTNITE API NEWS AGGREGATOR ---
+exports.fetchFortniteNews = functions.pubsub.schedule("*/5 * * * *") // Runs every 5 minutes
+    .timeZone("America/Chicago")
+    .onRun(async (context) => {
+        try {
+            const fetchJson = (url) => new Promise((resolve, reject) => {
+                https.get(url, (res) => {
+                    let data = '';
+                    res.on('data', chunk => data += chunk);
+                    res.on('end', () => {
+                        try { resolve(JSON.parse(data)); }
+                        catch (e) { reject(e); }
+                    });
+                }).on('error', reject);
+            });
+
+            const json = await fetchJson("https://fortnite-api.com/v2/news/br");
+            const motds = json?.data?.motds;
+
+            if (!motds || !Array.isArray(motds)) {
+                console.log("No MOTDs found in the response.");
+                return null;
+            }
+
+            const batch = db.batch();
+            const newsRef = db.collection("news_feed");
+
+            for (const item of motds) {
+                const rawId = item.id || item.title || "unknown_tile";
+                const docId = Buffer.from(rawId).toString('base64').replace(/[^a-zA-Z0-9]/g, '').substring(0, 32);
+
+                const docRef = newsRef.doc(docId);
+                batch.set(docRef, {
+                    title: item.title || "Fortnite Update",
+                    text: item.body || "",
+                    imageUrl: item.image || item.tileImage || "",
+                    author: "Epic Games",
+                    timestamp: admin.firestore.FieldValue.serverTimestamp(),
+                    sortTime: Date.now() // Instant numeric timestamp for reliable sorting
+                }, { merge: true });
+            }
+
+            await batch.commit();
+            console.log("Successfully fetched and updated official Fortnite API news!");
+        } catch (err) {
+            console.error("Failed fetching Fortnite API:", err);
         }
 
         return null;
