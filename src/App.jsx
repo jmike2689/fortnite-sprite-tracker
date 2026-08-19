@@ -7,12 +7,12 @@ import { PushNotifications } from '@capacitor/push-notifications';
 import { LocalNotifications } from '@capacitor/local-notifications';
 import { Capacitor } from '@capacitor/core';
 import {
-  Search, CheckCircle, Circle, Volume2, VolumeX, Percent, RotateCcw, AlertTriangle, X, Eye, Crown, Users, UserPlus, ChevronLeft, ChevronRight, Check, XCircle, UserMinus, Target, Plus, FileText, Radar, Newspaper, Info, MessageSquare, Mail, Lock, List, Filter, ChevronDown, ChevronUp, ShoppingCart, Smartphone, Globe, Settings, LogOut, History, AtSign, User as UserIcon, Edit3, Save, Tv, Gamepad2, Calendar, Award, Video, Music, Play
+  Search, CheckCircle, Circle, Volume2, VolumeX, Percent, RotateCcw, AlertTriangle, X, Eye, Crown, Users, UserPlus, ChevronLeft, ChevronRight, Check, XCircle, UserMinus, Target, Plus, FileText, Radar, Newspaper, Info, Mail, Lock, List, Filter, ChevronDown, ChevronUp, ShoppingCart, Smartphone, Globe, Settings, LogOut, History, AtSign, User as UserIcon, Edit3, Save, Tv, Gamepad2, Calendar, Award, Video, Music, Play, Trash2
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { useAuth } from './AuthContext';
 import { doc, getDoc, setDoc, updateDoc, collection as firestoreCollection, query, where, getDocs, arrayUnion, arrayRemove, deleteDoc, onSnapshot, addDoc, serverTimestamp, runTransaction, orderBy, limit } from 'firebase/firestore';
-import { sendPasswordResetEmail, onAuthStateChanged } from 'firebase/auth';
+import { sendPasswordResetEmail, onAuthStateChanged, deleteUser } from 'firebase/auth';
 import { auth, db } from './firebase';
 
 import { translations } from './locales';
@@ -344,8 +344,10 @@ function MainApp() {
 
   const [isInitializing, setIsInitializing] = useState(true);
   const [isAuthLoading, setIsAuthLoading] = useState(false);
+  const [authError, setAuthError] = useState("");
   const [showSettingsModal, setShowSettingsModal] = useState(false);
   const [showAboutModal, setShowAboutModal] = useState(false);
+  const [showSupportModal, setShowSupportModal] = useState(false);
   const [showNewsModal, setShowNewsModal] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -422,10 +424,9 @@ function MainApp() {
   const holdTimerRef = useRef(null);
   const [holdProgress, setHoldProgress] = useState(0);
 
-  const [showTargetSelector, setShowTargetSelector] = useState(false);
+  const [showSpriteSelector, setShowSpriteSelector] = useState(false);
+  const [selectorContext, setSelectorContext] = useState('extraction');
   const [targetSlotIndex, setTargetSlotIndex] = useState(null);
-
-  const [showTrophySelector, setShowTrophySelector] = useState(false);
   const [trophySlotIndex, setTrophySlotIndex] = useState(null);
 
   useEffect(() => { document.title = "Spritedex"; }, []);
@@ -461,12 +462,12 @@ function MainApp() {
     const handleBackButton = ({ canGoBack }) => {
       if (showSettingsModal) return setShowSettingsModal(false);
       if (showAboutModal) return setShowAboutModal(false);
+      if (showSupportModal) return setShowSupportModal(false);
       if (showNewsModal) return setShowNewsModal(false);
       if (selectedSprite) return setSelectedSprite(null);
       if (showPatchNotes) return setShowPatchNotes(false);
       if (showTransmission) return setShowTransmission(false);
-      if (showTargetSelector) return setShowTargetSelector(false);
-      if (showTrophySelector) return setShowTrophySelector(false);
+      if (showSpriteSelector) return setShowSpriteSelector(false);
       if (showUnfriendConfirm) return setShowUnfriendConfirm(null);
       if (showResetConfirm) return setShowResetConfirm(false);
       if (showAddFriendInput) return setShowAddFriendInput(false);
@@ -479,7 +480,7 @@ function MainApp() {
 
     const listener = CapApp.addListener('backButton', handleBackButton);
     return () => { listener.then(handle => handle.remove()); };
-  }, [showSettingsModal, showAboutModal, showNewsModal, selectedSprite, showPatchNotes, showTransmission, showTargetSelector, showTrophySelector, showUnfriendConfirm, showResetConfirm, showAddFriendInput, showRadarModal, activeViewingFriend, currentView]);
+  }, [showSettingsModal, showAboutModal, showSupportModal, showNewsModal, selectedSprite, showPatchNotes, showTransmission, showSpriteSelector, showUnfriendConfirm, showResetConfirm, showAddFriendInput, showRadarModal, activeViewingFriend, currentView]);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, () => { setIsInitializing(false); });
@@ -493,6 +494,7 @@ function MainApp() {
       setExtractionTargets([]);
       setProfileData({ bio: '', epicName: '', twitchName: '', tiktokName: '', youtubeName: '', kickName: '', trophies: [null, null, null, null] });
       setSpriteId(null);
+      setDesiredSpriteId('');
       setFriendsList([]);
       setPendingRequests([]);
       setSentRequests([]);
@@ -634,7 +636,9 @@ function MainApp() {
   const handleAuth = async (e) => {
     e.preventDefault();
     setIsAuthLoading(true);
+    setAuthError("");
     const sanitizedEmail = email.trim().toLowerCase();
+
     try {
       if (isLoginMode) {
         await logIn(sanitizedEmail, password);
@@ -644,12 +648,14 @@ function MainApp() {
       }
     } catch (err) {
       if (err.code === 'auth/email-already-in-use') {
-        alert(lang === 'es' ? "¡Ya existe una cuenta con este correo! Por favor, inicia sesión o restablece tu contraseña." : "An account with this email already exists! Please sign in or reset your password.");
+        setAuthError(lang === 'es' ? "¡Ya existe una cuenta con este correo! Por favor, inicia sesión o restablece tu contraseña." : "An account with this email already exists! Please sign in or reset your password.");
         setIsLoginMode(true);
       } else if (err.code === 'auth/wrong-password' || err.code === 'auth/user-not-found' || err.code === 'auth/invalid-credential') {
-        alert(lang === 'es' ? "Correo o contraseña incorrectos. Inténtalo de nuevo." : "Incorrect email or password. Please try again.");
+        setAuthError(lang === 'es' ? "Correo o contraseña incorrectos. Inténtalo de nuevo." : "Incorrect email or password. Please try again.");
+      } else if (err.code === 'auth/weak-password') {
+        setAuthError(lang === 'es' ? "La contraseña debe tener al menos 6 caracteres." : "Password must be at least 6 characters long.");
       } else {
-        alert(err.message);
+        setAuthError(err.message);
       }
     } finally {
       setIsAuthLoading(false);
@@ -738,6 +744,28 @@ function MainApp() {
     setCollection({}); setMastery({}); setShowResetConfirm(false);
     setDoc(doc(db, "users", user.uid), { sprites: {}, mastery: {} }, { merge: true });
     playBeep(180, 'sawtooth', 0.3);
+  };
+
+  const handleDeleteAccount = async () => {
+    const isConfirmed = window.confirm(
+      "WARNING: This will permanently delete your account, your Spritedex collection, and all saved progress. This action cannot be undone. Are you absolutely sure?"
+    );
+
+    if (isConfirmed) {
+      try {
+        await deleteDoc(doc(db, "users", user.uid));
+        await deleteUser(auth.currentUser);
+        setShowSettingsModal(false);
+        alert("Your account has been successfully deleted.");
+      } catch (error) {
+        console.error("Error deleting account:", error);
+        if (error.code === 'auth/requires-recent-login') {
+          alert("For security reasons, you must log out and log back in before deleting your account.");
+        } else {
+          alert("Failed to delete account: " + error.message);
+        }
+      }
+    }
   };
 
   const handlePasswordReset = () => {
@@ -843,21 +871,25 @@ function MainApp() {
     } catch (e) { }
   };
 
-  const handleSetTarget = async (targetSpriteId, variant) => {
-    const newTargets = [...extractionTargets]; newTargets[targetSlotIndex] = `${targetSpriteId}_${variant}`; setExtractionTargets(newTargets); setShowTargetSelector(false);
-    await updateDoc(doc(db, "users", user.uid), { extractionTargets: newTargets });
+  // --- CONSOLIDATED SPRITE SELECTOR ---
+  const handleSpriteSelect = async (selectedId, variant) => {
+    if (selectorContext === 'extraction') {
+      const newTargets = [...extractionTargets];
+      newTargets[targetSlotIndex] = `${selectedId}_${variant}`;
+      setExtractionTargets(newTargets);
+      setShowSpriteSelector(false);
+      await updateDoc(doc(db, "users", user.uid), { extractionTargets: newTargets });
+    } else if (selectorContext === 'trophy') {
+      const newTrophies = [...(profileData.trophies || [null, null, null, null])];
+      newTrophies[trophySlotIndex] = `${selectedId}_${variant}`;
+      setProfileData({ ...profileData, trophies: newTrophies });
+      setShowSpriteSelector(false);
+    }
   };
 
   const handleRemoveTarget = async (index, e) => {
     e.stopPropagation(); const newTargets = [...extractionTargets]; newTargets.splice(index, 1); setExtractionTargets(newTargets);
     await updateDoc(doc(db, "users", user.uid), { extractionTargets: newTargets });
-  };
-
-  const handleSetTrophy = async (targetSpriteId, variant) => {
-    const newTrophies = [...(profileData.trophies || [null, null, null, null])];
-    newTrophies[trophySlotIndex] = `${targetSpriteId}_${variant}`;
-    setProfileData({ ...profileData, trophies: newTrophies });
-    setShowTrophySelector(false);
   };
 
   const handleRemoveTrophy = (index, e) => {
@@ -1030,7 +1062,7 @@ function MainApp() {
   };
 
   const renderTargetSlot = (targetKey, index) => {
-    if (!targetKey) return (<button key={index} onClick={() => { setTargetSlotIndex(index); setShowTargetSelector(true); }} className="flex-1 h-12 border-2 border-dashed border-slate-700 rounded-xl flex items-center justify-center bg-black/40 hover:bg-black/60 transition-colors"><Plus className="w-5 h-5 text-slate-600" /></button>);
+    if (!targetKey) return (<button key={index} onClick={() => { setSelectorContext('extraction'); setTargetSlotIndex(index); setShowSpriteSelector(true); }} className="flex-1 h-12 border-2 border-dashed border-slate-700 rounded-xl flex items-center justify-center bg-black/40 hover:bg-black/60 transition-colors"><Plus className="w-5 h-5 text-slate-600" /></button>);
     const sprite = SPRITES_DATABASE.find(s => s.id === targetKey.split('_')[0]);
     const v = targetKey.split('_')[1];
     return (
@@ -1045,7 +1077,7 @@ function MainApp() {
   const renderTrophySlot = (targetKey, index, isSelf, isEditing, userMasteryData) => {
     if (!targetKey) {
       if (isEditing) {
-        return (<button key={index} onClick={() => { setTrophySlotIndex(index); setShowTrophySelector(true); }} className="flex-1 aspect-square border-2 border-dashed border-slate-700 rounded-xl flex items-center justify-center bg-black/40 hover:bg-black/60 transition-colors"><Plus className="w-5 h-5 text-slate-600" /></button>);
+        return (<button key={index} onClick={() => { setSelectorContext('trophy'); setTrophySlotIndex(index); setShowSpriteSelector(true); }} className="flex-1 aspect-square border-2 border-dashed border-slate-700 rounded-xl flex items-center justify-center bg-black/40 hover:bg-black/60 transition-colors"><Plus className="w-5 h-5 text-slate-600" /></button>);
       }
       return (<div key={index} className="flex-1 aspect-square border-2 border-dashed border-slate-800/50 rounded-xl flex items-center justify-center bg-black/20 opacity-50"><Eye className="w-4 h-4 text-slate-700" /></div>);
     }
@@ -1308,6 +1340,13 @@ function MainApp() {
           </div>
 
           <form onSubmit={handleAuth} className="space-y-5">
+            {/* --- NEW ERROR MESSAGE UI --- */}
+            {authError && (
+              <div className="bg-red-950/50 border border-red-500/50 text-red-400 p-3 rounded-xl text-xs font-bold text-center animate-in fade-in zoom-in-95">
+                {authError}
+              </div>
+            )}
+
             <div>
               <label className="block text-slate-300 text-xs font-medium uppercase tracking-wide mb-2">Email Address</label>
               <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} className={`w-full bg-slate-900/60 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-all ${inputSizeClass}`} placeholder="name@example.com" required />
@@ -1393,6 +1432,57 @@ function MainApp() {
               <button onClick={() => { setShowSettingsModal(false); setShowAboutModal(true); }} className="flex items-center gap-4 p-4 rounded-2xl hover:bg-slate-800/50 transition-colors text-left">
                 <Info className="w-6 h-6 text-slate-400" /><span className="text-base font-bold text-slate-200">{t('about')}</span>
               </button>
+
+              {/* --- SUPPORT BUTTON --- */}
+              <button onClick={() => { setShowSettingsModal(false); setShowSupportModal(true); }} className="flex items-center gap-4 p-4 rounded-2xl hover:bg-slate-800/50 transition-colors text-left">
+                <Mail className="w-6 h-6 text-slate-400" /><span className="text-base font-bold text-slate-200">Support & Feedback</span>
+              </button>
+
+              {/* --- DELETE ACCOUNT OPTION (APP STORE COMPLIANT) --- */}
+              <div className="h-px bg-slate-800/50 my-2" />
+              <button onClick={handleDeleteAccount} className="flex items-center gap-4 p-4 rounded-2xl hover:bg-red-950/30 transition-colors text-left group">
+                <Trash2 className="w-6 h-6 text-red-500/70 group-hover:text-red-400" />
+                <span className="text-base font-bold text-red-500/70 group-hover:text-red-400">Delete Account</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* --- SUPPORT / FEEDBACK MODAL --- */}
+      {showSupportModal && (
+        <div className="fixed inset-0 z-[90] flex items-center justify-center p-4 bg-black/90 backdrop-blur-md animate-in fade-in duration-200">
+          <div className="bg-[#12141f] border-2 border-slate-700 rounded-2xl flex flex-col max-w-sm w-full relative overflow-hidden shadow-2xl">
+            <header className="p-4 border-b border-slate-800 flex justify-between items-center bg-[#0e1017]">
+              <h3 className="text-md sm:text-lg font-black tracking-tight text-white uppercase italic flex items-center gap-2">
+                <Mail className="w-5 h-5 text-indigo-400" /> Support
+              </h3>
+              <button onClick={() => setShowSupportModal(false)} className="text-slate-400 hover:text-white"><X className="w-6 h-6" /></button>
+            </header>
+            <div className="p-6 flex flex-col gap-4">
+              <p className="text-sm text-slate-300">Found a bug or have a suggestion? Send a direct transmission to the developer.</p>
+
+              <form onSubmit={(e) => {
+                handleFeedbackSubmit(e);
+                if (feedbackText.trim()) setTimeout(() => setShowSupportModal(false), 2500);
+              }} className="flex flex-col gap-3">
+                <textarea
+                  value={feedbackText}
+                  onChange={(e) => setFeedbackText(e.target.value)}
+                  placeholder="Describe your issue or feedback..."
+                  className={`w-full bg-black/50 border border-slate-700 rounded-xl p-3 text-white focus:outline-none focus:border-indigo-500 resize-none h-32 ${inputSizeClass}`}
+                  required
+                />
+                <button
+                  type="submit"
+                  disabled={feedbackStatus === 'submitting'}
+                  className="w-full bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white font-black uppercase tracking-wider py-3 rounded-xl transition-colors"
+                >
+                  {feedbackStatus === 'submitting' ? 'Sending...' : feedbackStatus === 'success' ? 'Sent!' : 'Submit Feedback'}
+                </button>
+                {feedbackStatus === 'success' && <p className="text-emerald-400 text-xs text-center font-bold">Transmission received. Thank you!</p>}
+                {feedbackStatus === 'error' && <p className="text-red-400 text-xs text-center font-bold">Failed to send. Try again later.</p>}
+              </form>
             </div>
           </div>
         </div>
@@ -1540,6 +1630,45 @@ function MainApp() {
         </div>
       )}
 
+      {/* --- TARGET/TROPHY SELECTOR MODAL --- */}
+      {showSpriteSelector && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/90 backdrop-blur-md animate-in fade-in duration-200">
+          <div className="bg-[#12141f] border-2 border-cyan-500/60 rounded-2xl flex flex-col max-w-sm w-full h-[75vh] relative overflow-hidden shadow-[0_0_30px_rgba(0,0,0,0.8)]">
+            <header className="p-4 border-b border-slate-800 flex justify-between items-center bg-[#0e1017]">
+              <h3 className="text-md sm:text-lg font-black tracking-tight text-cyan-400 uppercase italic flex items-center gap-2">
+                <Target className="w-5 h-5" /> Select Sprite
+              </h3>
+              <button onClick={() => setShowSpriteSelector(false)} className="text-slate-400 hover:text-white"><X className="w-6 h-6" /></button>
+            </header>
+            <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-4">
+              {SPRITES_DATABASE.map(sprite => {
+                let validVariants = [];
+                if (selectorContext === 'trophy') {
+                  validVariants = sprite.variants.filter(v => collection[sprite.id]?.[v]);
+                } else if (selectorContext === 'extraction') {
+                  validVariants = sprite.variants.filter(v => !collection[sprite.id]?.[v] && !isVariantLocked(sprite.id, v));
+                }
+
+                if (validVariants.length === 0) return null;
+                return (
+                  <div key={sprite.id} className="bg-slate-900 border border-slate-800 rounded-xl p-3">
+                    <span className="text-sm font-black text-white uppercase italic mb-2 block">{sprite.name}</span>
+                    <div className="grid grid-cols-6 gap-2">
+                      {validVariants.map(v => (
+                        <button key={v} onClick={() => handleSpriteSelect(sprite.id, v)} className="flex flex-col items-center p-2 rounded-lg border border-slate-700 bg-black/40 hover:bg-slate-800 transition-colors">
+                          <img src={sprite.images[v]} className="w-8 h-8 object-contain mb-1" alt="" />
+                          <span className={`text-[7px] sm:text-[8px] font-black uppercase ${VARIANT_INFO[v]?.color}`}>{t(v)}</span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* --- ABOUT MODAL --- */}
       {showAboutModal && (
         <div className="fixed inset-0 z-[90] flex items-center justify-center p-4 bg-black/90 backdrop-blur-md animate-in fade-in duration-200">
@@ -1656,43 +1785,6 @@ function MainApp() {
                   </div>
                 ))}
               </section>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* --- TARGET/TROPHY SELECTOR MODAL --- */}
-      {(showTargetSelector || showTrophySelector) && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90 backdrop-blur-md animate-in fade-in duration-200">
-          <div className="bg-[#12141f] border-2 border-cyan-500/60 rounded-2xl flex flex-col max-w-sm w-full h-[75vh] relative overflow-hidden">
-            <header className="p-4 border-b border-slate-800 flex justify-between items-center bg-[#0e1017]">
-              <h3 className="text-md sm:text-lg font-black tracking-tight text-cyan-400 uppercase italic flex items-center gap-2"><Target className="w-5 h-5" /> Select {showTrophySelector ? 'Trophy' : 'Target'}</h3>
-              <button onClick={() => { setShowTargetSelector(false); setShowTrophySelector(false); }} className="text-slate-400 hover:text-white"><X className="w-6 h-6" /></button>
-            </header>
-            <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-4">
-              {SPRITES_DATABASE.map(sprite => {
-                let validVariants = [];
-                if (showTrophySelector) {
-                  validVariants = sprite.variants.filter(v => collection[sprite.id]?.[v]);
-                } else {
-                  validVariants = sprite.variants.filter(v => !collection[sprite.id]?.[v] && !isVariantLocked(sprite.id, v));
-                }
-
-                if (validVariants.length === 0) return null;
-                return (
-                  <div key={sprite.id} className="bg-slate-900 border border-slate-800 rounded-xl p-3">
-                    <span className="text-sm font-black text-white uppercase italic mb-2 block">{sprite.name}</span>
-                    <div className="grid grid-cols-6 gap-2">
-                      {validVariants.map(v => (
-                        <button key={v} onClick={() => { showTrophySelector ? handleSetTrophy(sprite.id, v) : handleSetTarget(sprite.id, v) }} className="flex flex-col items-center p-2 rounded-lg border border-slate-700 bg-black/40 hover:bg-slate-800 transition-colors">
-                          <img src={sprite.images[v]} className="w-8 h-8 object-contain mb-1" alt="" />
-                          <span className={`text-[7px] sm:text-[8px] font-black uppercase ${VARIANT_INFO[v]?.color}`}>{t(v)}</span>
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                )
-              })}
             </div>
           </div>
         </div>
@@ -1857,7 +1949,7 @@ function MainApp() {
                             </div>
                             <span className="text-[7px] sm:text-[8px] font-bold uppercase text-slate-500 tracking-wider whitespace-nowrap">{v === 'holofoil' ? 'Holo' : t(v)}</span>
                           </div>
-                        )
+                        );
                       })}
                     </div>
                   </div>
@@ -1903,7 +1995,6 @@ function MainApp() {
               </button>
             )}
 
-            {/* NEW STANDALONE NEWSFEED BUTTON (Between Profile & Settings) */}
             <button onClick={() => setShowNewsModal(true)} className="p-2 rounded-xl bg-slate-900 border-2 border-slate-700/60 hover:bg-slate-800 transition-colors shadow-sm">
               <Newspaper className="w-5 h-5 sm:w-6 sm:h-6 text-slate-300" />
             </button>
@@ -1920,106 +2011,7 @@ function MainApp() {
         {/* --- PROFILE VIEW --- */}
         {currentView === 'profile' && user && (
           <div className="flex flex-col gap-5 animate-in fade-in duration-300">
-
-            {/* Radar Sweep Container */}
-            <div className="bg-[#12141f] p-5 rounded-2xl border border-slate-800 shadow-xl relative overflow-hidden">
-              <div className="absolute top-0 right-0 w-32 h-32 bg-cyan-500/10 rounded-full blur-[50px] pointer-events-none" />
-              <div className="flex justify-between items-center mb-4 relative z-10">
-                <div>
-                  <h3 className="text-xl font-black text-cyan-400 flex items-center italic uppercase">
-                    <Radar className="w-5 h-5 mr-2" />
-                    Daily Radar
-                  </h3>
-                  {sweepStreak >= 1 && (
-                    <span className="text-[9px] font-black uppercase px-2 py-0.5 rounded-md bg-gradient-to-br from-red-900/60 to-orange-900/40 border border-red-500/50 text-red-400 flex items-center gap-1 shadow-[0_0_10px_rgba(239,68,68,0.3)] mt-1 w-max">
-                      🔥 {sweepStreak} Day Streak
-                    </span>
-                  )}
-                </div>
-                <div className="text-right flex flex-col items-end">
-                  <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mb-1">Fragments</p>
-                  <div className="flex items-center gap-2">
-                    <svg viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5 text-cyan-400 drop-shadow-[0_0_8px_rgba(34,211,238,0.8)] animate-pulse">
-                      <path d="M12 2L2 12l10 10 10-10L12 2zM12 5.83L18.17 12 12 18.17 5.83 12 12 5.83z" />
-                    </svg>
-                    <p className="text-xl font-mono font-black text-white">{fragments}</p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="relative z-10">
-                <button
-                  onClick={initiateRadarSweep}
-                  disabled={isSweeping || !canSweepToday}
-                  className={`w-full py-3.5 rounded-xl font-black text-sm uppercase tracking-wider transition-all duration-300 flex items-center justify-center border-2 ${isSweeping
-                    ? "bg-cyan-950/60 border-cyan-500 text-cyan-400 animate-pulse"
-                    : (!canSweepToday)
-                      ? "bg-slate-900 border-slate-800 text-slate-600 cursor-not-allowed"
-                      : "bg-cyan-600 border-cyan-400 hover:bg-cyan-500 text-white active:scale-[0.98] shadow-[0_0_20px_rgba(34,211,238,0.3)]"
-                    }`}
-                >
-                  {isSweeping ? "SCANNING..." : (!canSweepToday) ? `COOLDOWN: ${timeUntilNextSweep}` : "INITIATE SWEEP"}
-                </button>
-              </div>
-
-              {sweepResult && (
-                <div className="mt-4 p-3 bg-cyan-950/40 rounded-xl border border-cyan-500/30 text-center animate-in zoom-in-95 duration-200">
-                  <p className="text-xs font-black text-cyan-300 uppercase tracking-wider">{sweepResult}</p>
-                </div>
-              )}
-
-              <div className="mt-4 p-3.5 bg-slate-900/80 rounded-xl border border-slate-700/60 flex items-start relative z-10">
-                <div className="text-amber-400 mr-3 mt-0.5 shrink-0">
-                  <Lock className="w-5 h-5" />
-                </div>
-                <div>
-                  <p className="text-xs font-black text-amber-400 mb-1 tracking-wider">HOARD YOUR FRAGMENTS!</p>
-                  <p className="text-[10px] sm:text-xs text-slate-400 leading-relaxed font-medium">
-                    The Vault expands soon. Save up to unlock Profile Auras, extra Trophy slots, and tactical upgrades in the upcoming Profile Shop.
-                  </p>
-                </div>
-              </div>
-            </div>
-
             {renderProfileCard(spriteId, profileData, completionRate, masteryRate, user.metadata?.creationTime, true, mastery)}
-
-            <div className="bg-[#12141f] rounded-2xl border border-slate-800 p-5 shadow-xl">
-              <h3 className="text-sm font-black text-white uppercase italic tracking-wider mb-4 flex items-center gap-2"><Eye className="w-4 h-4 text-cyan-400" /> Milestone Unlocks</h3>
-              <p className="text-xs text-slate-400 leading-relaxed mb-4">Grind Masteries and full collections to automatically unlock prestigious backgrounds for your Profile.</p>
-
-              <div className="space-y-3">
-                {MILESTONES.map((stone, idx) => {
-                  let isUnlocked = false;
-                  let progress = 0;
-
-                  if (stone.isPercent) {
-                    const currentRate = stone.type === 'mastery' ? masteryRate : completionRate;
-                    isUnlocked = currentRate >= stone.count;
-                    progress = currentRate;
-                  } else {
-                    isUnlocked = totalMastered >= stone.count;
-                    progress = Math.min(totalMastered, stone.count);
-                  }
-
-                  return (
-                    <div key={idx} className={`p-3 rounded-xl border ${isUnlocked ? stone.bg : 'bg-black/40 border-slate-800 opacity-60'} flex items-center gap-3 transition-all`}>
-                      <div className="w-10 h-10 rounded-full bg-black/40 flex items-center justify-center shrink-0 border border-white/10">
-                        {isUnlocked ? <CheckCircle className="w-5 h-5 text-white" /> : <Lock className="w-5 h-5 text-slate-500" />}
-                      </div>
-                      <div className="flex-1">
-                        <span className={`block font-black text-sm uppercase ${isUnlocked ? 'text-white' : 'text-slate-400'}`}>{stone.name}</span>
-                        <span className="block text-[10px] font-mono text-slate-500 uppercase tracking-widest">{stone.isPercent ? `${stone.count}% ${stone.type}` : `${stone.count} Mastered`}</span>
-                      </div>
-                      {!isUnlocked && (
-                        <div className="text-right">
-                          <span className="text-xs font-black text-slate-500 font-mono">{progress} / {stone.count}{stone.isPercent ? '%' : ''}</span>
-                        </div>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
           </div>
         )}
 
@@ -2321,57 +2313,19 @@ function MainApp() {
           </div>
         )}
 
-        {/* --- SUPPORT TAB VIEW --- */}
-        {currentView === 'feedback' && (
-          <section className="flex flex-col gap-4 animate-in fade-in duration-300 pt-2">
-            <div className="bg-gradient-to-r from-emerald-900/40 via-teal-900/30 to-slate-900 border-2 border-emerald-500/50 rounded-2xl p-5 shadow-[0_0_20px_rgba(16,185,129,0.15)] flex flex-col items-center text-center">
-              <div className="w-12 h-12 bg-emerald-950/80 rounded-full border border-emerald-400 flex items-center justify-center mb-3"><Smartphone className="w-6 h-6 text-emerald-400" /></div>
-              <h4 className="text-lg font-black text-white uppercase italic mb-1 tracking-wider">Spritedex is on Android!</h4>
-              <a href="https://play.google.com/store/apps/details?id=com.prosynctech.spritedex" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 bg-emerald-500 hover:bg-emerald-400 text-black font-black uppercase tracking-wider py-3 px-6 rounded-xl text-xs sm:text-sm transition-all shadow-lg mt-2">
-                <span>Get it on Google Play</span>
-              </a>
-            </div>
-
-            <div className="bg-[#12141f] border-2 border-emerald-500/40 rounded-2xl p-5 shadow-[0_0_20px_rgba(16,185,129,0.1)]">
-              <h3 className="text-xl sm:text-2xl font-black text-emerald-400 uppercase italic mb-2">{t('feedback_title')}</h3>
-              <p className="text-sm sm:text-base text-slate-400 mb-6">{t('feedback_prompt')}</p>
-
-              <form onSubmit={handleFeedbackSubmit} className="flex flex-col gap-3">
-                <textarea value={feedbackText} onChange={(e) => setFeedbackText(e.target.value)} placeholder={t('tell_us')} className={`w-full bg-black/50 border-2 border-slate-800 rounded-xl p-3 ${responsiveInputSizeClass} text-white focus:outline-none focus:border-emerald-500 min-h-[120px] resize-y`} required />
-                <button type="submit" disabled={feedbackStatus === 'submitting'} className="w-full flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 disabled:hover:bg-emerald-600 text-white font-black uppercase tracking-wider py-3 rounded-xl transition-colors">
-                  {feedbackStatus === 'submitting' ? t('sending') : feedbackStatus === 'success' ? <><CheckCircle className="w-5 h-5" /> {t('sent')}</> : <><Mail className="w-5 h-5" /> {t('send_feedback')}</>}
-                </button>
-              </form>
-            </div>
-
-            <div className="p-5 bg-gradient-to-r from-purple-900/30 to-fuchsia-900/20 border border-purple-500/40 rounded-2xl flex flex-col items-center text-center shadow-[0_0_15px_rgba(168,85,247,0.15)] animate-in fade-in duration-500">
-              <div className="w-12 h-12 bg-purple-900/50 rounded-full border border-purple-400/50 flex items-center justify-center mb-3"><Info className="w-6 h-6 text-purple-400" /></div>
-              <h4 className="text-lg font-black text-purple-400 uppercase italic mb-2 tracking-wider">{t('support_tracker')}</h4>
-              <p className="text-xs sm:text-sm text-slate-300 leading-relaxed mb-4 max-w-[280px]">{t('buy_merch')}</p>
-              <div className="flex flex-col gap-2.5 w-full max-w-[280px]">
-                <a href="https://amzn.to/3ThkM2y" target="_blank" rel="noopener noreferrer" className="flex items-center justify-between bg-purple-900/40 hover:bg-purple-600 border border-purple-500/50 text-white font-black uppercase tracking-widest py-3 px-4 rounded-xl text-xs sm:text-sm transition-all shadow-md"><span>Mini Sprites</span><ShoppingCart className="w-4 h-4 opacity-70" /></a>
-                <a href="https://amzn.to/4yzmyfD" target="_blank" rel="noopener noreferrer" className="flex items-center justify-between bg-purple-900/40 hover:bg-purple-600 border border-purple-500/50 text-white font-black uppercase tracking-widest py-3 px-4 rounded-xl text-xs sm:text-sm transition-all shadow-md"><span>Sprite Plush</span><ShoppingCart className="w-4 h-4 opacity-70" /></a>
-              </div>
-            </div>
-          </section>
-        )}
-
       </main>
 
       {/* --- BOTTOM NAVIGATION BAR --- */}
       <nav className="fixed bottom-4 left-0 right-0 z-50 flex justify-center px-4">
-        <div className="bg-[#0e1017]/95 backdrop-blur-md border border-slate-800 rounded-2xl w-full max-w-sm px-2 py-2 flex justify-between shadow-2xl">
+        <div className="bg-[#0e1017]/95 backdrop-blur-md border border-slate-800 rounded-2xl w-full max-w-md px-1.5 py-2 flex justify-between shadow-2xl">
           <button onClick={() => { setCurrentView('sprites'); setActiveViewingFriend(null); playBeep(440, 'sine', 0.05); }} className={`flex-1 flex flex-col items-center gap-1 py-1 transition-colors ${currentView === 'sprites' && !activeViewingFriend ? 'text-cyan-400' : 'text-slate-600'}`}>
-            <List className="w-5 h-5 sm:w-6 sm:h-6" /><span className="text-[9px] sm:text-[10px] font-black uppercase tracking-wider">{t('sprites')}</span>
+            <List className="w-5 h-5" /><span className="text-[9px] font-black uppercase tracking-wider">{t('sprites')}</span>
           </button>
           <button onClick={() => { setCurrentView('mastery'); setActiveViewingFriend(null); playBeep(523, 'sine', 0.05); }} className={`flex-1 flex flex-col items-center gap-1 py-1 transition-colors ${currentView === 'mastery' && !activeViewingFriend ? 'text-yellow-400' : 'text-slate-600'}`}>
-            <Crown className="w-5 h-5 sm:w-6 sm:h-6" /><span className="text-[9px] sm:text-[10px] font-black uppercase tracking-wider">{t('mastery')}</span>
+            <Crown className="w-5 h-5" /><span className="text-[9px] font-black uppercase tracking-wider">{t('mastery')}</span>
           </button>
-          <button onClick={() => { setCurrentView('friends'); setActiveViewingFriend(null); playBeep(587, 'sine', 0.05); }} className={`flex-1 flex flex-col items-center gap-1 py-1 transition-colors ${currentView === 'friends' || activeViewingFriend ? 'text-indigo-400' : 'text-slate-600'}`}>
-            <Users className="w-5 h-5 sm:w-6 sm:h-6" /><span className="text-[9px] sm:text-[10px] font-black uppercase tracking-wider">{t('friends')}</span>
-          </button>
-          <button onClick={() => { setCurrentView('feedback'); setActiveViewingFriend(null); playBeep(659, 'sine', 0.05); }} className={`flex-1 flex flex-col items-center gap-1 py-1 transition-colors ${currentView === 'feedback' && !activeViewingFriend ? 'text-emerald-400' : 'text-slate-600'}`}>
-            <MessageSquare className="w-5 h-5 sm:w-6 sm:h-6" /><span className="text-[9px] sm:text-[10px] font-black uppercase tracking-wider">{t('support')}</span>
+          <button onClick={() => { setCurrentView('friends'); setActiveViewingFriend(null); playBeep(659, 'sine', 0.05); }} className={`flex-1 flex flex-col items-center gap-1 py-1 transition-colors ${currentView === 'friends' || activeViewingFriend ? 'text-blue-400' : 'text-slate-600'}`}>
+            <Users className="w-5 h-5" /><span className="text-[9px] font-black uppercase tracking-wider">Squad</span>
           </button>
         </div>
       </nav>

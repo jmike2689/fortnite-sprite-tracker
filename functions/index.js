@@ -340,3 +340,39 @@ exports.fetchFortniteNews = functions.pubsub.schedule("*/5 * * * *") // Runs eve
 
         return null;
     });
+
+// --- 6. AUTO-CLEANUP OLD NEWS FEED POSTS ---
+exports.cleanupOldNews = functions.pubsub.schedule("0 3 * * *") // Runs daily at 3:00 AM
+    .timeZone("America/Chicago")
+    .onRun(async (context) => {
+        try {
+            // Calculate the timestamp for exactly 7 days ago
+            const sevenDaysAgo = Date.now() - (7 * 24 * 60 * 60 * 1000);
+
+            const newsRef = db.collection("news_feed");
+
+            // Find all posts where sortTime is older than 7 days
+            const snapshot = await newsRef.where("sortTime", "<", sevenDaysAgo).get();
+
+            if (snapshot.empty) {
+                console.log("No old news to clean up today.");
+                return null;
+            }
+
+            // Delete them in a batch
+            const batch = db.batch();
+            let deletedCount = 0;
+
+            snapshot.docs.forEach((doc) => {
+                batch.delete(doc.ref);
+                deletedCount++;
+            });
+
+            await batch.commit();
+            console.log(`Successfully deleted ${deletedCount} old news posts.`);
+        } catch (error) {
+            console.error("Error cleaning up old news:", error);
+        }
+
+        return null;
+    });
