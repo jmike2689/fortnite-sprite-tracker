@@ -17,32 +17,74 @@ import { auth, db } from './firebase';
 
 import { translations } from './locales';
 
-// --- NEW SPRITES & VARIANTS IMPORTS ---
-import ironMouseBase from './assets/Iron Mouse Base.webp';
+// --- CHAPTER 7 SEASON 4 IMPORTS ---
+import jackrabbitBase from './assets/Jackrabbit Base.webp';
+import jackrabbitGold from './assets/Jackrabbit Gold.webp';
+import jackrabbitCheatMaster from './assets/Jackrabbit Cheat Master.webp';
 
+import shadowBase from './assets/Shadow Base.webp';
+import shadowGold from './assets/Shadow Gold.webp';
+import shadowCheatMaster from './assets/Shadow Cheat Master.webp';
+
+import bushBase from './assets/Bush Base.webp';
+import bushGold from './assets/Bush Gold.webp';
+import bushCheatMaster from './assets/Bush Cheat Master.webp';
+
+import tailsBase from './assets/Tails Base.webp';
+import tailsGold from './assets/Tails Gold.webp';
+import tailsCheatMaster from './assets/Tails Cheat Master.webp';
+
+import killswitchBase from './assets/Killswitch Base.webp';
+import killswitchGold from './assets/Killswitch Gold.webp';
+import killswitchCheatMaster from './assets/Killswitch Cheat Master.webp';
+
+import adventureBase from './assets/Adventure Base.webp';
+import adventureGold from './assets/Adventure Gold.webp';
+import adventureCheatMaster from './assets/Adventure Cheat Master.webp';
+
+import klomboBase from './assets/Klombo Base.webp';
+import klomboGold from './assets/Klombo Gold.webp';
+import klomboCheatMaster from './assets/Klombo Cheat Master.webp';
+
+import jonesyBase from './assets/Jonesy Base.webp';
+import jonesyGold from './assets/Jonesy Gold.webp';
+import jonesyCheatMaster from './assets/Jonesy Cheat Master.webp';
+
+import sonicBase from './assets/Sonic Base.webp';
+import sonicGold from './assets/Sonic Gold.webp';
+import sonicCheatMaster from './assets/Sonic Cheat Master.webp';
+
+import crownBase from './assets/Crown Base.webp';
+import crownGold from './assets/Crown Gold.webp';
+import crownCheatMaster from './assets/Crown Cheat Master.webp';
+
+import eightBitBase from './assets/8-Bit Base.webp';
+import eightBitGold from './assets/8-bit Gold.webp';
+import eightBitCheatMaster from './assets/8-Bit Cheat Master.webp';
+
+import stormScoutBase from './assets/Storm Scount Base.webp';
+import stormScoutGold from './assets/Storm Scout Gold.webp';
+import stormScoutCheatMaster from './assets/Storm Scout Cheat Master.webp';
+
+// --- EXISTING IMPORTS ---
+import ironMouseBase from './assets/Iron Mouse Base.webp';
 import peelyBase from './assets/Peely Base.webp';
 import peelyGold from './assets/Gold Peely.webp';
 import peelyGummy from './assets/Gummy Peely.webp';
 import peelyGalaxy from './assets/Galaxy Peely.webp';
 import peelyHolofoil from './assets/Holofoil Peely.webp';
-
 import llamaBase from './assets/Llama Base.webp';
 import llamaGold from './assets/Gold Llama.webp';
 import llamaGummy from './assets/Gummy Llama.webp';
 import llamaGalaxy from './assets/Galaxy Llama.webp';
 import llamaGem from './assets/Gem Llama.webp';
-
 import zpHolofoil from './assets/Holofoil Zero Point.webp';
 import zpCube from './assets/Cube Zero Point.webp';
-
 import waterQuack from './assets/Quack Water.webp';
 import earthQuack from './assets/Quack Earth.webp';
 import fireQuack from './assets/Quack Fire.webp';
-
 import grimGem from './assets/Gem Grim.webp';
 import grimHolofoil from './assets/Holofoil Grim.webp';
-
-// --- EXISTING IMPORTS ---
 import johnWickBase from './assets/John Wick Base.webp';
 import zpBase from './assets/Zero Point Base.webp';
 import zpGold from './assets/Zero Point Gold.webp';
@@ -144,7 +186,7 @@ import gemPunk from './assets/Gem Punk.webp';
 import gemAura from './assets/Gem Aura.webp';
 import quackZeroPoint from './assets/Quack Zero Point.webp';
 
-const variantsList = ['base', 'gold', 'gummy', 'galaxy', 'holofoil', 'cube', 'gem', 'quack'];
+const variantsList = ['base', 'gold', 'gummy', 'galaxy', 'holofoil', 'cube', 'gem', 'quack', 'cheatmaster'];
 const LOCKED_VARIANTS = {};
 
 const isVariantLocked = (spriteId, variant) => {
@@ -152,34 +194,60 @@ const isVariantLocked = (spriteId, variant) => {
 };
 
 const SPRITES_DATABASE = [
-  { id: "iron-mouse", name: "Iron Mouse", rarity: "Mythic", images: { base: ironMouseBase }, variants: ['base'], baseAbility: { en: "Regenerate health over time when low. While regenerating, gain Cloak and low gravity! Health regenerated to increases at each Level Up: 60 Health -> 70 Health -> 80 Health -> 90 Health -> 100 Health", es: "Regenera salud con el tiempo cuando está baja. ¡Mientras te regeneras, obtienes Camuflaje y baja gravedad! La salud regenerada aumenta en cada Nivel: 60 Salud -> 70 Salud -> 80 Salud -> 90 Salud -> 100 Salud" } },
-  { id: "john-wick", name: "John Wick", rarity: "Mythic", images: { base: johnWickBase }, variants: ['base'], baseAbility: { en: "Reveals nearby enemies after you knock or eliminate another player. Sprite level stays exactly as found. Only Sprite usable in Fortnite Reload (Simpsons Reload Mode). Claiming in Reload unlocks it for Battle Royale and other modes.", es: "Revela enemigos cercanos después de derribar o eliminar a otro jugador. Su nivel se mantiene exactamente como se encontró. Es el único Sprite utilizable en Fortnite Recarga. Reclamarlo en Recarga lo desbloquea para Battle Royale y otros modos." } },
-  { id: "peely", name: "Peely", rarity: "Legendary", images: { base: peelyBase, gold: peelyGold, gummy: peelyGummy, galaxy: peelyGalaxy, holofoil: peelyHolofoil }, variants: ['base', 'gold', 'gummy', 'galaxy', 'holofoil'], baseAbility: { en: "Emits a ping for players with rare sprites nearby, but marks you on the map. Ping radius increases at each Level Up: 40m -> 50m -> 60m -> 70m -> 80m", es: "Emite un ping para los jugadores con sprites raros cercanos, pero te marca en el mapa. El radio del ping aumenta en cada Nivel: 40m -> 50m -> 60m -> 70m -> 80m" } },
-  { id: "llama", name: "Llama", rarity: "Legendary", images: { base: llamaBase, gold: llamaGold, gummy: llamaGummy, galaxy: llamaGalaxy, gem: llamaGem }, variants: ['base', 'gold', 'gummy', 'galaxy', 'gem'], baseAbility: { en: "Opening ammo boxes has a chance to grant a weapon upgrade. Chance increases at each Level Up: 5% -> 10% -> 15% -> 17% -> 20%", es: "Abrir cajas de munición tiene la posibilidad de otorgar una mejora de arma. La probabilidad aumenta en cada Nivel: 5% -> 10% -> 15% -> 17% -> 20%" } },
-  { id: "zero-point", name: "Zero Point", rarity: "Mythic", images: { base: zpBase, gold: zpGold, gummy: zpGummy, galaxy: zpGalaxy, holofoil: zpHolofoil, cube: zpCube, gem: gemZeroPoint, quack: quackZeroPoint }, variants: ['base', 'gold', 'gummy', 'galaxy', 'holofoil', 'cube', 'gem', 'quack'], baseAbility: { en: "Spawn a Shield Bubble Jr. when you use a healing item on yourself (excluding splashes and grenades). Duration at each Level Up: 6s -> 7s -> 8s -> 9s -> 10s.", es: "Genera una Burbuja Escudo Jr. cuando usas un objeto de curación en ti mismo (excluyendo salpicones y granadas). Duración por nivel: 6s -> 7s -> 8s -> 9s -> 10s." } },
-  { id: "burnt-peanut", name: "Burnt Peanut", rarity: "Mythic", images: { base: peanutBase, gold: peanutBase, gummy: peanutBase, galaxy: peanutBase }, variants: ['base'], baseAbility: { en: "Goop! When eliminating players, you may find more loot. Sometimes mythic! Chance at each Level Up: 20% -> 30% -> 40% -> 50% -> 60% chance (10% chance to find Mythic at Max Level!).", es: "¡Pringue! Al eliminar jugadores, puedes encontrar más botín. ¡A veces mítico! Probabilidad por nivel: 20% -> 30% -> 40% -> 50% -> 60% (¡10% de encontrar Mítico al Nivel Máximo!)." } },
-  { id: "batman", name: "Batman", rarity: "Mythic", images: { base: batmanBase, gold: batmanGold, gummy: batmanGummy, galaxy: batmanGalaxy, holofoil: batmanHolofoil, cube: cubeBatman }, variants: ['base', 'gold', 'gummy', 'galaxy', 'holofoil', 'cube'], baseAbility: { en: "Grants the ability to launch in the air and deploy the Bat Cape!", es: "¡Otorga la habilidad de lanzarte en el aire y desplegar la capa de murciélago!" } },
-  { id: "vini-jr", name: "Vini Jr", rarity: "Mythic", images: { base: viniBase, gold: viniBase, gummy: viniBase, galaxy: viniBase, holofoil: viniBase }, variants: ['base'], baseAbility: { en: "Sprinting for a short time makes your slide destructive. Slidekicking enemies increases rate of fire and reload speed. Increases in power at each Level Up: 40 dmg / 10% fire rate -> 45 dmg / 20% fire rate -> 50 dmg / 30% fire rate -> 55 dmg / 40% fire rate -> 60 dmg / 50% fire rate", es: "Esprintar por poco tiempo hace que tu deslizamiento sea destructivo. Patear enemigos deslizándote aumenta la cadencia de fuego y recarga. Aumentos: 40 daño / 10% cadencia -> 45 / 20% -> 50 / 30% -> 55 / 40% -> 60 / 50%." } },
-  { id: "pollo", name: "Pollo", rarity: "Mythic", images: { base: polloBase, gold: polloBase, gummy: polloBase, galaxy: polloBase, holofoil: polloBase }, variants: ['base'], baseAbility: { en: "Upon earning an elimination, slowly replenish shield for you and nearby squad members for a duration. Duration increases at each Level Up: 6 Seconds -> 7 Seconds -> 8 Seconds -> 9 Seconds -> 10 Seconds", es: "Al conseguir una eliminación, repón lentamente el escudo para ti y miembros cercanos del escuadrón. Duración: 6s -> 7s -> 8s -> 9s -> 10s." } },
-  { id: "dream", name: "Dream", rarity: "Legendary", images: { base: dreamBase, gold: dreamGold, gummy: dreamGummy, galaxy: dreamGalaxy, cube: cubeDream }, variants: ['base', 'gold', 'gummy', 'galaxy', 'cube'], baseAbility: { en: "Grants a random item at each level, exploding with legendary loot at Max Level. Loot value increases at each Level Up!", es: "Otorga un objeto aleatorio en cada nivel, explotando con botín legendario en el Nivel Máximo. ¡El valor del botín aumenta!" } },
-  { id: "punk", name: "Punk", rarity: "Legendary", images: { base: punkBase, gold: punkGold, gummy: punkGummy, galaxy: punkGalaxy, cube: cubePunk, gem: gemPunk }, variants: ['base', 'gold', 'gummy', 'galaxy', 'cube'], baseAbility: { en: "Does nothing until Level 5, in which it will always grant a buff for unlimited ammo.", es: "No hace nada hasta el Nivel 5, en el que siempre otorgará un potenciador de munición ilimitada." } },
-  { id: "boss", name: "Boss", rarity: "Legendary", images: { base: bossBase, gold: bossGold, gummy: bossGummy, galaxy: bossGalaxy, cube: cubeBoss }, variants: ['base', 'gold', 'gummy', 'galaxy', 'cube'], baseAbility: { en: "Grants an increase to your max HP and Shield. Increases at each Level Up: 5 -> 10 -> 15 -> 20 -> 25 HP/Shield.", es: "Otorga un aumento a tu vida máxima y Escudo. Aumenta: 5 -> 10 -> 15 -> 20 -> 25 PV/Escudo." } },
-  { id: "grim", name: "Grim", rarity: "Mythic", images: { base: grimBase, gold: grimGold, gummy: grimGummy, galaxy: grimGalaxy, holofoil: grimHolofoil, cube: cubeGrim, gem: grimGem }, variants: ['base', 'gold', 'gummy', 'galaxy', 'holofoil', 'cube', 'gem'], baseAbility: { en: "Players who attack you are marked for a duration. Duration at each Level Up: 3s -> 3.5s -> 4s -> 4.5s -> 5s.", es: "Los jugadores que te ataquen quedan marcados. Duración: 3s -> 3.5s -> 4s -> 4.5s -> 5s." } },
-  { id: "seven", name: "Seven", rarity: "Legendary", images: { base: sevenBase, gold: sevenGold, gummy: sevenGummy, galaxy: sevenGalaxy, holofoil: sevenHolofoil }, variants: ['base', 'gold', 'gummy', 'galaxy', 'holofoil'], baseAbility: { en: "Enemy player foot trails are visible in the world for your Squad. Duration increases at each Level Up: 10 Seconds -> 15 Seconds -> 20 Seconds -> 25 Seconds -> 30 Second foot trails.", es: "Los rastros de los jugadores enemigos son visibles para tu Escuadrón. Duración: 10s -> 15s -> 20s -> 25s -> 30s." } },
-  { id: "duck", name: "Duck", rarity: "Epic", images: { base: duckBase, gold: duckGold, gummy: duckGummy, galaxy: duckGalaxy, gem: gemDuck }, variants: ['base', 'gold', 'gummy', 'galaxy', 'gem'], baseAbility: { en: "Emoting or Jamming replenishes shields. Increases in power at each Level Up: 2 -> 3 -> 4 -> 6 -> 8 Shield per tick.", es: "Hacer un gesto o improvisar repone los escudos. Poder: 2 -> 3 -> 4 -> 6 -> 8 Escudo por tick." } },
-  { id: "demon", name: "Demon", rarity: "Epic", images: { base: demonBase, gold: demonGold, gummy: demonGummy, galaxy: demonGalaxy, gem: gemDemon }, variants: ['base', 'gold', 'gummy', 'galaxy', 'gem'], baseAbility: { en: "Siphon some health and shields when you eliminate an opponent. Increases in power at each Level Up: 10 -> 15 -> 20 -> 25 -> 30 Healing per elimination.", es: "Sifón de salud y escudo cuando eliminas a un oponente. Poder: 10 -> 15 -> 20 -> 25 -> 30 Curación." } },
-  { id: "ghost", name: "Ghost", rarity: "Epic", images: { base: ghostBase, gold: ghostGold, gummy: ghostGummy, galaxy: ghostGalaxy, holofoil: ghostHolofoil }, variants: ['base', 'gold', 'gummy', 'galaxy', 'holofoil'], baseAbility: { en: "Grants cloak for a duration upon reloading. Increases in duration at each Level Up: 3s -> 3.5s -> 4s -> 4.5s -> 5s.", es: "Otorga camuflaje por una duración al recargar. Duración: 3s -> 3.5s -> 4s -> 4.5s -> 5s." } },
-  { id: "king", name: "King", rarity: "Epic", images: { base: kingBase, gold: kingGold, gummy: kingGummy, galaxy: kingGalaxy, holofoil: kingHolofoil }, variants: ['base', 'gold', 'gummy', 'galaxy', 'holofoil'], baseAbility: { en: "Your Pickaxe deals more damage. Increases in damage at each Level Up: 30 -> 40 -> 60 -> 80 -> 120 bonus damage.", es: "Tu pico inflige más daño. Daño: 30 -> 40 -> 60 -> 80 -> 120 daño adicional." } },
-  { id: "aura", name: "Aura", rarity: "Epic", images: { base: auraBase, gold: auraGold, gummy: auraGummy, galaxy: auraGalaxy, gem: gemAura }, variants: ['base', 'gold', 'gummy', 'galaxy', 'gem'], baseAbility: { en: "Gain a Shock Rock charge when you deal enough damage to enemies! Required damage decreases at each Level Up: 175 -> 150 -> 125 -> 100 -> 75 Damage to trigger.", es: "¡Obtén una carga de Roca de Choque al infligir suficiente daño a enemigos! Daño requerido: 175 -> 150 -> 125 -> 100 -> 75 Daño." } },
-  { id: "striker", name: "Striker", rarity: "Epic", images: { base: strikerBase, gold: strikerGold, gummy: strikerGummy, galaxy: strikerGalaxy, holofoil: strikerHolofoil }, variants: ['base', 'gold', 'gummy', 'galaxy', 'holofoil'], baseAbility: { en: "Gain the Overdrive effect when you Mantle, Hurdle, or Wall Scramble. Duration increases at each Level Up: 6s -> 7s -> 8s -> 9s -> 10s of Overdrive.", es: "Obtén el efecto Sobrecarga cuando trepas, saltas o te encaramas. Duración: 6s -> 7s -> 8s -> 9s -> 10s." } },
-  { id: "water", name: "Water", rarity: "Rare", images: { base: waterBase, gold: waterGold, gummy: waterGummy, galaxy: waterGalaxy, holofoil: waterHolofoil, gem: gemWater, quack: waterQuack }, variants: ['base', 'gold', 'gummy', 'galaxy', 'holofoil', 'gem', 'quack'], baseAbility: { en: "Replenish shields while standing in water! Increases in power at each Level Up: 2 -> 3 -> 4 -> 5 -> 6 Shield per tick.", es: "¡Repón escudos mientras estás en el agua! Poder: 2 -> 3 -> 4 -> 5 -> 6 Escudo por tick." } },
-  { id: "earth", name: "Earth", rarity: "Rare", images: { base: earthBase, gold: earthGold, gummy: earthGummy, galaxy: earthGalaxy, cube: cubeEarth, gem: gemEarth, quack: earthQuack }, variants: ['base', 'gold', 'gummy', 'galaxy', 'cube', 'gem', 'quack'], baseAbility: { en: "You have a chance to find additional rare items when opening chests. Chance increases at each Level Up: 10% -> 12.5% -> 15% -> 17.5% -> 20% chance.", es: "Tienes la posibilidad de encontrar objetos raros adicionales al abrir cofres. Probabilidad: 10% -> 12.5% -> 15% -> 17.5% -> 20%." } },
-  { id: "fire", name: "Fire", rarity: "Rare", images: { base: fireBase, gold: fireGold, gummy: fireGummy, galaxy: fireGalaxy, holofoil: fireHolofoil, cube: cubeFire, quack: fireQuack }, variants: ['base', 'gold', 'gummy', 'galaxy', 'holofoil', 'cube', 'quack'], baseAbility: { en: "Creates a fiery burst when you deal enough damage to an enemy! Required damage decreases at each Level Up: 150 -> 125 -> 100 -> 75 -> 50 Damage to trigger.", es: "¡Crea un estallido ardiente cuando infliges suficiente daño a un enemigo! Daño requerido: 150 -> 125 -> 100 -> 75 -> 50 Daño." } },
-  { id: "fishy", name: "Fishy", rarity: "Rare", images: { base: fishyBase, gold: fishyGold, gummy: fishyGummy, galaxy: fishyGalaxy, cube: cubeFishy }, variants: ['base', 'gold', 'gummy', 'galaxy', 'cube'], baseAbility: { en: "Swim speed greatly increased. Taking damage also briefly increases movement speed. Tiers: 25%/10% -> 50%/20% -> 100%/30% -> 150%/40% -> 200%/50% bonuses.", es: "Aumenta enormemente la velocidad de nado. Recibir daño también aumenta brevemente la velocidad de movimiento. Bonificaciones: 25%/10% -> 50%/20% -> 100%/30% -> 150%/40% -> 200%/50%." } },
-  { id: "air", name: "Air", rarity: "Rare", images: { base: airBase, gold: airGold, gummy: airGummy, galaxy: airGalaxy, holofoil: airHolofoil }, variants: ['base', 'gold', 'gummy', 'galaxy', 'holofoil'], baseAbility: { en: "Increases sprinting speed and jump height. Also nullifies fall damage. Jump height increased with each Level Up!", es: "Aumenta la velocidad de esprint y la altura de salto. También anula el daño por caída. ¡Altura de salto aumentada con cada nivel!" } }
+  { id: "iron-mouse", name: "Iron Mouse", rarity: "Mythic", season: 'C7S3', images: { base: ironMouseBase }, variants: ['base'], baseAbility: { en: "Regenerate health over time when low. While regenerating, gain Cloak and low gravity! Health regenerated to increases at each Level Up: 60 Health -> 70 Health -> 80 Health -> 90 Health -> 100 Health", es: "Regenera salud con el tiempo cuando está baja. ¡Mientras te regeneras, obtienes Camuflaje y baja gravedad! La salud regenerada aumenta en cada Nivel: 60 Salud -> 70 Salud -> 80 Salud -> 90 Salud -> 100 Salud" } },
+  { id: "john-wick", name: "John Wick", rarity: "Mythic", season: 'C7S3', images: { base: johnWickBase }, variants: ['base'], baseAbility: { en: "Reveals nearby enemies after you knock or eliminate another player. Sprite level stays exactly as found. Only Sprite usable in Fortnite Reload (Simpsons Reload Mode). Claiming in Reload unlocks it for Battle Royale and other modes.", es: "Revela enemigos cercanos después de derribar o eliminar a otro jugador. Su nivel se mantiene exactamente como se encontró. Es el único Sprite utilizable en Fortnite Recarga. Reclamarlo en Recarga lo desbloquea para Battle Royale y otros modos." } },
+  { id: "peely", name: "Peely", rarity: "Legendary", season: 'C7S3', images: { base: peelyBase, gold: peelyGold, gummy: peelyGummy, galaxy: peelyGalaxy, holofoil: peelyHolofoil }, variants: ['base', 'gold', 'gummy', 'galaxy', 'holofoil'], baseAbility: { en: "Emits a ping for players with rare sprites nearby, but marks you on the map. Ping radius increases at each Level Up: 40m -> 50m -> 60m -> 70m -> 80m", es: "Emite un ping para los jugadores con sprites raros cercanos, pero te marca en el mapa. El radio del ping aumenta en cada Nivel: 40m -> 50m -> 60m -> 70m -> 80m" } },
+  { id: "llama", name: "Llama", rarity: "Legendary", season: 'C7S3', images: { base: llamaBase, gold: llamaGold, gummy: llamaGummy, galaxy: llamaGalaxy, gem: llamaGem }, variants: ['base', 'gold', 'gummy', 'galaxy', 'gem'], baseAbility: { en: "Opening ammo boxes has a chance to grant a weapon upgrade. Chance increases at each Level Up: 5% -> 10% -> 15% -> 17% -> 20%", es: "Abrir cajas de munición tiene la posibilidad de otorgar una mejora de arma. La probabilidad aumenta en cada Nivel: 5% -> 10% -> 15% -> 17% -> 20%" } },
+  { id: "zero-point", name: "Zero Point", rarity: "Mythic", season: 'C7S3', images: { base: zpBase, gold: zpGold, gummy: zpGummy, galaxy: zpGalaxy, holofoil: zpHolofoil, cube: zpCube, gem: gemZeroPoint, quack: quackZeroPoint }, variants: ['base', 'gold', 'gummy', 'galaxy', 'holofoil', 'cube', 'gem', 'quack'], baseAbility: { en: "Spawn a Shield Bubble Jr. when you use a healing item on yourself (excluding splashes and grenades). Duration at each Level Up: 6s -> 7s -> 8s -> 9s -> 10s.", es: "Genera una Burbuja Escudo Jr. cuando usas un objeto de curación en ti mismo (excluyendo salpicones y granadas). Duración por nivel: 6s -> 7s -> 8s -> 9s -> 10s." } },
+  { id: "burnt-peanut", name: "Burnt Peanut", rarity: "Mythic", season: 'C7S3', images: { base: peanutBase, gold: peanutBase, gummy: peanutBase, galaxy: peanutBase }, variants: ['base'], baseAbility: { en: "Goop! When eliminating players, you may find more loot. Sometimes mythic! Chance at each Level Up: 20% -> 30% -> 40% -> 50% -> 60% chance (10% chance to find Mythic at Max Level!).", es: "¡Pringue! Al eliminar jugadores, puedes encontrar más botín. ¡A veces mítico! Probabilidad por nivel: 20% -> 30% -> 40% -> 50% -> 60% (¡10% de encontrar Mítico al Nivel Máximo!)." } },
+  { id: "batman", name: "Batman", rarity: "Mythic", season: 'C7S3', images: { base: batmanBase, gold: batmanGold, gummy: batmanGummy, galaxy: batmanGalaxy, holofoil: batmanHolofoil, cube: cubeBatman }, variants: ['base', 'gold', 'gummy', 'galaxy', 'holofoil', 'cube'], baseAbility: { en: "Grants the ability to launch in the air and deploy the Bat Cape!", es: "¡Otorga la habilidad de lanzarte en el aire y desplegar la capa de murciélago!" } },
+  { id: "vini-jr", name: "Vini Jr", rarity: "Mythic", season: 'C7S3', images: { base: viniBase, gold: viniBase, gummy: viniBase, galaxy: viniBase, holofoil: viniBase }, variants: ['base'], baseAbility: { en: "Sprinting for a short time makes your slide destructive. Slidekicking enemies increases rate of fire and reload speed. Increases in power at each Level Up: 40 dmg / 10% fire rate -> 45 dmg / 20% fire rate -> 50 dmg / 30% fire rate -> 55 dmg / 40% fire rate -> 60 dmg / 50% fire rate", es: "Esprintar por poco tiempo hace que tu deslizamiento sea destructivo. Patear enemigos deslizándote aumenta la cadencia de fuego y recarga. Aumentos: 40 daño / 10% cadencia -> 45 / 20% -> 50 / 30% -> 55 / 40% -> 60 / 50%." } },
+  { id: "pollo", name: "Pollo", rarity: "Mythic", season: 'C7S3', images: { base: polloBase, gold: polloBase, gummy: polloBase, galaxy: polloBase, holofoil: polloBase }, variants: ['base'], baseAbility: { en: "Upon earning an elimination, slowly replenish shield for you and nearby squad members for a duration. Duration increases at each Level Up: 6 Seconds -> 7 Seconds -> 8 Seconds -> 9 Seconds -> 10 Seconds", es: "Al conseguir una eliminación, repón lentamente el escudo para ti y miembros cercanos del escuadrón. Duración: 6s -> 7s -> 8s -> 9s -> 10s." } },
+  { id: "dream", name: "Dream", rarity: "Legendary", season: 'C7S3', images: { base: dreamBase, gold: dreamGold, gummy: dreamGummy, galaxy: dreamGalaxy, cube: cubeDream }, variants: ['base', 'gold', 'gummy', 'galaxy', 'cube'], baseAbility: { en: "Grants a random item at each level, exploding with legendary loot at Max Level. Loot value increases at each Level Up!", es: "Otorga un objeto aleatorio en cada nivel, explotando con botín legendario en el Nivel Máximo. ¡El valor del botín aumenta!" } },
+  { id: "punk", name: "Punk", rarity: "Legendary", season: 'C7S3', images: { base: punkBase, gold: punkGold, gummy: punkGummy, galaxy: punkGalaxy, cube: cubePunk, gem: gemPunk }, variants: ['base', 'gold', 'gummy', 'galaxy', 'cube'], baseAbility: { en: "Does nothing until Level 5, in which it will always grant a buff for unlimited ammo.", es: "No hace nada hasta el Nivel 5, en el que siempre otorgará un potenciador de munición ilimitada." } },
+  { id: "boss", name: "Boss", rarity: "Legendary", season: 'C7S3', images: { base: bossBase, gold: bossGold, gummy: bossGummy, galaxy: bossGalaxy, cube: cubeBoss }, variants: ['base', 'gold', 'gummy', 'galaxy', 'cube'], baseAbility: { en: "Grants an increase to your max HP and Shield. Increases at each Level Up: 5 -> 10 -> 15 -> 20 -> 25 HP/Shield.", es: "Otorga un aumento a tu vida máxima y Escudo. Aumenta: 5 -> 10 -> 15 -> 20 -> 25 PV/Escudo." } },
+  { id: "grim", name: "Grim", rarity: "Mythic", season: 'C7S3', images: { base: grimBase, gold: grimGold, gummy: grimGummy, galaxy: grimGalaxy, holofoil: grimHolofoil, cube: cubeGrim, gem: grimGem }, variants: ['base', 'gold', 'gummy', 'galaxy', 'holofoil', 'cube', 'gem'], baseAbility: { en: "Players who attack you are marked for a duration. Duration at each Level Up: 3s -> 3.5s -> 4s -> 4.5s -> 5s.", es: "Los jugadores que te ataquen quedan marcados. Duración: 3s -> 3.5s -> 4s -> 4.5s -> 5s." } },
+  { id: "seven", name: "Seven", rarity: "Legendary", season: 'C7S3', images: { base: sevenBase, gold: sevenGold, gummy: sevenGummy, galaxy: sevenGalaxy, holofoil: sevenHolofoil }, variants: ['base', 'gold', 'gummy', 'galaxy', 'holofoil'], baseAbility: { en: "Enemy player foot trails are visible in the world for your Squad. Duration increases at each Level Up: 10 Seconds -> 15 Seconds -> 20 Seconds -> 25 Seconds -> 30 Second foot trails.", es: "Los rastros de los jugadores enemigos son visibles para tu Escuadrón. Duración: 10s -> 15s -> 20s -> 25s -> 30s." } },
+  { id: "duck", name: "Duck", rarity: "Epic", season: 'C7S3', images: { base: duckBase, gold: duckGold, gummy: duckGummy, galaxy: duckGalaxy, gem: gemDuck }, variants: ['base', 'gold', 'gummy', 'galaxy', 'gem'], baseAbility: { en: "Emoting or Jamming replenishes shields. Increases in power at each Level Up: 2 -> 3 -> 4 -> 6 -> 8 Shield per tick.", es: "Hacer un gesto o improvisar repone los escudos. Poder: 2 -> 3 -> 4 -> 6 -> 8 Escudo por tick." } },
+  { id: "demon", name: "Demon", rarity: "Epic", season: 'C7S3', images: { base: demonBase, gold: demonGold, gummy: demonGummy, galaxy: demonGalaxy, gem: gemDemon }, variants: ['base', 'gold', 'gummy', 'galaxy', 'gem'], baseAbility: { en: "Siphon some health and shields when you eliminate an opponent. Increases in power at each Level Up: 10 -> 15 -> 20 -> 25 -> 30 Healing per elimination.", es: "Sifón de salud y escudo cuando eliminas a un oponente. Poder: 10 -> 15 -> 20 -> 25 -> 30 Curación." } },
+  { id: "ghost", name: "Ghost", rarity: "Epic", season: 'C7S3', images: { base: ghostBase, gold: ghostGold, gummy: ghostGummy, galaxy: ghostGalaxy, holofoil: ghostHolofoil }, variants: ['base', 'gold', 'gummy', 'galaxy', 'holofoil'], baseAbility: { en: "Grants cloak for a duration upon reloading. Increases in duration at each Level Up: 3s -> 3.5s -> 4s -> 4.5s -> 5s.", es: "Otorga camuflaje por una duración al recargar. Duración: 3s -> 3.5s -> 4s -> 4.5s -> 5s." } },
+  { id: "king", name: "King", rarity: "Epic", season: 'C7S3', images: { base: kingBase, gold: kingGold, gummy: kingGummy, galaxy: kingGalaxy, holofoil: kingHolofoil }, variants: ['base', 'gold', 'gummy', 'galaxy', 'holofoil'], baseAbility: { en: "Your Pickaxe deals more damage. Increases in damage at each Level Up: 30 -> 40 -> 60 -> 80 -> 120 bonus damage.", es: "Tu pico inflige más daño. Daño: 30 -> 40 -> 60 -> 80 -> 120 daño adicional." } },
+  { id: "aura", name: "Aura", rarity: "Epic", season: 'C7S3', images: { base: auraBase, gold: auraGold, gummy: auraGummy, galaxy: auraGalaxy, gem: gemAura }, variants: ['base', 'gold', 'gummy', 'galaxy', 'gem'], baseAbility: { en: "Gain a Shock Rock charge when you deal enough damage to enemies! Required damage decreases at each Level Up: 175 -> 150 -> 125 -> 100 -> 75 Damage to trigger.", es: "¡Obtén una carga de Roca de Choque al infligir suficiente daño a enemigos! Daño requerido: 175 -> 150 -> 125 -> 100 -> 75 Daño." } },
+  { id: "striker", name: "Striker", rarity: "Epic", season: 'C7S3', images: { base: strikerBase, gold: strikerGold, gummy: strikerGummy, galaxy: strikerGalaxy, holofoil: strikerHolofoil }, variants: ['base', 'gold', 'gummy', 'galaxy', 'holofoil'], baseAbility: { en: "Gain the Overdrive effect when you Mantle, Hurdle, or Wall Scramble. Duration increases at each Level Up: 6s -> 7s -> 8s -> 9s -> 10s of Overdrive.", es: "Obtén el efecto Sobrecarga cuando trepas, saltas o te encaramas. Duración: 6s -> 7s -> 8s -> 9s -> 10s." } },
+  { id: "water", name: "Water", rarity: "Rare", season: 'C7S3', images: { base: waterBase, gold: waterGold, gummy: waterGummy, galaxy: waterGalaxy, holofoil: waterHolofoil, gem: gemWater, quack: waterQuack }, variants: ['base', 'gold', 'gummy', 'galaxy', 'holofoil', 'gem', 'quack'], baseAbility: { en: "Replenish shields while standing in water! Increases in power at each Level Up: 2 -> 3 -> 4 -> 5 -> 6 Shield per tick.", es: "¡Repón escudos mientras estás en el agua! Poder: 2 -> 3 -> 4 -> 5 -> 6 Escudo por tick." } },
+  { id: "earth", name: "Earth", rarity: "Rare", season: 'C7S3', images: { base: earthBase, gold: earthGold, gummy: earthGummy, galaxy: earthGalaxy, cube: cubeEarth, gem: gemEarth, quack: earthQuack }, variants: ['base', 'gold', 'gummy', 'galaxy', 'cube', 'gem', 'quack'], baseAbility: { en: "You have a chance to find additional rare items when opening chests. Chance increases at each Level Up: 10% -> 12.5% -> 15% -> 17.5% -> 20% chance.", es: "Tienes la posibilidad de encontrar objetos raros adicionales al abrir cofres. Probabilidad: 10% -> 12.5% -> 15% -> 17.5% -> 20%." } },
+  { id: "fire", name: "Fire", rarity: "Rare", season: 'C7S3', images: { base: fireBase, gold: fireGold, gummy: fireGummy, galaxy: fireGalaxy, holofoil: fireHolofoil, cube: cubeFire, quack: fireQuack }, variants: ['base', 'gold', 'gummy', 'galaxy', 'holofoil', 'cube', 'quack'], baseAbility: { en: "Creates a fiery burst when you deal enough damage to an enemy! Required damage decreases at each Level Up: 150 -> 125 -> 100 -> 75 -> 50 Damage to trigger.", es: "¡Crea un estallido ardiente cuando infliges suficiente daño a un enemigo! Daño requerido: 150 -> 125 -> 100 -> 75 -> 50 Daño." } },
+  { id: "fishy", name: "Fishy", rarity: "Rare", season: 'C7S3', images: { base: fishyBase, gold: fishyGold, gummy: fishyGummy, galaxy: fishyGalaxy, cube: cubeFishy }, variants: ['base', 'gold', 'gummy', 'galaxy', 'cube'], baseAbility: { en: "Swim speed greatly increased. Taking damage also briefly increases movement speed. Tiers: 25%/10% -> 50%/20% -> 100%/30% -> 150%/40% -> 200%/50% bonuses.", es: "Aumenta enormemente la velocidad de nado. Recibir daño también aumenta brevemente la velocidad de movimiento. Bonificaciones: 25%/10% -> 50%/20% -> 100%/30% -> 150%/40% -> 200%/50%." } },
+  { id: "air", name: "Air", rarity: "Rare", season: 'C7S3', images: { base: airBase, gold: airGold, gummy: airGummy, galaxy: airGalaxy, holofoil: airHolofoil }, variants: ['base', 'gold', 'gummy', 'galaxy', 'holofoil'], baseAbility: { en: "Increases sprinting speed and jump height. Also nullifies fall damage. Jump height increased with each Level Up!", es: "Aumenta la velocidad de esprint y la altura de salto. También anula el daño por caída. ¡Altura de salto aumentada con cada nivel!" } },
+
+  // --- NEW SEASON 4 SPRITES ---
+  { id: "jackrabbit", name: "Jackrabbit", rarity: "Legendary", season: 'C7S4', images: { base: jackrabbitBase, gold: jackrabbitGold, cheatmaster: jackrabbitCheatMaster }, variants: ['base', 'gold', 'cheatmaster'], baseAbility: { en: "Grants the ability to perform another jump while mid-air! Cooldown between jumps decreases with each Level Up!", es: "Grants the ability to perform another jump while mid-air! Cooldown between jumps decreases with each Level Up!" } },
+  { id: "shadow", name: "Shadow", rarity: "Epic", season: 'C7S4', images: { base: shadowBase, gold: shadowGold, cheatmaster: shadowCheatMaster }, variants: ['base', 'gold', 'cheatmaster'], baseAbility: { en: "Automatically reload unequipped weapons over time. Reloads equipped weapon at max level. Automatic reload gets faster with each Level Up!", es: "Automatically reload unequipped weapons over time. Reloads equipped weapon at max level. Automatic reload gets faster with each Level Up!" } },
+  { id: "bush", name: "Bush", rarity: "Rare", season: 'C7S4', images: { base: bushBase, gold: bushGold, cheatmaster: bushCheatMaster }, variants: ['base', 'gold', 'cheatmaster'], baseAbility: { en: "Grants a bush on you after a duration, gain a bush on elimination at max level. Time between bush activating decreases with each Level Up!", es: "Grants a bush on you after a duration, gain a bush on elimination at max level. Time between bush activating decreases with each Level Up!" } },
+  { id: "tails", name: "Tails", rarity: "Epic", season: 'C7S4', images: { base: tailsBase, gold: tailsGold, cheatmaster: tailsCheatMaster }, variants: ['base', 'gold', 'cheatmaster'], baseAbility: { en: "Grants the ability to hover with the Help of Tails! Hover speed increased with each Level Up!", es: "Grants the ability to hover with the Help of Tails! Hover speed increased with each Level Up!" } },
+  { id: "killswitch", name: "Killswitch", rarity: "Epic", season: 'C7S4', images: { base: killswitchBase, gold: killswitchGold, cheatmaster: killswitchCheatMaster }, variants: ['base', 'gold', 'cheatmaster'], baseAbility: { en: "Enter Hangtime with improved accuracy when aiming while jumping and falling. Accuracy increases with each Level Up!", es: "Enter Hangtime with improved accuracy when aiming while jumping and falling. Accuracy increases with each Level Up!" } },
+  { id: "adventure", name: "Adventure", rarity: "Rare", season: 'C7S4', images: { base: adventureBase, gold: adventureGold, cheatmaster: adventureCheatMaster }, variants: ['base', 'gold', 'cheatmaster'], baseAbility: { en: "Upgrades a random item in the player's inventory with each Level Up!", es: "Upgrades a random item in the player's inventory with each Level Up!" } },
+  { id: "klombo", name: "Klombo", rarity: "Mythic", season: 'C7S4', images: { base: klomboBase, gold: klomboGold, cheatmaster: klomboCheatMaster }, variants: ['base', 'gold', 'cheatmaster'], baseAbility: { en: "Grants random items at each level, only levels up by consuming items. Item quality increases with each Level Up!", es: "Grants random items at each level, only levels up by consuming items. Item quality increases with each Level Up!" } },
+  { id: "jonesy", name: "Jonesy", rarity: "Rare", season: 'C7S4', images: { base: jonesyBase, gold: jonesyGold, cheatmaster: jonesyCheatMaster }, variants: ['base', 'gold', 'cheatmaster'], baseAbility: { en: "Recover some health or shields after being damaged after a short duration. Increase amount healed with each Level Up!", es: "Recover some health or shields after being damaged after a short duration. Increase amount healed with each Level Up!" } },
+  { id: "sonic", name: "Sonic", rarity: "Epic", season: 'C7S4', images: { base: sonicBase, gold: sonicGold, cheatmaster: sonicCheatMaster }, variants: ['base', 'gold', 'cheatmaster'], baseAbility: { en: "Gotta Go Fast! Sprint faster with each Level Up!", es: "Gotta Go Fast! Sprint faster with each Level Up!" } },
+  { id: "crown", name: "Crown", rarity: "Mythic", season: 'C7S4', images: { base: crownBase, gold: crownGold, cheatmaster: crownCheatMaster }, variants: ['base', 'gold', 'cheatmaster'], baseAbility: { en: "Only levels up by winning matches. Level up faster with Crown Wins. New variants unlocked after mastering!", es: "Only levels up by winning matches. Level up faster with Crown Wins. New variants unlocked after mastering!" } },
+  { id: "eight-bit", name: "8-Bit", rarity: "Rare", season: 'C7S4', images: { base: eightBitBase, gold: eightBitGold, cheatmaster: eightBitCheatMaster }, variants: ['base', 'gold', 'cheatmaster'], baseAbility: { en: "Find an 8-Bit Shotgun in your first chest and gain a score multiplier for it.", es: "Find an 8-Bit Shotgun in your first chest and gain a score multiplier for it." } },
+  { id: "storm-scout", name: "Storm Scout", rarity: "Rare", season: 'C7S4', images: { base: stormScoutBase, gold: stormScoutGold, cheatmaster: stormScoutCheatMaster }, variants: ['base', 'gold', 'cheatmaster'], baseAbility: { en: "Applies Overdrive after taking a certain amount of storm damage. Reveals future Storm Circles at max level. Reduces damage to trigger overdrive with each Level Up!", es: "Applies Overdrive after taking a certain amount of storm damage. Reveals future Storm Circles at max level. Reduces damage to trigger overdrive with each Level Up!" } }
 ];
 
 const PATCH_NOTES = [
+  {
+    version: "v2.0.0",
+    date: "08/20/2026",
+    title: "The Social Update & Chapter 7 Season 4!",
+    changes: [
+      "Global Comms Network: A brand new live social feed! Broadcast messages, coordinate with your squad, and negotiate drops on the dedicated Trade Board.",
+      "Community Hub: Join the official SpriteDex Discord directly from the Support tab to connect with other hunters and get live leak bot updates.",
+      "New Season Drop: 12 brand new Sprites added to the collection pool for Chapter 7 Season 4.",
+      "New Variant: The 'Cheat Master' variant has been discovered! Button mash your way to victory.",
+      "Dynamic Tracking: Collection and Mastery vault percentages now dynamically adjust based on which Season you filter by."
+    ]
+  },
   {
     version: "v1.10.0",
     date: "08/16/2026",
@@ -281,6 +349,7 @@ const PATCH_NOTES = [
   }
 ];
 
+// Absolute total for profile milestone unlocks
 const totalPossibleStatic = SPRITES_DATABASE.reduce((acc, sprite) => acc + sprite.variants.filter(v => !isVariantLocked(sprite.id, v)).length, 0);
 
 // --- MILESTONES FOR DOSSIER UNLOCKS ---
@@ -293,19 +362,25 @@ const MILESTONES = [
   { type: 'mastery', count: 100, isPercent: true, name: "True Perfection", bg: "bg-gradient-to-br from-rose-500/20 via-purple-500/20 to-cyan-500/20 border-rose-400/50", glow: "shadow-[0_0_30px_rgba(244,63,94,0.8)] border-rose-400", textColor: "text-rose-400" }
 ];
 
-const getUnlockedMilestone = (collectedCount, masteredCount) => {
-  let highest = null;
+const getUnlockedMilestone = (collectedCount, masteredCount, unlockedArray = []) => {
+  let highestIndex = -1;
+
   const colPercent = totalPossibleStatic > 0 ? Math.round((collectedCount / totalPossibleStatic) * 100) : 0;
   const mastPercent = totalPossibleStatic > 0 ? Math.round((masteredCount / totalPossibleStatic) * 100) : 0;
 
-  if (masteredCount >= 10) highest = MILESTONES[0];
-  if (masteredCount >= 25) highest = MILESTONES[1];
-  if (masteredCount >= 50) highest = MILESTONES[2];
-  if (masteredCount >= 100) highest = MILESTONES[3];
-  if (colPercent >= 100) highest = MILESTONES[4];
-  if (mastPercent >= 100) highest = MILESTONES[5];
+  if (masteredCount >= 10) highestIndex = Math.max(highestIndex, 0);
+  if (masteredCount >= 25) highestIndex = Math.max(highestIndex, 1);
+  if (masteredCount >= 50) highestIndex = Math.max(highestIndex, 2);
+  if (masteredCount >= 100) highestIndex = Math.max(highestIndex, 3);
+  if (colPercent >= 100) highestIndex = Math.max(highestIndex, 4);
+  if (mastPercent >= 100) highestIndex = Math.max(highestIndex, 5);
 
-  return highest;
+  unlockedArray.forEach(name => {
+    const idx = MILESTONES.findIndex(m => m.name === name);
+    if (idx > highestIndex) highestIndex = idx;
+  });
+
+  return highestIndex >= 0 ? MILESTONES[highestIndex] : null;
 };
 
 const PROFANITY_LIST = ['fuck', 'shit', 'bitch', 'asshole', 'cunt', 'dick', 'pussy', 'whore', 'slut', 'fag', 'nigger', 'nigga', 'cock', 'bastard', 'crap'];
@@ -318,7 +393,8 @@ const VARIANT_INFO = {
   holofoil: { name: "Holofoil", color: "text-sky-400", bgColor: "bg-sky-400" },
   cube: { name: "Cube", color: "text-violet-500", bgColor: "bg-violet-500" },
   gem: { name: "Gem", color: "text-emerald-400", bgColor: "bg-emerald-400" },
-  quack: { name: "Quack", color: "text-yellow-300", bgColor: "bg-yellow-300" }
+  quack: { name: "Quack", color: "text-yellow-300", bgColor: "bg-yellow-300" },
+  cheatmaster: { name: "Cheat Master", color: "text-red-500", bgColor: "bg-red-500" }
 };
 
 const RARITY_COLORS = { Mythic: "bg-yellow-400 text-black border-yellow-300 font-extrabold", Legendary: "bg-orange-500 text-white border-orange-400", Epic: "bg-purple-600 text-white border-purple-400", Rare: "bg-blue-600 text-white border-blue-400", Unknown: "bg-slate-500 text-white border-slate-400" };
@@ -326,7 +402,6 @@ const RARITY_BG_GRADIENTS = { Mythic: "from-yellow-400 via-yellow-600 to-amber-9
 const SUMMON_COST_MATRIX = { Mythic: { base: "6,750", variant: "10,000" }, Legendary: { base: "4,500", variant: "6,750" }, Epic: { base: "2,700", variant: "4,000" }, Rare: { base: "1,800", variant: "2,700" }, Unknown: { base: "TBD", variant: "TBD" } };
 const RARITY_WEIGHT = { Mythic: 4, Legendary: 3, Epic: 2, Rare: 1, Unknown: 0 };
 
-// Helper function for Comms time display
 const timeAgo = (timestamp) => {
   if (!timestamp) return 'Just now';
   const seconds = Math.floor((new Date() - timestamp.toDate()) / 1000);
@@ -343,25 +418,18 @@ const timeAgo = (timestamp) => {
   return Math.floor(seconds) + 's';
 };
 
-// --- NEW SUB-COMPONENT: Dynamic News Card ---
 const NewsCard = ({ news }) => {
   const [imgFailed, setImgFailed] = useState(false);
-
-  // Sanitize the URL to fix missing protocols and invisible spaces
   let safeImageUrl = news.imageUrl?.trim();
-  if (safeImageUrl && safeImageUrl.startsWith('//')) {
-    safeImageUrl = `https:${safeImageUrl}`;
-  }
-
-  // Determine if we should show the image layout or the text-only fallback
+  if (safeImageUrl && safeImageUrl.startsWith('//')) safeImageUrl = `https:${safeImageUrl}`;
   const hasValidImage = Boolean(safeImageUrl && !imgFailed);
 
   return (
     <div className="relative w-full shrink-0 bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-lg transition-all duration-300">
       {hasValidImage && (
-        <img 
-          src={safeImageUrl} 
-          alt="" 
+        <img
+          src={safeImageUrl}
+          alt=""
           className="absolute inset-0 w-full h-full object-cover bg-slate-900"
           referrerPolicy="no-referrer"
           onError={() => setImgFailed(true)}
@@ -370,11 +438,7 @@ const NewsCard = ({ news }) => {
       <div className={`relative z-10 w-full flex flex-col justify-end p-4 ${hasValidImage ? 'min-h-[160px] sm:min-h-[180px] bg-gradient-to-t from-black/95 via-black/80 to-transparent pt-28' : 'bg-slate-900/50'}`}>
         <div className="flex justify-between items-center mb-1.5">
           <span className="text-[9px] font-black text-cyan-400 uppercase tracking-widest drop-shadow-md">{news.author}</span>
-          {news.timestamp && (
-            <span className="text-[9px] font-mono text-slate-400 drop-shadow-md">
-              {new Date(news.timestamp.toDate()).toLocaleDateString()}
-            </span>
-          )}
+          {news.timestamp && <span className="text-[9px] font-mono text-slate-400 drop-shadow-md">{new Date(news.timestamp.toDate()).toLocaleDateString()}</span>}
         </div>
         <h3 className="text-base sm:text-lg font-black text-white uppercase italic tracking-tight drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] leading-tight">{news.title}</h3>
         {news.text && <p className="text-xs text-slate-300 leading-relaxed mt-2 drop-shadow-[0_1px_3px_rgba(0,0,0,0.8)]">{news.text}</p>}
@@ -418,6 +482,10 @@ function MainApp() {
   const [currentView, setCurrentView] = useState('sprites');
   const [searchQuery, setSearchQuery] = useState('');
   const [showFilters, setShowFilters] = useState(false);
+
+  // LocalStorage Defaulting
+  const [seasonFilter, setSeasonFilter] = useState(localStorage.getItem('spritedex_seasonFilter') || 'All');
+
   const [rarityFilter, setRarityFilter] = useState('All');
   const [variantFilter, setVariantFilter] = useState('All');
   const [statusFilter, setStatusFilter] = useState('All');
@@ -454,8 +522,12 @@ function MainApp() {
   const [richFriends, setRichFriends] = useState([]);
   const [activeViewingFriend, setActiveViewingFriend] = useState(null);
 
+  const [unlockedMilestones, setUnlockedMilestones] = useState([]);
+  const [reputationVouches, setReputationVouches] = useState([]);
+
   const [fSearchQuery, setFSearchQuery] = useState('');
   const [showFFilters, setShowFFilters] = useState(false);
+  const [fSeasonFilter, setFSeasonFilter] = useState('All');
   const [fRarityFilter, setFRarityFilter] = useState('All');
   const [fVariantFilter, setFVariantFilter] = useState('All');
   const [fStatusFilter, setFStatusFilter] = useState('All');
@@ -465,7 +537,6 @@ function MainApp() {
   const [lastRadarSweep, setLastRadarSweep] = useState(null);
   const [sweepStreak, setSweepStreak] = useState(0);
   const [dailyIntel, setDailyIntel] = useState("");
-
   const [newsFeed, setNewsFeed] = useState([]);
 
   const [isSweeping, setIsSweeping] = useState(false);
@@ -476,12 +547,10 @@ function MainApp() {
 
   const [activeHoldId, setActiveHoldId] = useState(null);
   const dotHoldTimer = useRef(null);
-
   const holdTimerRef = useRef(null);
   const [holdProgress, setHoldProgress] = useState(0);
 
-  // --- COMMS STATE ---
-  const [commsFilter, setCommsFilter] = useState('general'); // 'general', 'trade', 'mine'
+  const [commsFilter, setCommsFilter] = useState('general');
   const [commsPosts, setCommsPosts] = useState([]);
   const [showCreatePost, setShowCreatePost] = useState(false);
   const [postText, setPostText] = useState("");
@@ -498,25 +567,16 @@ function MainApp() {
 
   useEffect(() => { document.title = "Spritedex"; }, []);
 
-  // --- COMMS LISTENER ---
   useEffect(() => {
     if (!user || currentView !== 'comms') return;
-
     const q = query(firestoreCollection(db, 'comms_posts'), orderBy('timestamp', 'desc'), limit(100));
-
     const unsubComms = onSnapshot(q, snap => {
       const allPosts = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-
       let filteredPosts = allPosts;
-      if (commsFilter === 'mine') {
-        filteredPosts = allPosts.filter(p => p.authorId === user.uid);
-      } else {
-        filteredPosts = allPosts.filter(p => p.type === commsFilter);
-      }
-
+      if (commsFilter === 'mine') filteredPosts = allPosts.filter(p => p.authorId === user.uid);
+      else filteredPosts = allPosts.filter(p => p.type === commsFilter);
       setCommsPosts(filteredPosts.filter(post => (post.reports || 0) < 3 || post.authorId === user.uid));
     });
-
     return () => unsubComms();
   }, [user, currentView, commsFilter]);
 
@@ -541,7 +601,6 @@ function MainApp() {
         setTimeUntilNextSweep(`${h}h ${m}m ${s}s`);
       }
     };
-
     checkCooldown();
     const interval = setInterval(checkCooldown, 1000);
     return () => clearInterval(interval);
@@ -562,11 +621,9 @@ function MainApp() {
       if (showRadarModal) return setShowRadarModal(false);
       if (showCreatePost) return setShowCreatePost(false);
       if (activeViewingFriend) return setActiveViewingFriend(null);
-
       if (currentView !== 'sprites') return setCurrentView('sprites');
       if (canGoBack) window.history.back();
     };
-
     const listener = CapApp.addListener('backButton', handleBackButton);
     return () => { listener.then(handle => handle.remove()); };
   }, [showSettingsModal, showAboutModal, showNewsModal, selectedSprite, showPatchNotes, showTransmission, showSpriteSelector, showUnfriendConfirm, showResetConfirm, showAddFriendInput, showRadarModal, showCreatePost, activeViewingFriend, currentView]);
@@ -578,93 +635,63 @@ function MainApp() {
 
   useEffect(() => {
     if (!user) {
-      setCollection({});
-      setMastery({});
-      setExtractionTargets([]);
+      setCollection({}); setMastery({}); setExtractionTargets([]);
       setProfileData({ bio: '', epicName: '', twitchName: '', tiktokName: '', youtubeName: '', kickName: '', trophies: [null, null, null, null] });
-      setSpriteId(null);
-      setDesiredSpriteId('');
-      setFriendsList([]);
-      setPendingRequests([]);
-      setSentRequests([]);
-      setRichFriends([]);
-      setActiveViewingFriend(null);
-      setHasCheckedVersion(false);
-      setFragments(0);
-      setLastRadarSweep(null);
-      setSweepStreak(0);
-      setDailyIntel("");
-      setNewsFeed([]);
+      setSpriteId(null); setDesiredSpriteId(''); setFriendsList([]); setPendingRequests([]);
+      setSentRequests([]); setRichFriends([]); setActiveViewingFriend(null); setHasCheckedVersion(false);
+      setFragments(0); setLastRadarSweep(null); setSweepStreak(0); setDailyIntel(""); setNewsFeed([]);
+      setUnlockedMilestones([]); setReputationVouches([]);
       return;
     }
-
     const setupPushNotifications = async () => {
       try {
         const platform = await CapApp.getInfo();
         if (platform.platform === 'web') return;
         if (!PushNotifications) return;
-
         let permStatus = await PushNotifications.checkPermissions();
-        if (permStatus.receive === 'prompt') {
-          permStatus = await PushNotifications.requestPermissions();
-        }
-
+        if (permStatus.receive === 'prompt') permStatus = await PushNotifications.requestPermissions();
         if (permStatus.receive !== 'granted') return;
         await PushNotifications.register();
-
         PushNotifications.addListener('registration', async (token) => {
-          try {
-            if (user?.uid) await updateDoc(doc(db, "users", user.uid), { fcmToken: token.value });
-          } catch (e) { }
+          try { if (user?.uid) await updateDoc(doc(db, "users", user.uid), { fcmToken: token.value }); } catch (e) { }
         });
       } catch (e) { }
     };
-
     setupPushNotifications();
 
     const userDocRef = doc(db, "users", user.uid);
     const unsubUser = onSnapshot(userDocRef, (docSnap) => {
       if (docSnap.exists()) {
         const data = docSnap.data();
-
-        setCollection(data.sprites || {});
-        setMastery(data.mastery || {});
+        setCollection(data.sprites || {}); setMastery(data.mastery || {});
         setExtractionTargets(data.extractionTargets || []);
         setProfileData(data.profile || { bio: '', epicName: '', twitchName: '', tiktokName: '', youtubeName: '', kickName: '', trophies: [null, null, null, null] });
-        setFriendsList(data.friends || []);
-        setFragments(data.fragments || 0);
+        setFriendsList(data.friends || []); setFragments(data.fragments || 0);
         setLastRadarSweep(data.lastRadarSweep && typeof data.lastRadarSweep.toDate === 'function' ? data.lastRadarSweep.toDate() : null);
-        setSweepStreak(data.sweepStreak || 0);
-        setDailyIntel(data.dailyIntel || "");
+        setSweepStreak(data.sweepStreak || 0); setDailyIntel(data.dailyIntel || "");
+        setUnlockedMilestones(data.unlockedMilestones || []);
+        setReputationVouches(data.reputationVouches || []);
 
         const now = new Date();
         const todayString = now.toISOString().split('T')[0];
         const updates = {};
-
         if (!data.creationTime && user.metadata?.creationTime) updates.creationTime = user.metadata.creationTime;
         if (!data.lastActive || data.lastActive.split('T')[0] !== todayString) updates.lastActive = now.toISOString();
-
         if (Object.keys(updates).length > 0) updateDoc(userDocRef, updates).catch(e => { });
 
-        if (data.spriteId) setSpriteId(data.spriteId);
-        else setIsSettingSpriteId(true);
-
+        if (data.spriteId) setSpriteId(data.spriteId); else setIsSettingSpriteId(true);
         if (!hasCheckedVersion && !isSettingSpriteId) {
           const userVersion = data.lastSeenVersion || "v1.0.0";
           if (userVersion !== PATCH_NOTES[0].version) setShowTransmission(true);
           setHasCheckedVersion(true);
         }
-      } else {
-        setIsSettingSpriteId(true);
-      }
+      } else { setIsSettingSpriteId(true); }
     });
 
     const reqsQuery = query(firestoreCollection(db, "friend_requests"), where("receiverId", "==", user.uid));
     const unsubReqs = onSnapshot(reqsQuery, (snapshot) => setPendingRequests(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))));
-
     const sentReqsQuery = query(firestoreCollection(db, "friend_requests"), where("senderId", "==", user.uid));
     const unsubSentReqs = onSnapshot(sentReqsQuery, (snapshot) => setSentRequests(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))));
-
     const newsQuery = query(firestoreCollection(db, "news_feed"), orderBy("sortTime", "desc"), limit(20));
     const unsubNews = onSnapshot(newsQuery, (snapshot) => {
       const items = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
@@ -684,15 +711,14 @@ function MainApp() {
           const docSnap = await getDoc(doc(db, "users", friend.uid));
           if (docSnap.exists()) {
             const data = docSnap.data();
-            let tCollected = 0;
-            let tMastered = 0;
+            let tCollected = 0; let tMastered = 0;
             SPRITES_DATABASE.forEach(sprite => {
               tCollected += sprite.variants.filter(v => !isVariantLocked(sprite.id, v) && (data.sprites || {})[sprite.id]?.[v]).length;
               tMastered += sprite.variants.filter(v => !isVariantLocked(sprite.id, v) && (data.mastery || {})[sprite.id]?.[v]).length;
             });
             const cRate = totalPossibleStatic > 0 ? Math.round((tCollected / totalPossibleStatic) * 100) : 0;
             const mRate = totalPossibleStatic > 0 ? Math.round((tMastered / totalPossibleStatic) * 100) : 0;
-            return { ...friend, completionRate: cRate, masteryRate: mRate, sprites: data.sprites || {}, profile: data.profile || {}, creationTime: data.creationTime || null, extractionTargets: data.extractionTargets || [] };
+            return { ...friend, completionRate: cRate, masteryRate: mRate, sprites: data.sprites || {}, profile: data.profile || {}, creationTime: data.creationTime || null, extractionTargets: data.extractionTargets || [], unlockedMilestones: data.unlockedMilestones || [], reputationVouches: data.reputationVouches || [] };
           }
         } catch (e) { }
         return { ...friend, completionRate: 0, masteryRate: 0, sprites: {}, profile: {}, extractionTargets: [] };
@@ -703,74 +729,104 @@ function MainApp() {
     fetchRichFriends();
   }, [friendsList, collection]);
 
+  // --- DYNAMIC PROGRESS CALCULATION (SEASON AWARE) ---
+  const { totalCollected, totalMastered, completionRate, masteryRate, currentPossibleStatic } = useMemo(() => {
+    const activeSprites = seasonFilter === 'All'
+      ? SPRITES_DATABASE
+      : SPRITES_DATABASE.filter(s => s.season === seasonFilter);
+
+    const possible = activeSprites.reduce((acc, sprite) => acc + sprite.variants.filter(v => !isVariantLocked(sprite.id, v)).length, 0);
+
+    const tCol = activeSprites.reduce((acc, sprite) => acc + sprite.variants.filter(v => !isVariantLocked(sprite.id, v) && (collection[sprite.id] || {})[v]).length, 0);
+    const tMast = activeSprites.reduce((acc, sprite) => acc + sprite.variants.filter(v => !isVariantLocked(sprite.id, v) && (mastery[sprite.id] || {})[v]).length, 0);
+
+    const cRate = possible > 0 ? Math.round((tCol / possible) * 100) : 0;
+    const mRate = possible > 0 ? Math.round((tMast / possible) * 100) : 0;
+
+    return { totalCollected: tCol, totalMastered: tMast, completionRate: cRate, masteryRate: mRate, currentPossibleStatic: possible };
+  }, [collection, mastery, seasonFilter]);
+
+  // --- PERMANENT MILESTONE UNLOCK CHECKER ---
+  useEffect(() => {
+    if (!user || isInitializing) return;
+    const newUnlocks = [];
+    MILESTONES.forEach(stone => {
+      if (unlockedMilestones.includes(stone.name)) return;
+      let isUnlocked = false;
+      if (stone.isPercent) {
+        const currentRate = stone.type === 'mastery' ? masteryRate : completionRate;
+        isUnlocked = currentRate >= stone.count;
+      } else {
+        isUnlocked = totalMastered >= stone.count;
+      }
+      if (isUnlocked) newUnlocks.push(stone.name);
+    });
+
+    if (newUnlocks.length > 0) {
+      const updated = [...unlockedMilestones, ...newUnlocks];
+      setUnlockedMilestones(updated);
+      updateDoc(doc(db, "users", user.uid), { unlockedMilestones: arrayUnion(...newUnlocks) }).catch(e => { });
+    }
+  }, [totalMastered, completionRate, masteryRate, unlockedMilestones, user, isInitializing]);
+
   const playBeep = (freq, type = 'sine', duration = 0.08) => {
     if (!soundEnabled) return;
     try {
       if (!audioCtxRef.current) audioCtxRef.current = new (window.AudioContext || window.webkitAudioContext)();
       const ctx = audioCtxRef.current;
       if (ctx.state === 'suspended') ctx.resume();
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
-      osc.type = type;
-      osc.frequency.setValueAtTime(freq, ctx.currentTime);
+      const osc = ctx.createOscillator(); const gain = ctx.createGain();
+      osc.type = type; osc.frequency.setValueAtTime(freq, ctx.currentTime);
       gain.gain.setValueAtTime(0.04, ctx.currentTime);
       gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
-      osc.connect(gain);
-      gain.connect(ctx.destination);
-      osc.start();
-      osc.stop(ctx.currentTime + duration);
+      osc.connect(gain); gain.connect(ctx.destination);
+      osc.start(); osc.stop(ctx.currentTime + duration);
     } catch (e) { }
   };
 
-  const handleAuth = async (e) => {
-    e.preventDefault();
-    setIsAuthLoading(true);
-    setAuthError("");
-    const sanitizedEmail = email.trim().toLowerCase();
+  const handleSeasonFilterChange = (season) => {
+    setSeasonFilter(season);
+    localStorage.setItem('spritedex_seasonFilter', season);
+  };
 
+  const handleAuth = async (e) => {
+    e.preventDefault(); setIsAuthLoading(true); setAuthError("");
+    const sanitizedEmail = email.trim().toLowerCase();
     try {
-      if (isLoginMode) {
-        await logIn(sanitizedEmail, password);
-      } else {
+      if (isLoginMode) { await logIn(sanitizedEmail, password); }
+      else {
         const userCred = await signUp(sanitizedEmail, password);
         await setDoc(doc(db, "users", userCred.user.uid), { creationTime: new Date().toISOString() }, { merge: true });
       }
     } catch (err) {
       if (err.code === 'auth/email-already-in-use') {
-        setAuthError(lang === 'es' ? "¡Ya existe una cuenta con este correo! Por favor, inicia sesión o restablece tu contraseña." : "An account with this email already exists! Please sign in or reset your password.");
+        setAuthError(lang === 'es' ? "¡Ya existe una cuenta con este correo!" : "An account with this email already exists!");
         setIsLoginMode(true);
       } else if (err.code === 'auth/wrong-password' || err.code === 'auth/user-not-found' || err.code === 'auth/invalid-credential') {
-        setAuthError(lang === 'es' ? "Correo o contraseña incorrectos. Inténtalo de nuevo." : "Incorrect email or password. Please try again.");
+        setAuthError(lang === 'es' ? "Correo o contraseña incorrectos." : "Incorrect email or password.");
       } else if (err.code === 'auth/weak-password') {
         setAuthError(lang === 'es' ? "La contraseña debe tener al menos 6 caracteres." : "Password must be at least 6 characters long.");
-      } else {
-        setAuthError(err.message);
-      }
-    } finally {
-      setIsAuthLoading(false);
-    }
+      } else { setAuthError(err.message); }
+    } finally { setIsAuthLoading(false); }
   };
 
   const handleSaveSpriteId = async (e) => {
-    e.preventDefault();
-    setSpriteIdError('');
+    e.preventDefault(); setSpriteIdError('');
     if (desiredSpriteId.length < 3) return setSpriteIdError('Sprite ID must be at least 3 characters.');
     if (PROFANITY_LIST.some(word => desiredSpriteId.toLowerCase().includes(word))) return setSpriteIdError('Please choose a more appropriate Sprite ID.');
     try {
       const querySnapshot = await getDocs(query(firestoreCollection(db, "users"), where("spriteId", "==", desiredSpriteId.toLowerCase())));
       if (!querySnapshot.empty) return setSpriteIdError('That Sprite ID is already taken!');
       await setDoc(doc(db, "users", user.uid), { spriteId: desiredSpriteId.toLowerCase(), friends: [], extractionTargets: [], lastSeenVersion: PATCH_NOTES[0].version }, { merge: true });
-      setSpriteId(desiredSpriteId.toLowerCase());
-      setIsSettingSpriteId(false);
+      setSpriteId(desiredSpriteId.toLowerCase()); setIsSettingSpriteId(false);
     } catch (error) { setSpriteIdError('An error occurred. Try again.'); }
   };
 
   const handleToggleCheck = (spriteId, variant) => {
     if (isVariantLocked(spriteId, variant)) return;
-    const currentVal = collection[spriteId]?.[variant];
-    const newVal = !currentVal;
+    const currentVal = collection[spriteId]?.[variant]; const newVal = !currentVal;
     if (newVal) {
-      if (variant === 'holofoil' || variant === 'cube' || variant === 'gem' || variant === 'quack') playBeep(1200, 'square', 0.15);
+      if (variant === 'holofoil' || variant === 'cube' || variant === 'gem' || variant === 'quack' || variant === 'cheatmaster') playBeep(1200, 'square', 0.15);
       else if (variant === 'galaxy') playBeep(880, 'triangle', 0.15);
       else if (variant === 'gold') playBeep(659, 'sine', 0.1);
       else if (variant === 'gummy') playBeep(587, 'sine', 0.1);
@@ -797,8 +853,7 @@ function MainApp() {
       const updated = { ...prev, [spriteId]: { ...(prev[spriteId] || {}), [variant]: newVal } };
       if (newVal) {
         confetti({ particleCount: 120, spread: 90, origin: { y: 0.5 }, colors: ['#FFD700', '#FFA500', '#DAA520', '#FFF8DC'] });
-        setTimeout(() => confetti.reset(), 3000);
-        playBeep(1046.50, 'sine', 0.2);
+        setTimeout(() => confetti.reset(), 3000); playBeep(1046.50, 'sine', 0.2);
       } else playBeep(220, 'sawtooth', 0.1);
       setDoc(doc(db, "users", user.uid), { mastery: updated }, { merge: true }).catch(e => { });
       return updated;
@@ -806,20 +861,12 @@ function MainApp() {
   };
 
   const handleDotPressStart = (e, spriteId, variant) => {
-    e.stopPropagation();
-    setActiveHoldId(`${spriteId}_${variant}`);
-
+    e.stopPropagation(); setActiveHoldId(`${spriteId}_${variant}`);
     try { Haptics.impact({ style: ImpactStyle.Light }); } catch (err) { }
-
     dotHoldTimer.current = setTimeout(() => {
       setActiveHoldId(null);
       try { Haptics.impact({ style: ImpactStyle.Heavy }); } catch (err) { }
-
-      if (isMasteryView) {
-        toggleMastery(spriteId, variant);
-      } else {
-        handleToggleCheck(spriteId, variant);
-      }
+      if (isMasteryView) toggleMastery(spriteId, variant); else handleToggleCheck(spriteId, variant);
     }, 700);
   };
 
@@ -836,10 +883,7 @@ function MainApp() {
   };
 
   const handleDeleteAccount = async () => {
-    const isConfirmed = window.confirm(
-      "WARNING: This will permanently delete your account, your Spritedex collection, and all saved progress. This action cannot be undone. Are you absolutely sure?"
-    );
-
+    const isConfirmed = window.confirm("WARNING: This will permanently delete your account, your Spritedex collection, and all saved progress. This action cannot be undone. Are you absolutely sure?");
     if (isConfirmed) {
       try {
         await deleteDoc(doc(db, "users", user.uid));
@@ -847,12 +891,8 @@ function MainApp() {
         setShowSettingsModal(false);
         alert("Your account has been successfully deleted.");
       } catch (error) {
-        console.error("Error deleting account:", error);
-        if (error.code === 'auth/requires-recent-login') {
-          alert("For security reasons, you must log out and log back in before deleting your account.");
-        } else {
-          alert("Failed to delete account: " + error.message);
-        }
+        if (error.code === 'auth/requires-recent-login') alert("For security reasons, you must log out and log back in before deleting your account.");
+        else alert("Failed to delete account: " + error.message);
       }
     }
   };
@@ -863,8 +903,7 @@ function MainApp() {
   };
 
   const handleFeedbackSubmit = async (e) => {
-    e.preventDefault();
-    if (!feedbackText.trim()) return;
+    e.preventDefault(); if (!feedbackText.trim()) return;
     setFeedbackStatus('submitting');
     try {
       await addDoc(firestoreCollection(db, "mail"), { to: "prosyncts@gmail.com", message: { subject: "Spritedex App Support", text: `Sprite ID: ${spriteId || "User"}\n\nMessage:\n${feedbackText}` } });
@@ -891,38 +930,19 @@ function MainApp() {
   };
 
   const acceptFriendRequest = async (req) => {
-    try {
-      await updateDoc(doc(db, "users", user.uid), { friends: arrayUnion({ uid: req.senderId, spriteId: req.senderSpriteId }) });
-    } catch (e) { console.error("Self update failed:", e); }
-
-    try {
-      await updateDoc(doc(db, "users", req.senderId), { friends: arrayUnion({ uid: user.uid, spriteId: spriteId }) });
-    } catch (e) { console.error("Sender update failed:", e); }
-
-    try {
-      await deleteDoc(doc(db, "friend_requests", req.id));
-      playBeep(880, 'sine', 0.1);
-    } catch (e) { console.error("Request deletion failed:", e); }
+    try { await updateDoc(doc(db, "users", user.uid), { friends: arrayUnion({ uid: req.senderId, spriteId: req.senderSpriteId }) }); } catch (e) { }
+    try { await updateDoc(doc(db, "users", req.senderId), { friends: arrayUnion({ uid: user.uid, spriteId: spriteId }) }); } catch (e) { }
+    try { await deleteDoc(doc(db, "friend_requests", req.id)); playBeep(880, 'sine', 0.1); } catch (e) { }
   };
 
   const cancelFriendRequest = async (reqId) => { try { await deleteDoc(doc(doc(db, "friend_requests", reqId))); } catch (e) { } };
 
   const handleUnfriendExecution = async () => {
     if (!showUnfriendConfirm) return;
-
-    const targetUid = showUnfriendConfirm.uid;
-    const targetSpriteId = showUnfriendConfirm.spriteId;
-
+    const targetUid = showUnfriendConfirm.uid; const targetSpriteId = showUnfriendConfirm.spriteId;
     setShowUnfriendConfirm(null);
-
-    try {
-      await updateDoc(doc(db, "users", user.uid), { friends: arrayRemove({ uid: targetUid, spriteId: targetSpriteId }) });
-      playBeep(220, 'sawtooth', 0.15);
-    } catch (e) { console.error("Self removal failed:", e); }
-
-    try {
-      await updateDoc(doc(db, "users", targetUid), { friends: arrayRemove({ uid: user.uid, spriteId: spriteId }) });
-    } catch (e) { console.error("Target removal failed:", e); }
+    try { await updateDoc(doc(db, "users", user.uid), { friends: arrayRemove({ uid: targetUid, spriteId: targetSpriteId }) }); playBeep(220, 'sawtooth', 0.15); } catch (e) { }
+    try { await updateDoc(doc(db, "users", targetUid), { friends: arrayRemove({ uid: user.uid, spriteId: spriteId }) }); } catch (e) { }
   };
 
   const inspectFriendLibrary = async (friendObj) => {
@@ -930,8 +950,7 @@ function MainApp() {
       const docSnap = await getDoc(doc(db, "users", friendObj.uid));
       if (docSnap.exists()) {
         const data = docSnap.data();
-        let tCollected = 0;
-        let tMastered = 0;
+        let tCollected = 0; let tMastered = 0;
         SPRITES_DATABASE.forEach(s => {
           tCollected += s.variants.filter(v => !isVariantLocked(s.id, v) && (data.sprites || {})[s.id]?.[v]).length;
           tMastered += s.variants.filter(v => !isVariantLocked(s.id, v) && (data.mastery || {})[s.id]?.[v]).length;
@@ -940,153 +959,88 @@ function MainApp() {
         const mRate = totalPossibleStatic > 0 ? Math.round((tMastered / totalPossibleStatic) * 100) : 0;
 
         setActiveViewingFriend({
-          spriteId: friendObj.spriteId,
-          completionRate: cRate,
-          masteryRate: mRate,
-          sprites: data.sprites || {},
-          mastery: data.mastery || {},
-          extractionTargets: data.extractionTargets || [],
-          profile: data.profile || { bio: '', epicName: '', twitchName: '', tiktokName: '', youtubeName: '', kickName: '', trophies: [null, null, null, null] },
-          creationTime: data.creationTime || null
+          uid: friendObj.uid,
+          spriteId: friendObj.spriteId, completionRate: cRate, masteryRate: mRate, sprites: data.sprites || {}, mastery: data.mastery || {},
+          extractionTargets: data.extractionTargets || [], profile: data.profile || { bio: '', epicName: '', twitchName: '', tiktokName: '', youtubeName: '', kickName: '', trophies: [null, null, null, null] }, creationTime: data.creationTime || null,
+          unlockedMilestones: data.unlockedMilestones || [], reputationVouches: data.reputationVouches || []
         });
-
-        setFSearchQuery('');
-        setFRarityFilter('All');
-        setFVariantFilter('All');
-        setFStatusFilter('All');
-        setFSortBy('A-Z');
-        setShowFFilters(false);
+        setFSearchQuery(''); setFRarityFilter('All'); setFVariantFilter('All'); setFStatusFilter('All'); setFSortBy('A-Z'); setFSeasonFilter('All'); setShowFFilters(false);
       }
     } catch (e) { }
   };
 
-  // --- COMMS ACTIONS ---
   const handlePostSubmit = async () => {
     if (!postText.trim() && postType === 'general') return;
-
-    if (PROFANITY_LIST.some(word => postText.toLowerCase().includes(word))) {
-      return alert("Transmission blocked: Please keep comms PG-13.");
-    }
-
+    if (PROFANITY_LIST.some(word => postText.toLowerCase().includes(word))) return alert("Transmission blocked: Please keep comms PG-13.");
     try {
       if (editingPostId) {
-        await updateDoc(doc(db, 'comms_posts', editingPostId), {
-          text: postText.trim(),
-          type: postType,
-          lookingFor: postLookingFor,
-          offering: postOffering,
-        });
+        await updateDoc(doc(db, 'comms_posts', editingPostId), { text: postText.trim(), type: postType, lookingFor: postLookingFor, offering: postOffering, authorAvatar: profileData.trophies?.[0] || null });
       } else {
-        await addDoc(firestoreCollection(db, 'comms_posts'), {
-          authorId: user.uid,
-          authorSpriteId: spriteId,
-          text: postText.trim(),
-          type: postType,
-          lookingFor: postLookingFor,
-          offering: postOffering,
-          timestamp: serverTimestamp(),
-          reports: 0,
-          likes: []
-        });
+        await addDoc(firestoreCollection(db, 'comms_posts'), { authorId: user.uid, authorSpriteId: spriteId, text: postText.trim(), type: postType, lookingFor: postLookingFor, offering: postOffering, timestamp: serverTimestamp(), reports: 0, likes: [], authorAvatar: profileData.trophies?.[0] || null });
       }
-      setShowCreatePost(false);
-      setPostText("");
-      setPostLookingFor(null);
-      setPostOffering(null);
-      setEditingPostId(null);
-      playBeep(880, 'square', 0.1);
-    } catch (e) {
-      alert("Failed to send transmission.");
-    }
+      setShowCreatePost(false); setPostText(""); setPostLookingFor(null); setPostOffering(null); setEditingPostId(null); playBeep(880, 'square', 0.1);
+    } catch (e) { alert("Failed to send transmission."); }
   };
 
   const handleDeletePost = async (postId) => {
     const isConfirmed = window.confirm("Permanently delete this transmission?");
     if (isConfirmed) {
-      try {
-        await deleteDoc(doc(db, 'comms_posts', postId));
-        playBeep(200, 'sawtooth', 0.1);
-      } catch (error) {
-        console.error("Error deleting post:", error);
-        alert("Failed to delete transmission. Please try again.");
-      } finally {
-        setActiveMenuId(null);
-      }
-    } else {
-      setActiveMenuId(null);
-    }
+      try { await deleteDoc(doc(db, 'comms_posts', postId)); playBeep(200, 'sawtooth', 0.1); } catch (error) { alert("Failed to delete transmission. Please try again."); } finally { setActiveMenuId(null); }
+    } else { setActiveMenuId(null); }
   };
 
   const handleEditPost = (post) => {
-    setPostType(post.type);
-    setPostText(post.text);
-    setPostLookingFor(post.lookingFor || null);
-    setPostOffering(post.offering || null);
-    setEditingPostId(post.id);
-    setShowCreatePost(true);
-    setActiveMenuId(null);
+    setPostType(post.type); setPostText(post.text); setPostLookingFor(post.lookingFor || null); setPostOffering(post.offering || null);
+    setEditingPostId(post.id); setShowCreatePost(true); setActiveMenuId(null);
   };
 
   const handleReportPost = async (postId) => {
-    try {
-      await updateDoc(doc(db, 'comms_posts', postId), { reports: increment(1) });
-      alert("Transmission flagged for review by Command.");
-      setActiveMenuId(null);
-    } catch (error) {
-      console.error("Error reporting post:", error);
-    }
+    try { await updateDoc(doc(db, 'comms_posts', postId), { reports: increment(1) }); alert("Transmission flagged for review by Command."); setActiveMenuId(null); } catch (error) { }
   };
 
   const handleToggleLike = async (postId, currentLikes = []) => {
     const isLiked = currentLikes.includes(user.uid);
     try {
-      if (isLiked) playBeep(220, 'sine', 0.05);
-      else playBeep(880, 'triangle', 0.1);
-
-      await updateDoc(doc(db, 'comms_posts', postId), {
-        likes: isLiked ? arrayRemove(user.uid) : arrayUnion(user.uid)
-      });
-    } catch (error) {
-      console.error("Error liking post:", error);
-    }
+      if (isLiked) playBeep(220, 'sine', 0.05); else playBeep(880, 'triangle', 0.1);
+      await updateDoc(doc(db, 'comms_posts', postId), { likes: isLiked ? arrayRemove(user.uid) : arrayUnion(user.uid) });
+    } catch (error) { }
   };
 
   const handleQuickAddFriend = async (targetUid, targetSpriteId) => {
     try {
-      await setDoc(doc(db, "friend_requests", `${user.uid}_${targetUid}`), {
-        senderId: user.uid,
-        senderSpriteId: spriteId,
-        receiverId: targetUid,
-        receiverSpriteId: targetSpriteId,
-        status: 'pending',
-        timestamp: new Date()
-      });
-      playBeep(659, 'sine', 0.1);
-      alert(`Friend request sent to @${targetSpriteId}!`);
-    } catch (e) {
-      console.error("Error sending fast request:", e);
-    }
+      await setDoc(doc(db, "friend_requests", `${user.uid}_${targetUid}`), { senderId: user.uid, senderSpriteId: spriteId, receiverId: targetUid, receiverSpriteId: targetSpriteId, status: 'pending', timestamp: new Date() });
+      playBeep(659, 'sine', 0.1); alert(`Friend request sent to @${targetSpriteId}!`);
+    } catch (e) { }
   };
 
-  // --- CONSOLIDATED SPRITE SELECTOR ---
+  // --- TRADER VOUCH FUNCTION ---
+  const handleVouch = async () => {
+    if (!activeViewingFriend || activeViewingFriend.uid === user.uid) return;
+    if (activeViewingFriend.reputationVouches?.includes(user.uid)) return;
+    try {
+      await updateDoc(doc(db, "users", activeViewingFriend.uid), {
+        reputationVouches: arrayUnion(user.uid)
+      });
+      setActiveViewingFriend(prev => ({
+        ...prev,
+        reputationVouches: [...(prev.reputationVouches || []), user.uid]
+      }));
+      playBeep(880, 'sine', 0.1);
+    } catch (e) { console.error("Error vouching:", e); }
+  };
+
   const handleSpriteSelect = async (selectedId, variant) => {
     if (selectorContext === 'extraction') {
-      const newTargets = [...extractionTargets];
-      newTargets[targetSlotIndex] = `${selectedId}_${variant}`;
-      setExtractionTargets(newTargets);
-      setShowSpriteSelector(false);
+      const newTargets = [...extractionTargets]; newTargets[targetSlotIndex] = `${selectedId}_${variant}`;
+      setExtractionTargets(newTargets); setShowSpriteSelector(false);
       await updateDoc(doc(db, "users", user.uid), { extractionTargets: newTargets });
     } else if (selectorContext === 'trophy') {
-      const newTrophies = [...(profileData.trophies || [null, null, null, null])];
-      newTrophies[trophySlotIndex] = `${selectedId}_${variant}`;
-      setProfileData({ ...profileData, trophies: newTrophies });
-      setShowSpriteSelector(false);
+      const newTrophies = [...(profileData.trophies || [null, null, null, null])]; newTrophies[trophySlotIndex] = `${selectedId}_${variant}`;
+      setProfileData({ ...profileData, trophies: newTrophies }); setShowSpriteSelector(false);
     } else if (selectorContext === 'commsLooking') {
-      setPostLookingFor(`${selectedId}_${variant}`);
-      setShowSpriteSelector(false);
+      setPostLookingFor(`${selectedId}_${variant}`); setShowSpriteSelector(false);
     } else if (selectorContext === 'commsOffering') {
-      setPostOffering(`${selectedId}_${variant}`);
-      setShowSpriteSelector(false);
+      setPostOffering(`${selectedId}_${variant}`); setShowSpriteSelector(false);
     }
   };
 
@@ -1096,73 +1050,42 @@ function MainApp() {
   };
 
   const handleRemoveTrophy = (index, e) => {
-    e.stopPropagation();
-    const newTrophies = [...(profileData.trophies || [null, null, null, null])];
-    newTrophies[index] = null;
-    setProfileData({ ...profileData, trophies: newTrophies });
+    e.stopPropagation(); const newTrophies = [...(profileData.trophies || [null, null, null, null])];
+    newTrophies[index] = null; setProfileData({ ...profileData, trophies: newTrophies });
   };
 
   const handleSaveProfile = async () => {
     setIsEditingProfile(false);
-    try {
-      await updateDoc(doc(db, "users", user.uid), { profile: profileData });
-      playBeep(880, 'sine', 0.1);
-    } catch (e) { }
+    try { await updateDoc(doc(db, "users", user.uid), { profile: profileData }); playBeep(880, 'sine', 0.1); } catch (e) { }
   };
 
   const scheduleStreakReminder = async (currentStreak) => {
     if (Capacitor.getPlatform() === 'web') return;
     try {
       let permStatus = await LocalNotifications.checkPermissions();
-      if (permStatus.display === 'prompt') {
-        permStatus = await LocalNotifications.requestPermissions();
-      }
+      if (permStatus.display === 'prompt') permStatus = await LocalNotifications.requestPermissions();
       if (permStatus.display !== 'granted') return;
-
       const pending = await LocalNotifications.getPending();
-      if (pending.notifications.length > 0) {
-        await LocalNotifications.cancel({ notifications: pending.notifications });
-      }
-
+      if (pending.notifications.length > 0) await LocalNotifications.cancel({ notifications: pending.notifications });
       const triggerDate = new Date(Date.now() + 22 * 60 * 60 * 1000);
-
       await LocalNotifications.schedule({
-        notifications: [
-          {
-            title: "⚠️ Streak at Risk!",
-            body: `Your Daily Radar is fully charged. Sweep now to protect your ${currentStreak}-Day Streak!`,
-            id: 1001,
-            schedule: { at: triggerDate, allowWhileIdle: true }
-          }
-        ]
+        notifications: [{ title: "⚠️ Streak at Risk!", body: `Your Daily Radar is fully charged. Sweep now to protect your ${currentStreak}-Day Streak!`, id: 1001, schedule: { at: triggerDate, allowWhileIdle: true } }]
       });
-    } catch (e) {
-      console.error("Local Notification Error", e);
-    }
+    } catch (e) { }
   };
 
   const startHold = () => {
     if (!canSweepToday || isSweeping) return;
     setHoldProgress(0);
-    const duration = 2000;
-    const interval = 50;
-    const step = (interval / duration) * 100;
-    let currentProgress = 0;
-
+    const duration = 2000; const interval = 50; const step = (interval / duration) * 100; let currentProgress = 0;
     try { Haptics.impact({ style: ImpactStyle.Light }); } catch (e) { }
-
     holdTimerRef.current = setInterval(() => {
       currentProgress += step;
       if (currentProgress >= 100) {
-        currentProgress = 100;
-        clearInterval(holdTimerRef.current);
-        setHoldProgress(100);
-        initiateRadarSweep();
+        currentProgress = 100; clearInterval(holdTimerRef.current); setHoldProgress(100); initiateRadarSweep();
       } else {
         setHoldProgress(currentProgress);
-        if (Math.round(currentProgress) % 15 === 0) {
-          try { Haptics.impact({ style: ImpactStyle.Light }); } catch (e) { }
-        }
+        if (Math.round(currentProgress) % 15 === 0) { try { Haptics.impact({ style: ImpactStyle.Light }); } catch (e) { } }
       }
     }, interval);
   };
@@ -1174,89 +1097,47 @@ function MainApp() {
 
   const initiateRadarSweep = async () => {
     if (!user) return;
-
-    setIsSweeping(true);
-    setSweepResult("");
-
+    setIsSweeping(true); setSweepResult("");
     try { await Haptics.impact({ style: ImpactStyle.Heavy }); } catch (e) { }
-
     let newFact = "Signal lost. No intel recovered.";
     try {
       const intelDoc = await getDoc(doc(db, "system", "daily_intel"));
       if (intelDoc.exists() && intelDoc.data().facts?.length > 0) {
-        const facts = intelDoc.data().facts;
-        newFact = facts[Math.floor(Math.random() * facts.length)];
-      } else {
-        console.warn("The document exists, but the 'facts' array is missing or empty.");
+        const facts = intelDoc.data().facts; newFact = facts[Math.floor(Math.random() * facts.length)];
       }
-    } catch (e) {
-      console.error("FAILED TO FETCH INTEL:", e);
-    }
+    } catch (e) { }
 
     const userRef = doc(db, 'users', user.uid);
-
     try {
       const txResult = await runTransaction(db, async (transaction) => {
         const userDoc = await transaction.get(userRef);
         if (!userDoc.exists()) throw "User document does not exist!";
-
         const data = userDoc.data();
         const lastSweepData = data.lastRadarSweep;
         const lastSweep = lastSweepData && typeof lastSweepData.toDate === 'function' ? lastSweepData.toDate() : null;
         const now = new Date();
-
-        if (lastSweep && (now.getTime() - lastSweep.getTime() < 24 * 60 * 60 * 1000)) {
-          throw "Sweep already on 24h cooldown.";
-        }
+        if (lastSweep && (now.getTime() - lastSweep.getTime() < 24 * 60 * 60 * 1000)) throw "Sweep already on 24h cooldown.";
 
         let currentStreak = data.sweepStreak || 0;
         if (lastSweep) {
           const hoursSince = (now.getTime() - lastSweep.getTime()) / (1000 * 60 * 60);
-          if (hoursSince < 48) {
-            currentStreak += 1;
-          } else {
-            currentStreak = 1;
-          }
-        } else {
-          currentStreak = 1;
-        }
+          if (hoursSince < 48) currentStreak += 1; else currentStreak = 1;
+        } else { currentStreak = 1; }
 
         const roll = Math.random() * 100;
-        let payout = 100;
-        let sweepMessage = "Sweep Complete. Recovered 100 Fragments.";
-
-        if (roll > 80 && roll <= 95) {
-          payout = 250;
-          sweepMessage = "Deep Sweep! Recovered 250 Fragments.";
-        } else if (roll > 95) {
-          payout = 500;
-          sweepMessage = "Anomaly Detected! Recovered 500 Fragments.";
-        }
+        let payout = 100; let sweepMessage = "Sweep Complete. Recovered 100 Fragments.";
+        if (roll > 80 && roll <= 95) { payout = 250; sweepMessage = "Deep Sweep! Recovered 250 Fragments."; }
+        else if (roll > 95) { payout = 500; sweepMessage = "Anomaly Detected! Recovered 500 Fragments."; }
 
         const currentFragments = data.fragments || 0;
-
-        transaction.update(userRef, {
-          fragments: currentFragments + payout,
-          lastRadarSweep: serverTimestamp(),
-          sweepStreak: currentStreak,
-          dailyIntel: newFact
-        });
-
+        transaction.update(userRef, { fragments: currentFragments + payout, lastRadarSweep: serverTimestamp(), sweepStreak: currentStreak, dailyIntel: newFact });
         return { currentStreak, sweepMessage };
       });
-
-      setSweepResult(txResult.sweepMessage);
-      playBeep(880, 'square', 0.2);
-      scheduleStreakReminder(txResult.currentStreak);
+      setSweepResult(txResult.sweepMessage); playBeep(880, 'square', 0.2); scheduleStreakReminder(txResult.currentStreak);
     } catch (error) {
-      console.error("Sweep failed: ", error);
       setSweepResult(typeof error === 'string' ? error : "Sweep failed. Try again.");
     } finally {
-      setTimeout(() => {
-        setIsSweeping(false);
-        setHoldProgress(0);
-        setTimeout(() => setSweepResult(""), 4000);
-      }, 2000);
+      setTimeout(() => { setIsSweeping(false); setHoldProgress(0); setTimeout(() => setSweepResult(""), 4000); }, 2000);
     }
   };
 
@@ -1279,14 +1160,10 @@ function MainApp() {
 
   const renderTrophySlot = (targetKey, index, isSelf, isEditing, userMasteryData) => {
     if (!targetKey) {
-      if (isEditing) {
-        return (<button key={index} onClick={() => { setSelectorContext('trophy'); setTrophySlotIndex(index); setShowSpriteSelector(true); }} className="flex-1 aspect-square border-2 border-dashed border-slate-700 rounded-xl flex items-center justify-center bg-black/40 hover:bg-black/60 transition-colors"><Plus className="w-5 h-5 text-slate-600" /></button>);
-      }
+      if (isEditing) return (<button key={index} onClick={() => { setSelectorContext('trophy'); setTrophySlotIndex(index); setShowSpriteSelector(true); }} className="flex-1 aspect-square border-2 border-dashed border-slate-700 rounded-xl flex items-center justify-center bg-black/40 hover:bg-black/60 transition-colors"><Plus className="w-5 h-5 text-slate-600" /></button>);
       return (<div key={index} className="flex-1 aspect-square border-2 border-dashed border-slate-800/50 rounded-xl flex items-center justify-center bg-black/20 opacity-50"><Eye className="w-4 h-4 text-slate-700" /></div>);
     }
-
-    const spriteId = targetKey.split('_')[0];
-    const v = targetKey.split('_')[1];
+    const spriteId = targetKey.split('_')[0]; const v = targetKey.split('_')[1];
     const sprite = SPRITES_DATABASE.find(s => s.id === spriteId);
     const isMastered = userMasteryData[spriteId]?.[v];
 
@@ -1302,14 +1179,6 @@ function MainApp() {
 
   const handleAcknowledgeTransmission = async () => { setShowTransmission(false); if (user) { try { await setDoc(doc(db, "users", user.uid), { lastSeenVersion: PATCH_NOTES[0].version }, { merge: true }); } catch (err) { } } };
 
-  const { totalCollected, totalMastered, completionRate, masteryRate } = useMemo(() => {
-    const tCol = SPRITES_DATABASE.reduce((acc, sprite) => acc + sprite.variants.filter(v => !isVariantLocked(sprite.id, v) && (collection[sprite.id] || {})[v]).length, 0);
-    const tMast = SPRITES_DATABASE.reduce((acc, sprite) => acc + sprite.variants.filter(v => !isVariantLocked(sprite.id, v) && (mastery[sprite.id] || {})[v]).length, 0);
-    const cRate = totalPossibleStatic > 0 ? Math.round((tCol / totalPossibleStatic) * 100) : 0;
-    const mRate = totalPossibleStatic > 0 ? Math.round((tMast / totalPossibleStatic) * 100) : 0;
-    return { totalCollected: tCol, totalMastered: tMast, completionRate: cRate, masteryRate: mRate };
-  }, [collection, mastery]);
-
   const isMasteryView = currentView === 'mastery';
   const displayVariantKey = variantFilter === 'All' ? 'All' : variantFilter.toLowerCase();
 
@@ -1318,13 +1187,14 @@ function MainApp() {
       const matchesSearch = sprite.name.toLowerCase().includes(searchQuery.toLowerCase());
       const matchesRarity = rarityFilter === 'All' || sprite.rarity === rarityFilter;
       const matchesVariant = variantFilter === 'All' || sprite.variants.includes(displayVariantKey);
+      const matchesSeason = seasonFilter === 'All' || sprite.season === seasonFilter;
       let matchesStatus = true;
       if (statusFilter !== 'All') {
         if (isMasteryView) matchesStatus = statusFilter === 'Mastered' ? (variantFilter === 'All' ? sprite.variants.some(v => mastery[sprite.id]?.[v] === true) : mastery[sprite.id]?.[displayVariantKey] === true) : (variantFilter === 'All' ? sprite.variants.some(v => collection[sprite.id]?.[v] === true && !mastery[sprite.id]?.[v]) : (collection[sprite.id]?.[displayVariantKey] === true && !mastery[sprite.id]?.[displayVariantKey]));
         else matchesStatus = statusFilter === 'Collected' ? (variantFilter === 'All' ? sprite.variants.some(v => collection[sprite.id]?.[v] === true) : collection[sprite.id]?.[displayVariantKey] === true) : (variantFilter === 'All' ? sprite.variants.some(v => !collection[sprite.id]?.[v]) : (sprite.variants.includes(displayVariantKey) && !collection[sprite.id]?.[displayVariantKey]));
       }
-      if (isMasteryView && statusFilter === 'All') return matchesSearch && matchesRarity && matchesVariant && matchesStatus && (variantFilter === 'All' ? sprite.variants.some(v => (collection[sprite.id] || {})[v] === true) : (collection[sprite.id] || {})[displayVariantKey] === true);
-      return matchesSearch && matchesRarity && matchesVariant && matchesStatus;
+      if (isMasteryView && statusFilter === 'All') return matchesSearch && matchesRarity && matchesVariant && matchesSeason && matchesStatus && (variantFilter === 'All' ? sprite.variants.some(v => (collection[sprite.id] || {})[v] === true) : (collection[sprite.id] || {})[displayVariantKey] === true);
+      return matchesSearch && matchesRarity && matchesVariant && matchesSeason && matchesStatus;
     }).sort((a, b) => {
       if (sortBy === 'A-Z') return a.name.localeCompare(b.name);
       if (sortBy === 'Z-A') return b.name.localeCompare(a.name);
@@ -1332,7 +1202,7 @@ function MainApp() {
       if (sortBy === 'Rarity (Low to High)') return RARITY_WEIGHT[a.rarity] - RARITY_WEIGHT[b.rarity];
       return a.name.localeCompare(b.name);
     });
-  }, [searchQuery, rarityFilter, variantFilter, statusFilter, sortBy, isMasteryView, displayVariantKey, collection, mastery]);
+  }, [searchQuery, rarityFilter, variantFilter, statusFilter, seasonFilter, sortBy, isMasteryView, displayVariantKey, collection, mastery]);
 
   const filteredFriendSprites = useMemo(() => {
     return [...SPRITES_DATABASE].filter(sprite => {
@@ -1340,6 +1210,7 @@ function MainApp() {
       const matchesSearch = sprite.name.toLowerCase().includes(fSearchQuery.toLowerCase());
       const matchesRarity = fRarityFilter === 'All' || sprite.rarity === fRarityFilter;
       const matchesVariant = fVariantFilter === 'All' || sprite.variants.includes(fVariantFilter === 'All' ? 'base' : fVariantFilter.toLowerCase());
+      const matchesSeason = fSeasonFilter === 'All' || sprite.season === fSeasonFilter;
 
       let matchesStatus = true;
       if (fStatusFilter !== 'All') {
@@ -1359,7 +1230,7 @@ function MainApp() {
           matchesStatus = displayV === 'All' ? sprite.variants.some(v => collection[sprite.id]?.[v] && !friendStatus[v]) : (collection[sprite.id]?.[displayV] && !friendStatus[displayV]);
         }
       }
-      return matchesSearch && matchesRarity && matchesVariant && matchesStatus;
+      return matchesSearch && matchesRarity && matchesVariant && matchesSeason && matchesStatus;
     }).sort((a, b) => {
       if (fSortBy === 'A-Z') return a.name.localeCompare(b.name);
       if (fSortBy === 'Z-A') return b.name.localeCompare(a.name);
@@ -1367,7 +1238,7 @@ function MainApp() {
       if (fSortBy === 'Rarity (Low to High)') return RARITY_WEIGHT[a.rarity] - RARITY_WEIGHT[b.rarity];
       return a.name.localeCompare(b.name);
     });
-  }, [activeViewingFriend, fSearchQuery, fRarityFilter, fVariantFilter, fStatusFilter, fSortBy, collection]);
+  }, [activeViewingFriend, fSearchQuery, fRarityFilter, fVariantFilter, fStatusFilter, fSeasonFilter, fSortBy, collection]);
 
   const filteredSquad = useMemo(() => {
     return richFriends.filter(f =>
@@ -1379,38 +1250,20 @@ function MainApp() {
     });
   }, [richFriends, squadSearchQuery]);
 
-  const getVariantModifierText = (variantName) => {
-    if (variantName === 'gold') return lang === 'es' ? "Gana 3x de XP de bonificación por eliminaciones" : "Gain 3x bonus XP from eliminations";
-    if (variantName === 'gummy') return lang === 'es' ? "Gana un 20% más de Polvo al extraer" : "Gain 20% more Sprite Dust upon Extraction";
-    if (variantName === 'galaxy') return lang === 'es' ? "Gana un 30% más de munición al saquear" : "Gain 30% more Ammunition when looting";
-    if (variantName === 'holofoil') return lang === 'es' ? "Gana un 5% más de probabilidad de encontrar Sprites raros" : "Gain 5% increased chance of finding rare Sprites for yourself and entire squad";
-    if (variantName === 'cube') return lang === 'es' ? "Obtén el efecto Sobrecarga estando en la tormenta" : "Gain the Overdrive effect while in the storm";
-    if (variantName === 'gem') return lang === 'es' ? "Recibe un 30% menos de daño por caída" : "Take 30% less fall damage";
-    if (variantName === 'quack') return lang === 'es' ? "Otorga un 50% más de XP de Sprite a otros Sprites en tu inventario" : "Grants 50% more Sprite XP to other Sprites in your inventory";
-    return null;
-  };
-
-  const getDynamicSummonCost = (rarity, variantName, spriteId = null) => {
-    if (spriteId && isVariantLocked(spriteId, variantName)) return "TBD";
-    return variantName === 'base' ? SUMMON_COST_MATRIX[rarity].base : SUMMON_COST_MATRIX[rarity].variant;
-  };
-
   const formatJoinDate = (timestamp) => {
     if (!timestamp) return 'Unknown';
     const d = new Date(timestamp);
     return d.toLocaleDateString(lang === 'en' ? 'en-US' : 'es-ES', { month: 'short', year: 'numeric' });
   };
 
-  const renderProfileCard = (id, profData, colRate, mastRate, joinTime, isSelf, masteriesObj) => {
-    const unlockedBg = getUnlockedMilestone(Math.round((colRate / 100) * totalPossibleStatic), Math.round((mastRate / 100) * totalPossibleStatic));
+  const renderProfileCard = (id, profData, colRate, mastRate, joinTime, isSelf, masteriesObj, repVouches, uid, unlockedArray = []) => {
+    const unlockedBg = getUnlockedMilestone(Math.round((colRate / 100) * totalPossibleStatic), Math.round((mastRate / 100) * totalPossibleStatic), unlockedArray);
     const bgClass = unlockedBg ? unlockedBg.bg : "bg-slate-900 border-slate-800";
     const glowClass = unlockedBg ? unlockedBg.glow : "";
 
     return (
       <div className="relative mt-2 mb-4">
-        {unlockedBg && (
-          <div className={`absolute inset-0 rounded-2xl border-2 ${glowClass} animate-pulse pointer-events-none opacity-90`}></div>
-        )}
+        {unlockedBg && (<div className={`absolute inset-0 rounded-2xl border-2 ${glowClass} animate-pulse pointer-events-none opacity-90`}></div>)}
         <div className={`rounded-2xl border-2 p-5 relative overflow-hidden transition-all ${bgClass}`}>
           <div className="flex items-start justify-between mb-4">
             <div>
@@ -1418,7 +1271,10 @@ function MainApp() {
                 <h2 className="text-xl sm:text-2xl font-black text-white uppercase italic tracking-tight">@{id}</h2>
                 {unlockedBg && <span className="text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md border bg-black/40 text-slate-200 border-white/20">{unlockedBg.name}</span>}
               </div>
-              <span className="text-[10px] font-mono text-slate-400 flex items-center gap-1 mt-0.5"><Calendar className="w-3 h-3" /> Joined {formatJoinDate(joinTime)}</span>
+              <div className="flex items-center gap-2 mt-1">
+                <span className="text-[10px] font-mono text-slate-400 flex items-center gap-1"><Calendar className="w-3 h-3" /> Joined {formatJoinDate(joinTime)}</span>
+                <span className="text-[10px] font-black text-amber-400 bg-amber-950/40 px-1.5 py-0.5 rounded border border-amber-500/30 flex items-center gap-1">⭐ {repVouches?.length || 0} Rep</span>
+              </div>
             </div>
             {isSelf && (
               <button onClick={() => isEditingProfile ? handleSaveProfile() : setIsEditingProfile(true)} className="p-2 bg-black/40 hover:bg-black/60 rounded-xl border border-white/10 text-white transition-colors">
@@ -1467,39 +1323,18 @@ function MainApp() {
           ) : (
             <div className="mb-4">
               {profData.bio && <p className="text-sm text-slate-300 italic mb-3 bg-black/20 p-3 rounded-xl border-l-2 border-indigo-500">"{profData.bio}"</p>}
-
               <div className="flex flex-col gap-2">
                 {profData.epicName && (
                   <div className="w-full bg-blue-950/40 border border-blue-500/30 p-3 rounded-xl flex items-center justify-between shadow-inner">
-                    <div className="flex items-center gap-2">
-                      <Gamepad2 className="w-5 h-5 text-blue-400" />
-                      <span className="text-[10px] font-mono text-blue-300 uppercase tracking-widest">Epic ID</span>
-                    </div>
+                    <div className="flex items-center gap-2"><Gamepad2 className="w-5 h-5 text-blue-400" /><span className="text-[10px] font-mono text-blue-300 uppercase tracking-widest">Epic ID</span></div>
                     <span className="text-sm font-black text-white">{profData.epicName}</span>
                   </div>
                 )}
-
                 <div className="grid grid-cols-2 gap-2">
-                  {profData.twitchName && (
-                    <a href={`https://twitch.tv/${profData.twitchName}`} target="_blank" rel="noopener noreferrer" className="bg-purple-900/30 hover:bg-purple-800/40 border border-purple-500/30 text-purple-300 p-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-colors">
-                      <Tv className="w-4 h-4 text-purple-400" /> Twitch
-                    </a>
-                  )}
-                  {profData.tiktokName && (
-                    <a href={`https://tiktok.com/@${profData.tiktokName}`} target="_blank" rel="noopener noreferrer" className="bg-pink-900/30 hover:bg-pink-800/40 border border-pink-500/30 text-pink-300 p-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-colors">
-                      <Music className="w-4 h-4 text-pink-400" /> TikTok
-                    </a>
-                  )}
-                  {profData.youtubeName && (
-                    <a href={`https://youtube.com/@${profData.youtubeName}`} target="_blank" rel="noopener noreferrer" className="bg-red-900/30 hover:bg-red-800/40 border border-red-500/30 text-red-300 p-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-colors">
-                      <Video className="w-4 h-4 text-red-400" /> YouTube
-                    </a>
-                  )}
-                  {profData.kickName && (
-                    <a href={`https://kick.com/${profData.kickName}`} target="_blank" rel="noopener noreferrer" className="bg-green-900/30 hover:bg-green-800/40 border border-green-500/30 text-green-300 p-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-colors">
-                      <Play className="w-4 h-4 text-green-400" /> Kick
-                    </a>
-                  )}
+                  {profData.twitchName && (<a href={`https://twitch.tv/${profData.twitchName}`} target="_blank" rel="noopener noreferrer" className="bg-purple-900/30 hover:bg-purple-800/40 border border-purple-500/30 text-purple-300 p-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-colors"><Tv className="w-4 h-4 text-purple-400" /> Twitch</a>)}
+                  {profData.tiktokName && (<a href={`https://tiktok.com/@${profData.tiktokName}`} target="_blank" rel="noopener noreferrer" className="bg-pink-900/30 hover:bg-pink-800/40 border border-pink-500/30 text-pink-300 p-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-colors"><Music className="w-4 h-4 text-pink-400" /> TikTok</a>)}
+                  {profData.youtubeName && (<a href={`https://youtube.com/@${profData.youtubeName}`} target="_blank" rel="noopener noreferrer" className="bg-red-900/30 hover:bg-red-800/40 border border-red-500/30 text-red-300 p-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-colors"><Video className="w-4 h-4 text-red-400" /> YouTube</a>)}
+                  {profData.kickName && (<a href={`https://kick.com/${profData.kickName}`} target="_blank" rel="noopener noreferrer" className="bg-green-900/30 hover:bg-green-800/40 border border-green-500/30 text-green-300 p-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-colors"><Play className="w-4 h-4 text-green-400" /> Kick</a>)}
                 </div>
               </div>
             </div>
@@ -1511,6 +1346,18 @@ function MainApp() {
               {[0, 1, 2, 3].map(index => renderTrophySlot(profData.trophies?.[index], index, isSelf, isEditingProfile, masteriesObj))}
             </div>
           </div>
+
+          {!isSelf && uid && (
+            <div className="mt-4 pt-4 border-t border-slate-800">
+              <button
+                onClick={handleVouch}
+                disabled={repVouches?.includes(user.uid)}
+                className={`w-full py-2.5 rounded-xl text-xs font-black uppercase tracking-wider flex items-center justify-center gap-2 transition-colors ${repVouches?.includes(user.uid) ? 'bg-amber-900/40 text-amber-500/50 border border-amber-500/20' : 'bg-amber-600 hover:bg-amber-500 text-white shadow-[0_0_10px_rgba(217,119,6,0.4)]'}`}
+              >
+                <Award className="w-4 h-4" /> {repVouches?.includes(user.uid) ? 'Vouched ✓' : 'Vouch Trader (+1 Rep)'}
+              </button>
+            </div>
+          )}
         </div>
       </div>
     );
@@ -1535,28 +1382,19 @@ function MainApp() {
         <div className="bg-white/[0.03] backdrop-blur-xl p-8 rounded-2xl border border-white/10 w-full max-w-md shadow-2xl z-10 transition-all duration-300 hover:border-white/15">
           <div className="flex flex-col items-center text-center mb-8">
             <img src="/app_icon.webp" className="w-24 h-24 drop-shadow-[0_0_15px_rgba(168,85,247,0.4)] object-contain mb-4 animate-pulse duration-[4000ms]" alt="Spritedex Logo" />
-            <h1 className="text-white text-3xl font-extrabold tracking-tight mb-2 bg-gradient-to-r from-white via-slate-200 to-slate-400 bg-clip-text text-transparent">
-              Spritedex
-            </h1>
+            <h1 className="text-white text-3xl font-extrabold tracking-tight mb-2 bg-gradient-to-r from-white via-slate-200 to-slate-400 bg-clip-text text-transparent">Spritedex</h1>
             <p className="text-purple-400 text-sm font-semibold uppercase tracking-wider mb-1">Master your collection</p>
             <p className="text-slate-400 text-sm sm:text-base max-w-xs px-2">{t('app_desc')}</p>
           </div>
 
           <form onSubmit={handleAuth} className="space-y-5">
-            {authError && (
-              <div className="bg-red-950/50 border border-red-500/50 text-red-400 p-3 rounded-xl text-xs font-bold text-center animate-in fade-in zoom-in-95">
-                {authError}
-              </div>
-            )}
-
+            {authError && (<div className="bg-red-950/50 border border-red-500/50 text-red-400 p-3 rounded-xl text-xs font-bold text-center animate-in fade-in zoom-in-95">{authError}</div>)}
             <div>
               <label className="block text-slate-300 text-xs font-medium uppercase tracking-wide mb-2">Email Address</label>
               <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} className={`w-full bg-slate-900/60 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-all ${inputSizeClass}`} placeholder="name@example.com" required />
             </div>
             <div>
-              <div className="flex justify-between items-center mb-2">
-                <label className="block text-slate-300 text-xs font-medium uppercase tracking-wide">Password</label>
-              </div>
+              <div className="flex justify-between items-center mb-2"><label className="block text-slate-300 text-xs font-medium uppercase tracking-wide">Password</label></div>
               <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} className={`w-full bg-slate-900/60 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-all ${inputSizeClass}`} placeholder="••••••••" required />
             </div>
             <button type="submit" disabled={isAuthLoading} className="w-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-medium rounded-xl py-3 px-4 shadow-lg shadow-purple-900/30 transition-all duration-200 transform active:scale-[0.98] mt-2 text-sm disabled:opacity-50">
@@ -1571,14 +1409,8 @@ function MainApp() {
                 {isLoginMode ? (lang === 'es' ? 'Regístrate' : 'Sign Up') : (lang === 'es' ? 'Inicia Sesión' : 'Sign In')}
               </button>
             </p>
-            {isLoginMode && (
-              <button type="button" onClick={handlePasswordReset} className="text-xs text-slate-500 hover:text-slate-300 transition-colors">
-                {resetSent ? (lang === 'es' ? '¡Enlace enviado!' : 'Reset link sent!') : (lang === 'es' ? '¿Olvidaste tu contraseña?' : 'Forgot Password?')}
-              </button>
-            )}
-            <p className="text-[10px] sm:text-xs text-slate-500 mt-2 leading-relaxed max-w-xs mx-auto">
-              {t('disclaimer')}
-            </p>
+            {isLoginMode && (<button type="button" onClick={handlePasswordReset} className="text-xs text-slate-500 hover:text-slate-300 transition-colors">{resetSent ? (lang === 'es' ? '¡Enlace enviado!' : 'Reset link sent!') : (lang === 'es' ? '¿Olvidaste tu contraseña?' : 'Forgot Password?')}</button>)}
+            <p className="text-[10px] sm:text-xs text-slate-500 mt-2 leading-relaxed max-w-xs mx-auto">{t('disclaimer')}</p>
           </div>
         </div>
       </div>
@@ -1634,11 +1466,9 @@ function MainApp() {
               <button onClick={() => { setShowSettingsModal(false); setShowAboutModal(true); }} className="flex items-center gap-4 p-4 rounded-2xl hover:bg-slate-800/50 transition-colors text-left">
                 <Info className="w-6 h-6 text-slate-400" /><span className="text-base font-bold text-slate-200">{t('about')}</span>
               </button>
-
               <div className="h-px bg-slate-800/50 my-2" />
               <button onClick={handleDeleteAccount} className="flex items-center gap-4 p-4 rounded-2xl hover:bg-red-950/30 transition-colors text-left group">
-                <Trash2 className="w-6 h-6 text-red-500/70 group-hover:text-red-400" />
-                <span className="text-base font-bold text-red-500/70 group-hover:text-red-400">Delete Account</span>
+                <Trash2 className="w-6 h-6 text-red-500/70 group-hover:text-red-400" /><span className="text-base font-bold text-red-500/70 group-hover:text-red-400">Delete Account</span>
               </button>
             </div>
           </div>
@@ -1650,21 +1480,13 @@ function MainApp() {
         <div className="fixed inset-0 z-[80] flex flex-col justify-end sm:justify-center items-center bg-black/80 backdrop-blur-sm animate-in fade-in">
           <div className="bg-[#12141f] w-full max-w-md h-[85vh] rounded-t-3xl sm:rounded-3xl border-t-2 sm:border-2 border-cyan-500/50 p-6 shadow-2xl animate-in slide-in-from-bottom-10 flex flex-col overflow-hidden">
             <div className="flex justify-between items-center mb-4 shrink-0">
-              <h2 className="text-xl font-black text-white uppercase italic flex items-center gap-2">
-                <Newspaper className="w-6 h-6 text-cyan-400" /> Live News & Intel
-              </h2>
+              <h2 className="text-xl font-black text-white uppercase italic flex items-center gap-2"><Newspaper className="w-6 h-6 text-cyan-400" /> Live News & Intel</h2>
               <button onClick={() => setShowNewsModal(false)} className="p-2 bg-black/40 rounded-full text-slate-400 hover:text-white"><X className="w-5 h-5" /></button>
             </div>
-
             <div className="flex-1 overflow-y-auto pr-1 flex flex-col gap-4">
               {newsFeed.length === 0 ? (
-                <div className="flex-1 flex flex-col items-center justify-center text-center p-8">
-                  <Newspaper className="w-12 h-12 text-slate-700 mb-3" />
-                  <p className="text-sm text-slate-400 font-bold uppercase tracking-wider">No News Broadcasts Available</p>
-                </div>
-              ) : (
-                newsFeed.map((news) => <NewsCard key={news.id} news={news} />)
-              )}
+                <div className="flex-1 flex flex-col items-center justify-center text-center p-8"><Newspaper className="w-12 h-12 text-slate-700 mb-3" /><p className="text-sm text-slate-400 font-bold uppercase tracking-wider">No News Broadcasts Available</p></div>
+              ) : (newsFeed.map((news) => <NewsCard key={news.id} news={news} />))}
             </div>
           </div>
         </div>
@@ -1675,56 +1497,32 @@ function MainApp() {
         <div className="fixed inset-0 z-[90] flex flex-col justify-end sm:justify-center items-center bg-black/80 backdrop-blur-sm animate-in fade-in">
           <div className="bg-[#12141f] w-full max-w-md rounded-t-3xl sm:rounded-3xl border-t-2 sm:border-2 border-slate-800 p-6 shadow-2xl animate-in slide-in-from-bottom-10 relative overflow-hidden">
             <div className="absolute top-0 right-0 w-32 h-32 bg-cyan-500/10 rounded-full blur-[50px] pointer-events-none" />
-
             <div className="flex justify-between items-start mb-6 relative z-10">
               <div>
-                <h2 className="text-2xl font-black text-cyan-400 uppercase italic flex items-center">
-                  <Radar className="w-6 h-6 mr-2" /> Daily Radar
-                </h2>
+                <h2 className="text-2xl font-black text-cyan-400 uppercase italic flex items-center"><Radar className="w-6 h-6 mr-2" /> Daily Radar</h2>
                 <div className="flex items-center gap-2 mt-1">
-                  <p className="text-xs text-slate-400 font-medium">
-                    {canSweepToday ? "Scanner ready. Initiate sweep." : "Radar cooling down."}
-                  </p>
+                  <p className="text-xs text-slate-400 font-medium">{canSweepToday ? "Scanner ready. Initiate sweep." : "Radar cooling down."}</p>
                   {sweepStreak >= 1 && (
-                    <span className="text-[9px] font-black uppercase px-2 py-0.5 rounded-md bg-gradient-to-br from-red-900/60 to-orange-900/40 border border-red-500/50 text-red-400 flex items-center gap-1 shadow-[0_0_10px_rgba(239,68,68,0.3)]">
-                      🔥 {sweepStreak} Day Streak
-                    </span>
+                    <span className="text-[9px] font-black uppercase px-2 py-0.5 rounded-md bg-gradient-to-br from-red-900/60 to-orange-900/40 border border-red-500/50 text-red-400 flex items-center gap-1 shadow-[0_0_10px_rgba(239,68,68,0.3)]">🔥 {sweepStreak} Day Streak</span>
                   )}
                 </div>
               </div>
-              <button onClick={() => setShowRadarModal(false)} className="p-2 bg-black/40 rounded-full text-slate-400 hover:text-white transition-colors">
-                <X className="w-5 h-5" />
-              </button>
+              <button onClick={() => setShowRadarModal(false)} className="p-2 bg-black/40 rounded-full text-slate-400 hover:text-white transition-colors"><X className="w-5 h-5" /></button>
             </div>
 
             <div className="bg-black/80 border-y-2 border-slate-800 p-6 mb-6 flex flex-col items-center justify-center relative shadow-[inset_0_0_30px_rgba(0,0,0,1)] rounded-xl z-10">
               <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2">Vaulted Fragments</span>
               <div className="flex items-center gap-3">
-                <svg viewBox="0 0 24 24" fill="currentColor" className="w-8 h-8 text-cyan-400 drop-shadow-[0_0_10px_rgba(34,211,238,0.8)] animate-pulse">
-                  <path d="M12 2L2 12l10 10 10-10L12 2zM12 5.83L18.17 12 12 18.17 5.83 12 12 5.83z" />
-                </svg>
-                <span className="text-4xl font-mono font-black text-cyan-50 drop-shadow-[0_0_8px_rgba(255,255,255,0.5)]">
-                  {fragments}
-                </span>
+                <svg viewBox="0 0 24 24" fill="currentColor" className="w-8 h-8 text-cyan-400 drop-shadow-[0_0_10px_rgba(34,211,238,0.8)] animate-pulse"><path d="M12 2L2 12l10 10 10-10L12 2zM12 5.83L18.17 12 12 18.17 5.83 12 12 5.83z" /></svg>
+                <span className="text-4xl font-mono font-black text-cyan-50 drop-shadow-[0_0_8px_rgba(255,255,255,0.5)]">{fragments}</span>
               </div>
             </div>
 
             {canSweepToday ? (
               <div className="relative z-10 mb-6 touch-none select-none">
                 <div className="relative w-full h-14 bg-slate-900 rounded-xl overflow-hidden border-2 border-cyan-800 shadow-[0_0_15px_rgba(34,211,238,0.15)]">
-                  <div
-                    className="absolute top-0 left-0 h-full bg-cyan-600 transition-all duration-75"
-                    style={{ width: `${holdProgress}%` }}
-                  />
-                  <button
-                    onMouseDown={startHold}
-                    onMouseUp={endHold}
-                    onMouseLeave={endHold}
-                    onTouchStart={startHold}
-                    onTouchEnd={endHold}
-                    disabled={isSweeping}
-                    className="absolute inset-0 w-full h-full flex items-center justify-center text-white font-black text-sm uppercase tracking-widest z-10 outline-none"
-                  >
+                  <div className="absolute top-0 left-0 h-full bg-cyan-600 transition-all duration-75" style={{ width: `${holdProgress}%` }} />
+                  <button onMouseDown={startHold} onMouseUp={endHold} onMouseLeave={endHold} onTouchStart={startHold} onTouchEnd={endHold} disabled={isSweeping} className="absolute inset-0 w-full h-full flex items-center justify-center text-white font-black text-sm uppercase tracking-widest z-10 outline-none">
                     {isSweeping ? "SCANNING..." : holdProgress > 0 ? "HOLDING..." : "PRESS & HOLD TO SWEEP"}
                   </button>
                 </div>
@@ -1745,26 +1543,18 @@ function MainApp() {
 
             {dailyIntel && (
               <div className="mb-6 p-4 bg-indigo-950/40 rounded-xl border border-indigo-500/30 text-center animate-in zoom-in-95 duration-500 relative z-10 shadow-[0_0_15px_rgba(99,102,241,0.15)]">
-                <div className="flex items-center justify-center gap-2 mb-2">
-                  <Radar className="w-4 h-4 text-indigo-400 animate-pulse" />
-                  <span className="text-[10px] font-black text-indigo-400 uppercase tracking-widest">Decrypted AI Intel</span>
-                </div>
+                <div className="flex items-center justify-center gap-2 mb-2"><Radar className="w-4 h-4 text-indigo-400 animate-pulse" /><span className="text-[10px] font-black text-indigo-400 uppercase tracking-widest">Decrypted AI Intel</span></div>
                 <p className="text-xs text-slate-300 font-medium leading-relaxed italic">"{dailyIntel}"</p>
               </div>
             )}
 
             <div className="p-4 bg-slate-900/80 rounded-xl border border-slate-700/60 flex items-start relative z-10">
-              <div className="text-amber-400 mr-3 mt-0.5 shrink-0">
-                <Lock className="w-5 h-5" />
-              </div>
+              <div className="text-amber-400 mr-3 mt-0.5 shrink-0"><Lock className="w-5 h-5" /></div>
               <div>
                 <p className="text-xs font-black text-amber-400 mb-1 tracking-wider">HOARD YOUR FRAGMENTS!</p>
-                <p className="text-[10px] sm:text-xs text-slate-400 leading-relaxed font-medium">
-                  The Vault expands soon. Save up to unlock Profile Auras, extra Trophy slots, and tactical upgrades in the upcoming Profile Shop.
-                </p>
+                <p className="text-[10px] sm:text-xs text-slate-400 leading-relaxed font-medium">The Vault expands soon. Save up to unlock Profile Auras, extra Trophy slots, and tactical upgrades in the upcoming Profile Shop.</p>
               </div>
             </div>
-
           </div>
         </div>
       )}
@@ -1774,28 +1564,18 @@ function MainApp() {
         <div className="fixed inset-0 z-[80] flex flex-col justify-end sm:justify-center items-center bg-black/90 backdrop-blur-sm animate-in fade-in">
           <div className="bg-[#12141f] w-full max-w-md h-[85vh] rounded-t-3xl sm:rounded-3xl border-t-2 sm:border-2 border-indigo-500/50 p-5 shadow-2xl animate-in slide-in-from-bottom-10 flex flex-col overflow-hidden relative">
             <div className="flex justify-between items-center mb-4 shrink-0">
-              <h2 className="text-lg font-black text-white uppercase italic flex items-center gap-2">
-                <Radio className="w-5 h-5 text-indigo-400" /> {editingPostId ? 'Edit Transmission' : 'New Transmission'}
-              </h2>
+              <h2 className="text-lg font-black text-white uppercase italic flex items-center gap-2"><Radio className="w-5 h-5 text-indigo-400" /> {editingPostId ? 'Edit Transmission' : 'New Transmission'}</h2>
               <button onClick={() => { setShowCreatePost(false); setPostText(""); setPostLookingFor(null); setPostOffering(null); setEditingPostId(null); }} className="p-2 bg-black/40 rounded-full text-slate-400 hover:text-white"><X className="w-5 h-5" /></button>
             </div>
-
             <div className="flex gap-2 mb-4">
               <button onClick={() => setPostType('general')} className={`flex-1 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition-colors border ${postType === 'general' ? 'bg-indigo-600 text-white border-indigo-400' : 'bg-black/40 text-slate-400 border-slate-800'}`}>General</button>
               <button onClick={() => setPostType('trade')} className={`flex-1 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition-colors border ${postType === 'trade' ? 'bg-cyan-600 text-white border-cyan-400' : 'bg-black/40 text-slate-400 border-slate-800'}`}>Trade Board</button>
             </div>
-
             <div className="flex-1 overflow-y-auto flex flex-col gap-4">
               <div className="relative">
-                <textarea
-                  value={postText}
-                  onChange={(e) => setPostText(e.target.value.substring(0, 200))}
-                  placeholder={postType === 'trade' ? "Add trade details (optional)..." : "Broadcast to the network..."}
-                  className={`w-full bg-black/50 border-2 border-slate-800 rounded-xl p-4 ${responsiveInputSizeClass} text-white focus:outline-none focus:border-indigo-500 resize-none h-32`}
-                />
+                <textarea value={postText} onChange={(e) => setPostText(e.target.value.substring(0, 200))} placeholder={postType === 'trade' ? "Add trade details (optional)..." : "Broadcast to the network..."} className={`w-full bg-black/50 border-2 border-slate-800 rounded-xl p-4 ${responsiveInputSizeClass} text-white focus:outline-none focus:border-indigo-500 resize-none h-32`} />
                 <span className={`absolute bottom-3 right-3 text-[10px] font-mono font-bold ${postText.length >= 200 ? 'text-red-400' : 'text-slate-500'}`}>{postText.length}/200</span>
               </div>
-
               {postType === 'trade' && (
                 <div className="flex gap-3">
                   <div className="flex-1 flex flex-col gap-1.5">
@@ -1809,7 +1589,6 @@ function MainApp() {
                       <button onClick={() => { setSelectorContext('commsLooking'); setShowSpriteSelector(true); }} className="h-20 border-2 border-dashed border-slate-700 rounded-xl flex items-center justify-center bg-black/40 hover:bg-black/60 transition-colors"><Plus className="w-6 h-6 text-slate-600" /></button>
                     )}
                   </div>
-
                   <div className="flex-1 flex flex-col gap-1.5">
                     <span className="text-[10px] font-black uppercase tracking-widest text-emerald-400 text-center">Offering</span>
                     {postOffering ? (
@@ -1824,15 +1603,8 @@ function MainApp() {
                 </div>
               )}
             </div>
-
             <div className="pt-4 shrink-0">
-              <button
-                onClick={handlePostSubmit}
-                disabled={!postText.trim() && !postLookingFor && !postOffering}
-                className="w-full bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 disabled:hover:bg-indigo-600 text-white font-black uppercase tracking-wider py-3.5 rounded-xl transition-colors flex items-center justify-center gap-2"
-              >
-                <Radio className="w-5 h-5" /> Broadcast
-              </button>
+              <button onClick={handlePostSubmit} disabled={!postText.trim() && !postLookingFor && !postOffering} className="w-full bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 disabled:hover:bg-indigo-600 text-white font-black uppercase tracking-wider py-3.5 rounded-xl transition-colors flex items-center justify-center gap-2"><Radio className="w-5 h-5" /> Broadcast</button>
             </div>
           </div>
         </div>
@@ -1843,9 +1615,7 @@ function MainApp() {
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/90 backdrop-blur-md animate-in fade-in duration-200">
           <div className="bg-[#12141f] border-2 border-cyan-500/60 rounded-2xl flex flex-col max-w-sm w-full h-[75vh] relative overflow-hidden shadow-[0_0_30px_rgba(0,0,0,0.8)]">
             <header className="p-4 border-b border-slate-800 flex justify-between items-center bg-[#0e1017]">
-              <h3 className="text-md sm:text-lg font-black tracking-tight text-cyan-400 uppercase italic flex items-center gap-2">
-                <Target className="w-5 h-5" /> Select Sprite
-              </h3>
+              <h3 className="text-md sm:text-lg font-black tracking-tight text-cyan-400 uppercase italic flex items-center gap-2"><Target className="w-5 h-5" /> Select Sprite</h3>
               <button onClick={() => setShowSpriteSelector(false)} className="text-slate-400 hover:text-white"><X className="w-6 h-6" /></button>
             </header>
             <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-4">
@@ -1856,7 +1626,6 @@ function MainApp() {
                 } else if (selectorContext === 'extraction' || selectorContext === 'commsLooking') {
                   validVariants = sprite.variants.filter(v => selectorContext === 'commsLooking' ? !isVariantLocked(sprite.id, v) : (!collection[sprite.id]?.[v] && !isVariantLocked(sprite.id, v)));
                 }
-
                 if (validVariants.length === 0) return null;
                 return (
                   <div key={sprite.id} className="bg-slate-900 border border-slate-800 rounded-xl p-3">
@@ -1906,12 +1675,9 @@ function MainApp() {
         <div className="fixed inset-0 z-[70] flex items-center justify-center p-4 bg-black/90 backdrop-blur-md animate-in fade-in zoom-in-95 duration-200">
           {(() => {
             const sprite = SPRITES_DATABASE.find(s => s.id === selectedSprite.id);
-            const validVariants = sprite.variants;
-            const v = selectedSprite.variant;
-            const vIndex = validVariants.indexOf(v);
-            const isLocked = isVariantLocked(sprite.id, v);
-            const isCollected = collection[sprite.id]?.[v];
-            const isMastered = mastery[sprite.id]?.[v];
+            const validVariants = sprite.variants; const v = selectedSprite.variant;
+            const vIndex = validVariants.indexOf(v); const isLocked = isVariantLocked(sprite.id, v);
+            const isCollected = collection[sprite.id]?.[v]; const isMastered = mastery[sprite.id]?.[v];
             const variantModifier = getVariantModifierText(v);
             const abilityText = typeof sprite.baseAbility === 'object' ? sprite.baseAbility[lang] : sprite.baseAbility;
 
@@ -1929,6 +1695,7 @@ function MainApp() {
                     <div className="flex items-center gap-2 mt-1 flex-wrap">
                       <span className={`text-[9px] sm:text-[10px] font-black uppercase px-2 py-0.5 rounded border ${RARITY_COLORS[sprite.rarity]}`}>{t(sprite.rarity.toLowerCase())}</span>
                       <span className={`text-[9px] sm:text-[10px] font-black uppercase px-2 py-0.5 rounded border border-slate-700 bg-slate-800 ${VARIANT_INFO[v]?.color}`}>{t(v)}</span>
+                      {sprite.season === 'C7S3' && <span className="text-[9px] sm:text-[10px] font-black uppercase px-2 py-0.5 rounded border border-slate-700 bg-slate-900 text-slate-400">Vaulted</span>}
                       {isLocked && <span className="text-[9px] sm:text-[10px] font-black uppercase px-2 py-0.5 rounded border border-amber-500/50 bg-amber-950/60 text-amber-400 flex items-center gap-1"><Lock className="w-3 h-3" /> {t('locked_until_release')}</span>}
                     </div>
                   </div>
@@ -2039,7 +1806,7 @@ function MainApp() {
           </header>
 
           <div className="max-w-md w-full mx-auto p-4 flex flex-col gap-4 mt-2">
-            {renderProfileCard(activeViewingFriend.spriteId, activeViewingFriend.profile, activeViewingFriend.completionRate, activeViewingFriend.masteryRate, activeViewingFriend.creationTime, false, activeViewingFriend.mastery)}
+            {renderProfileCard(activeViewingFriend.spriteId, activeViewingFriend.profile, activeViewingFriend.completionRate, activeViewingFriend.masteryRate, activeViewingFriend.creationTime, false, activeViewingFriend.mastery, activeViewingFriend.reputationVouches, activeViewingFriend.uid, activeViewingFriend.unlockedMilestones)}
 
             <div className="h-px w-full bg-gradient-to-r from-transparent via-slate-700 to-transparent my-2" />
 
@@ -2067,6 +1834,16 @@ function MainApp() {
                     </div>
                   </div>
                   <div>
+                    <span className="text-[9px] text-slate-500 font-black uppercase tracking-widest mb-1.5 block">Season Filter</span>
+                    <div className="flex flex-wrap gap-1.5">
+                      {['All', 'C7S3', 'C7S4'].map(season => (
+                        <button key={season} onClick={() => setFSeasonFilter(season)} className={`px-3 py-1.5 text-[10px] font-black tracking-wider rounded-lg border uppercase ${fSeasonFilter === season ? 'bg-indigo-500 text-white border-indigo-400' : 'bg-black/40 text-slate-400 border-slate-800'}`}>
+                          {season === 'All' ? 'All Seasons' : season === 'C7S3' ? 'Ch 7: S3' : 'Ch 7: S4'}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                  <div>
                     <span className="text-[9px] text-slate-500 font-black uppercase tracking-widest mb-1.5 block">{t('rarity')}</span>
                     <div className="flex flex-wrap gap-1.5">
                       {['All', 'Mythic', 'Legendary', 'Epic', 'Rare', 'Unknown'].map(rarity => (
@@ -2079,7 +1856,7 @@ function MainApp() {
                   <div>
                     <span className="text-[9px] text-slate-500 font-black uppercase tracking-widest mb-1.5 block">{t('variant_type')}</span>
                     <div className="flex flex-wrap gap-1.5">
-                      {['All', 'Base', 'Gold', 'Gummy', 'Galaxy', 'Holofoil', 'Cube', 'Gem', 'Quack'].map(variant => (
+                      {['All', 'Base', 'Gold', 'Gummy', 'Galaxy', 'Holofoil', 'Cube', 'Gem', 'Quack', 'Cheatmaster'].map(variant => (
                         <button key={variant} onClick={() => setFVariantFilter(variant)} className={`px-3 py-1.5 text-[10px] font-black tracking-wider rounded-lg border uppercase ${fVariantFilter === variant ? 'bg-purple-500 text-white border-purple-400' : 'bg-black/40 text-slate-400 border-slate-800'}`}>
                           {t(variant.toLowerCase())}
                         </button>
@@ -2130,7 +1907,7 @@ function MainApp() {
                   </div>
                   <div className="flex-1 flex flex-col justify-center min-w-0">
                     <div className="flex flex-col mb-2.5">
-                      <span className="font-black text-base sm:text-lg text-white uppercase italic tracking-tight truncate">{sprite.name}</span>
+                      <span className="font-black text-base sm:text-lg text-white uppercase italic tracking-tight truncate">{sprite.name} {sprite.season === 'C7S3' && <span className="text-[8px] bg-slate-800 text-slate-400 px-1.5 py-0.5 rounded ml-1 not-italic">VAULTED</span>}</span>
                       <span className={`text-[8px] sm:text-[9px] font-black uppercase tracking-widest ${VARIANT_INFO[validInitialVariant]?.color}`}>{t(validInitialVariant)}</span>
                     </div>
                     <div className="flex flex-wrap gap-x-3 gap-y-2">
@@ -2139,8 +1916,6 @@ function MainApp() {
                         const isLocked = isVariantLocked(sprite.id, v);
                         const isCollected = friendStatus[v];
                         const isMastered = friendMastery[v];
-                        const isMatch = extractionTargets.includes(`${sprite.id}_${v}`) && isCollected;
-
                         if (fStatusFilter === 'Missing' && isCollected) return null;
                         if (fStatusFilter === 'I Need' && (!isCollected || collection[sprite.id]?.[v])) return null;
                         if (fStatusFilter === 'They Need' && (isCollected || !collection[sprite.id]?.[v])) return null;
@@ -2155,7 +1930,7 @@ function MainApp() {
                                 </>
                               )}
                             </div>
-                            <span className="text-[7px] sm:text-[8px] font-bold uppercase text-slate-500 tracking-wider whitespace-nowrap">{v === 'holofoil' ? 'Holo' : t(v)}</span>
+                            <span className="text-[7px] sm:text-[8px] font-bold uppercase text-slate-500 tracking-wider whitespace-nowrap">{v === 'holofoil' ? 'Holo' : v === 'cheatmaster' ? 'Cheat' : t(v)}</span>
                           </div>
                         );
                       })}
@@ -2172,96 +1947,57 @@ function MainApp() {
       <header className={`sticky top-0 z-50 bg-[#0e1017]/95 backdrop-blur-md border-b-2 border-cyan-500/80 shadow-[0_4px_20px_rgba(0,240,255,0.15)] px-4 pb-4 ${Capacitor.getPlatform() === 'ios' ? 'pt-14' : 'pt-4'}`}>
         <div className="max-w-md mx-auto flex items-center justify-between">
           <div>
-            <h1 className="text-2xl sm:text-3xl font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-yellow-400 to-pink-500 uppercase italic">
-              SPRITEDEX
-            </h1>
+            <h1 className="text-2xl sm:text-3xl font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-yellow-400 to-pink-500 uppercase italic">SPRITEDEX</h1>
             {user && <p className="text-[10px] sm:text-xs font-mono text-slate-400 uppercase tracking-widest mt-0.5">ID: {spriteId}</p>}
           </div>
           <div className="flex items-center gap-2.5">
             {user && (
-              <button
-                onClick={() => setShowRadarModal(true)}
-                className={`relative p-2 rounded-xl border-2 transition-all duration-300 shadow-sm ${canSweepToday
-                  ? 'bg-cyan-950/60 border-cyan-500 text-cyan-400 animate-pulse shadow-[0_0_15px_rgba(34,211,238,0.4)]'
-                  : 'bg-slate-900 border-slate-800 text-slate-600'
-                  }`}
-              >
+              <button onClick={() => setShowRadarModal(true)} className={`relative p-2 rounded-xl border-2 transition-all duration-300 shadow-sm ${canSweepToday ? 'bg-cyan-950/60 border-cyan-500 text-cyan-400 animate-pulse shadow-[0_0_15px_rgba(34,211,238,0.4)]' : 'bg-slate-900 border-slate-800 text-slate-600'}`}>
                 <Radar className="w-5 h-5 sm:w-6 sm:h-6" />
-
-                {!canSweepToday && sweepStreak >= 1 && (
-                  <div className="absolute -top-2 -right-3 bg-[#0b0c10] border border-orange-500 shadow-[0_0_12px_rgba(249,115,22,0.6)] text-orange-400 text-[10px] font-black px-1.5 py-0.5 rounded-full flex items-center justify-center gap-0.5 z-10">
-                    <span className="drop-shadow-[0_0_5px_rgba(249,115,22,0.8)]">🔥</span>
-                    {sweepStreak}
-                  </div>
-                )}
+                {!canSweepToday && sweepStreak >= 1 && (<div className="absolute -top-2 -right-3 bg-[#0b0c10] border border-orange-500 shadow-[0_0_12px_rgba(249,115,22,0.6)] text-orange-400 text-[10px] font-black px-1.5 py-0.5 rounded-full flex items-center justify-center gap-0.5 z-10"><span className="drop-shadow-[0_0_5px_rgba(249,115,22,0.8)]">🔥</span>{sweepStreak}</div>)}
               </button>
             )}
-
             {user && (
               <button onClick={() => { setCurrentView('profile'); setActiveViewingFriend(null); }} className={`p-2 rounded-xl border-2 transition-colors shadow-sm ${currentView === 'profile' ? 'bg-indigo-900 border-indigo-500' : 'bg-slate-900 border-slate-700/60 hover:bg-slate-800'}`}>
                 <UserIcon className={`w-5 h-5 sm:w-6 sm:h-6 ${currentView === 'profile' ? 'text-indigo-400' : 'text-slate-300'}`} />
               </button>
             )}
-
-            <button onClick={() => setShowNewsModal(true)} className="p-2 rounded-xl bg-slate-900 border-2 border-slate-700/60 hover:bg-slate-800 transition-colors shadow-sm">
-              <Newspaper className="w-5 h-5 sm:w-6 sm:h-6 text-slate-300" />
-            </button>
-
-            <button onClick={() => setShowSettingsModal(true)} className="p-2 rounded-xl bg-slate-900 border-2 border-slate-700/60 hover:bg-slate-800 transition-colors shadow-sm">
-              <Settings className="w-5 h-5 sm:w-6 sm:h-6 text-slate-300" />
-            </button>
+            <button onClick={() => setShowNewsModal(true)} className="p-2 rounded-xl bg-slate-900 border-2 border-slate-700/60 hover:bg-slate-800 transition-colors shadow-sm"><Newspaper className="w-5 h-5 sm:w-6 sm:h-6 text-slate-300" /></button>
+            <button onClick={() => setShowSettingsModal(true)} className="p-2 rounded-xl bg-slate-900 border-2 border-slate-700/60 hover:bg-slate-800 transition-colors shadow-sm"><Settings className="w-5 h-5 sm:w-6 sm:h-6 text-slate-300" /></button>
           </div>
         </div>
       </header>
 
       <main className="flex-1 max-w-md w-full mx-auto p-4 flex flex-col gap-5 pb-24">
-
         {/* --- PROFILE VIEW --- */}
         {currentView === 'profile' && user && (
           <div className="flex flex-col gap-5 animate-in fade-in duration-300">
-            {renderProfileCard(spriteId, profileData, completionRate, masteryRate, user.metadata?.creationTime, true, mastery)}
-
-            {/* --- RESTORED MILESTONE UNLOCKS --- */}
+            {renderProfileCard(spriteId, profileData, completionRate, masteryRate, user.metadata?.creationTime, true, mastery, reputationVouches, user.uid, unlockedMilestones)}
             <div className="bg-[#12141f] rounded-2xl border border-slate-800 p-5 shadow-xl">
-              <h3 className="text-sm font-black text-white uppercase italic tracking-wider mb-4 flex items-center gap-2">
-                <Eye className="w-4 h-4 text-cyan-400" /> Milestone Unlocks
-              </h3>
-              <p className="text-xs text-slate-400 leading-relaxed mb-4">
-                Grind Masteries and full collections to automatically unlock prestigious backgrounds for your Profile.
-              </p>
-
+              <h3 className="text-sm font-black text-white uppercase italic tracking-wider mb-4 flex items-center gap-2"><Eye className="w-4 h-4 text-cyan-400" /> Milestone Unlocks</h3>
+              <p className="text-xs text-slate-400 leading-relaxed mb-4">Grind Masteries and full collections to automatically unlock prestigious backgrounds for your Profile.</p>
               <div className="space-y-3">
                 {MILESTONES.map((stone, idx) => {
-                  let isUnlocked = false;
+                  let isUnlocked = unlockedMilestones.includes(stone.name);
                   let progress = 0;
 
                   if (stone.isPercent) {
                     const currentRate = stone.type === 'mastery' ? masteryRate : completionRate;
-                    isUnlocked = currentRate >= stone.count;
+                    if (!isUnlocked) isUnlocked = currentRate >= stone.count;
                     progress = currentRate;
                   } else {
-                    isUnlocked = totalMastered >= stone.count;
+                    if (!isUnlocked) isUnlocked = totalMastered >= stone.count;
                     progress = Math.min(totalMastered, stone.count);
                   }
 
                   return (
                     <div key={idx} className={`p-3 rounded-xl border ${isUnlocked ? stone.bg : 'bg-black/40 border-slate-800 opacity-60'} flex items-center gap-3 transition-all`}>
-                      <div className="w-10 h-10 rounded-full bg-black/40 flex items-center justify-center shrink-0 border border-white/10">
-                        {isUnlocked ? <CheckCircle className="w-5 h-5 text-white" /> : <Lock className="w-5 h-5 text-slate-500" />}
-                      </div>
+                      <div className="w-10 h-10 rounded-full bg-black/40 flex items-center justify-center shrink-0 border border-white/10">{isUnlocked ? <CheckCircle className="w-5 h-5 text-white" /> : <Lock className="w-5 h-5 text-slate-500" />}</div>
                       <div className="flex-1">
                         <span className={`block font-black text-sm uppercase ${isUnlocked ? 'text-white' : 'text-slate-400'}`}>{stone.name}</span>
-                        <span className="block text-[10px] font-mono text-slate-500 uppercase tracking-widest">
-                          {stone.isPercent ? `${stone.count}% ${stone.type}` : `${stone.count} Mastered`}
-                        </span>
+                        <span className="block text-[10px] font-mono text-slate-500 uppercase tracking-widest">{stone.isPercent ? `${stone.count}% ${stone.type}` : `${stone.count} Mastered`}</span>
                       </div>
-                      {!isUnlocked && (
-                        <div className="text-right">
-                          <span className="text-xs font-black text-slate-500 font-mono">
-                            {progress} / {stone.count}{stone.isPercent ? '%' : ''}
-                          </span>
-                        </div>
-                      )}
+                      {!isUnlocked && (<div className="text-right"><span className="text-xs font-black text-slate-500 font-mono">{progress} / {stone.count}{stone.isPercent ? '%' : ''}</span></div>)}
                     </div>
                   );
                 })}
@@ -2273,19 +2009,16 @@ function MainApp() {
         {/* --- MAIN VIEWS (SPRITES / MASTERY) --- */}
         {(currentView === 'sprites' || currentView === 'mastery') && (
           <div className="flex flex-col gap-5 animate-in fade-in duration-300">
-
             {currentView === 'sprites' && (
               <section className="sticky top-[86px] sm:top-[94px] z-40 bg-[#151824]/95 backdrop-blur-md rounded-2xl p-4 border-2 border-slate-800 shadow-xl">
                 <div className="flex items-center justify-between mb-2.5">
                   <span className="text-sm sm:text-base font-black text-gray-200 tracking-wider font-mono">{t('sprite_progress')}</span>
-                  <button onClick={() => { setShowResetConfirm(true); playBeep(330, 'sine', 0.08); }} className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-red-950/30 hover:bg-red-950/60 border border-red-900/40 text-[9px] sm:text-[10px] font-mono font-black text-red-400 tracking-wider uppercase">
-                    <RotateCcw className="w-3 h-3" /> {t('reset_archive')}
-                  </button>
+                  <button onClick={() => { setShowResetConfirm(true); playBeep(330, 'sine', 0.08); }} className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-red-950/30 hover:bg-red-950/60 border border-red-900/40 text-[9px] sm:text-[10px] font-mono font-black text-red-400 tracking-wider uppercase"><RotateCcw className="w-3 h-3" /> {t('reset_archive')}</button>
                 </div>
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center gap-2">
                     <span className="text-[10px] sm:text-xs text-slate-400 font-mono">{t('completion')}</span>
-                    <span className="text-[9px] sm:text-[10px] font-black text-cyan-400/80 tracking-widest bg-cyan-950/50 px-2 py-0.5 rounded-md border border-cyan-900/50">{totalCollected}/{totalPossibleStatic}</span>
+                    <span className="text-[9px] sm:text-[10px] font-black text-cyan-400/80 tracking-widest bg-cyan-950/50 px-2 py-0.5 rounded-md border border-cyan-900/50">{totalCollected}/{currentPossibleStatic}</span>
                   </div>
                   <span className="text-2xl sm:text-3xl font-black text-cyan-400 font-mono">{completionRate}%</span>
                 </div>
@@ -2305,7 +2038,7 @@ function MainApp() {
                   <div className="flex items-center justify-between mb-1.5">
                     <div className="flex items-center gap-2">
                       <span className="text-[10px] sm:text-xs text-yellow-500/80 font-mono font-bold tracking-wider">{t('vault_completion')}</span>
-                      <span className="text-[9px] sm:text-[10px] font-black text-yellow-400/80 tracking-widest bg-yellow-950/50 px-2 py-0.5 rounded-md border border-yellow-700/50">{totalMastered}/{totalPossibleStatic}</span>
+                      <span className="text-[9px] sm:text-[10px] font-black text-yellow-400/80 tracking-widest bg-yellow-950/50 px-2 py-0.5 rounded-md border border-yellow-700/50">{totalMastered}/{currentPossibleStatic}</span>
                     </div>
                     <span className="text-lg sm:text-xl font-black text-yellow-400 font-mono">{masteryRate}%</span>
                   </div>
@@ -2341,6 +2074,16 @@ function MainApp() {
                     </div>
                   </div>
                   <div>
+                    <span className="text-[9px] text-slate-500 font-black uppercase tracking-widest mb-1.5 block">Season Filter</span>
+                    <div className="flex flex-wrap gap-1.5">
+                      {['All', 'C7S3', 'C7S4'].map(season => (
+                        <button key={season} onClick={() => handleSeasonFilterChange(season)} className={`px-3 py-1.5 text-[10px] font-black tracking-wider rounded-lg border uppercase ${seasonFilter === season ? 'bg-cyan-500 text-white border-cyan-400' : 'bg-black/40 text-slate-400 border-slate-800'}`}>
+                          {season === 'All' ? 'All Seasons' : season === 'C7S3' ? 'Ch 7: S3' : 'Ch 7: S4'}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                  <div>
                     <span className="text-[9px] text-slate-500 font-black uppercase tracking-widest mb-1.5 block">{t('rarity')}</span>
                     <div className="flex flex-wrap gap-1.5">
                       {['All', 'Mythic', 'Legendary', 'Epic', 'Rare', 'Unknown'].map(rarity => (
@@ -2353,7 +2096,7 @@ function MainApp() {
                   <div>
                     <span className="text-[9px] text-slate-500 font-black uppercase tracking-widest mb-1.5 block">{t('variant_type')}</span>
                     <div className="flex flex-wrap gap-1.5">
-                      {['All', 'Base', 'Gold', 'Gummy', 'Galaxy', 'Holofoil', 'Cube', 'Gem', 'Quack'].map(variant => (
+                      {['All', 'Base', 'Gold', 'Gummy', 'Galaxy', 'Holofoil', 'Cube', 'Gem', 'Quack', 'Cheatmaster'].map(variant => (
                         <button key={variant} onClick={() => setVariantFilter(variant)} className={`px-3 py-1.5 text-[10px] font-black tracking-wider rounded-lg border uppercase ${variantFilter === variant ? 'bg-purple-500 text-white border-purple-400' : 'bg-black/40 text-slate-400 border-slate-800'}`}>
                           {t(variant.toLowerCase())}
                         </button>
@@ -2381,13 +2124,11 @@ function MainApp() {
                   <p className="text-sm sm:text-base text-slate-400 font-bold uppercase tracking-widest">{isMasteryView ? t('no_collectables') : t('no_sprites')}</p>
                 </div>
               )}
-
               <div className="flex flex-col gap-4 animate-in fade-in duration-300">
                 {filteredSprites.map(sprite => {
                   const displayVariant = variantFilter === 'All' ? 'base' : variantFilter.toLowerCase();
                   const validInitialVariant = sprite.variants.includes(displayVariant) ? displayVariant : 'base';
                   const hasAnyVariant = variantsList.some(v => collection[sprite.id]?.[v]);
-
                   return (
                     <div key={sprite.id} onClick={() => setSelectedSprite({ id: sprite.id, variant: validInitialVariant })} className="flex items-center gap-4 bg-[#151722] border border-slate-800/90 rounded-2xl p-4 hover:bg-slate-800/80 transition-colors cursor-pointer shadow-sm">
                       <div className={`w-14 h-14 sm:w-16 sm:h-16 rounded-xl p-1.5 border-2 transition-all shrink-0 ${hasAnyVariant ? 'bg-cyan-950/40 border-cyan-500/50' : 'bg-slate-900 border-slate-800 grayscale opacity-60'}`}>
@@ -2395,38 +2136,20 @@ function MainApp() {
                       </div>
                       <div className="flex-1 flex flex-col justify-center min-w-0">
                         <div className="flex flex-col mb-2.5">
-                          <span className="font-black text-base sm:text-lg text-white uppercase italic tracking-tight truncate">{sprite.name}</span>
+                          <span className="font-black text-base sm:text-lg text-white uppercase italic tracking-tight truncate">{sprite.name} {sprite.season === 'C7S3' && <span className="text-[8px] bg-slate-800 text-slate-400 px-1.5 py-0.5 rounded ml-1 not-italic">VAULTED</span>}</span>
                           <span className={`text-[8px] sm:text-[9px] font-black uppercase tracking-widest ${VARIANT_INFO[validInitialVariant]?.color}`}>{t(validInitialVariant)}</span>
                         </div>
                         <div className="flex flex-wrap gap-x-3 gap-y-2">
                           {variantsList.map(v => {
                             if (!sprite.variants.includes(v)) return null;
-                            const isLocked = isVariantLocked(sprite.id, v);
-                            const isCollected = collection[sprite.id]?.[v];
-                            const isMastered = mastery[sprite.id]?.[v];
+                            const isLocked = isVariantLocked(sprite.id, v); const isCollected = collection[sprite.id]?.[v]; const isMastered = mastery[sprite.id]?.[v];
                             if (statusFilter === 'Missing' && isCollected && !isMasteryView) return null;
-
                             return (
                               <div key={v} className="flex flex-col items-center gap-1">
-                                <div
-                                  onMouseDown={(e) => handleDotPressStart(e, sprite.id, v)}
-                                  onMouseUp={handleDotPressEnd}
-                                  onMouseLeave={handleDotPressEnd}
-                                  onTouchStart={(e) => handleDotPressStart(e, sprite.id, v)}
-                                  onTouchEnd={handleDotPressEnd}
-                                  onClick={(e) => e.stopPropagation()}
-                                  className={`w-6 h-6 sm:w-8 sm:h-8 rounded-full flex items-center justify-center border-2 transition-all duration-300 relative select-none cursor-pointer 
-                                    ${activeHoldId === `${sprite.id}_${v}` ? 'scale-[1.3] ring-2 ring-cyan-400 shadow-[0_0_20px_rgba(34,211,238,0.8)]' : ''}
-                                    ${isLocked ? 'bg-slate-950/80 border-slate-800/60 opacity-60' : isMasteryView && isMastered ? 'bg-yellow-900/40 border-yellow-400' : isCollected ? `bg-slate-900 border-${VARIANT_INFO[v]?.color.split('-')[1]}-500/70` : 'bg-black border-slate-800'}`}
-                                >
-                                  {isLocked ? <Lock className="w-3 h-3 sm:w-4 sm:h-4 text-slate-600" /> : (
-                                    <>
-                                      {isCollected && <div className={`w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full ${VARIANT_INFO[v]?.bgColor} ${(isMasteryView && isMastered) ? 'opacity-30' : 'opacity-100'}`} />}
-                                      {isMasteryView && isMastered && <Crown className="w-4 h-4 sm:w-5 sm:h-5 text-yellow-400 drop-shadow-[0_0_2px_rgba(255,215,0,0.8)] absolute z-10" />}
-                                    </>
-                                  )}
+                                <div onMouseDown={(e) => handleDotPressStart(e, sprite.id, v)} onMouseUp={handleDotPressEnd} onMouseLeave={handleDotPressEnd} onTouchStart={(e) => handleDotPressStart(e, sprite.id, v)} onTouchEnd={handleDotPressEnd} onClick={(e) => e.stopPropagation()} className={`w-6 h-6 sm:w-8 sm:h-8 rounded-full flex items-center justify-center border-2 transition-all duration-300 relative select-none cursor-pointer ${activeHoldId === `${sprite.id}_${v}` ? 'scale-[1.3] ring-2 ring-cyan-400 shadow-[0_0_20px_rgba(34,211,238,0.8)]' : ''} ${isLocked ? 'bg-slate-950/80 border-slate-800/60 opacity-60' : isMasteryView && isMastered ? 'bg-yellow-900/40 border-yellow-400' : isCollected ? `bg-slate-900 border-${VARIANT_INFO[v]?.color.split('-')[1]}-500/70` : 'bg-black border-slate-800'}`}>
+                                  {isLocked ? <Lock className="w-3 h-3 sm:w-4 sm:h-4 text-slate-600" /> : (<>{isCollected && <div className={`w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full ${VARIANT_INFO[v]?.bgColor} ${(isMasteryView && isMastered) ? 'opacity-30' : 'opacity-100'}`} />}{isMasteryView && isMastered && <Crown className="w-4 h-4 sm:w-5 sm:h-5 text-yellow-400 drop-shadow-[0_0_2px_rgba(255,215,0,0.8)] absolute z-10" />}</>)}
                                 </div>
-                                <span className="text-[7px] sm:text-[8px] font-bold uppercase text-slate-500 tracking-wider whitespace-nowrap">{v === 'holofoil' ? 'Holo' : t(v)}</span>
+                                <span className="text-[7px] sm:text-[8px] font-bold uppercase text-slate-500 tracking-wider whitespace-nowrap">{v === 'holofoil' ? 'Holo' : v === 'cheatmaster' ? 'Cheat' : t(v)}</span>
                               </div>
                             )
                           })}
@@ -2447,127 +2170,75 @@ function MainApp() {
               <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/10 rounded-full blur-[50px] pointer-events-none" />
               <div className="flex justify-between items-start relative z-10">
                 <div>
-                  <div className="flex items-center gap-3 mb-1">
-                    <Radio className="w-6 h-6 sm:w-7 sm:h-7 text-indigo-400" />
-                    <h2 className="text-xl sm:text-2xl font-black text-indigo-400 uppercase italic tracking-tight">Comms</h2>
-                  </div>
+                  <div className="flex items-center gap-3 mb-1"><Radio className="w-6 h-6 sm:w-7 sm:h-7 text-indigo-400" /><h2 className="text-xl sm:text-2xl font-black text-indigo-400 uppercase italic tracking-tight">Comms</h2></div>
                   <p className="text-xs text-indigo-300/80 font-bold uppercase tracking-widest">Global Live Feed</p>
                 </div>
-                <button onClick={() => setShowCreatePost(true)} className="bg-indigo-600 hover:bg-indigo-500 text-white p-3 rounded-xl shadow-[0_0_15px_rgba(79,70,229,0.4)] transition-all">
-                  <MessageSquare className="w-5 h-5" />
-                </button>
+                <button onClick={() => setShowCreatePost(true)} className="bg-indigo-600 hover:bg-indigo-500 text-white p-3 rounded-xl shadow-[0_0_15px_rgba(79,70,229,0.4)] transition-all"><MessageSquare className="w-5 h-5" /></button>
               </div>
             </section>
-
             <div className="flex bg-[#12141f] rounded-xl border border-slate-800 p-1">
               <button onClick={() => setCommsFilter('general')} className={`flex-1 py-2 rounded-lg text-xs font-black uppercase tracking-wider transition-colors ${commsFilter === 'general' ? 'bg-indigo-900/40 text-indigo-400 border border-indigo-500/30' : 'text-slate-500 hover:text-slate-300'}`}>General</button>
               <button onClick={() => setCommsFilter('trade')} className={`flex-1 py-2 rounded-lg text-xs font-black uppercase tracking-wider transition-colors ${commsFilter === 'trade' ? 'bg-cyan-900/40 text-cyan-400 border border-cyan-500/30' : 'text-slate-500 hover:text-slate-300'}`}>Trades</button>
               <button onClick={() => setCommsFilter('mine')} className={`flex-1 py-2 rounded-lg text-xs font-black uppercase tracking-wider transition-colors ${commsFilter === 'mine' ? 'bg-purple-900/40 text-purple-400 border border-purple-500/30' : 'text-slate-500 hover:text-slate-300'}`}>My Posts</button>
             </div>
-
             <section className="flex flex-col gap-3">
               {commsPosts.length === 0 ? (
-                <div className="text-center p-8 bg-[#12141f] rounded-2xl border border-slate-800 mt-4">
-                  <Radio className="w-12 h-12 text-slate-700 mx-auto mb-4" />
-                  <p className="text-sm text-slate-400 font-bold uppercase tracking-widest">No transmissions found.</p>
-                </div>
+                <div className="text-center p-8 bg-[#12141f] rounded-2xl border border-slate-800 mt-4"><Radio className="w-12 h-12 text-slate-700 mx-auto mb-4" /><p className="text-sm text-slate-400 font-bold uppercase tracking-widest">No transmissions found.</p></div>
               ) : (
                 commsPosts.map(post => {
-                  const currentLikes = post.likes || [];
-                  const isLiked = currentLikes.includes(user.uid);
-                  const isOwnPost = post.authorId === user.uid;
-
-                  const isFriend = friendsList.some(f => f.uid === post.authorId);
-                  const requestSent = sentRequests.some(r => r.receiverId === post.authorId);
-
+                  const currentLikes = post.likes || []; const isLiked = currentLikes.includes(user.uid); const isOwnPost = post.authorId === user.uid;
+                  const isFriend = friendsList.some(f => f.uid === post.authorId); const requestSent = sentRequests.some(r => r.receiverId === post.authorId);
                   return (
                     <div key={post.id} className="bg-[#151722] border border-slate-800 rounded-2xl p-4 relative shadow-sm hover:border-slate-700 transition-colors">
-
                       <div className="flex justify-between items-start mb-3">
                         <div className="flex items-center gap-3">
-                          <div className="w-9 h-9 rounded-full bg-indigo-950 border border-indigo-500/50 flex items-center justify-center text-indigo-400 shrink-0">
-                            <UserIcon className="w-4 h-4" />
+                          <div className="w-9 h-9 rounded-full bg-indigo-950 border border-indigo-500/50 flex items-center justify-center text-indigo-400 shrink-0 overflow-hidden">
+                            {post.authorAvatar ? (
+                              <img src={SPRITES_DATABASE.find(s => s.id === post.authorAvatar.split('_')[0])?.images[post.authorAvatar.split('_')[1]]} className="w-7 h-7 object-contain drop-shadow-sm" alt="" />
+                            ) : (
+                              <span className="font-black text-sm uppercase">{post.authorSpriteId?.charAt(0)}</span>
+                            )}
                           </div>
                           <div className="flex flex-col">
                             <div className="flex items-center gap-2">
                               <span className="block text-sm font-black text-white">@{post.authorSpriteId}</span>
-
-                              {!isOwnPost && (
-                                isFriend ? (
-                                  <span className="text-[8px] font-black uppercase tracking-wider px-1.5 py-0.5 bg-slate-800 text-slate-400 rounded flex items-center gap-0.5"><Check className="w-2.5 h-2.5" /> Squad</span>
-                                ) : requestSent ? (
-                                  <span className="text-[8px] font-black uppercase tracking-wider px-1.5 py-0.5 bg-indigo-900/40 text-indigo-400 rounded border border-indigo-500/30">Pending</span>
-                                ) : (
-                                  <button onClick={() => handleQuickAddFriend(post.authorId, post.authorSpriteId)} className="text-[8px] font-black uppercase tracking-wider px-1.5 py-0.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded shadow flex items-center gap-0.5 transition-colors">
-                                    <Plus className="w-2.5 h-2.5" /> Squad
-                                  </button>
-                                )
-                              )}
+                              {!isOwnPost && (isFriend ? (<span className="text-[8px] font-black uppercase tracking-wider px-1.5 py-0.5 bg-slate-800 text-slate-400 rounded flex items-center gap-0.5"><Check className="w-2.5 h-2.5" /> Squad</span>) : requestSent ? (<span className="text-[8px] font-black uppercase tracking-wider px-1.5 py-0.5 bg-indigo-900/40 text-indigo-400 rounded border border-indigo-500/30">Pending</span>) : (<button onClick={() => handleQuickAddFriend(post.authorId, post.authorSpriteId)} className="text-[8px] font-black uppercase tracking-wider px-1.5 py-0.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded shadow flex items-center gap-0.5 transition-colors"><Plus className="w-2.5 h-2.5" /> Squad</button>))}
                             </div>
                             <span className="block text-[10px] font-mono text-slate-500 mt-0.5">{timeAgo(post.timestamp)}</span>
                           </div>
                         </div>
-
                         <div className="relative">
-                          <button onClick={() => setActiveMenuId(activeMenuId === post.id ? null : post.id)} className="p-1 text-slate-500 hover:text-white rounded-md hover:bg-slate-800">
-                            <MoreHorizontal className="w-5 h-5" />
-                          </button>
+                          <button onClick={() => setActiveMenuId(activeMenuId === post.id ? null : post.id)} className="p-1 text-slate-500 hover:text-white rounded-md hover:bg-slate-800"><MoreHorizontal className="w-5 h-5" /></button>
                           {activeMenuId === post.id && (
-                            <div className="absolute right-0 mt-1 w-32 bg-slate-900 border border-slate-700 rounded-xl shadow-xl z-20 overflow-hidden animate-in fade-in zoom-in-95">
-                              {post.authorId === user.uid ? (
-                                <>
-                                  <button onClick={() => handleEditPost(post)} className="w-full flex items-center gap-2 px-3 py-2 text-xs font-bold text-slate-300 hover:bg-slate-800 hover:text-white transition-colors">
-                                    <Edit3 className="w-4 h-4" /> Edit
-                                  </button>
-                                  <button onClick={() => handleDeletePost(post.id)} className="w-full flex items-center gap-2 px-3 py-2 text-xs font-bold text-red-400 hover:bg-red-950 hover:text-red-300 transition-colors border-t border-slate-800">
-                                    <Trash2 className="w-4 h-4" /> Delete
-                                  </button>
-                                </>
-                              ) : (
-                                <button onClick={() => handleReportPost(post.id)} className="w-full flex items-center gap-2 px-3 py-2 text-xs font-bold text-amber-400 hover:bg-amber-950 transition-colors">
-                                  <Flag className="w-4 h-4" /> Report
+                            <div className="absolute right-0 mt-1 w-36 bg-slate-900 border border-slate-700 rounded-xl shadow-xl z-20 overflow-hidden animate-in fade-in zoom-in-95">
+                              {!isOwnPost && (
+                                <button onClick={() => { setActiveMenuId(null); inspectFriendLibrary({ uid: post.authorId, spriteId: post.authorSpriteId }); }} className="w-full flex items-center gap-2 px-3 py-2 text-xs font-bold text-cyan-400 hover:bg-cyan-950 transition-colors border-b border-slate-800">
+                                  <UserIcon className="w-4 h-4" /> View Profile
                                 </button>
+                              )}
+                              {post.authorId === user.uid ? (
+                                <><button onClick={() => handleEditPost(post)} className="w-full flex items-center gap-2 px-3 py-2 text-xs font-bold text-slate-300 hover:bg-slate-800 hover:text-white transition-colors"><Edit3 className="w-4 h-4" /> Edit</button><button onClick={() => handleDeletePost(post.id)} className="w-full flex items-center gap-2 px-3 py-2 text-xs font-bold text-red-400 hover:bg-red-950 hover:text-red-300 transition-colors border-t border-slate-800"><Trash2 className="w-4 h-4" /> Delete</button></>
+                              ) : (
+                                <button onClick={() => handleReportPost(post.id)} className="w-full flex items-center gap-2 px-3 py-2 text-xs font-bold text-amber-400 hover:bg-amber-950 transition-colors"><Flag className="w-4 h-4" /> Report</button>
                               )}
                             </div>
                           )}
                         </div>
                       </div>
-
                       {post.type === 'trade' && (post.lookingFor || post.offering) && (
                         <div className="flex gap-2 mb-3 bg-black/40 p-2 rounded-xl border border-slate-800/80">
                           {post.lookingFor && post.lookingFor.includes('_') && (
-                            <div className="flex-1 flex items-center gap-2 bg-cyan-950/20 border border-cyan-500/20 rounded-lg p-2">
-                              <img src={SPRITES_DATABASE.find(s => s.id === post.lookingFor.split('_')[0])?.images[post.lookingFor.split('_')[1]]} className="w-8 h-8 object-contain shrink-0" alt="" />
-                              <div className="flex flex-col min-w-0">
-                                <span className="text-[8px] font-black text-cyan-500 uppercase tracking-widest">Looking For</span>
-                                <span className="text-[10px] font-bold text-white truncate">{SPRITES_DATABASE.find(s => s.id === post.lookingFor.split('_')[0])?.name}</span>
-                              </div>
-                            </div>
+                            <div className="flex-1 flex items-center gap-2 bg-cyan-950/20 border border-cyan-500/20 rounded-lg p-2"><img src={SPRITES_DATABASE.find(s => s.id === post.lookingFor.split('_')[0])?.images[post.lookingFor.split('_')[1]]} className="w-8 h-8 object-contain shrink-0" alt="" /><div className="flex flex-col min-w-0"><span className="text-[8px] font-black text-cyan-500 uppercase tracking-widest">Looking For</span><span className="text-[10px] font-bold text-white truncate">{SPRITES_DATABASE.find(s => s.id === post.lookingFor.split('_')[0])?.name}</span></div></div>
                           )}
                           {post.offering && post.offering.includes('_') && (
-                            <div className="flex-1 flex items-center gap-2 bg-emerald-950/20 border border-emerald-500/20 rounded-lg p-2">
-                              <img src={SPRITES_DATABASE.find(s => s.id === post.offering.split('_')[0])?.images[post.offering.split('_')[1]]} className="w-8 h-8 object-contain shrink-0" alt="" />
-                              <div className="flex flex-col min-w-0">
-                                <span className="text-[8px] font-black text-emerald-500 uppercase tracking-widest">Offering</span>
-                                <span className="text-[10px] font-bold text-white truncate">{SPRITES_DATABASE.find(s => s.id === post.offering.split('_')[0])?.name}</span>
-                              </div>
-                            </div>
+                            <div className="flex-1 flex items-center gap-2 bg-emerald-950/20 border border-emerald-500/20 rounded-lg p-2"><img src={SPRITES_DATABASE.find(s => s.id === post.offering.split('_')[0])?.images[post.offering.split('_')[1]]} className="w-8 h-8 object-contain shrink-0" alt="" /><div className="flex flex-col min-w-0"><span className="text-[8px] font-black text-emerald-500 uppercase tracking-widest">Offering</span><span className="text-[10px] font-bold text-white truncate">{SPRITES_DATABASE.find(s => s.id === post.offering.split('_')[0])?.name}</span></div></div>
                           )}
                         </div>
                       )}
-
                       {post.text && <p className="text-sm text-slate-300 leading-relaxed whitespace-pre-wrap break-words">{post.text}</p>}
-
                       <div className="mt-3 pt-3 border-t border-slate-800/80 flex items-center gap-4">
-                        <button
-                          onClick={() => handleToggleLike(post.id, currentLikes)}
-                          className={`flex items-center gap-1.5 text-xs font-bold transition-colors ${isLiked ? 'text-cyan-400' : 'text-slate-500 hover:text-slate-400'}`}
-                        >
-                          <Zap className={`w-4 h-4 ${isLiked ? 'fill-cyan-400' : ''}`} />
-                          <span>{currentLikes.length}</span>
-                        </button>
+                        <button onClick={() => handleToggleLike(post.id, currentLikes)} className={`flex items-center gap-1.5 text-xs font-bold transition-colors ${isLiked ? 'text-cyan-400' : 'text-slate-500 hover:text-slate-400'}`}><Zap className={`w-4 h-4 ${isLiked ? 'fill-cyan-400' : ''}`} /><span>{currentLikes.length}</span></button>
                       </div>
-
                     </div>
                   );
                 })
@@ -2579,122 +2250,54 @@ function MainApp() {
         {/* --- FRIENDS TAB VIEW --- */}
         {currentView === 'friends' && (
           <div className="flex flex-col gap-4 animate-in fade-in duration-300">
-            <section className="bg-gradient-to-br from-indigo-900/40 to-blue-900/20 border-2 border-indigo-500/50 rounded-2xl p-5">
-              <div className="flex items-center gap-3 mb-2">
-                <Users className="w-6 h-6 sm:w-7 sm:h-7 text-indigo-400" />
-                <h2 className="text-xl sm:text-2xl font-black text-indigo-400 uppercase italic">{t('sprite_squad')}</h2>
-              </div>
-            </section>
-
+            <section className="bg-gradient-to-br from-indigo-900/40 to-blue-900/20 border-2 border-indigo-500/50 rounded-2xl p-5"><div className="flex items-center gap-3 mb-2"><Users className="w-6 h-6 sm:w-7 sm:h-7 text-indigo-400" /><h2 className="text-xl sm:text-2xl font-black text-indigo-400 uppercase italic">{t('sprite_squad')}</h2></div></section>
             <section className="bg-[#12141f] rounded-2xl border border-slate-800 p-4 flex flex-col gap-3">
-              <div className="flex items-center justify-between">
-                <h3 className="text-sm font-black text-cyan-400 uppercase tracking-wider flex items-center gap-2"><Target className="w-4 h-4 sm:w-5 sm:h-5" /> {t('extraction_targets')}</h3>
-                <span className="text-[10px] sm:text-xs text-slate-500 font-bold uppercase">{extractionTargets.filter(Boolean).length} / 3</span>
-              </div>
-              <div className="flex gap-2">
-                {[0, 1, 2].map(index => renderTargetSlot(extractionTargets[index], index))}
-              </div>
+              <div className="flex items-center justify-between"><h3 className="text-sm font-black text-cyan-400 uppercase tracking-wider flex items-center gap-2"><Target className="w-4 h-4 sm:w-5 sm:h-5" /> {t('extraction_targets')}</h3><span className="text-[10px] sm:text-xs text-slate-500 font-bold uppercase">{extractionTargets.filter(Boolean).length} / 3</span></div>
+              <div className="flex gap-2">{[0, 1, 2].map(index => renderTargetSlot(extractionTargets[index], index))}</div>
             </section>
-
             <section className="bg-[#12141f] rounded-2xl border border-slate-800 p-4">
               {!showAddFriendInput ? (
-                <button onClick={() => setShowAddFriendInput(true)} className="w-full flex items-center justify-center gap-2 bg-indigo-900/40 hover:bg-indigo-900/60 border border-indigo-500/50 text-indigo-400 py-3 rounded-xl font-black uppercase tracking-wider transition-colors">
-                  <Plus className="w-5 h-5" /> {t('add_friend')}
-                </button>
+                <button onClick={() => setShowAddFriendInput(true)} className="w-full flex items-center justify-center gap-2 bg-indigo-900/40 hover:bg-indigo-900/60 border border-indigo-500/50 text-indigo-400 py-3 rounded-xl font-black uppercase tracking-wider transition-colors"><Plus className="w-5 h-5" /> {t('add_friend')}</button>
               ) : (
                 <div className="animate-in fade-in zoom-in-95">
-                  <div className="flex items-center justify-between mb-3">
-                    <h3 className="text-sm font-black text-slate-400 uppercase tracking-wider">{t('add_friend')}</h3>
-                    <button onClick={() => { setShowAddFriendInput(false); setFriendSearchQuery(''); setFriendSearchResult(null); setFriendSearchStatus(''); }} className="text-slate-500 hover:text-white"><X className="w-4 h-4" /></button>
-                  </div>
-                  <div className="flex gap-2">
-                    <div className="relative flex-1">
-                      <Search className="w-4 h-4 sm:w-5 sm:h-5 text-slate-500 absolute left-3 top-3" />
-                      <input type="text" value={friendSearchQuery} onChange={(e) => setFriendSearchQuery(e.target.value)} placeholder={t('search_id')} className={`w-full bg-black border-2 border-slate-800 rounded-xl pl-9 sm:pl-10 pr-3 py-2 ${responsiveInputSizeClass} text-white focus:outline-none focus:border-indigo-500`} />
-                    </div>
-                    <button onClick={handleSearchFriend} className="bg-indigo-600 hover:bg-indigo-500 text-white px-4 rounded-xl transition-colors"><Search className="w-5 h-5" /></button>
-                  </div>
+                  <div className="flex items-center justify-between mb-3"><h3 className="text-sm font-black text-slate-400 uppercase tracking-wider">{t('add_friend')}</h3><button onClick={() => { setShowAddFriendInput(false); setFriendSearchQuery(''); setFriendSearchResult(null); setFriendSearchStatus(''); }} className="text-slate-500 hover:text-white"><X className="w-4 h-4" /></button></div>
+                  <div className="flex gap-2"><div className="relative flex-1"><Search className="w-4 h-4 sm:w-5 sm:h-5 text-slate-500 absolute left-3 top-3" /><input type="text" value={friendSearchQuery} onChange={(e) => setFriendSearchQuery(e.target.value)} placeholder={t('search_id')} className={`w-full bg-black border-2 border-slate-800 rounded-xl pl-9 sm:pl-10 pr-3 py-2 ${responsiveInputSizeClass} text-white focus:outline-none focus:border-indigo-500`} /></div><button onClick={handleSearchFriend} className="bg-indigo-600 hover:bg-indigo-500 text-white px-4 rounded-xl transition-colors"><Search className="w-5 h-5" /></button></div>
                   {friendSearchStatus === 'searching' && <p className="text-sm text-slate-400 mt-3">Searching...</p>}
                   {friendSearchStatus === 'not-found' && <p className="text-sm text-red-400 mt-3 font-bold">Sprite ID not found.</p>}
-                  {friendSearchStatus === 'found' && friendSearchResult && (
-                    <div className="mt-4 p-3 bg-indigo-950/30 border border-indigo-500/30 rounded-xl flex justify-between items-center animate-in zoom-in-95">
-                      <span className="text-base sm:text-lg font-bold text-white">@{friendSearchResult.spriteId}</span>
-                      <button onClick={handleSendFriendRequest} className="bg-indigo-500 px-3 py-1.5 rounded-lg text-xs sm:text-sm font-bold text-white flex items-center gap-1 hover:bg-indigo-400"><UserPlus className="w-4 h-4" /> {t('request')}</button>
-                    </div>
-                  )}
+                  {friendSearchStatus === 'found' && friendSearchResult && (<div className="mt-4 p-3 bg-indigo-950/30 border border-indigo-500/30 rounded-xl flex justify-between items-center animate-in zoom-in-95"><span className="text-base sm:text-lg font-bold text-white">@{friendSearchResult.spriteId}</span><button onClick={handleSendFriendRequest} className="bg-indigo-500 px-3 py-1.5 rounded-lg text-xs sm:text-sm font-bold text-white flex items-center gap-1 hover:bg-indigo-400"><UserPlus className="w-4 h-4" /> {t('request')}</button></div>)}
                 </div>
               )}
             </section>
-
             {sentRequests.length > 0 && (
-              <section className="bg-slate-900/50 rounded-2xl border border-slate-800 p-4">
-                <h3 className="text-sm font-black text-slate-400 uppercase tracking-wider mb-3">{t('sent_requests')}</h3>
-                {sentRequests.map(req => (
-                  <div key={req.id} className="flex justify-between items-center bg-black/40 p-3 rounded-lg border border-slate-800 mb-2">
-                    <span className="text-sm sm:text-base font-bold text-slate-300 tracking-wider">To: @{req.receiverSpriteId}</span>
-                    <button onClick={() => cancelFriendRequest(req.id)} className="bg-red-900/40 border border-red-800/50 px-3 py-1.5 rounded-lg text-[10px] sm:text-xs font-black uppercase text-red-400"><XCircle className="w-3.5 h-3.5 sm:w-4 sm:h-4 inline" /> {t('cancel')}</button>
-                  </div>
-                ))}
-              </section>
+              <section className="bg-slate-900/50 rounded-2xl border border-slate-800 p-4"><h3 className="text-sm font-black text-slate-400 uppercase tracking-wider mb-3">{t('sent_requests')}</h3>{sentRequests.map(req => (<div key={req.id} className="flex justify-between items-center bg-black/40 p-3 rounded-lg border border-slate-800 mb-2"><span className="text-sm sm:text-base font-bold text-slate-300 tracking-wider">To: @{req.receiverSpriteId}</span><button onClick={() => cancelFriendRequest(req.id)} className="bg-red-900/40 border border-red-800/50 px-3 py-1.5 rounded-lg text-[10px] sm:text-xs font-black uppercase text-red-400"><XCircle className="w-3.5 h-3.5 sm:w-4 sm:h-4 inline" /> {t('cancel')}</button></div>))}</section>
             )}
-
             {pendingRequests.length > 0 && (
-              <section className="bg-indigo-950/20 rounded-2xl border border-indigo-500/30 p-4">
-                <h3 className="text-sm font-black text-indigo-400 uppercase tracking-wider mb-3">{t('incoming_requests')}</h3>
-                {pendingRequests.map(req => (
-                  <div key={req.id} className="flex justify-between items-center bg-black/40 p-3 rounded-lg border border-slate-800 mb-2">
-                    <span className="text-sm sm:text-base font-bold text-white tracking-wider">@{req.senderSpriteId}</span>
-                    <button onClick={() => acceptFriendRequest(req)} className="bg-emerald-600 px-4 py-2 rounded-lg text-[10px] sm:text-xs font-black uppercase text-white"><Check className="w-3.5 h-3.5 sm:w-4 sm:h-4 inline" /> {t('accept')}</button>
-                  </div>
-                ))}
-              </section>
+              <section className="bg-indigo-950/20 rounded-2xl border border-indigo-500/30 p-4"><h3 className="text-sm font-black text-indigo-400 uppercase tracking-wider mb-3">{t('incoming_requests')}</h3>{pendingRequests.map(req => (<div key={req.id} className="flex justify-between items-center bg-black/40 p-3 rounded-lg border border-slate-800 mb-2"><span className="text-sm sm:text-base font-bold text-white tracking-wider">@{req.senderSpriteId}</span><button onClick={() => acceptFriendRequest(req)} className="bg-emerald-600 px-4 py-2 rounded-lg text-[10px] sm:text-xs font-black uppercase text-white"><Check className="w-3.5 h-3.5 sm:w-4 sm:h-4 inline" /> {t('accept')}</button></div>))}</section>
             )}
-
             <section className="bg-[#12141f] rounded-2xl border border-slate-800 p-4">
-              <div className="flex items-center justify-between mb-3">
-                <h3 className="text-sm font-black text-slate-400 uppercase tracking-wider">{t('sprite_squad')} ({richFriends.length})</h3>
-              </div>
-
-              <div className="flex flex-col gap-2 mb-4">
-                <div className="relative w-full">
-                  <Search className="w-4 h-4 text-indigo-500/70 absolute left-3 top-3" />
-                  <input type="text" placeholder="Search Squad..." value={squadSearchQuery} onChange={(e) => setSquadSearchQuery(e.target.value)} className={`w-full bg-black/50 border-2 border-slate-800 rounded-xl pl-9 pr-3 py-2 ${inputSizeClass} text-white focus:outline-none focus:border-indigo-500`} />
-                </div>
-              </div>
-
+              <div className="flex items-center justify-between mb-3"><h3 className="text-sm font-black text-slate-400 uppercase tracking-wider">{t('sprite_squad')} ({richFriends.length})</h3></div>
+              <div className="flex flex-col gap-2 mb-4"><div className="relative w-full"><Search className="w-4 h-4 text-indigo-500/70 absolute left-3 top-3" /><input type="text" placeholder="Search Squad..." value={squadSearchQuery} onChange={(e) => setSquadSearchQuery(e.target.value)} className={`w-full bg-black/50 border-2 border-slate-800 rounded-xl pl-9 pr-3 py-2 ${inputSizeClass} text-white focus:outline-none focus:border-indigo-500`} /></div></div>
               {filteredSquad.length === 0 ? (
-                <div className="text-center py-6">
-                  <Users className="w-10 h-10 sm:w-12 sm:h-12 text-slate-700 mx-auto mb-3" />
-                  <p className="text-sm text-slate-500 font-bold uppercase tracking-wider">No Squad Members Found</p>
-                </div>
+                <div className="text-center py-6"><Users className="w-10 h-10 sm:w-12 sm:h-12 text-slate-700 mx-auto mb-3" /><p className="text-sm text-slate-500 font-bold uppercase tracking-wider">No Squad Members Found</p></div>
               ) : (
                 <div className="flex flex-col gap-2">
                   {filteredSquad.map((friend, index) => {
                     const matchFound = isMutualMatch(friend);
                     const cardClass = matchFound ? "bg-cyan-950/40 border-2 border-cyan-400 shadow-[0_0_15px_rgba(34,211,238,0.5)]" : "bg-slate-900 border border-slate-800/80";
-
                     const friendColCount = Math.round((friend.completionRate / 100) * totalPossibleStatic);
                     const friendMastCount = Math.round((friend.masteryRate / 100) * totalPossibleStatic);
-                    const milestone = getUnlockedMilestone(friendColCount, friendMastCount);
+                    const milestone = getUnlockedMilestone(friendColCount, friendMastCount, friend.unlockedMilestones);
                     const nameColor = milestone ? milestone.textColor : "text-slate-500";
-
                     return (
                       <div key={index} className={`p-3 rounded-xl flex items-center justify-between transition-all duration-300 ${cardClass}`}>
                         <div className="flex items-center gap-3">
                           <div className={`w-6 h-6 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-[10px] sm:text-xs font-black ${matchFound ? 'bg-cyan-900/50 border-cyan-400 text-cyan-400' : 'bg-indigo-900/50 border-indigo-500/50 text-indigo-400'}`}>#{index + 1}</div>
                           <div className="flex flex-col">
                             <span className={`text-sm sm:text-base font-bold tracking-wider flex items-center gap-1 ${nameColor}`}>@{friend.spriteId || 'Unknown'}</span>
-                            {matchFound ? (
-                              <span className="text-[9px] sm:text-[10px] font-black text-cyan-400 font-mono tracking-widest mt-0.5 animate-pulse uppercase flex items-center gap-1"><Target className="w-3 h-3" /> Extraction Match</span>
-                            ) : (
-                              <span className="text-[10px] sm:text-[11px] font-black text-indigo-400 font-mono tracking-widest">{friend.completionRate}% COMPLETE</span>
-                            )}
+                            {matchFound ? (<span className="text-[9px] sm:text-[10px] font-black text-cyan-400 font-mono tracking-widest mt-0.5 animate-pulse uppercase flex items-center gap-1"><Target className="w-3 h-3" /> Extraction Match</span>) : (<span className="text-[10px] sm:text-[11px] font-black text-indigo-400 font-mono tracking-widest">{friend.completionRate}% COMPLETE</span>)}
                           </div>
                         </div>
-                        <div className="flex items-center gap-2">
-                          <button onClick={() => inspectFriendLibrary(friend)} className={`text-[10px] sm:text-xs font-bold uppercase tracking-wider px-3 py-1.5 rounded-lg border transition-colors ${matchFound ? 'bg-cyan-900/40 text-cyan-300 border-cyan-500/50' : 'bg-indigo-900/40 text-indigo-300 border-indigo-500/30'}`}>View</button>
-                          <button onClick={() => setShowUnfriendConfirm(friend)} className="text-slate-500 hover:text-red-400 p-1.5 rounded-lg hover:bg-red-950/30 transition-colors"><UserMinus className="w-4 h-4 sm:w-5 sm:h-5" /></button>
-                        </div>
+                        <div className="flex items-center gap-2"><button onClick={() => inspectFriendLibrary(friend)} className={`text-[10px] sm:text-xs font-bold uppercase tracking-wider px-3 py-1.5 rounded-lg border transition-colors ${matchFound ? 'bg-cyan-900/40 text-cyan-300 border-cyan-500/50' : 'bg-indigo-900/40 text-indigo-300 border-indigo-500/30'}`}>View</button><button onClick={() => setShowUnfriendConfirm(friend)} className="text-slate-500 hover:text-red-400 p-1.5 rounded-lg hover:bg-red-950/30 transition-colors"><UserMinus className="w-4 h-4 sm:w-5 sm:h-5" /></button></div>
                       </div>
                     );
                   })}
@@ -2707,53 +2310,30 @@ function MainApp() {
         {/* --- SUPPORT / DISCORD TAB VIEW --- */}
         {currentView === 'feedback' && (
           <section className="flex flex-col gap-4 animate-in fade-in duration-300 pt-2">
-            
-            {/* 1. FEEDBACK SYSTEM (TOP) */}
             <div className="bg-[#12141f] border-2 border-emerald-500/40 rounded-2xl p-5 shadow-[0_0_20px_rgba(16,185,129,0.1)]">
               <h3 className="text-xl sm:text-2xl font-black text-emerald-400 uppercase italic mb-2">Support & Feedback</h3>
               <p className="text-sm sm:text-base text-slate-400 mb-6">Found a bug or have a suggestion? Send a direct transmission to the developer.</p>
-
               <form onSubmit={handleFeedbackSubmit} className="flex flex-col gap-3">
-                <textarea 
-                  value={feedbackText} 
-                  onChange={(e) => setFeedbackText(e.target.value)} 
-                  placeholder="Describe your issue or feedback..." 
-                  className={`w-full bg-black/50 border-2 border-slate-800 rounded-xl p-3 text-sm sm:text-base text-white focus:outline-none focus:border-emerald-500 min-h-[120px] resize-y ${inputSizeClass}`} 
-                  required 
-                />
+                <textarea value={feedbackText} onChange={(e) => setFeedbackText(e.target.value)} placeholder="Describe your issue or feedback..." className={`w-full bg-black/50 border-2 border-slate-800 rounded-xl p-3 text-sm sm:text-base text-white focus:outline-none focus:border-emerald-500 min-h-[120px] resize-y ${inputSizeClass}`} required />
                 <button type="submit" disabled={feedbackStatus === 'submitting'} className="w-full flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 disabled:hover:bg-emerald-600 text-white font-black uppercase tracking-wider py-3 rounded-xl transition-colors">
                   {feedbackStatus === 'submitting' ? 'Sending...' : feedbackStatus === 'success' ? <><CheckCircle className="w-5 h-5" /> Sent!</> : <><Mail className="w-5 h-5" /> Send Feedback</>}
                 </button>
               </form>
             </div>
-
-            {/* 2. JOIN DISCORD (MIDDLE) */}
             <div className="bg-gradient-to-r from-indigo-900/40 via-blue-900/30 to-slate-900 border-2 border-indigo-500/50 rounded-2xl p-5 shadow-[0_0_20px_rgba(99,102,241,0.15)] flex flex-col items-center text-center">
-              <div className="w-12 h-12 bg-indigo-950/80 rounded-full border border-indigo-400 flex items-center justify-center mb-3">
-                <MessageSquare className="w-6 h-6 text-indigo-400" />
-              </div>
+              <div className="w-12 h-12 bg-indigo-950/80 rounded-full border border-indigo-400 flex items-center justify-center mb-3"><MessageSquare className="w-6 h-6 text-indigo-400" /></div>
               <h4 className="text-lg font-black text-white uppercase italic mb-1 tracking-wider">Join The Comms Network</h4>
               <p className="text-sm text-slate-300 mb-5">Connect with other hunters, coordinate trades, and get live leak bot updates in our official Discord server.</p>
-              <a href="https://discord.gg/YOUR_INVITE_LINK" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-500 text-white font-black uppercase tracking-wider py-3 px-6 rounded-xl text-xs sm:text-sm transition-all shadow-lg w-full">
-                Join Discord
-              </a>
+              <a href="https://discord.gg/J3E3fGvEtw" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-500 text-white font-black uppercase tracking-wider py-3 px-6 rounded-xl text-xs sm:text-sm transition-all shadow-lg w-full">Join Discord</a>
             </div>
-
-            {/* 3. GOOGLE PLAY (BOTTOM) */}
             <div className="bg-gradient-to-r from-teal-900/40 via-emerald-900/30 to-slate-900 border-2 border-teal-500/50 rounded-2xl p-5 shadow-[0_0_20px_rgba(20,184,166,0.15)] flex flex-col items-center text-center">
-              <div className="w-12 h-12 bg-teal-950/80 rounded-full border border-teal-400 flex items-center justify-center mb-3">
-                <Smartphone className="w-6 h-6 text-teal-400" />
-              </div>
+              <div className="w-12 h-12 bg-teal-950/80 rounded-full border border-teal-400 flex items-center justify-center mb-3"><Smartphone className="w-6 h-6 text-teal-400" /></div>
               <h4 className="text-lg font-black text-white uppercase italic mb-1 tracking-wider">Spritedex is on Android!</h4>
               <p className="text-sm text-slate-300 mb-5">Take your collection on the go with the native Android app.</p>
-              <a href="https://play.google.com/store/apps/details?id=com.prosynctech.spritedex" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2 bg-teal-600 hover:bg-teal-500 text-white font-black uppercase tracking-wider py-3 px-6 rounded-xl text-xs sm:text-sm transition-all shadow-lg w-full">
-                Get it on Google Play
-              </a>
+              <a href="https://play.google.com/store/apps/details?id=com.prosynctech.spritedex" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2 bg-teal-600 hover:bg-teal-500 text-white font-black uppercase tracking-wider py-3 px-6 rounded-xl text-xs sm:text-sm transition-all shadow-lg w-full">Get it on Google Play</a>
             </div>
-
           </section>
         )}
-
       </main>
 
       {/* --- BOTTOM NAVIGATION BAR --- */}
@@ -2765,11 +2345,9 @@ function MainApp() {
           <button onClick={() => { setCurrentView('mastery'); setActiveViewingFriend(null); playBeep(523, 'sine', 0.05); }} className={`flex-1 flex flex-col items-center gap-1 py-1 transition-colors ${currentView === 'mastery' && !activeViewingFriend ? 'text-yellow-400' : 'text-slate-600'}`}>
             <Crown className="w-5 h-5" /><span className="text-[8px] sm:text-[9px] font-black uppercase tracking-wider">{t('mastery')}</span>
           </button>
-
           <button onClick={() => { setCurrentView('comms'); setActiveViewingFriend(null); playBeep(587, 'sine', 0.05); }} className={`flex-1 flex flex-col items-center gap-1 py-1 transition-colors ${currentView === 'comms' && !activeViewingFriend ? 'text-indigo-400' : 'text-slate-600'}`}>
             <Radio className="w-5 h-5" /><span className="text-[8px] sm:text-[9px] font-black uppercase tracking-wider">Comms</span>
           </button>
-
           <button onClick={() => { setCurrentView('friends'); setActiveViewingFriend(null); playBeep(659, 'sine', 0.05); }} className={`flex-1 flex flex-col items-center gap-1 py-1 transition-colors ${(currentView === 'friends' || activeViewingFriend) ? 'text-blue-400' : 'text-slate-600'}`}>
             <Users className="w-5 h-5" /><span className="text-[8px] sm:text-[9px] font-black uppercase tracking-wider">Squad</span>
           </button>
