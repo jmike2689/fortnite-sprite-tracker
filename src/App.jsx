@@ -1256,6 +1256,14 @@ function MainApp() {
     return d.toLocaleDateString(lang === 'en' ? 'en-US' : 'es-ES', { month: 'short', year: 'numeric' });
   };
 
+  const getVariantModifierText = (variant) => {
+    return null;
+  };
+
+  const getDynamicSummonCost = (variant = null) => {
+    return 0; // Fallback cost or logic
+  };
+
   const renderProfileCard = (id, profData, colRate, mastRate, joinTime, isSelf, masteriesObj, repVouches, uid, unlockedArray = []) => {
     const unlockedBg = getUnlockedMilestone(Math.round((colRate / 100) * totalPossibleStatic), Math.round((mastRate / 100) * totalPossibleStatic), unlockedArray);
     const bgClass = unlockedBg ? unlockedBg.bg : "bg-slate-900 border-slate-800";
