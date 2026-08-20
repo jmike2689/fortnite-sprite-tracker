@@ -7,11 +7,11 @@ import { PushNotifications } from '@capacitor/push-notifications';
 import { LocalNotifications } from '@capacitor/local-notifications';
 import { Capacitor } from '@capacitor/core';
 import {
-  Search, CheckCircle, Circle, Volume2, VolumeX, Percent, RotateCcw, AlertTriangle, X, Eye, Crown, Users, UserPlus, ChevronLeft, ChevronRight, Check, XCircle, UserMinus, Target, Plus, FileText, Radar, Newspaper, Info, Mail, Lock, List, Filter, ChevronDown, ChevronUp, ShoppingCart, Smartphone, Globe, Settings, LogOut, History, AtSign, User as UserIcon, Edit3, Save, Tv, Gamepad2, Calendar, Award, Video, Music, Play, Trash2
+  Search, CheckCircle, Circle, Volume2, VolumeX, Percent, RotateCcw, AlertTriangle, X, Eye, Crown, Users, UserPlus, ChevronLeft, ChevronRight, Check, XCircle, UserMinus, Target, Plus, FileText, Radar, Newspaper, Info, Mail, Lock, List, Filter, ChevronDown, ChevronUp, ShoppingCart, Smartphone, Globe, Settings, LogOut, History, AtSign, User as UserIcon, Edit3, Save, Tv, Gamepad2, Calendar, Award, Video, Music, Play, Trash2, MessageSquare, Radio, MoreHorizontal, Flag, Zap
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { useAuth } from './AuthContext';
-import { doc, getDoc, setDoc, updateDoc, collection as firestoreCollection, query, where, getDocs, arrayUnion, arrayRemove, deleteDoc, onSnapshot, addDoc, serverTimestamp, runTransaction, orderBy, limit } from 'firebase/firestore';
+import { doc, getDoc, setDoc, updateDoc, collection as firestoreCollection, query, where, getDocs, arrayUnion, arrayRemove, deleteDoc, onSnapshot, addDoc, serverTimestamp, runTransaction, orderBy, limit, increment } from 'firebase/firestore';
 import { sendPasswordResetEmail, onAuthStateChanged, deleteUser } from 'firebase/auth';
 import { auth, db } from './firebase';
 
@@ -326,6 +326,63 @@ const RARITY_BG_GRADIENTS = { Mythic: "from-yellow-400 via-yellow-600 to-amber-9
 const SUMMON_COST_MATRIX = { Mythic: { base: "6,750", variant: "10,000" }, Legendary: { base: "4,500", variant: "6,750" }, Epic: { base: "2,700", variant: "4,000" }, Rare: { base: "1,800", variant: "2,700" }, Unknown: { base: "TBD", variant: "TBD" } };
 const RARITY_WEIGHT = { Mythic: 4, Legendary: 3, Epic: 2, Rare: 1, Unknown: 0 };
 
+// Helper function for Comms time display
+const timeAgo = (timestamp) => {
+  if (!timestamp) return 'Just now';
+  const seconds = Math.floor((new Date() - timestamp.toDate()) / 1000);
+  let interval = seconds / 31536000;
+  if (interval > 1) return Math.floor(interval) + 'y';
+  interval = seconds / 2592000;
+  if (interval > 1) return Math.floor(interval) + 'mo';
+  interval = seconds / 86400;
+  if (interval > 1) return Math.floor(interval) + 'd';
+  interval = seconds / 3600;
+  if (interval > 1) return Math.floor(interval) + 'h';
+  interval = seconds / 60;
+  if (interval > 1) return Math.floor(interval) + 'm';
+  return Math.floor(seconds) + 's';
+};
+
+// --- NEW SUB-COMPONENT: Dynamic News Card ---
+const NewsCard = ({ news }) => {
+  const [imgFailed, setImgFailed] = useState(false);
+
+  // Sanitize the URL to fix missing protocols and invisible spaces
+  let safeImageUrl = news.imageUrl?.trim();
+  if (safeImageUrl && safeImageUrl.startsWith('//')) {
+    safeImageUrl = `https:${safeImageUrl}`;
+  }
+
+  // Determine if we should show the image layout or the text-only fallback
+  const hasValidImage = Boolean(safeImageUrl && !imgFailed);
+
+  return (
+    <div className="relative w-full shrink-0 bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-lg transition-all duration-300">
+      {hasValidImage && (
+        <img 
+          src={safeImageUrl} 
+          alt="" 
+          className="absolute inset-0 w-full h-full object-cover bg-slate-900"
+          referrerPolicy="no-referrer"
+          onError={() => setImgFailed(true)}
+        />
+      )}
+      <div className={`relative z-10 w-full flex flex-col justify-end p-4 ${hasValidImage ? 'min-h-[160px] sm:min-h-[180px] bg-gradient-to-t from-black/95 via-black/80 to-transparent pt-28' : 'bg-slate-900/50'}`}>
+        <div className="flex justify-between items-center mb-1.5">
+          <span className="text-[9px] font-black text-cyan-400 uppercase tracking-widest drop-shadow-md">{news.author}</span>
+          {news.timestamp && (
+            <span className="text-[9px] font-mono text-slate-400 drop-shadow-md">
+              {new Date(news.timestamp.toDate()).toLocaleDateString()}
+            </span>
+          )}
+        </div>
+        <h3 className="text-base sm:text-lg font-black text-white uppercase italic tracking-tight drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] leading-tight">{news.title}</h3>
+        {news.text && <p className="text-xs text-slate-300 leading-relaxed mt-2 drop-shadow-[0_1px_3px_rgba(0,0,0,0.8)]">{news.text}</p>}
+      </div>
+    </div>
+  );
+};
+
 function MainApp() {
   const isIOS = Capacitor.getPlatform() === 'ios';
   const inputSizeClass = isIOS ? 'text-base' : 'text-sm';
@@ -347,7 +404,6 @@ function MainApp() {
   const [authError, setAuthError] = useState("");
   const [showSettingsModal, setShowSettingsModal] = useState(false);
   const [showAboutModal, setShowAboutModal] = useState(false);
-  const [showSupportModal, setShowSupportModal] = useState(false);
   const [showNewsModal, setShowNewsModal] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -424,12 +480,45 @@ function MainApp() {
   const holdTimerRef = useRef(null);
   const [holdProgress, setHoldProgress] = useState(0);
 
+  // --- COMMS STATE ---
+  const [commsFilter, setCommsFilter] = useState('general'); // 'general', 'trade', 'mine'
+  const [commsPosts, setCommsPosts] = useState([]);
+  const [showCreatePost, setShowCreatePost] = useState(false);
+  const [postText, setPostText] = useState("");
+  const [postType, setPostType] = useState('general');
+  const [postLookingFor, setPostLookingFor] = useState(null);
+  const [postOffering, setPostOffering] = useState(null);
+  const [editingPostId, setEditingPostId] = useState(null);
+  const [activeMenuId, setActiveMenuId] = useState(null);
+
   const [showSpriteSelector, setShowSpriteSelector] = useState(false);
   const [selectorContext, setSelectorContext] = useState('extraction');
   const [targetSlotIndex, setTargetSlotIndex] = useState(null);
   const [trophySlotIndex, setTrophySlotIndex] = useState(null);
 
   useEffect(() => { document.title = "Spritedex"; }, []);
+
+  // --- COMMS LISTENER ---
+  useEffect(() => {
+    if (!user || currentView !== 'comms') return;
+
+    const q = query(firestoreCollection(db, 'comms_posts'), orderBy('timestamp', 'desc'), limit(100));
+
+    const unsubComms = onSnapshot(q, snap => {
+      const allPosts = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+
+      let filteredPosts = allPosts;
+      if (commsFilter === 'mine') {
+        filteredPosts = allPosts.filter(p => p.authorId === user.uid);
+      } else {
+        filteredPosts = allPosts.filter(p => p.type === commsFilter);
+      }
+
+      setCommsPosts(filteredPosts.filter(post => (post.reports || 0) < 3 || post.authorId === user.uid));
+    });
+
+    return () => unsubComms();
+  }, [user, currentView, commsFilter]);
 
   useEffect(() => {
     if (!lastRadarSweep) {
@@ -462,7 +551,6 @@ function MainApp() {
     const handleBackButton = ({ canGoBack }) => {
       if (showSettingsModal) return setShowSettingsModal(false);
       if (showAboutModal) return setShowAboutModal(false);
-      if (showSupportModal) return setShowSupportModal(false);
       if (showNewsModal) return setShowNewsModal(false);
       if (selectedSprite) return setSelectedSprite(null);
       if (showPatchNotes) return setShowPatchNotes(false);
@@ -472,6 +560,7 @@ function MainApp() {
       if (showResetConfirm) return setShowResetConfirm(false);
       if (showAddFriendInput) return setShowAddFriendInput(false);
       if (showRadarModal) return setShowRadarModal(false);
+      if (showCreatePost) return setShowCreatePost(false);
       if (activeViewingFriend) return setActiveViewingFriend(null);
 
       if (currentView !== 'sprites') return setCurrentView('sprites');
@@ -480,7 +569,7 @@ function MainApp() {
 
     const listener = CapApp.addListener('backButton', handleBackButton);
     return () => { listener.then(handle => handle.remove()); };
-  }, [showSettingsModal, showAboutModal, showSupportModal, showNewsModal, selectedSprite, showPatchNotes, showTransmission, showSpriteSelector, showUnfriendConfirm, showResetConfirm, showAddFriendInput, showRadarModal, activeViewingFriend, currentView]);
+  }, [showSettingsModal, showAboutModal, showNewsModal, selectedSprite, showPatchNotes, showTransmission, showSpriteSelector, showUnfriendConfirm, showResetConfirm, showAddFriendInput, showRadarModal, showCreatePost, activeViewingFriend, currentView]);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, () => { setIsInitializing(false); });
@@ -576,7 +665,7 @@ function MainApp() {
     const sentReqsQuery = query(firestoreCollection(db, "friend_requests"), where("senderId", "==", user.uid));
     const unsubSentReqs = onSnapshot(sentReqsQuery, (snapshot) => setSentRequests(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))));
 
-    const newsQuery = query(firestoreCollection(db, "news_feed"), limit(20));
+    const newsQuery = query(firestoreCollection(db, "news_feed"), orderBy("sortTime", "desc"), limit(20));
     const unsubNews = onSnapshot(newsQuery, (snapshot) => {
       const items = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
       items.sort((a, b) => (b.sortTime || 0) - (a.sortTime || 0));
@@ -816,7 +905,7 @@ function MainApp() {
     } catch (e) { console.error("Request deletion failed:", e); }
   };
 
-  const cancelFriendRequest = async (reqId) => { try { await deleteDoc(doc(db, "friend_requests", reqId)); } catch (e) { } };
+  const cancelFriendRequest = async (reqId) => { try { await deleteDoc(doc(doc(db, "friend_requests", reqId))); } catch (e) { } };
 
   const handleUnfriendExecution = async () => {
     if (!showUnfriendConfirm) return;
@@ -871,6 +960,114 @@ function MainApp() {
     } catch (e) { }
   };
 
+  // --- COMMS ACTIONS ---
+  const handlePostSubmit = async () => {
+    if (!postText.trim() && postType === 'general') return;
+
+    if (PROFANITY_LIST.some(word => postText.toLowerCase().includes(word))) {
+      return alert("Transmission blocked: Please keep comms PG-13.");
+    }
+
+    try {
+      if (editingPostId) {
+        await updateDoc(doc(db, 'comms_posts', editingPostId), {
+          text: postText.trim(),
+          type: postType,
+          lookingFor: postLookingFor,
+          offering: postOffering,
+        });
+      } else {
+        await addDoc(firestoreCollection(db, 'comms_posts'), {
+          authorId: user.uid,
+          authorSpriteId: spriteId,
+          text: postText.trim(),
+          type: postType,
+          lookingFor: postLookingFor,
+          offering: postOffering,
+          timestamp: serverTimestamp(),
+          reports: 0,
+          likes: []
+        });
+      }
+      setShowCreatePost(false);
+      setPostText("");
+      setPostLookingFor(null);
+      setPostOffering(null);
+      setEditingPostId(null);
+      playBeep(880, 'square', 0.1);
+    } catch (e) {
+      alert("Failed to send transmission.");
+    }
+  };
+
+  const handleDeletePost = async (postId) => {
+    const isConfirmed = window.confirm("Permanently delete this transmission?");
+    if (isConfirmed) {
+      try {
+        await deleteDoc(doc(db, 'comms_posts', postId));
+        playBeep(200, 'sawtooth', 0.1);
+      } catch (error) {
+        console.error("Error deleting post:", error);
+        alert("Failed to delete transmission. Please try again.");
+      } finally {
+        setActiveMenuId(null);
+      }
+    } else {
+      setActiveMenuId(null);
+    }
+  };
+
+  const handleEditPost = (post) => {
+    setPostType(post.type);
+    setPostText(post.text);
+    setPostLookingFor(post.lookingFor || null);
+    setPostOffering(post.offering || null);
+    setEditingPostId(post.id);
+    setShowCreatePost(true);
+    setActiveMenuId(null);
+  };
+
+  const handleReportPost = async (postId) => {
+    try {
+      await updateDoc(doc(db, 'comms_posts', postId), { reports: increment(1) });
+      alert("Transmission flagged for review by Command.");
+      setActiveMenuId(null);
+    } catch (error) {
+      console.error("Error reporting post:", error);
+    }
+  };
+
+  const handleToggleLike = async (postId, currentLikes = []) => {
+    const isLiked = currentLikes.includes(user.uid);
+    try {
+      if (isLiked) playBeep(220, 'sine', 0.05);
+      else playBeep(880, 'triangle', 0.1);
+
+      await updateDoc(doc(db, 'comms_posts', postId), {
+        likes: isLiked ? arrayRemove(user.uid) : arrayUnion(user.uid)
+      });
+    } catch (error) {
+      console.error("Error liking post:", error);
+    }
+  };
+
+  const handleQuickAddFriend = async (targetUid, targetSpriteId) => {
+    try {
+      await setDoc(doc(db, "friend_requests", `${user.uid}_${targetUid}`), {
+        senderId: user.uid,
+        senderSpriteId: spriteId,
+        receiverId: targetUid,
+        receiverSpriteId: targetSpriteId,
+        status: 'pending',
+        timestamp: new Date()
+      });
+      playBeep(659, 'sine', 0.1);
+      alert(`Friend request sent to @${targetSpriteId}!`);
+    } catch (e) {
+      console.error("Error sending fast request:", e);
+    }
+  };
+
   // --- CONSOLIDATED SPRITE SELECTOR ---
   const handleSpriteSelect = async (selectedId, variant) => {
     if (selectorContext === 'extraction') {
@@ -883,6 +1080,12 @@ function MainApp() {
       const newTrophies = [...(profileData.trophies || [null, null, null, null])];
       newTrophies[trophySlotIndex] = `${selectedId}_${variant}`;
       setProfileData({ ...profileData, trophies: newTrophies });
+      setShowSpriteSelector(false);
+    } else if (selectorContext === 'commsLooking') {
+      setPostLookingFor(`${selectedId}_${variant}`);
+      setShowSpriteSelector(false);
+    } else if (selectorContext === 'commsOffering') {
+      setPostOffering(`${selectedId}_${variant}`);
       setShowSpriteSelector(false);
     }
   };
@@ -1340,7 +1543,6 @@ function MainApp() {
           </div>
 
           <form onSubmit={handleAuth} className="space-y-5">
-            {/* --- NEW ERROR MESSAGE UI --- */}
             {authError && (
               <div className="bg-red-950/50 border border-red-500/50 text-red-400 p-3 rounded-xl text-xs font-bold text-center animate-in fade-in zoom-in-95">
                 {authError}
@@ -1433,56 +1635,11 @@ function MainApp() {
                 <Info className="w-6 h-6 text-slate-400" /><span className="text-base font-bold text-slate-200">{t('about')}</span>
               </button>
 
-              {/* --- SUPPORT BUTTON --- */}
-              <button onClick={() => { setShowSettingsModal(false); setShowSupportModal(true); }} className="flex items-center gap-4 p-4 rounded-2xl hover:bg-slate-800/50 transition-colors text-left">
-                <Mail className="w-6 h-6 text-slate-400" /><span className="text-base font-bold text-slate-200">Support & Feedback</span>
-              </button>
-
-              {/* --- DELETE ACCOUNT OPTION (APP STORE COMPLIANT) --- */}
               <div className="h-px bg-slate-800/50 my-2" />
               <button onClick={handleDeleteAccount} className="flex items-center gap-4 p-4 rounded-2xl hover:bg-red-950/30 transition-colors text-left group">
                 <Trash2 className="w-6 h-6 text-red-500/70 group-hover:text-red-400" />
                 <span className="text-base font-bold text-red-500/70 group-hover:text-red-400">Delete Account</span>
               </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* --- SUPPORT / FEEDBACK MODAL --- */}
-      {showSupportModal && (
-        <div className="fixed inset-0 z-[90] flex items-center justify-center p-4 bg-black/90 backdrop-blur-md animate-in fade-in duration-200">
-          <div className="bg-[#12141f] border-2 border-slate-700 rounded-2xl flex flex-col max-w-sm w-full relative overflow-hidden shadow-2xl">
-            <header className="p-4 border-b border-slate-800 flex justify-between items-center bg-[#0e1017]">
-              <h3 className="text-md sm:text-lg font-black tracking-tight text-white uppercase italic flex items-center gap-2">
-                <Mail className="w-5 h-5 text-indigo-400" /> Support
-              </h3>
-              <button onClick={() => setShowSupportModal(false)} className="text-slate-400 hover:text-white"><X className="w-6 h-6" /></button>
-            </header>
-            <div className="p-6 flex flex-col gap-4">
-              <p className="text-sm text-slate-300">Found a bug or have a suggestion? Send a direct transmission to the developer.</p>
-
-              <form onSubmit={(e) => {
-                handleFeedbackSubmit(e);
-                if (feedbackText.trim()) setTimeout(() => setShowSupportModal(false), 2500);
-              }} className="flex flex-col gap-3">
-                <textarea
-                  value={feedbackText}
-                  onChange={(e) => setFeedbackText(e.target.value)}
-                  placeholder="Describe your issue or feedback..."
-                  className={`w-full bg-black/50 border border-slate-700 rounded-xl p-3 text-white focus:outline-none focus:border-indigo-500 resize-none h-32 ${inputSizeClass}`}
-                  required
-                />
-                <button
-                  type="submit"
-                  disabled={feedbackStatus === 'submitting'}
-                  className="w-full bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white font-black uppercase tracking-wider py-3 rounded-xl transition-colors"
-                >
-                  {feedbackStatus === 'submitting' ? 'Sending...' : feedbackStatus === 'success' ? 'Sent!' : 'Submit Feedback'}
-                </button>
-                {feedbackStatus === 'success' && <p className="text-emerald-400 text-xs text-center font-bold">Transmission received. Thank you!</p>}
-                {feedbackStatus === 'error' && <p className="text-red-400 text-xs text-center font-bold">Failed to send. Try again later.</p>}
-              </form>
             </div>
           </div>
         </div>
@@ -1506,25 +1663,7 @@ function MainApp() {
                   <p className="text-sm text-slate-400 font-bold uppercase tracking-wider">No News Broadcasts Available</p>
                 </div>
               ) : (
-                newsFeed.map((news) => (
-                  <div key={news.id} className="relative w-full shrink-0 bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-lg">
-                    {news.imageUrl && (
-                      <img src={news.imageUrl} alt="" className="absolute inset-0 w-full h-full object-cover" />
-                    )}
-                    <div className={`relative z-10 w-full flex flex-col justify-end p-4 min-h-[160px] sm:min-h-[180px] ${news.imageUrl ? 'bg-gradient-to-t from-black/95 via-black/80 to-transparent pt-28' : 'bg-black/50'}`}>
-                      <div className="flex justify-between items-center mb-1.5">
-                        <span className="text-[9px] font-black text-cyan-400 uppercase tracking-widest drop-shadow-md">{news.author}</span>
-                        {news.timestamp && (
-                          <span className="text-[9px] font-mono text-slate-300 drop-shadow-md">
-                            {new Date(news.timestamp.toDate()).toLocaleDateString()}
-                          </span>
-                        )}
-                      </div>
-                      <h3 className="text-base sm:text-lg font-black text-white uppercase italic tracking-tight drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] leading-tight">{news.title}</h3>
-                      {news.text && <p className="text-xs text-slate-200 leading-relaxed mt-2 drop-shadow-[0_1px_3px_rgba(0,0,0,0.8)]">{news.text}</p>}
-                    </div>
-                  </div>
-                ))
+                newsFeed.map((news) => <NewsCard key={news.id} news={news} />)
               )}
             </div>
           </div>
@@ -1630,7 +1769,76 @@ function MainApp() {
         </div>
       )}
 
-      {/* --- TARGET/TROPHY SELECTOR MODAL --- */}
+      {/* --- COMMS: CREATE / EDIT POST MODAL --- */}
+      {showCreatePost && (
+        <div className="fixed inset-0 z-[80] flex flex-col justify-end sm:justify-center items-center bg-black/90 backdrop-blur-sm animate-in fade-in">
+          <div className="bg-[#12141f] w-full max-w-md h-[85vh] rounded-t-3xl sm:rounded-3xl border-t-2 sm:border-2 border-indigo-500/50 p-5 shadow-2xl animate-in slide-in-from-bottom-10 flex flex-col overflow-hidden relative">
+            <div className="flex justify-between items-center mb-4 shrink-0">
+              <h2 className="text-lg font-black text-white uppercase italic flex items-center gap-2">
+                <Radio className="w-5 h-5 text-indigo-400" /> {editingPostId ? 'Edit Transmission' : 'New Transmission'}
+              </h2>
+              <button onClick={() => { setShowCreatePost(false); setPostText(""); setPostLookingFor(null); setPostOffering(null); setEditingPostId(null); }} className="p-2 bg-black/40 rounded-full text-slate-400 hover:text-white"><X className="w-5 h-5" /></button>
+            </div>
+
+            <div className="flex gap-2 mb-4">
+              <button onClick={() => setPostType('general')} className={`flex-1 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition-colors border ${postType === 'general' ? 'bg-indigo-600 text-white border-indigo-400' : 'bg-black/40 text-slate-400 border-slate-800'}`}>General</button>
+              <button onClick={() => setPostType('trade')} className={`flex-1 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition-colors border ${postType === 'trade' ? 'bg-cyan-600 text-white border-cyan-400' : 'bg-black/40 text-slate-400 border-slate-800'}`}>Trade Board</button>
+            </div>
+
+            <div className="flex-1 overflow-y-auto flex flex-col gap-4">
+              <div className="relative">
+                <textarea
+                  value={postText}
+                  onChange={(e) => setPostText(e.target.value.substring(0, 200))}
+                  placeholder={postType === 'trade' ? "Add trade details (optional)..." : "Broadcast to the network..."}
+                  className={`w-full bg-black/50 border-2 border-slate-800 rounded-xl p-4 ${responsiveInputSizeClass} text-white focus:outline-none focus:border-indigo-500 resize-none h-32`}
+                />
+                <span className={`absolute bottom-3 right-3 text-[10px] font-mono font-bold ${postText.length >= 200 ? 'text-red-400' : 'text-slate-500'}`}>{postText.length}/200</span>
+              </div>
+
+              {postType === 'trade' && (
+                <div className="flex gap-3">
+                  <div className="flex-1 flex flex-col gap-1.5">
+                    <span className="text-[10px] font-black uppercase tracking-widest text-cyan-400 text-center">Looking For</span>
+                    {postLookingFor ? (
+                      <div className="h-20 border-2 border-cyan-500/50 rounded-xl bg-cyan-950/30 relative flex flex-col items-center justify-center overflow-hidden">
+                        <button onClick={() => setPostLookingFor(null)} className="absolute top-1 right-1 bg-black/80 rounded-full p-1 text-slate-400 hover:text-white z-20"><X className="w-3 h-3" /></button>
+                        <img src={SPRITES_DATABASE.find(s => s.id === postLookingFor.split('_')[0])?.images[postLookingFor.split('_')[1]]} className="w-10 h-10 object-contain z-10" alt="" />
+                      </div>
+                    ) : (
+                      <button onClick={() => { setSelectorContext('commsLooking'); setShowSpriteSelector(true); }} className="h-20 border-2 border-dashed border-slate-700 rounded-xl flex items-center justify-center bg-black/40 hover:bg-black/60 transition-colors"><Plus className="w-6 h-6 text-slate-600" /></button>
+                    )}
+                  </div>
+
+                  <div className="flex-1 flex flex-col gap-1.5">
+                    <span className="text-[10px] font-black uppercase tracking-widest text-emerald-400 text-center">Offering</span>
+                    {postOffering ? (
+                      <div className="h-20 border-2 border-emerald-500/50 rounded-xl bg-emerald-950/30 relative flex flex-col items-center justify-center overflow-hidden">
+                        <button onClick={() => setPostOffering(null)} className="absolute top-1 right-1 bg-black/80 rounded-full p-1 text-slate-400 hover:text-white z-20"><X className="w-3 h-3" /></button>
+                        <img src={SPRITES_DATABASE.find(s => s.id === postOffering.split('_')[0])?.images[postOffering.split('_')[1]]} className="w-10 h-10 object-contain z-10" alt="" />
+                      </div>
+                    ) : (
+                      <button onClick={() => { setSelectorContext('commsOffering'); setShowSpriteSelector(true); }} className="h-20 border-2 border-dashed border-slate-700 rounded-xl flex items-center justify-center bg-black/40 hover:bg-black/60 transition-colors"><Plus className="w-6 h-6 text-slate-600" /></button>
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <div className="pt-4 shrink-0">
+              <button
+                onClick={handlePostSubmit}
+                disabled={!postText.trim() && !postLookingFor && !postOffering}
+                className="w-full bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 disabled:hover:bg-indigo-600 text-white font-black uppercase tracking-wider py-3.5 rounded-xl transition-colors flex items-center justify-center gap-2"
+              >
+                <Radio className="w-5 h-5" /> Broadcast
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* --- TARGET/TROPHY/COMMS SELECTOR MODAL --- */}
       {showSpriteSelector && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/90 backdrop-blur-md animate-in fade-in duration-200">
           <div className="bg-[#12141f] border-2 border-cyan-500/60 rounded-2xl flex flex-col max-w-sm w-full h-[75vh] relative overflow-hidden shadow-[0_0_30px_rgba(0,0,0,0.8)]">
@@ -1643,10 +1851,10 @@ function MainApp() {
             <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-4">
               {SPRITES_DATABASE.map(sprite => {
                 let validVariants = [];
-                if (selectorContext === 'trophy') {
+                if (selectorContext === 'trophy' || selectorContext === 'commsOffering') {
                   validVariants = sprite.variants.filter(v => collection[sprite.id]?.[v]);
-                } else if (selectorContext === 'extraction') {
-                  validVariants = sprite.variants.filter(v => !collection[sprite.id]?.[v] && !isVariantLocked(sprite.id, v));
+                } else if (selectorContext === 'extraction' || selectorContext === 'commsLooking') {
+                  validVariants = sprite.variants.filter(v => selectorContext === 'commsLooking' ? !isVariantLocked(sprite.id, v) : (!collection[sprite.id]?.[v] && !isVariantLocked(sprite.id, v)));
                 }
 
                 if (validVariants.length === 0) return null;
@@ -2012,6 +2220,53 @@ function MainApp() {
         {currentView === 'profile' && user && (
           <div className="flex flex-col gap-5 animate-in fade-in duration-300">
             {renderProfileCard(spriteId, profileData, completionRate, masteryRate, user.metadata?.creationTime, true, mastery)}
+
+            {/* --- RESTORED MILESTONE UNLOCKS --- */}
+            <div className="bg-[#12141f] rounded-2xl border border-slate-800 p-5 shadow-xl">
+              <h3 className="text-sm font-black text-white uppercase italic tracking-wider mb-4 flex items-center gap-2">
+                <Eye className="w-4 h-4 text-cyan-400" /> Milestone Unlocks
+              </h3>
+              <p className="text-xs text-slate-400 leading-relaxed mb-4">
+                Grind Masteries and full collections to automatically unlock prestigious backgrounds for your Profile.
+              </p>
+
+              <div className="space-y-3">
+                {MILESTONES.map((stone, idx) => {
+                  let isUnlocked = false;
+                  let progress = 0;
+
+                  if (stone.isPercent) {
+                    const currentRate = stone.type === 'mastery' ? masteryRate : completionRate;
+                    isUnlocked = currentRate >= stone.count;
+                    progress = currentRate;
+                  } else {
+                    isUnlocked = totalMastered >= stone.count;
+                    progress = Math.min(totalMastered, stone.count);
+                  }
+
+                  return (
+                    <div key={idx} className={`p-3 rounded-xl border ${isUnlocked ? stone.bg : 'bg-black/40 border-slate-800 opacity-60'} flex items-center gap-3 transition-all`}>
+                      <div className="w-10 h-10 rounded-full bg-black/40 flex items-center justify-center shrink-0 border border-white/10">
+                        {isUnlocked ? <CheckCircle className="w-5 h-5 text-white" /> : <Lock className="w-5 h-5 text-slate-500" />}
+                      </div>
+                      <div className="flex-1">
+                        <span className={`block font-black text-sm uppercase ${isUnlocked ? 'text-white' : 'text-slate-400'}`}>{stone.name}</span>
+                        <span className="block text-[10px] font-mono text-slate-500 uppercase tracking-widest">
+                          {stone.isPercent ? `${stone.count}% ${stone.type}` : `${stone.count} Mastered`}
+                        </span>
+                      </div>
+                      {!isUnlocked && (
+                        <div className="text-right">
+                          <span className="text-xs font-black text-slate-500 font-mono">
+                            {progress} / {stone.count}{stone.isPercent ? '%' : ''}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
           </div>
         )}
 
@@ -2185,6 +2440,142 @@ function MainApp() {
           </div>
         )}
 
+        {/* --- COMMS VIEW --- */}
+        {currentView === 'comms' && (
+          <div className="flex flex-col gap-4 animate-in fade-in duration-300">
+            <section className="bg-gradient-to-br from-indigo-900/40 to-blue-900/20 border-2 border-indigo-500/50 rounded-2xl p-5 relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/10 rounded-full blur-[50px] pointer-events-none" />
+              <div className="flex justify-between items-start relative z-10">
+                <div>
+                  <div className="flex items-center gap-3 mb-1">
+                    <Radio className="w-6 h-6 sm:w-7 sm:h-7 text-indigo-400" />
+                    <h2 className="text-xl sm:text-2xl font-black text-indigo-400 uppercase italic tracking-tight">Comms</h2>
+                  </div>
+                  <p className="text-xs text-indigo-300/80 font-bold uppercase tracking-widest">Global Live Feed</p>
+                </div>
+                <button onClick={() => setShowCreatePost(true)} className="bg-indigo-600 hover:bg-indigo-500 text-white p-3 rounded-xl shadow-[0_0_15px_rgba(79,70,229,0.4)] transition-all">
+                  <MessageSquare className="w-5 h-5" />
+                </button>
+              </div>
+            </section>
+
+            <div className="flex bg-[#12141f] rounded-xl border border-slate-800 p-1">
+              <button onClick={() => setCommsFilter('general')} className={`flex-1 py-2 rounded-lg text-xs font-black uppercase tracking-wider transition-colors ${commsFilter === 'general' ? 'bg-indigo-900/40 text-indigo-400 border border-indigo-500/30' : 'text-slate-500 hover:text-slate-300'}`}>General</button>
+              <button onClick={() => setCommsFilter('trade')} className={`flex-1 py-2 rounded-lg text-xs font-black uppercase tracking-wider transition-colors ${commsFilter === 'trade' ? 'bg-cyan-900/40 text-cyan-400 border border-cyan-500/30' : 'text-slate-500 hover:text-slate-300'}`}>Trades</button>
+              <button onClick={() => setCommsFilter('mine')} className={`flex-1 py-2 rounded-lg text-xs font-black uppercase tracking-wider transition-colors ${commsFilter === 'mine' ? 'bg-purple-900/40 text-purple-400 border border-purple-500/30' : 'text-slate-500 hover:text-slate-300'}`}>My Posts</button>
+            </div>
+
+            <section className="flex flex-col gap-3">
+              {commsPosts.length === 0 ? (
+                <div className="text-center p-8 bg-[#12141f] rounded-2xl border border-slate-800 mt-4">
+                  <Radio className="w-12 h-12 text-slate-700 mx-auto mb-4" />
+                  <p className="text-sm text-slate-400 font-bold uppercase tracking-widest">No transmissions found.</p>
+                </div>
+              ) : (
+                commsPosts.map(post => {
+                  const currentLikes = post.likes || [];
+                  const isLiked = currentLikes.includes(user.uid);
+                  const isOwnPost = post.authorId === user.uid;
+
+                  const isFriend = friendsList.some(f => f.uid === post.authorId);
+                  const requestSent = sentRequests.some(r => r.receiverId === post.authorId);
+
+                  return (
+                    <div key={post.id} className="bg-[#151722] border border-slate-800 rounded-2xl p-4 relative shadow-sm hover:border-slate-700 transition-colors">
+
+                      <div className="flex justify-between items-start mb-3">
+                        <div className="flex items-center gap-3">
+                          <div className="w-9 h-9 rounded-full bg-indigo-950 border border-indigo-500/50 flex items-center justify-center text-indigo-400 shrink-0">
+                            <UserIcon className="w-4 h-4" />
+                          </div>
+                          <div className="flex flex-col">
+                            <div className="flex items-center gap-2">
+                              <span className="block text-sm font-black text-white">@{post.authorSpriteId}</span>
+
+                              {!isOwnPost && (
+                                isFriend ? (
+                                  <span className="text-[8px] font-black uppercase tracking-wider px-1.5 py-0.5 bg-slate-800 text-slate-400 rounded flex items-center gap-0.5"><Check className="w-2.5 h-2.5" /> Squad</span>
+                                ) : requestSent ? (
+                                  <span className="text-[8px] font-black uppercase tracking-wider px-1.5 py-0.5 bg-indigo-900/40 text-indigo-400 rounded border border-indigo-500/30">Pending</span>
+                                ) : (
+                                  <button onClick={() => handleQuickAddFriend(post.authorId, post.authorSpriteId)} className="text-[8px] font-black uppercase tracking-wider px-1.5 py-0.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded shadow flex items-center gap-0.5 transition-colors">
+                                    <Plus className="w-2.5 h-2.5" /> Squad
+                                  </button>
+                                )
+                              )}
+                            </div>
+                            <span className="block text-[10px] font-mono text-slate-500 mt-0.5">{timeAgo(post.timestamp)}</span>
+                          </div>
+                        </div>
+
+                        <div className="relative">
+                          <button onClick={() => setActiveMenuId(activeMenuId === post.id ? null : post.id)} className="p-1 text-slate-500 hover:text-white rounded-md hover:bg-slate-800">
+                            <MoreHorizontal className="w-5 h-5" />
+                          </button>
+                          {activeMenuId === post.id && (
+                            <div className="absolute right-0 mt-1 w-32 bg-slate-900 border border-slate-700 rounded-xl shadow-xl z-20 overflow-hidden animate-in fade-in zoom-in-95">
+                              {post.authorId === user.uid ? (
+                                <>
+                                  <button onClick={() => handleEditPost(post)} className="w-full flex items-center gap-2 px-3 py-2 text-xs font-bold text-slate-300 hover:bg-slate-800 hover:text-white transition-colors">
+                                    <Edit3 className="w-4 h-4" /> Edit
+                                  </button>
+                                  <button onClick={() => handleDeletePost(post.id)} className="w-full flex items-center gap-2 px-3 py-2 text-xs font-bold text-red-400 hover:bg-red-950 hover:text-red-300 transition-colors border-t border-slate-800">
+                                    <Trash2 className="w-4 h-4" /> Delete
+                                  </button>
+                                </>
+                              ) : (
+                                <button onClick={() => handleReportPost(post.id)} className="w-full flex items-center gap-2 px-3 py-2 text-xs font-bold text-amber-400 hover:bg-amber-950 transition-colors">
+                                  <Flag className="w-4 h-4" /> Report
+                                </button>
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+
+                      {post.type === 'trade' && (post.lookingFor || post.offering) && (
+                        <div className="flex gap-2 mb-3 bg-black/40 p-2 rounded-xl border border-slate-800/80">
+                          {post.lookingFor && post.lookingFor.includes('_') && (
+                            <div className="flex-1 flex items-center gap-2 bg-cyan-950/20 border border-cyan-500/20 rounded-lg p-2">
+                              <img src={SPRITES_DATABASE.find(s => s.id === post.lookingFor.split('_')[0])?.images[post.lookingFor.split('_')[1]]} className="w-8 h-8 object-contain shrink-0" alt="" />
+                              <div className="flex flex-col min-w-0">
+                                <span className="text-[8px] font-black text-cyan-500 uppercase tracking-widest">Looking For</span>
+                                <span className="text-[10px] font-bold text-white truncate">{SPRITES_DATABASE.find(s => s.id === post.lookingFor.split('_')[0])?.name}</span>
+                              </div>
+                            </div>
+                          )}
+                          {post.offering && post.offering.includes('_') && (
+                            <div className="flex-1 flex items-center gap-2 bg-emerald-950/20 border border-emerald-500/20 rounded-lg p-2">
+                              <img src={SPRITES_DATABASE.find(s => s.id === post.offering.split('_')[0])?.images[post.offering.split('_')[1]]} className="w-8 h-8 object-contain shrink-0" alt="" />
+                              <div className="flex flex-col min-w-0">
+                                <span className="text-[8px] font-black text-emerald-500 uppercase tracking-widest">Offering</span>
+                                <span className="text-[10px] font-bold text-white truncate">{SPRITES_DATABASE.find(s => s.id === post.offering.split('_')[0])?.name}</span>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      )}
+
+                      {post.text && <p className="text-sm text-slate-300 leading-relaxed whitespace-pre-wrap break-words">{post.text}</p>}
+
+                      <div className="mt-3 pt-3 border-t border-slate-800/80 flex items-center gap-4">
+                        <button
+                          onClick={() => handleToggleLike(post.id, currentLikes)}
+                          className={`flex items-center gap-1.5 text-xs font-bold transition-colors ${isLiked ? 'text-cyan-400' : 'text-slate-500 hover:text-slate-400'}`}
+                        >
+                          <Zap className={`w-4 h-4 ${isLiked ? 'fill-cyan-400' : ''}`} />
+                          <span>{currentLikes.length}</span>
+                        </button>
+                      </div>
+
+                    </div>
+                  );
+                })
+              )}
+            </section>
+          </div>
+        )}
+
         {/* --- FRIENDS TAB VIEW --- */}
         {currentView === 'friends' && (
           <div className="flex flex-col gap-4 animate-in fade-in duration-300">
@@ -2313,19 +2704,77 @@ function MainApp() {
           </div>
         )}
 
+        {/* --- SUPPORT / DISCORD TAB VIEW --- */}
+        {currentView === 'feedback' && (
+          <section className="flex flex-col gap-4 animate-in fade-in duration-300 pt-2">
+            
+            {/* 1. FEEDBACK SYSTEM (TOP) */}
+            <div className="bg-[#12141f] border-2 border-emerald-500/40 rounded-2xl p-5 shadow-[0_0_20px_rgba(16,185,129,0.1)]">
+              <h3 className="text-xl sm:text-2xl font-black text-emerald-400 uppercase italic mb-2">Support & Feedback</h3>
+              <p className="text-sm sm:text-base text-slate-400 mb-6">Found a bug or have a suggestion? Send a direct transmission to the developer.</p>
+
+              <form onSubmit={handleFeedbackSubmit} className="flex flex-col gap-3">
+                <textarea 
+                  value={feedbackText} 
+                  onChange={(e) => setFeedbackText(e.target.value)} 
+                  placeholder="Describe your issue or feedback..." 
+                  className={`w-full bg-black/50 border-2 border-slate-800 rounded-xl p-3 text-sm sm:text-base text-white focus:outline-none focus:border-emerald-500 min-h-[120px] resize-y ${inputSizeClass}`} 
+                  required 
+                />
+                <button type="submit" disabled={feedbackStatus === 'submitting'} className="w-full flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 disabled:hover:bg-emerald-600 text-white font-black uppercase tracking-wider py-3 rounded-xl transition-colors">
+                  {feedbackStatus === 'submitting' ? 'Sending...' : feedbackStatus === 'success' ? <><CheckCircle className="w-5 h-5" /> Sent!</> : <><Mail className="w-5 h-5" /> Send Feedback</>}
+                </button>
+              </form>
+            </div>
+
+            {/* 2. JOIN DISCORD (MIDDLE) */}
+            <div className="bg-gradient-to-r from-indigo-900/40 via-blue-900/30 to-slate-900 border-2 border-indigo-500/50 rounded-2xl p-5 shadow-[0_0_20px_rgba(99,102,241,0.15)] flex flex-col items-center text-center">
+              <div className="w-12 h-12 bg-indigo-950/80 rounded-full border border-indigo-400 flex items-center justify-center mb-3">
+                <MessageSquare className="w-6 h-6 text-indigo-400" />
+              </div>
+              <h4 className="text-lg font-black text-white uppercase italic mb-1 tracking-wider">Join The Comms Network</h4>
+              <p className="text-sm text-slate-300 mb-5">Connect with other hunters, coordinate trades, and get live leak bot updates in our official Discord server.</p>
+              <a href="https://discord.gg/YOUR_INVITE_LINK" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-500 text-white font-black uppercase tracking-wider py-3 px-6 rounded-xl text-xs sm:text-sm transition-all shadow-lg w-full">
+                Join Discord
+              </a>
+            </div>
+
+            {/* 3. GOOGLE PLAY (BOTTOM) */}
+            <div className="bg-gradient-to-r from-teal-900/40 via-emerald-900/30 to-slate-900 border-2 border-teal-500/50 rounded-2xl p-5 shadow-[0_0_20px_rgba(20,184,166,0.15)] flex flex-col items-center text-center">
+              <div className="w-12 h-12 bg-teal-950/80 rounded-full border border-teal-400 flex items-center justify-center mb-3">
+                <Smartphone className="w-6 h-6 text-teal-400" />
+              </div>
+              <h4 className="text-lg font-black text-white uppercase italic mb-1 tracking-wider">Spritedex is on Android!</h4>
+              <p className="text-sm text-slate-300 mb-5">Take your collection on the go with the native Android app.</p>
+              <a href="https://play.google.com/store/apps/details?id=com.prosynctech.spritedex" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2 bg-teal-600 hover:bg-teal-500 text-white font-black uppercase tracking-wider py-3 px-6 rounded-xl text-xs sm:text-sm transition-all shadow-lg w-full">
+                Get it on Google Play
+              </a>
+            </div>
+
+          </section>
+        )}
+
       </main>
 
       {/* --- BOTTOM NAVIGATION BAR --- */}
       <nav className="fixed bottom-4 left-0 right-0 z-50 flex justify-center px-4">
-        <div className="bg-[#0e1017]/95 backdrop-blur-md border border-slate-800 rounded-2xl w-full max-w-md px-1.5 py-2 flex justify-between shadow-2xl">
+        <div className="bg-[#0e1017]/95 backdrop-blur-md border border-slate-800 rounded-2xl w-full max-w-md px-1 py-2 flex justify-between shadow-2xl">
           <button onClick={() => { setCurrentView('sprites'); setActiveViewingFriend(null); playBeep(440, 'sine', 0.05); }} className={`flex-1 flex flex-col items-center gap-1 py-1 transition-colors ${currentView === 'sprites' && !activeViewingFriend ? 'text-cyan-400' : 'text-slate-600'}`}>
-            <List className="w-5 h-5" /><span className="text-[9px] font-black uppercase tracking-wider">{t('sprites')}</span>
+            <List className="w-5 h-5" /><span className="text-[8px] sm:text-[9px] font-black uppercase tracking-wider">{t('sprites')}</span>
           </button>
           <button onClick={() => { setCurrentView('mastery'); setActiveViewingFriend(null); playBeep(523, 'sine', 0.05); }} className={`flex-1 flex flex-col items-center gap-1 py-1 transition-colors ${currentView === 'mastery' && !activeViewingFriend ? 'text-yellow-400' : 'text-slate-600'}`}>
-            <Crown className="w-5 h-5" /><span className="text-[9px] font-black uppercase tracking-wider">{t('mastery')}</span>
+            <Crown className="w-5 h-5" /><span className="text-[8px] sm:text-[9px] font-black uppercase tracking-wider">{t('mastery')}</span>
           </button>
-          <button onClick={() => { setCurrentView('friends'); setActiveViewingFriend(null); playBeep(659, 'sine', 0.05); }} className={`flex-1 flex flex-col items-center gap-1 py-1 transition-colors ${currentView === 'friends' || activeViewingFriend ? 'text-blue-400' : 'text-slate-600'}`}>
-            <Users className="w-5 h-5" /><span className="text-[9px] font-black uppercase tracking-wider">Squad</span>
+
+          <button onClick={() => { setCurrentView('comms'); setActiveViewingFriend(null); playBeep(587, 'sine', 0.05); }} className={`flex-1 flex flex-col items-center gap-1 py-1 transition-colors ${currentView === 'comms' && !activeViewingFriend ? 'text-indigo-400' : 'text-slate-600'}`}>
+            <Radio className="w-5 h-5" /><span className="text-[8px] sm:text-[9px] font-black uppercase tracking-wider">Comms</span>
+          </button>
+
+          <button onClick={() => { setCurrentView('friends'); setActiveViewingFriend(null); playBeep(659, 'sine', 0.05); }} className={`flex-1 flex flex-col items-center gap-1 py-1 transition-colors ${(currentView === 'friends' || activeViewingFriend) ? 'text-blue-400' : 'text-slate-600'}`}>
+            <Users className="w-5 h-5" /><span className="text-[8px] sm:text-[9px] font-black uppercase tracking-wider">Squad</span>
+          </button>
+          <button onClick={() => { setCurrentView('feedback'); setActiveViewingFriend(null); playBeep(784, 'sine', 0.05); }} className={`flex-1 flex flex-col items-center gap-1 py-1 transition-colors ${currentView === 'feedback' && !activeViewingFriend ? 'text-emerald-400' : 'text-slate-600'}`}>
+            <MessageSquare className="w-5 h-5" /><span className="text-[8px] sm:text-[9px] font-black uppercase tracking-wider">Support</span>
           </button>
         </div>
       </nav>
