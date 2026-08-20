@@ -2322,7 +2322,7 @@ function MainApp() {
             </div>
             <div className="bg-gradient-to-r from-indigo-900/40 via-blue-900/30 to-slate-900 border-2 border-indigo-500/50 rounded-2xl p-5 shadow-[0_0_20px_rgba(99,102,241,0.15)] flex flex-col items-center text-center">
               <div className="w-12 h-12 bg-indigo-950/80 rounded-full border border-indigo-400 flex items-center justify-center mb-3"><MessageSquare className="w-6 h-6 text-indigo-400" /></div>
-              <h4 className="text-lg font-black text-white uppercase italic mb-1 tracking-wider">Join The Comms Network</h4>
+              <h4 className="text-lg font-black text-white uppercase italic mb-1 tracking-wider">Join The Discord Network</h4>
               <p className="text-sm text-slate-300 mb-5">Connect with other hunters, coordinate trades, and get live leak bot updates in our official Discord server.</p>
               <a href="https://discord.gg/J3E3fGvEtw" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-500 text-white font-black uppercase tracking-wider py-3 px-6 rounded-xl text-xs sm:text-sm transition-all shadow-lg w-full">Join Discord</a>
             </div>
