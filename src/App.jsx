@@ -1049,7 +1049,7 @@ function MainApp() {
     try { await deleteDoc(doc(db, "friend_requests", req.id)); playBeep(880, 'sine', 0.1); } catch (e) { }
   };
 
-  const cancelFriendRequest = async (reqId) => { try { await deleteDoc(doc(doc(db, "friend_requests", reqId))); } catch (e) { } };
+  const cancelFriendRequest = async (reqId) => { try { await deleteDoc(doc(db, "friend_requests", reqId)); playBeep(220, 'sawtooth', 0.1); } catch (e) { } };
 
   const handleUnfriendExecution = async () => {
     if (!showUnfriendConfirm) return;
@@ -1898,11 +1898,11 @@ function MainApp() {
               </div>
             )}
 
-            <div className="p-4 bg-slate-900/80 rounded-xl border border-slate-700/60 flex items-start relative z-10">
-              <div className="text-amber-400 mr-3 mt-0.5 shrink-0"><Lock className="w-5 h-5" /></div>
+            <div className="p-4 bg-slate-900/80 rounded-xl border border-emerald-500/30 shadow-[0_0_15px_rgba(16,185,129,0.1)] flex items-start relative z-10">
+              <div className="text-emerald-400 mr-3 mt-0.5 shrink-0"><ShoppingBag className="w-5 h-5" /></div>
               <div>
-                <p className="text-xs font-black text-amber-400 mb-1 tracking-wider">HOARD YOUR FRAGMENTS!</p>
-                <p className="text-[10px] sm:text-xs text-slate-400 leading-relaxed font-medium">The Vault expands soon. Save up to unlock Profile Auras, extra Trophy slots, and tactical upgrades in the upcoming Profile Shop.</p>
+                <p className="text-xs font-black text-emerald-400 mb-1 tracking-wider">THE BLACK MARKET IS LIVE!</p>
+                <p className="text-[10px] sm:text-xs text-slate-300 leading-relaxed font-medium">Tap the Shopping Bag icon in the top menu to spend your Fragments on premium Profile Auras, extra Trophy slots, and tactical upgrades.</p>
               </div>
             </div>
           </div>
@@ -1970,8 +1970,8 @@ function MainApp() {
             </header>
             <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-4">
               {SPRITES_DATABASE.map(sprite => {
-                // RESTRICT TRADE BOARD TO ACTIVE SEASON ONLY
-                if ((selectorContext === 'commsLooking' || selectorContext === 'commsOffering') && sprite.season !== 'C7S4') {
+                // RESTRICT TRADE BOARD AND EXTRACTIONS TO ACTIVE SEASON ONLY
+                if ((selectorContext === 'commsLooking' || selectorContext === 'commsOffering' || selectorContext === 'extraction') && sprite.season !== 'C7S4') {
                   return null;
                 }
 
@@ -1989,15 +1989,18 @@ function MainApp() {
                     <span className="text-sm font-black text-white uppercase italic mb-2 block">{sprite.name}</span>
                     <div className="grid grid-cols-6 gap-2">
                       {validVariants.map(v => (
-                        <button key={v} onClick={() => handleSpriteSelect(sprite.id, v)} className="flex flex-col items-center p-2 rounded-lg border border-slate-700 bg-black/40 hover:bg-slate-800 transition-colors">
+                        <button key={v} onClick={() => handleSpriteSelect(sprite.id, v)} className="flex flex-col items-center p-2 rounded-lg border border-slate-700 bg-black/40 hover:bg-slate-800 transition-colors overflow-hidden">
                           <img src={sprite.images[v]} className="w-8 h-8 object-contain mb-1" alt="" />
-                          <span className={`text-[7px] sm:text-[8px] font-black uppercase ${VARIANT_INFO[v]?.color}`}>{t(v)}</span>
+                          <span className={`text-[7px] sm:text-[8px] font-black uppercase truncate w-full text-center ${VARIANT_INFO[v]?.color}`}>
+                            {v === 'holofoil' ? 'Holo' : v === 'cheatmaster' ? 'Cheat' : t(v)}
+                          </span>
                         </button>
                       ))}
                     </div>
                   </div>
                 );
-              })}            </div>
+              })}
+            </div>
           </div>
         </div>
       )}
