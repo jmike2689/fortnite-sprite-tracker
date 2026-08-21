@@ -7,7 +7,7 @@ import { PushNotifications } from '@capacitor/push-notifications';
 import { LocalNotifications } from '@capacitor/local-notifications';
 import { Capacitor } from '@capacitor/core';
 import {
-  Search, CheckCircle, Circle, Volume2, VolumeX, Percent, RotateCcw, AlertTriangle, X, Eye, Crown, Users, UserPlus, ChevronLeft, ChevronRight, Check, XCircle, UserMinus, Target, Plus, FileText, Radar, Newspaper, Info, Mail, Lock, List, Filter, ChevronDown, ChevronUp, ShoppingCart, Smartphone, Globe, Settings, LogOut, History, AtSign, User as UserIcon, Edit3, Save, Tv, Gamepad2, Calendar, Award, Video, Music, Play, Trash2, MessageSquare, Radio, MoreHorizontal, Flag, Zap
+  Search, CheckCircle, Circle, Volume2, VolumeX, Percent, RotateCcw, AlertTriangle, X, Eye, Crown, Users, UserPlus, ChevronLeft, ChevronRight, Check, XCircle, UserMinus, Target, Plus, FileText, Radar, Newspaper, Info, Mail, Lock, List, Filter, ChevronDown, ChevronUp, ShoppingCart, ShoppingBag, Smartphone, Globe, Settings, LogOut, History, AtSign, User as UserIcon, Edit3, Save, Tv, Gamepad2, Calendar, Award, Video, Music, Play, Trash2, MessageSquare, Radio, MoreHorizontal, Flag, Zap
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { useAuth } from './AuthContext';
@@ -193,6 +193,77 @@ const isVariantLocked = (spriteId, variant) => {
   return LOCKED_VARIANTS[spriteId]?.includes(variant) || false;
 };
 
+// --- AURA DICTIONARY CONFIGURATION ---
+const AURA_DICTIONARY = {
+  'neon_mint': {
+    name: 'Neon Mint', tier: 1, isAnimated: false,
+    text: 'text-emerald-400 drop-shadow-[0_0_8px_rgba(16,185,129,0.8)]',
+    ring: 'border-2 border-emerald-400 shadow-[0_0_12px_rgba(16,185,129,0.8)] text-emerald-400',
+    profileGlow: 'shadow-[0_0_20px_rgba(16,185,129,0.3)] border-emerald-500/50',
+    profileBg: 'bg-emerald-950/20'
+  },
+  'crimson_glow': {
+    name: 'Crimson Glow', tier: 1, isAnimated: false,
+    text: 'text-red-500 drop-shadow-[0_0_8px_rgba(239,68,68,0.8)]',
+    ring: 'border-2 border-red-500 shadow-[0_0_12px_rgba(239,68,68,0.8)] text-red-500',
+    profileGlow: 'shadow-[0_0_20px_rgba(239,68,68,0.3)] border-red-500/50',
+    profileBg: 'bg-red-950/20'
+  },
+  'plasma_pink': {
+    name: 'Plasma Pink', tier: 1, isAnimated: false,
+    text: 'text-pink-400 drop-shadow-[0_0_8px_rgba(244,114,182,0.8)]',
+    ring: 'border-2 border-pink-400 shadow-[0_0_12px_rgba(244,114,182,0.8)] text-pink-400',
+    profileGlow: 'shadow-[0_0_20px_rgba(244,114,182,0.3)] border-pink-400/50',
+    profileBg: 'bg-pink-950/20'
+  },
+  'gummy_swirl': {
+    name: 'Gummy Swirl', tier: 2, isAnimated: false,
+    text: 'text-rose-400 drop-shadow-[0_0_8px_rgba(251,113,133,0.8)]',
+    ring: 'border-2 border-rose-400 shadow-[0_0_12px_rgba(251,113,133,0.8)] text-rose-400',
+    profileGlow: 'shadow-[0_0_25px_rgba(251,113,133,0.4)] border-rose-400/60',
+    profileBg: "bg-[#120c10] bg-[url('data:image/svg+xml,%3Csvg%20width=%22100%22%20height=%22100%22%20viewBox=%220%200%20100%20100%22%20xmlns=%22http://www.w3.org/2000/svg%22%3E%3Crect%20x=%2214%22%20y=%2214%22%20width=%2212%22%20height=%2224%22%20rx=%226%22%20transform=%22rotate(45%2020%2026)%22%20fill=%22%23fb7185%22%20fill-opacity=%220.15%22/%3E%3Crect%20x=%2264%22%20y=%2250%22%20width=%2210%22%20height=%2216%22%20rx=%225%22%20transform=%22rotate(-30%2069%2058)%22%20fill=%22%23fb7185%22%20fill-opacity=%220.1%22/%3E%3C/svg%3E')]"
+  },
+  'slurp_splash': {
+    name: 'Slurp Splash', tier: 2, isAnimated: false,
+    text: 'text-cyan-300 drop-shadow-[0_0_8px_rgba(103,232,249,0.8)]',
+    ring: 'border-2 border-cyan-300 shadow-[0_0_12px_rgba(103,232,249,0.8)] text-cyan-300',
+    profileGlow: 'shadow-[0_0_25px_rgba(103,232,249,0.4)] border-cyan-300/60',
+    profileBg: "bg-[#0b131a] bg-[url('data:image/svg+xml,%3Csvg%20width=%2280%22%20height=%2280%22%20viewBox=%220%200%2080%2080%22%20xmlns=%22http://www.w3.org/2000/svg%22%3E%3Ccircle%20cx=%2220%22%20cy=%2220%22%20r=%223%22%20fill=%22%2367e8f9%22%20fill-opacity=%220.15%22/%3E%3Ccircle%20cx=%2260%22%20cy=%2250%22%20r=%224%22%20fill=%22%2367e8f9%22%20fill-opacity=%220.1%22/%3E%3Cpath%20d=%22M40%2040c-1.5%200-2.5%201-2.5%202.5S38.5%2045%2040%2045s2.5-1%202.5-2.5S41.5%2040%2040%2040z%22%20fill=%22%2367e8f9%22%20fill-opacity=%220.05%22/%3E%3C/svg%3E')]"
+  },
+  'cube_corruption': {
+    name: 'Cube Corruption', tier: 2, isAnimated: false,
+    text: 'text-violet-400 drop-shadow-[0_0_8px_rgba(167,139,250,0.8)]',
+    ring: 'border-2 border-violet-400 shadow-[0_0_12px_rgba(167,139,250,0.8)] text-violet-400',
+    profileGlow: 'shadow-[0_0_25px_rgba(167,139,250,0.4)] border-violet-400/60',
+    profileBg: "bg-[#100b1a] bg-[url('data:image/svg+xml,%3Csvg%20width=%2280%22%20height=%22120%22%20viewBox=%220%200%2080%20120%22%20xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cg%20fill=%22%23a78bfa%22%20fill-opacity=%220.12%22%20fill-rule=%22evenodd%22%3E%3Cpath%20d=%22M0%2060L40%2040l40%2020-40%2020zM40%2080v40L0%20100V60zM80%2060v40L40%20120V80z%22/%3E%3C/g%3E%3C/svg%3E')]"
+  },
+  'zero_point_pulse': {
+    name: 'Zero Point Pulse', tier: 3, isAnimated: true,
+    spinnerClass: 'bg-[conic-gradient(from_0deg,transparent_0%,transparent_30%,rgba(34,211,238,1)_50%,transparent_70%,transparent_100%)]',
+    text: 'text-cyan-400 drop-shadow-[0_0_8px_rgba(34,211,238,0.8)]',
+    ring: 'border-2 border-cyan-400 shadow-[0_0_12px_rgba(34,211,238,0.8)] text-cyan-400',
+    profileGlow: 'shadow-[0_0_30px_rgba(34,211,238,0.3)] border-cyan-400/50',
+    profileBg: 'bg-[#151722]'
+  },
+  'holofoil': {
+    name: 'Holofoil', tier: 3, isAnimated: true,
+    spinnerClass: 'bg-[conic-gradient(from_0deg,transparent_0%,#a5b4fc_20%,#67e8f9_40%,#f9a8d4_60%,#a5b4fc_80%,transparent_100%)] opacity-80',
+    text: 'text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 via-violet-300 to-pink-300 drop-shadow-[0_0_8px_rgba(167,139,250,0.5)]',
+    ring: 'border-2 border-violet-300 shadow-[0_0_12px_rgba(103,232,249,0.7)] text-violet-300',
+    profileGlow: 'shadow-[0_0_30px_rgba(167,139,250,0.35)] border-violet-300/50',
+    profileBg: 'bg-[#151722]'
+  },
+  'golden_glitch': {
+    name: 'Golden Glitch', tier: 3, isAnimated: true,
+    spinnerClass: 'bg-[conic-gradient(from_0deg,transparent_0%,transparent_40%,rgba(250,204,21,1)_50%,transparent_60%,transparent_100%)]',
+    text: 'text-yellow-400 drop-shadow-[0_0_8px_rgba(250,204,21,0.8)]',
+    ring: 'border-2 border-yellow-400 shadow-[0_0_12px_rgba(250,204,21,0.8)] text-yellow-400',
+    profileGlow: 'shadow-[0_0_30px_rgba(250,204,21,0.3)] border-yellow-400/50',
+    profileBg: 'bg-[#151722]'
+  }
+};
+
+
 const SPRITES_DATABASE = [
   { id: "iron-mouse", name: "Iron Mouse", rarity: "Mythic", season: 'C7S3', images: { base: ironMouseBase }, variants: ['base'], baseAbility: { en: "Regenerate health over time when low. While regenerating, gain Cloak and low gravity! Health regenerated to increases at each Level Up: 60 Health -> 70 Health -> 80 Health -> 90 Health -> 100 Health", es: "Regenera salud con el tiempo cuando está baja. ¡Mientras te regeneras, obtienes Camuflaje y baja gravedad! La salud regenerada aumenta en cada Nivel: 60 Salud -> 70 Salud -> 80 Salud -> 90 Salud -> 100 Salud" } },
   { id: "john-wick", name: "John Wick", rarity: "Mythic", season: 'C7S3', images: { base: johnWickBase }, variants: ['base'], baseAbility: { en: "Reveals nearby enemies after you knock or eliminate another player. Sprite level stays exactly as found. Only Sprite usable in Fortnite Reload (Simpsons Reload Mode). Claiming in Reload unlocks it for Battle Royale and other modes.", es: "Revela enemigos cercanos después de derribar o eliminar a otro jugador. Su nivel se mantiene exactamente como se encontró. Es el único Sprite utilizable en Fortnite Recarga. Reclamarlo en Recarga lo desbloquea para Battle Royale y otros modos." } },
@@ -236,6 +307,18 @@ const SPRITES_DATABASE = [
 ];
 
 const PATCH_NOTES = [
+  {
+    version: "v2.1.0",
+    date: "08/21/2026",
+    title: "The Black Market & Comms Upgrades!",
+    changes: [
+      "The Black Market: Spend your vaulted fragments! Unlock animated Profile Auras, a 5th Trophy Slot, and a 4th Extraction Target slot.",
+      "Comms Avatars: Your #1 Trophy Case Sprite now dynamically appears as your official avatar headshot in the global Comms feed.",
+      "Flex Your Aura: Equipped Auras now actively glow and animate around your posts in the Comms feed.",
+      "Radar Payout Buff: Increased the Daily Radar sweep payouts! Standard sweeps now grant 125 fragments, with anomalies paying out up to 600.",
+      "Trade Board Integrity: The Trade Board now actively filters out vaulted Sprites to keep offers focused strictly on the current season."
+    ]
+  },
   {
     version: "v2.0.0",
     date: "08/20/2026",
@@ -469,6 +552,7 @@ function MainApp() {
   const [showSettingsModal, setShowSettingsModal] = useState(false);
   const [showAboutModal, setShowAboutModal] = useState(false);
   const [showNewsModal, setShowNewsModal] = useState(false);
+  const [showShopModal, setShowShopModal] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [resetSent, setResetSent] = useState(false);
@@ -504,7 +588,7 @@ function MainApp() {
   const [collection, setCollection] = useState({});
   const [mastery, setMastery] = useState({});
   const [extractionTargets, setExtractionTargets] = useState([]);
-  const [profileData, setProfileData] = useState({ bio: '', epicName: '', twitchName: '', tiktokName: '', youtubeName: '', kickName: '', trophies: [null, null, null, null] });
+  const [profileData, setProfileData] = useState({ bio: '', epicName: '', twitchName: '', tiktokName: '', youtubeName: '', kickName: '', trophies: [null, null, null, null, null], activeAura: null });
   const [isEditingProfile, setIsEditingProfile] = useState(false);
   const [feedbackText, setFeedbackText] = useState("");
   const [feedbackStatus, setFeedbackStatus] = useState("idle");
@@ -611,6 +695,7 @@ function MainApp() {
       if (showSettingsModal) return setShowSettingsModal(false);
       if (showAboutModal) return setShowAboutModal(false);
       if (showNewsModal) return setShowNewsModal(false);
+      if (showShopModal) return setShowShopModal(false);
       if (selectedSprite) return setSelectedSprite(null);
       if (showPatchNotes) return setShowPatchNotes(false);
       if (showTransmission) return setShowTransmission(false);
@@ -626,7 +711,7 @@ function MainApp() {
     };
     const listener = CapApp.addListener('backButton', handleBackButton);
     return () => { listener.then(handle => handle.remove()); };
-  }, [showSettingsModal, showAboutModal, showNewsModal, selectedSprite, showPatchNotes, showTransmission, showSpriteSelector, showUnfriendConfirm, showResetConfirm, showAddFriendInput, showRadarModal, showCreatePost, activeViewingFriend, currentView]);
+  }, [showSettingsModal, showAboutModal, showNewsModal, showShopModal, selectedSprite, showPatchNotes, showTransmission, showSpriteSelector, showUnfriendConfirm, showResetConfirm, showAddFriendInput, showRadarModal, showCreatePost, activeViewingFriend, currentView]);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, () => { setIsInitializing(false); });
@@ -636,7 +721,7 @@ function MainApp() {
   useEffect(() => {
     if (!user) {
       setCollection({}); setMastery({}); setExtractionTargets([]);
-      setProfileData({ bio: '', epicName: '', twitchName: '', tiktokName: '', youtubeName: '', kickName: '', trophies: [null, null, null, null] });
+      setProfileData({ bio: '', epicName: '', twitchName: '', tiktokName: '', youtubeName: '', kickName: '', trophies: [null, null, null, null, null], activeAura: null });
       setSpriteId(null); setDesiredSpriteId(''); setFriendsList([]); setPendingRequests([]);
       setSentRequests([]); setRichFriends([]); setActiveViewingFriend(null); setHasCheckedVersion(false);
       setFragments(0); setLastRadarSweep(null); setSweepStreak(0); setDailyIntel(""); setNewsFeed([]);
@@ -665,7 +750,7 @@ function MainApp() {
         const data = docSnap.data();
         setCollection(data.sprites || {}); setMastery(data.mastery || {});
         setExtractionTargets(data.extractionTargets || []);
-        setProfileData(data.profile || { bio: '', epicName: '', twitchName: '', tiktokName: '', youtubeName: '', kickName: '', trophies: [null, null, null, null] });
+        setProfileData(data.profile || { bio: '', epicName: '', twitchName: '', tiktokName: '', youtubeName: '', kickName: '', trophies: [null, null, null, null, null], activeAura: null });
         setFriendsList(data.friends || []); setFragments(data.fragments || 0);
         setLastRadarSweep(data.lastRadarSweep && typeof data.lastRadarSweep.toDate === 'function' ? data.lastRadarSweep.toDate() : null);
         setSweepStreak(data.sweepStreak || 0); setDailyIntel(data.dailyIntel || "");
@@ -876,6 +961,35 @@ function MainApp() {
     setActiveHoldId(null);
   };
 
+  const calculateFragmentStats = async () => {
+    try {
+      // 1. Fetch all users from the database
+      const usersQuery = await getDocs(firestoreCollection(db, "users"));
+
+      let usersWithFragments = 0;
+      let totalFragments = 0;
+
+      // 2. Loop through every user and tally up their fragments
+      usersQuery.forEach(doc => {
+        const data = doc.data();
+        if (data.fragments && data.fragments > 0) {
+          usersWithFragments++;
+          totalFragments += data.fragments;
+        }
+      });
+
+      // 3. Calculate the average
+      const averageFragments = usersWithFragments > 0 ? Math.round(totalFragments / usersWithFragments) : 0;
+
+      // 4. Show you the results
+      alert(`📊 FRAGMENT ECONOMY STATS:\n\nTotal Players Hoarding: ${usersWithFragments}\nTotal Fragments Mined: ${totalFragments.toLocaleString()}\nAverage Per Player: ${averageFragments.toLocaleString()}`);
+
+    } catch (error) {
+      alert("Failed to fetch stats. Check console for error.");
+      console.error(error);
+    }
+  };
+
   const handleAbsoluteReset = () => {
     setCollection({}); setMastery({}); setShowResetConfirm(false);
     setDoc(doc(db, "users", user.uid), { sprites: {}, mastery: {} }, { merge: true });
@@ -961,7 +1075,7 @@ function MainApp() {
         setActiveViewingFriend({
           uid: friendObj.uid,
           spriteId: friendObj.spriteId, completionRate: cRate, masteryRate: mRate, sprites: data.sprites || {}, mastery: data.mastery || {},
-          extractionTargets: data.extractionTargets || [], profile: data.profile || { bio: '', epicName: '', twitchName: '', tiktokName: '', youtubeName: '', kickName: '', trophies: [null, null, null, null] }, creationTime: data.creationTime || null,
+          extractionTargets: data.extractionTargets || [], profile: data.profile || { bio: '', epicName: '', twitchName: '', tiktokName: '', youtubeName: '', kickName: '', trophies: [null, null, null, null, null], activeAura: null }, creationTime: data.creationTime || null,
           unlockedMilestones: data.unlockedMilestones || [], reputationVouches: data.reputationVouches || []
         });
         setFSearchQuery(''); setFRarityFilter('All'); setFVariantFilter('All'); setFStatusFilter('All'); setFSortBy('A-Z'); setFSeasonFilter('All'); setShowFFilters(false);
@@ -972,14 +1086,46 @@ function MainApp() {
   const handlePostSubmit = async () => {
     if (!postText.trim() && postType === 'general') return;
     if (PROFANITY_LIST.some(word => postText.toLowerCase().includes(word))) return alert("Transmission blocked: Please keep comms PG-13.");
+
     try {
       if (editingPostId) {
-        await updateDoc(doc(db, 'comms_posts', editingPostId), { text: postText.trim(), type: postType, lookingFor: postLookingFor, offering: postOffering, authorAvatar: profileData.trophies?.[0] || null });
+        // Update an existing transmission
+        await updateDoc(doc(db, 'comms_posts', editingPostId), {
+          text: postText.trim(),
+          type: postType,
+          lookingFor: postLookingFor,
+          offering: postOffering,
+          authorAvatar: profileData.trophies?.[0] || null,
+          authorAura: profileData.activeAura || null
+        });
       } else {
-        await addDoc(firestoreCollection(db, 'comms_posts'), { authorId: user.uid, authorSpriteId: spriteId, text: postText.trim(), type: postType, lookingFor: postLookingFor, offering: postOffering, timestamp: serverTimestamp(), reports: 0, likes: [], authorAvatar: profileData.trophies?.[0] || null });
+        // Create a brand new transmission
+        await addDoc(firestoreCollection(db, 'comms_posts'), {
+          authorId: user.uid,
+          authorSpriteId: spriteId,
+          text: postText.trim(),
+          type: postType,
+          lookingFor: postLookingFor,
+          offering: postOffering,
+          timestamp: serverTimestamp(),
+          reports: 0,
+          likes: [],
+          authorAvatar: profileData.trophies?.[0] || null,
+          authorAura: profileData.activeAura || null
+        });
       }
-      setShowCreatePost(false); setPostText(""); setPostLookingFor(null); setPostOffering(null); setEditingPostId(null); playBeep(880, 'square', 0.1);
-    } catch (e) { alert("Failed to send transmission."); }
+
+      // Clean up UI state after successful post
+      setShowCreatePost(false);
+      setPostText("");
+      setPostLookingFor(null);
+      setPostOffering(null);
+      setEditingPostId(null);
+      playBeep(880, 'square', 0.1);
+
+    } catch (e) {
+      alert("Failed to send transmission.");
+    }
   };
 
   const handleDeletePost = async (postId) => {
@@ -1035,7 +1181,7 @@ function MainApp() {
       setExtractionTargets(newTargets); setShowSpriteSelector(false);
       await updateDoc(doc(db, "users", user.uid), { extractionTargets: newTargets });
     } else if (selectorContext === 'trophy') {
-      const newTrophies = [...(profileData.trophies || [null, null, null, null])]; newTrophies[trophySlotIndex] = `${selectedId}_${variant}`;
+      const newTrophies = [...(profileData.trophies || [null, null, null, null, null])]; newTrophies[trophySlotIndex] = `${selectedId}_${variant}`;
       setProfileData({ ...profileData, trophies: newTrophies }); setShowSpriteSelector(false);
     } else if (selectorContext === 'commsLooking') {
       setPostLookingFor(`${selectedId}_${variant}`); setShowSpriteSelector(false);
@@ -1050,7 +1196,7 @@ function MainApp() {
   };
 
   const handleRemoveTrophy = (index, e) => {
-    e.stopPropagation(); const newTrophies = [...(profileData.trophies || [null, null, null, null])];
+    e.stopPropagation(); const newTrophies = [...(profileData.trophies || [null, null, null, null, null])];
     newTrophies[index] = null; setProfileData({ ...profileData, trophies: newTrophies });
   };
 
@@ -1125,9 +1271,9 @@ function MainApp() {
         } else { currentStreak = 1; }
 
         const roll = Math.random() * 100;
-        let payout = 100; let sweepMessage = "Sweep Complete. Recovered 100 Fragments.";
-        if (roll > 80 && roll <= 95) { payout = 250; sweepMessage = "Deep Sweep! Recovered 250 Fragments."; }
-        else if (roll > 95) { payout = 500; sweepMessage = "Anomaly Detected! Recovered 500 Fragments."; }
+        let payout = 125; let sweepMessage = "Sweep Complete. Recovered 125 Fragments.";
+        if (roll > 80 && roll <= 95) { payout = 300; sweepMessage = "Deep Sweep! Recovered 300 Fragments."; }
+        else if (roll > 95) { payout = 600; sweepMessage = "Anomaly Detected! Recovered 600 Fragments."; }
 
         const currentFragments = data.fragments || 0;
         transaction.update(userRef, { fragments: currentFragments + payout, lastRadarSweep: serverTimestamp(), sweepStreak: currentStreak, dailyIntel: newFact });
@@ -1266,106 +1412,162 @@ function MainApp() {
 
   const renderProfileCard = (id, profData, colRate, mastRate, joinTime, isSelf, masteriesObj, repVouches, uid, unlockedArray = []) => {
     const unlockedBg = getUnlockedMilestone(Math.round((colRate / 100) * totalPossibleStatic), Math.round((mastRate / 100) * totalPossibleStatic), unlockedArray);
-    const bgClass = unlockedBg ? unlockedBg.bg : "bg-slate-900 border-slate-800";
-    const glowClass = unlockedBg ? unlockedBg.glow : "";
+    const auraDef = profData.activeAura ? AURA_DICTIONARY[profData.activeAura] : null;
+
+    const bgClass = auraDef ? auraDef.profileBg : (unlockedBg ? unlockedBg.bg : "bg-slate-900 border-slate-800");
+    const glowClass = auraDef ? auraDef.profileGlow : (unlockedBg ? unlockedBg.glow : "");
 
     return (
       <div className="relative mt-2 mb-4">
-        {unlockedBg && (<div className={`absolute inset-0 rounded-2xl border-2 ${glowClass} animate-pulse pointer-events-none opacity-90`}></div>)}
-        <div className={`rounded-2xl border-2 p-5 relative overflow-hidden transition-all ${bgClass}`}>
-          <div className="flex items-start justify-between mb-4">
-            <div>
-              <div className="flex items-center gap-2">
-                <h2 className="text-xl sm:text-2xl font-black text-white uppercase italic tracking-tight">@{id}</h2>
-                {unlockedBg && <span className="text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md border bg-black/40 text-slate-200 border-white/20">{unlockedBg.name}</span>}
+        {(unlockedBg || auraDef) && !auraDef?.isAnimated && (<div className={`absolute inset-0 rounded-2xl border-2 ${glowClass} animate-pulse pointer-events-none opacity-90`}></div>)}
+
+        <div className={`rounded-2xl border-2 p-5 relative overflow-hidden transition-all ${auraDef?.isAnimated ? `p-[2px] ${glowClass}` : bgClass}`}>
+
+          {auraDef?.isAnimated && (
+            <div className={`absolute inset-[-150%] animate-[spin_4s_linear_infinite] ${auraDef.spinnerClass} pointer-events-none z-0`} />
+          )}
+
+          <div className={auraDef?.isAnimated ? `relative rounded-[14px] p-4 h-full w-full z-10 ${auraDef.profileBg}` : "h-full w-full relative z-10"}>
+            <div className="flex items-start justify-between mb-4">
+              <div>
+                <div className="flex items-center gap-2">
+                  <h2 className={`text-xl sm:text-2xl font-black uppercase italic tracking-tight ${auraDef ? auraDef.text : 'text-white'}`}>@{id}</h2>
+                  {unlockedBg && !auraDef && <span className="text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md border bg-black/40 text-slate-200 border-white/20">{unlockedBg.name}</span>}
+                  {auraDef && <span className={`text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md border bg-black/60 ${auraDef.text} border-current opacity-80`}>{auraDef.name}</span>}
+                </div>
+                <div className="flex items-center gap-2 mt-1">
+                  <span className="text-[10px] font-mono text-slate-400 flex items-center gap-1"><Calendar className="w-3 h-3" /> Joined {formatJoinDate(joinTime)}</span>
+                  <span className="text-[10px] font-black text-amber-400 bg-amber-950/40 px-1.5 py-0.5 rounded border border-amber-500/30 flex items-center gap-1">⭐ {repVouches?.length || 0} Rep</span>
+                </div>
               </div>
-              <div className="flex items-center gap-2 mt-1">
-                <span className="text-[10px] font-mono text-slate-400 flex items-center gap-1"><Calendar className="w-3 h-3" /> Joined {formatJoinDate(joinTime)}</span>
-                <span className="text-[10px] font-black text-amber-400 bg-amber-950/40 px-1.5 py-0.5 rounded border border-amber-500/30 flex items-center gap-1">⭐ {repVouches?.length || 0} Rep</span>
+              {isSelf && (
+                <button onClick={() => isEditingProfile ? handleSaveProfile() : setIsEditingProfile(true)} className="p-2 bg-black/40 hover:bg-black/60 rounded-xl border border-white/10 text-white transition-colors relative z-20">
+                  {isEditingProfile ? <Save className="w-5 h-5 text-emerald-400" /> : <Edit3 className="w-5 h-5" />}
+                </button>
+              )}
+            </div>
+
+            <div className="flex gap-2 mb-4">
+              <div className="flex-1 bg-black/30 border border-white/5 rounded-xl p-2 text-center">
+                <span className="block text-xl font-black text-cyan-400">{colRate}%</span>
+                <span className="block text-[8px] font-mono uppercase text-slate-500 tracking-wider">Collected</span>
+              </div>
+              <div className="flex-1 bg-black/30 border border-white/5 rounded-xl p-2 text-center">
+                <span className="block text-xl font-black text-yellow-400">{mastRate}%</span>
+                <span className="block text-[8px] font-mono uppercase text-slate-500 tracking-wider">Mastered</span>
               </div>
             </div>
-            {isSelf && (
-              <button onClick={() => isEditingProfile ? handleSaveProfile() : setIsEditingProfile(true)} className="p-2 bg-black/40 hover:bg-black/60 rounded-xl border border-white/10 text-white transition-colors">
-                {isEditingProfile ? <Save className="w-5 h-5 text-emerald-400" /> : <Edit3 className="w-5 h-5" />}
-              </button>
+
+            {isEditingProfile ? (
+              <div className="space-y-3 mb-4">
+                <textarea value={profileData.bio} onChange={(e) => setProfileData({ ...profileData, bio: e.target.value.substring(0, 100) })} placeholder="Enter bio (max 100 chars)..." className={`w-full bg-black/40 border border-white/10 rounded-xl p-3 ${inputSizeClass} text-white focus:outline-none focus:border-cyan-500 resize-none h-20`} />
+                <div className="grid grid-cols-2 gap-2">
+                  <div className="relative col-span-2">
+                    <Gamepad2 className="w-4 h-4 text-blue-500 absolute left-3 top-2.5" />
+                    <input type="text" value={profileData.epicName} onChange={(e) => setProfileData({ ...profileData, epicName: e.target.value })} placeholder="Epic Name" className={`w-full bg-black/40 border border-white/10 rounded-xl pl-9 pr-3 py-2 ${inputSizeClass} text-white focus:outline-none focus:border-blue-500`} />
+                  </div>
+                  <div className="relative">
+                    <Tv className="w-4 h-4 text-purple-500 absolute left-3 top-2.5" />
+                    <input type="text" value={profileData.twitchName} onChange={(e) => setProfileData({ ...profileData, twitchName: e.target.value })} placeholder="Twitch Username" className={`w-full bg-black/40 border border-white/10 rounded-xl pl-9 pr-3 py-2 ${inputSizeClass} text-white focus:outline-none focus:border-purple-500`} />
+                  </div>
+                  <div className="relative">
+                    <Music className="w-4 h-4 text-pink-500 absolute left-3 top-2.5" />
+                    <input type="text" value={profileData.tiktokName} onChange={(e) => setProfileData({ ...profileData, tiktokName: e.target.value })} placeholder="TikTok Username" className={`w-full bg-black/40 border border-white/10 rounded-xl pl-9 pr-3 py-2 ${inputSizeClass} text-white focus:outline-none focus:border-pink-500`} />
+                  </div>
+                  <div className="relative">
+                    <Video className="w-4 h-4 text-red-500 absolute left-3 top-2.5" />
+                    <input type="text" value={profileData.youtubeName} onChange={(e) => setProfileData({ ...profileData, youtubeName: e.target.value })} placeholder="YouTube Handle" className={`w-full bg-black/40 border border-white/10 rounded-xl pl-9 pr-3 py-2 ${inputSizeClass} text-white focus:outline-none focus:border-red-500`} />
+                  </div>
+                  <div className="relative">
+                    <Play className="w-4 h-4 text-green-500 absolute left-3 top-2.5" />
+                    <input type="text" value={profileData.kickName} onChange={(e) => setProfileData({ ...profileData, kickName: e.target.value })} placeholder="Kick Channel" className={`w-full bg-black/40 border border-white/10 rounded-xl pl-9 pr-3 py-2 ${inputSizeClass} text-white focus:outline-none focus:border-green-500`} />
+                  </div>
+
+                  {/* PLAYER AURA SELECTION (Only shows if they own at least one aura) */}
+                  {profileData.purchasedAuras?.length > 0 && (
+                    <div className="col-span-2 mt-4 p-3 bg-black/40 rounded-xl border border-slate-700 flex flex-col gap-3">
+                      <span className="block text-[10px] font-black text-emerald-400 uppercase tracking-widest"><Eye className="w-3 h-3 inline mr-1" /> Equip Aura</span>
+                      <div className="flex flex-wrap gap-2">
+                        <button onClick={() => setProfileData({ ...profileData, activeAura: null })} className={`px-3 py-1.5 text-[10px] font-bold rounded-lg border transition-colors ${!profileData.activeAura ? 'bg-slate-700 text-white border-slate-500' : 'bg-black text-slate-500 border-slate-700 hover:text-slate-300'}`}>None</button>
+                        {profileData.purchasedAuras.map(auraKey => {
+                          const auraDef = AURA_DICTIONARY[auraKey];
+                          if (!auraDef) return null;
+                          return (
+                            <button key={auraKey} onClick={() => setProfileData({ ...profileData, activeAura: auraKey })} className={`px-2 py-1.5 text-[10px] font-bold rounded-lg border transition-colors ${profileData.activeAura === auraKey ? 'bg-indigo-600 text-white border-indigo-400 shadow-[0_0_10px_rgba(79,70,229,0.4)]' : 'bg-black text-slate-400 border-slate-700 hover:border-slate-500'}`}>
+                              {auraDef.name}
+                            </button>
+                          )
+                        })}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* MASTER CHEAT UNLOCK MENU (RESTRICTED TO ADMIN) */}
+                  {id?.toLowerCase() === 'imbearkat' && (
+                    <div className="col-span-2 mt-4 p-3 bg-black/60 rounded-xl border border-red-900/50 flex flex-col gap-3 shadow-[inset_0_0_20px_rgba(220,38,38,0.1)]">
+                      <span className="block text-[10px] font-black text-red-500 uppercase tracking-widest"><Crown className="w-3 h-3 inline mr-1" /> Admin Override (ImBearKat Only)</span>
+
+                      <div className="border-b border-red-900/30 pb-3">
+                        <button onClick={() => setProfileData({ ...profileData, activeAura: null })} className={`px-3 py-1.5 text-[10px] font-bold rounded-lg border transition-colors ${!profileData.activeAura ? 'bg-slate-700 text-white border-slate-500' : 'bg-black text-slate-500 border-slate-700 hover:text-slate-300'}`}>
+                          Default (Milestones Only)
+                        </button>
+                      </div>
+
+                      {[1, 2, 3].map(tierLevel => (
+                        <div key={tierLevel}>
+                          <span className="block text-[9px] text-slate-500 font-bold uppercase tracking-widest mb-1.5">Tier {tierLevel} Auras</span>
+                          <div className="flex flex-wrap gap-2">
+                            {Object.entries(AURA_DICTIONARY).filter(([_, aura]) => aura.tier === tierLevel).map(([key, aura]) => (
+                              <button key={key} onClick={() => setProfileData({ ...profileData, activeAura: key })} className={`px-2 py-1.5 text-[10px] font-bold rounded-lg border transition-colors ${profileData.activeAura === key ? 'bg-indigo-600 text-white border-indigo-400 shadow-[0_0_10px_rgba(79,70,229,0.4)]' : 'bg-black text-slate-400 border-slate-700 hover:border-slate-500'}`}>
+                                {aura.name}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+            ) : (
+              <div className="mb-4">
+                {profData.bio && <p className="text-sm text-slate-300 italic mb-3 bg-black/20 p-3 rounded-xl border-l-2 border-indigo-500">"{profData.bio}"</p>}
+                <div className="flex flex-col gap-2">
+                  {profData.epicName && (
+                    <div className="w-full bg-blue-950/40 border border-blue-500/30 p-3 rounded-xl flex items-center justify-between shadow-inner">
+                      <div className="flex items-center gap-2"><Gamepad2 className="w-5 h-5 text-blue-400" /><span className="text-[10px] font-mono text-blue-300 uppercase tracking-widest">Epic ID</span></div>
+                      <span className="text-sm font-black text-white">{profData.epicName}</span>
+                    </div>
+                  )}
+                  <div className="grid grid-cols-2 gap-2">
+                    {profData.twitchName && (<a href={`https://twitch.tv/${profData.twitchName}`} target="_blank" rel="noopener noreferrer" className="bg-purple-900/30 hover:bg-purple-800/40 border border-purple-500/30 text-purple-300 p-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-colors"><Tv className="w-4 h-4 text-purple-400" /> Twitch</a>)}
+                    {profData.tiktokName && (<a href={`https://tiktok.com/@${profData.tiktokName}`} target="_blank" rel="noopener noreferrer" className="bg-pink-900/30 hover:bg-pink-800/40 border border-pink-500/30 text-pink-300 p-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-colors"><Music className="w-4 h-4 text-pink-400" /> TikTok</a>)}
+                    {profData.youtubeName && (<a href={`https://youtube.com/@${profData.youtubeName}`} target="_blank" rel="noopener noreferrer" className="bg-red-900/30 hover:bg-red-800/40 border border-red-500/30 text-red-300 p-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-colors"><Video className="w-4 h-4 text-red-400" /> YouTube</a>)}
+                    {profData.kickName && (<a href={`https://kick.com/${profData.kickName}`} target="_blank" rel="noopener noreferrer" className="bg-green-900/30 hover:bg-green-800/40 border border-green-500/30 text-green-300 p-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-colors"><Play className="w-4 h-4 text-green-400" /> Kick</a>)}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            <div>
+              <h3 className="text-xs font-black text-slate-400 uppercase tracking-wider mb-2 flex items-center gap-1.5"><Award className="w-4 h-4" /> Trophy Case</h3>
+              <div className="flex gap-2">
+                {[0, 1, 2, 3, 4].map(index => renderTrophySlot(profData.trophies?.[index], index, isSelf, isEditingProfile, masteriesObj))}
+              </div>
+            </div>
+
+            {!isSelf && uid && (
+              <div className="mt-4 pt-4 border-t border-slate-800">
+                <button
+                  onClick={handleVouch}
+                  disabled={repVouches?.includes(user.uid)}
+                  className={`w-full py-2.5 rounded-xl text-xs font-black uppercase tracking-wider flex items-center justify-center gap-2 transition-colors ${repVouches?.includes(user.uid) ? 'bg-amber-900/40 text-amber-500/50 border border-amber-500/20' : 'bg-amber-600 hover:bg-amber-500 text-white shadow-[0_0_10px_rgba(217,119,6,0.4)]'}`}
+                >
+                  <Award className="w-4 h-4" /> {repVouches?.includes(user.uid) ? 'Vouched ✓' : 'Vouch Trader (+1 Rep)'}
+                </button>
+              </div>
             )}
           </div>
-
-          <div className="flex gap-2 mb-4">
-            <div className="flex-1 bg-black/30 border border-white/5 rounded-xl p-2 text-center">
-              <span className="block text-xl font-black text-cyan-400">{colRate}%</span>
-              <span className="block text-[8px] font-mono uppercase text-slate-500 tracking-wider">Collected</span>
-            </div>
-            <div className="flex-1 bg-black/30 border border-white/5 rounded-xl p-2 text-center">
-              <span className="block text-xl font-black text-yellow-400">{mastRate}%</span>
-              <span className="block text-[8px] font-mono uppercase text-slate-500 tracking-wider">Mastered</span>
-            </div>
-          </div>
-
-          {isEditingProfile ? (
-            <div className="space-y-3 mb-4">
-              <textarea value={profileData.bio} onChange={(e) => setProfileData({ ...profileData, bio: e.target.value.substring(0, 100) })} placeholder="Enter bio (max 100 chars)..." className={`w-full bg-black/40 border border-white/10 rounded-xl p-3 ${inputSizeClass} text-white focus:outline-none focus:border-cyan-500 resize-none h-20`} />
-              <div className="grid grid-cols-2 gap-2">
-                <div className="relative col-span-2">
-                  <Gamepad2 className="w-4 h-4 text-blue-500 absolute left-3 top-2.5" />
-                  <input type="text" value={profileData.epicName} onChange={(e) => setProfileData({ ...profileData, epicName: e.target.value })} placeholder="Epic Name" className={`w-full bg-black/40 border border-white/10 rounded-xl pl-9 pr-3 py-2 ${inputSizeClass} text-white focus:outline-none focus:border-blue-500`} />
-                </div>
-                <div className="relative">
-                  <Tv className="w-4 h-4 text-purple-500 absolute left-3 top-2.5" />
-                  <input type="text" value={profileData.twitchName} onChange={(e) => setProfileData({ ...profileData, twitchName: e.target.value })} placeholder="Twitch Username" className={`w-full bg-black/40 border border-white/10 rounded-xl pl-9 pr-3 py-2 ${inputSizeClass} text-white focus:outline-none focus:border-purple-500`} />
-                </div>
-                <div className="relative">
-                  <Music className="w-4 h-4 text-pink-500 absolute left-3 top-2.5" />
-                  <input type="text" value={profileData.tiktokName} onChange={(e) => setProfileData({ ...profileData, tiktokName: e.target.value })} placeholder="TikTok Username" className={`w-full bg-black/40 border border-white/10 rounded-xl pl-9 pr-3 py-2 ${inputSizeClass} text-white focus:outline-none focus:border-pink-500`} />
-                </div>
-                <div className="relative">
-                  <Video className="w-4 h-4 text-red-500 absolute left-3 top-2.5" />
-                  <input type="text" value={profileData.youtubeName} onChange={(e) => setProfileData({ ...profileData, youtubeName: e.target.value })} placeholder="YouTube Handle" className={`w-full bg-black/40 border border-white/10 rounded-xl pl-9 pr-3 py-2 ${inputSizeClass} text-white focus:outline-none focus:border-red-500`} />
-                </div>
-                <div className="relative">
-                  <Play className="w-4 h-4 text-green-500 absolute left-3 top-2.5" />
-                  <input type="text" value={profileData.kickName} onChange={(e) => setProfileData({ ...profileData, kickName: e.target.value })} placeholder="Kick Channel" className={`w-full bg-black/40 border border-white/10 rounded-xl pl-9 pr-3 py-2 ${inputSizeClass} text-white focus:outline-none focus:border-green-500`} />
-                </div>
-              </div>
-            </div>
-          ) : (
-            <div className="mb-4">
-              {profData.bio && <p className="text-sm text-slate-300 italic mb-3 bg-black/20 p-3 rounded-xl border-l-2 border-indigo-500">"{profData.bio}"</p>}
-              <div className="flex flex-col gap-2">
-                {profData.epicName && (
-                  <div className="w-full bg-blue-950/40 border border-blue-500/30 p-3 rounded-xl flex items-center justify-between shadow-inner">
-                    <div className="flex items-center gap-2"><Gamepad2 className="w-5 h-5 text-blue-400" /><span className="text-[10px] font-mono text-blue-300 uppercase tracking-widest">Epic ID</span></div>
-                    <span className="text-sm font-black text-white">{profData.epicName}</span>
-                  </div>
-                )}
-                <div className="grid grid-cols-2 gap-2">
-                  {profData.twitchName && (<a href={`https://twitch.tv/${profData.twitchName}`} target="_blank" rel="noopener noreferrer" className="bg-purple-900/30 hover:bg-purple-800/40 border border-purple-500/30 text-purple-300 p-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-colors"><Tv className="w-4 h-4 text-purple-400" /> Twitch</a>)}
-                  {profData.tiktokName && (<a href={`https://tiktok.com/@${profData.tiktokName}`} target="_blank" rel="noopener noreferrer" className="bg-pink-900/30 hover:bg-pink-800/40 border border-pink-500/30 text-pink-300 p-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-colors"><Music className="w-4 h-4 text-pink-400" /> TikTok</a>)}
-                  {profData.youtubeName && (<a href={`https://youtube.com/@${profData.youtubeName}`} target="_blank" rel="noopener noreferrer" className="bg-red-900/30 hover:bg-red-800/40 border border-red-500/30 text-red-300 p-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-colors"><Video className="w-4 h-4 text-red-400" /> YouTube</a>)}
-                  {profData.kickName && (<a href={`https://kick.com/${profData.kickName}`} target="_blank" rel="noopener noreferrer" className="bg-green-900/30 hover:bg-green-800/40 border border-green-500/30 text-green-300 p-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-colors"><Play className="w-4 h-4 text-green-400" /> Kick</a>)}
-                </div>
-              </div>
-            </div>
-          )}
-
-          <div>
-            <h3 className="text-xs font-black text-slate-400 uppercase tracking-wider mb-2 flex items-center gap-1.5"><Award className="w-4 h-4" /> Trophy Case</h3>
-            <div className="flex gap-2">
-              {[0, 1, 2, 3].map(index => renderTrophySlot(profData.trophies?.[index], index, isSelf, isEditingProfile, masteriesObj))}
-            </div>
-          </div>
-
-          {!isSelf && uid && (
-            <div className="mt-4 pt-4 border-t border-slate-800">
-              <button
-                onClick={handleVouch}
-                disabled={repVouches?.includes(user.uid)}
-                className={`w-full py-2.5 rounded-xl text-xs font-black uppercase tracking-wider flex items-center justify-center gap-2 transition-colors ${repVouches?.includes(user.uid) ? 'bg-amber-900/40 text-amber-500/50 border border-amber-500/20' : 'bg-amber-600 hover:bg-amber-500 text-white shadow-[0_0_10px_rgba(217,119,6,0.4)]'}`}
-              >
-                <Award className="w-4 h-4" /> {repVouches?.includes(user.uid) ? 'Vouched ✓' : 'Vouch Trader (+1 Rep)'}
-              </button>
-            </div>
-          )}
         </div>
       </div>
     );
@@ -1500,6 +1702,146 @@ function MainApp() {
         </div>
       )}
 
+      {/* --- THE BLACK MARKET (SHOP MODAL) --- */}
+      {showShopModal && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/90 backdrop-blur-md animate-in fade-in duration-200">
+          <div className="bg-[#12141f] border-2 border-emerald-500/60 rounded-2xl flex flex-col max-w-sm w-full h-[85vh] relative overflow-hidden shadow-[0_0_40px_rgba(16,185,129,0.15)]">
+            <header className="p-4 border-b border-slate-800 flex justify-between items-center bg-[#0e1017]">
+              <h3 className="text-md sm:text-lg font-black tracking-tight text-emerald-400 uppercase italic flex items-center gap-2"><ShoppingBag className="w-5 h-5" /> The Black Market</h3>
+              <button onClick={() => setShowShopModal(false)} className="text-slate-400 hover:text-white"><X className="w-6 h-6" /></button>
+            </header>
+
+            <div className="p-4 bg-emerald-950/20 border-b border-slate-800 flex justify-between items-center shrink-0">
+              <span className="text-xs font-black text-slate-400 uppercase tracking-widest">Available Balance</span>
+              <div className="flex items-center gap-2">
+                <svg viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5 text-cyan-400 drop-shadow-[0_0_8px_rgba(34,211,238,0.8)]"><path d="M12 2L2 12l10 10 10-10L12 2zM12 5.83L18.17 12 12 18.17 5.83 12 12 5.83z" /></svg>
+                <span className="text-lg font-mono font-black text-white">{fragments.toLocaleString()}</span>
+              </div>
+            </div>
+
+            <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-6">
+
+              {/* TACTICAL UPGRADES */}
+              <section>
+                <h4 className="text-xs font-black text-slate-500 uppercase tracking-widest mb-3 flex items-center gap-2"><Target className="w-4 h-4" /> Tactical Upgrades</h4>
+                <div className="flex flex-col gap-3">
+                  {/* 5th Trophy Slot */}
+                  <div className="bg-black/40 border border-slate-800 rounded-xl p-3 flex items-center justify-between">
+                    <div>
+                      <span className="block text-sm font-black text-white uppercase italic">5th Trophy Slot</span>
+                      <span className="block text-[10px] text-slate-400 mt-0.5">Expand your profile showcase.</span>
+                    </div>
+                    <button
+                      disabled={profileData.unlockedTrophySlot}
+                      onClick={async () => {
+                        if (fragments < 2500) return alert("Not enough fragments!");
+                        if (!window.confirm("Purchase 5th Trophy Slot for 2,500 Fragments?")) return;
+                        try {
+                          const newFrags = fragments - 2500;
+                          const newProf = { ...profileData, unlockedTrophySlot: true };
+                          await updateDoc(doc(db, "users", user.uid), { fragments: newFrags, profile: newProf });
+                          setFragments(newFrags); setProfileData(newProf); playBeep(1046.50, 'sine', 0.2);
+                        } catch (e) { }
+                      }}
+                      className={`px-3 py-2 rounded-lg text-xs font-black tracking-wider transition-all duration-300 ${profileData.unlockedTrophySlot ? 'bg-emerald-950/10 text-emerald-500/50 border border-emerald-500/20 cursor-not-allowed' : 'bg-black/40 border border-slate-700 text-slate-400 hover:text-cyan-300 hover:border-cyan-500/50 hover:bg-cyan-950/30'}`}
+                    >
+                      {profileData.unlockedTrophySlot ? 'OWNED' : '2,500'}
+                    </button>
+                  </div>
+
+                  {/* 4th Extraction Target */}
+                  <div className="bg-black/40 border border-slate-800 rounded-xl p-3 flex items-center justify-between">
+                    <div>
+                      <span className="block text-sm font-black text-white uppercase italic">4th Target Slot</span>
+                      <span className="block text-[10px] text-slate-400 mt-0.5">Track an extra Squad match.</span>
+                    </div>
+                    <button
+                      disabled={profileData.unlockedTargetSlot}
+                      onClick={async () => {
+                        if (fragments < 4000) return alert("Not enough fragments!");
+                        if (!window.confirm("Purchase 4th Target Slot for 4,000 Fragments?")) return;
+                        try {
+                          const newFrags = fragments - 4000;
+                          const newProf = { ...profileData, unlockedTargetSlot: true };
+                          await updateDoc(doc(db, "users", user.uid), { fragments: newFrags, profile: newProf });
+                          setFragments(newFrags); setProfileData(newProf); playBeep(1046.50, 'sine', 0.2);
+                        } catch (e) { }
+                      }}
+                      className={`px-3 py-2 rounded-lg text-xs font-black tracking-wider transition-all duration-300 ${profileData.unlockedTargetSlot ? 'bg-emerald-950/10 text-emerald-500/50 border border-emerald-500/20 cursor-not-allowed' : 'bg-black/40 border border-slate-700 text-slate-400 hover:text-cyan-300 hover:border-cyan-500/50 hover:bg-cyan-950/30'}`}
+                    >
+                      {profileData.unlockedTargetSlot ? 'OWNED' : '4,000'}
+                    </button>
+                  </div>
+                </div>
+              </section>
+
+              {/* COSMETIC AURAS */}
+              <section>
+                <h4 className="text-xs font-black text-slate-500 uppercase tracking-widest mb-3 flex items-center gap-2"><Eye className="w-4 h-4" /> Profile and Comms Auras</h4>
+                <div className="flex flex-col gap-4">
+                  {[1, 2, 3].map(tier => (
+                    <div key={tier} className="bg-slate-900/50 border border-slate-800 rounded-xl p-3">
+                      <span className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 border-b border-slate-800 pb-2">Tier {tier}</span>
+                      <div className="flex flex-col gap-3">
+                        {Object.entries(AURA_DICTIONARY).filter(([_, aura]) => aura.tier === tier).map(([key, aura]) => {
+                          const cost = tier === 1 ? 1500 : tier === 2 ? 3500 : 7500;
+                          const isOwned = profileData.purchasedAuras?.includes(key);
+
+                          return (
+                            <div key={key} className="flex flex-col gap-2">
+                              {/* Live Aura Preview Card */}
+                              <div className={`relative rounded-xl overflow-hidden p-3 transition-all ${aura.isAnimated ? `p-[2px] ${aura.profileGlow}` : `border-2 border-slate-700/50 ${aura.profileBg}`}`}>
+                                {aura.isAnimated && (<div className={`absolute inset-[-150%] animate-[spin_4s_linear_infinite] ${aura.spinnerClass} pointer-events-none z-0`} />)}
+                                <div className={aura.isAnimated ? `relative rounded-[10px] p-2 h-full w-full z-10 ${aura.profileBg} flex items-center justify-between` : "relative z-10 flex items-center justify-between"}>
+                                  <div className="flex items-center gap-3">
+                                    <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 bg-black ${aura.ring}`}><span className="font-black text-xs uppercase">A</span></div>
+                                    <span className={`text-sm font-black uppercase italic ${aura.text}`}>{aura.name}</span>
+                                  </div>
+                                </div>
+                              </div>
+
+                              {/* Purchase / Equip Button */}
+                              <button
+                                onClick={async () => {
+                                  if (isOwned) {
+                                    // EQUIP LOGIC
+                                    if (profileData.activeAura === key) return; // already equipped
+                                    try {
+                                      const newProf = { ...profileData, activeAura: key };
+                                      await updateDoc(doc(db, "users", user.uid), { profile: newProf });
+                                      setProfileData(newProf); playBeep(880, 'sine', 0.1);
+                                    } catch (e) { }
+                                    return;
+                                  }
+
+                                  // PURCHASE LOGIC
+                                  if (fragments < cost) return alert("Not enough fragments!");
+                                  if (!window.confirm(`Purchase ${aura.name} for ${cost.toLocaleString()} Fragments?`)) return;
+                                  try {
+                                    const newFrags = fragments - cost;
+                                    const currentAuras = profileData.purchasedAuras || [];
+                                    const newProf = { ...profileData, purchasedAuras: [...currentAuras, key] };
+                                    await updateDoc(doc(db, "users", user.uid), { fragments: newFrags, profile: newProf });
+                                    setFragments(newFrags); setProfileData(newProf); playBeep(1046.50, 'sine', 0.2);
+                                  } catch (e) { }
+                                }}
+                                className={`w-full py-2.5 rounded-lg text-xs font-black tracking-wider transition-all duration-300 ${isOwned ? (profileData.activeAura === key ? 'bg-emerald-950/30 text-emerald-500 border border-emerald-500/50 cursor-default' : 'bg-indigo-600 hover:bg-indigo-500 text-white shadow-[0_0_10px_rgba(79,70,229,0.3)]') : 'bg-black/40 border border-slate-700 text-slate-400 hover:text-cyan-300 hover:border-cyan-500/50 hover:bg-cyan-950/30'}`}
+                              >
+                                {isOwned ? (profileData.activeAura === key ? 'EQUIPPED ✓' : 'EQUIP') : `${cost.toLocaleString()} Fragments`}
+                              </button>                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </section>
+
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* --- RADAR SWEEP MODAL --- */}
       {showRadarModal && (
         <div className="fixed inset-0 z-[90] flex flex-col justify-end sm:justify-center items-center bg-black/80 backdrop-blur-sm animate-in fade-in">
@@ -1628,13 +1970,20 @@ function MainApp() {
             </header>
             <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-4">
               {SPRITES_DATABASE.map(sprite => {
+                // RESTRICT TRADE BOARD TO ACTIVE SEASON ONLY
+                if ((selectorContext === 'commsLooking' || selectorContext === 'commsOffering') && sprite.season !== 'C7S4') {
+                  return null;
+                }
+
                 let validVariants = [];
                 if (selectorContext === 'trophy' || selectorContext === 'commsOffering') {
                   validVariants = sprite.variants.filter(v => collection[sprite.id]?.[v]);
                 } else if (selectorContext === 'extraction' || selectorContext === 'commsLooking') {
                   validVariants = sprite.variants.filter(v => selectorContext === 'commsLooking' ? !isVariantLocked(sprite.id, v) : (!collection[sprite.id]?.[v] && !isVariantLocked(sprite.id, v)));
                 }
+
                 if (validVariants.length === 0) return null;
+
                 return (
                   <div key={sprite.id} className="bg-slate-900 border border-slate-800 rounded-xl p-3">
                     <span className="text-sm font-black text-white uppercase italic mb-2 block">{sprite.name}</span>
@@ -1648,8 +1997,7 @@ function MainApp() {
                     </div>
                   </div>
                 );
-              })}
-            </div>
+              })}            </div>
           </div>
         </div>
       )}
@@ -1955,8 +2303,7 @@ function MainApp() {
       <header className={`sticky top-0 z-50 bg-[#0e1017]/95 backdrop-blur-md border-b-2 border-cyan-500/80 shadow-[0_4px_20px_rgba(0,240,255,0.15)] px-4 pb-4 ${Capacitor.getPlatform() === 'ios' ? 'pt-14' : 'pt-4'}`}>
         <div className="max-w-md mx-auto flex items-center justify-between">
           <div>
-            <h1 className="text-2xl sm:text-3xl font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-yellow-400 to-pink-500 uppercase italic">SPRITEDEX</h1>
-            {user && <p className="text-[10px] sm:text-xs font-mono text-slate-400 uppercase tracking-widest mt-0.5">ID: {spriteId}</p>}
+            <h1 onClick={calculateFragmentStats} className="text-2xl sm:text-3xl font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-yellow-400 to-pink-500 uppercase italic cursor-pointer">SPRITEDEX</h1>            {user && <p className="text-[10px] sm:text-xs font-mono text-slate-400 uppercase tracking-widest mt-0.5">ID: {spriteId}</p>}
           </div>
           <div className="flex items-center gap-2.5">
             {user && (
@@ -1968,6 +2315,11 @@ function MainApp() {
             {user && (
               <button onClick={() => { setCurrentView('profile'); setActiveViewingFriend(null); }} className={`p-2 rounded-xl border-2 transition-colors shadow-sm ${currentView === 'profile' ? 'bg-indigo-900 border-indigo-500' : 'bg-slate-900 border-slate-700/60 hover:bg-slate-800'}`}>
                 <UserIcon className={`w-5 h-5 sm:w-6 sm:h-6 ${currentView === 'profile' ? 'text-indigo-400' : 'text-slate-300'}`} />
+              </button>
+            )}
+            {user && (
+              <button onClick={() => setShowShopModal(true)} className="p-2 rounded-xl bg-slate-900 border-2 border-emerald-500/50 hover:bg-slate-800 transition-colors shadow-sm">
+                <ShoppingBag className="w-5 h-5 sm:w-6 sm:h-6 text-emerald-400" />
               </button>
             )}
             <button onClick={() => setShowNewsModal(true)} className="p-2 rounded-xl bg-slate-900 border-2 border-slate-700/60 hover:bg-slate-800 transition-colors shadow-sm"><Newspaper className="w-5 h-5 sm:w-6 sm:h-6 text-slate-300" /></button>
@@ -2196,56 +2548,78 @@ function MainApp() {
                 commsPosts.map(post => {
                   const currentLikes = post.likes || []; const isLiked = currentLikes.includes(user.uid); const isOwnPost = post.authorId === user.uid;
                   const isFriend = friendsList.some(f => f.uid === post.authorId); const requestSent = sentRequests.some(r => r.receiverId === post.authorId);
+
+                  // Dynamically pull the active aura if it is the current user's post (for live testing)
+                  const activeAuraKey = isOwnPost ? profileData.activeAura : post.authorAura;
+                  const auraObj = activeAuraKey ? AURA_DICTIONARY[activeAuraKey] : null;
+
                   return (
-                    <div key={post.id} className="bg-[#151722] border border-slate-800 rounded-2xl p-4 relative shadow-sm hover:border-slate-700 transition-colors">
-                      <div className="flex justify-between items-start mb-3">
-                        <div className="flex items-center gap-3">
-                          <div className="w-9 h-9 rounded-full bg-indigo-950 border border-indigo-500/50 flex items-center justify-center text-indigo-400 shrink-0 overflow-hidden">
-                            {post.authorAvatar ? (
-                              <img src={SPRITES_DATABASE.find(s => s.id === post.authorAvatar.split('_')[0])?.images[post.authorAvatar.split('_')[1]]} className="w-7 h-7 object-contain drop-shadow-sm" alt="" />
-                            ) : (
-                              <span className="font-black text-sm uppercase">{post.authorSpriteId?.charAt(0)}</span>
+                    <div key={post.id} className={`relative rounded-2xl transition-all duration-500 overflow-hidden ${auraObj ? (auraObj.isAnimated ? `p-[2px] ${auraObj.profileGlow}` : `border-2 ${auraObj.profileGlow} ${auraObj.profileBg}`) : 'bg-[#151722] border border-slate-800 p-4 shadow-sm hover:border-slate-700'}`}>
+
+                      {/* Animated Spinner Background */}
+                      {auraObj?.isAnimated && (
+                        <div className={`absolute inset-[-150%] animate-[spin_4s_linear_infinite] ${auraObj.spinnerClass} pointer-events-none z-0`} />
+                      )}
+
+                      <div className={auraObj ? `relative rounded-[14px] p-4 h-full w-full z-10 ${auraObj.profileBg}` : 'h-full w-full relative z-10'}>
+                        <div className="flex justify-between items-start mb-3">
+                          <div className="flex items-center gap-3 sm:gap-4">
+                            <div className={`w-12 h-12 sm:w-14 sm:h-14 rounded-full flex items-center justify-center shrink-0 overflow-hidden transition-all ${auraObj ? `bg-black ${auraObj.ring}` : 'bg-indigo-950 border border-indigo-500/50 text-indigo-400'}`}>
+                              {post.authorAvatar ? (
+                                <img src={SPRITES_DATABASE.find(s => s.id === post.authorAvatar.split('_')[0])?.images[post.authorAvatar.split('_')[1]]} className="w-10 h-10 sm:w-11 sm:h-11 object-contain drop-shadow-md" alt="" />
+                              ) : (
+                                <span className="font-black text-lg sm:text-xl uppercase">{post.authorSpriteId?.charAt(0)}</span>
+                              )}
+                            </div>
+                            <div className="flex flex-col">
+                              <div className="flex items-center gap-2">
+                                {/* Glowing Username */}
+                                <span className={`block text-base sm:text-lg font-black transition-all ${auraObj ? auraObj.text : 'text-white'}`}>@{post.authorSpriteId}</span>
+                                {!isOwnPost && (isFriend ? (<span className="text-[9px] font-black uppercase tracking-wider px-2 py-0.5 bg-slate-800 text-slate-400 rounded flex items-center gap-0.5"><Check className="w-3 h-3" /> Squad</span>) : requestSent ? (<span className="text-[9px] font-black uppercase tracking-wider px-2 py-0.5 bg-indigo-900/40 text-indigo-400 rounded border border-indigo-500/30">Pending</span>) : (<button onClick={() => handleQuickAddFriend(post.authorId, post.authorSpriteId)} className="text-[9px] font-black uppercase tracking-wider px-2 py-0.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded shadow flex items-center gap-0.5 transition-colors"><Plus className="w-3 h-3" /> Squad</button>))}
+                              </div>
+                              <span className="block text-[10px] sm:text-xs font-mono text-slate-500 mt-0.5">{timeAgo(post.timestamp)}</span>
+                            </div>
+                          </div>
+                          <div className="relative">
+                            <button onClick={() => setActiveMenuId(activeMenuId === post.id ? null : post.id)} className="p-1 text-slate-500 hover:text-white rounded-md hover:bg-slate-800"><MoreHorizontal className="w-5 h-5" /></button>
+                            {activeMenuId === post.id && (
+                              <div className="absolute right-0 mt-1 w-36 bg-slate-900 border border-slate-700 rounded-xl shadow-xl z-20 overflow-hidden animate-in fade-in zoom-in-95">
+                                {!isOwnPost && (
+                                  <button onClick={() => { setActiveMenuId(null); inspectFriendLibrary({ uid: post.authorId, spriteId: post.authorSpriteId }); }} className="w-full flex items-center gap-2 px-3 py-2 text-xs font-bold text-cyan-400 hover:bg-cyan-950 transition-colors border-b border-slate-800">
+                                    <UserIcon className="w-4 h-4" /> View Profile
+                                  </button>
+                                )}
+                                {isOwnPost ? (
+                                  <>
+                                    <button onClick={() => handleEditPost(post)} className="w-full flex items-center gap-2 px-3 py-2 text-xs font-bold text-slate-300 hover:bg-slate-800 hover:text-white transition-colors"><Edit3 className="w-4 h-4" /> Edit</button>
+                                    <button onClick={() => handleDeletePost(post.id)} className="w-full flex items-center gap-2 px-3 py-2 text-xs font-bold text-red-400 hover:bg-red-950 hover:text-red-300 transition-colors border-t border-slate-800"><Trash2 className="w-4 h-4" /> Delete</button>
+                                  </>
+                                ) : (
+                                  <>
+                                    <button onClick={() => handleReportPost(post.id)} className="w-full flex items-center gap-2 px-3 py-2 text-xs font-bold text-amber-400 hover:bg-amber-950 transition-colors"><Flag className="w-4 h-4" /> Report</button>
+                                    {spriteId?.toLowerCase() === 'imbearkat' && (
+                                      <button onClick={() => handleDeletePost(post.id)} className="w-full flex items-center gap-2 px-3 py-2 text-xs font-bold text-red-400 hover:bg-red-950 hover:text-red-300 transition-colors border-t border-slate-800"><Trash2 className="w-4 h-4" /> Delete (Admin)</button>
+                                    )}
+                                  </>
+                                )}
+                              </div>
                             )}
                           </div>
-                          <div className="flex flex-col">
-                            <div className="flex items-center gap-2">
-                              <span className="block text-sm font-black text-white">@{post.authorSpriteId}</span>
-                              {!isOwnPost && (isFriend ? (<span className="text-[8px] font-black uppercase tracking-wider px-1.5 py-0.5 bg-slate-800 text-slate-400 rounded flex items-center gap-0.5"><Check className="w-2.5 h-2.5" /> Squad</span>) : requestSent ? (<span className="text-[8px] font-black uppercase tracking-wider px-1.5 py-0.5 bg-indigo-900/40 text-indigo-400 rounded border border-indigo-500/30">Pending</span>) : (<button onClick={() => handleQuickAddFriend(post.authorId, post.authorSpriteId)} className="text-[8px] font-black uppercase tracking-wider px-1.5 py-0.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded shadow flex items-center gap-0.5 transition-colors"><Plus className="w-2.5 h-2.5" /> Squad</button>))}
-                            </div>
-                            <span className="block text-[10px] font-mono text-slate-500 mt-0.5">{timeAgo(post.timestamp)}</span>
+                        </div>
+                        {post.type === 'trade' && (post.lookingFor || post.offering) && (
+                          <div className="flex gap-2 mb-3 bg-black/40 p-2 rounded-xl border border-slate-800/80">
+                            {post.lookingFor && post.lookingFor.includes('_') && (
+                              <div className="flex-1 flex items-center gap-2 bg-cyan-950/20 border border-cyan-500/20 rounded-lg p-2"><img src={SPRITES_DATABASE.find(s => s.id === post.lookingFor.split('_')[0])?.images[post.lookingFor.split('_')[1]]} className="w-8 h-8 object-contain shrink-0" alt="" /><div className="flex flex-col min-w-0"><span className="text-[8px] font-black text-cyan-500 uppercase tracking-widest">Looking For</span><span className="text-[10px] font-bold text-white truncate">{SPRITES_DATABASE.find(s => s.id === post.lookingFor.split('_')[0])?.name}</span></div></div>
+                            )}
+                            {post.offering && post.offering.includes('_') && (
+                              <div className="flex-1 flex items-center gap-2 bg-emerald-950/20 border border-emerald-500/20 rounded-lg p-2"><img src={SPRITES_DATABASE.find(s => s.id === post.offering.split('_')[0])?.images[post.offering.split('_')[1]]} className="w-8 h-8 object-contain shrink-0" alt="" /><div className="flex flex-col min-w-0"><span className="text-[8px] font-black text-emerald-500 uppercase tracking-widest">Offering</span><span className="text-[10px] font-bold text-white truncate">{SPRITES_DATABASE.find(s => s.id === post.offering.split('_')[0])?.name}</span></div></div>
+                            )}
                           </div>
+                        )}
+                        {post.text && <p className="text-sm text-slate-300 leading-relaxed whitespace-pre-wrap break-words">{post.text}</p>}
+                        <div className="mt-3 pt-3 border-t border-slate-800/80 flex items-center gap-4">
+                          <button onClick={() => handleToggleLike(post.id, currentLikes)} className={`flex items-center gap-1.5 text-xs font-bold transition-colors ${isLiked ? 'text-cyan-400' : 'text-slate-500 hover:text-slate-400'}`}><Zap className={`w-4 h-4 ${isLiked ? 'fill-cyan-400' : ''}`} /><span>{currentLikes.length}</span></button>
                         </div>
-                        <div className="relative">
-                          <button onClick={() => setActiveMenuId(activeMenuId === post.id ? null : post.id)} className="p-1 text-slate-500 hover:text-white rounded-md hover:bg-slate-800"><MoreHorizontal className="w-5 h-5" /></button>
-                          {activeMenuId === post.id && (
-                            <div className="absolute right-0 mt-1 w-36 bg-slate-900 border border-slate-700 rounded-xl shadow-xl z-20 overflow-hidden animate-in fade-in zoom-in-95">
-                              {!isOwnPost && (
-                                <button onClick={() => { setActiveMenuId(null); inspectFriendLibrary({ uid: post.authorId, spriteId: post.authorSpriteId }); }} className="w-full flex items-center gap-2 px-3 py-2 text-xs font-bold text-cyan-400 hover:bg-cyan-950 transition-colors border-b border-slate-800">
-                                  <UserIcon className="w-4 h-4" /> View Profile
-                                </button>
-                              )}
-                              {post.authorId === user.uid ? (
-                                <><button onClick={() => handleEditPost(post)} className="w-full flex items-center gap-2 px-3 py-2 text-xs font-bold text-slate-300 hover:bg-slate-800 hover:text-white transition-colors"><Edit3 className="w-4 h-4" /> Edit</button><button onClick={() => handleDeletePost(post.id)} className="w-full flex items-center gap-2 px-3 py-2 text-xs font-bold text-red-400 hover:bg-red-950 hover:text-red-300 transition-colors border-t border-slate-800"><Trash2 className="w-4 h-4" /> Delete</button></>
-                              ) : (
-                                <button onClick={() => handleReportPost(post.id)} className="w-full flex items-center gap-2 px-3 py-2 text-xs font-bold text-amber-400 hover:bg-amber-950 transition-colors"><Flag className="w-4 h-4" /> Report</button>
-                              )}
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                      {post.type === 'trade' && (post.lookingFor || post.offering) && (
-                        <div className="flex gap-2 mb-3 bg-black/40 p-2 rounded-xl border border-slate-800/80">
-                          {post.lookingFor && post.lookingFor.includes('_') && (
-                            <div className="flex-1 flex items-center gap-2 bg-cyan-950/20 border border-cyan-500/20 rounded-lg p-2"><img src={SPRITES_DATABASE.find(s => s.id === post.lookingFor.split('_')[0])?.images[post.lookingFor.split('_')[1]]} className="w-8 h-8 object-contain shrink-0" alt="" /><div className="flex flex-col min-w-0"><span className="text-[8px] font-black text-cyan-500 uppercase tracking-widest">Looking For</span><span className="text-[10px] font-bold text-white truncate">{SPRITES_DATABASE.find(s => s.id === post.lookingFor.split('_')[0])?.name}</span></div></div>
-                          )}
-                          {post.offering && post.offering.includes('_') && (
-                            <div className="flex-1 flex items-center gap-2 bg-emerald-950/20 border border-emerald-500/20 rounded-lg p-2"><img src={SPRITES_DATABASE.find(s => s.id === post.offering.split('_')[0])?.images[post.offering.split('_')[1]]} className="w-8 h-8 object-contain shrink-0" alt="" /><div className="flex flex-col min-w-0"><span className="text-[8px] font-black text-emerald-500 uppercase tracking-widest">Offering</span><span className="text-[10px] font-bold text-white truncate">{SPRITES_DATABASE.find(s => s.id === post.offering.split('_')[0])?.name}</span></div></div>
-                          )}
-                        </div>
-                      )}
-                      {post.text && <p className="text-sm text-slate-300 leading-relaxed whitespace-pre-wrap break-words">{post.text}</p>}
-                      <div className="mt-3 pt-3 border-t border-slate-800/80 flex items-center gap-4">
-                        <button onClick={() => handleToggleLike(post.id, currentLikes)} className={`flex items-center gap-1.5 text-xs font-bold transition-colors ${isLiked ? 'text-cyan-400' : 'text-slate-500 hover:text-slate-400'}`}><Zap className={`w-4 h-4 ${isLiked ? 'fill-cyan-400' : ''}`} /><span>{currentLikes.length}</span></button>
                       </div>
                     </div>
                   );
@@ -2254,14 +2628,13 @@ function MainApp() {
             </section>
           </div>
         )}
-
         {/* --- FRIENDS TAB VIEW --- */}
         {currentView === 'friends' && (
           <div className="flex flex-col gap-4 animate-in fade-in duration-300">
             <section className="bg-gradient-to-br from-indigo-900/40 to-blue-900/20 border-2 border-indigo-500/50 rounded-2xl p-5"><div className="flex items-center gap-3 mb-2"><Users className="w-6 h-6 sm:w-7 sm:h-7 text-indigo-400" /><h2 className="text-xl sm:text-2xl font-black text-indigo-400 uppercase italic">{t('sprite_squad')}</h2></div></section>
             <section className="bg-[#12141f] rounded-2xl border border-slate-800 p-4 flex flex-col gap-3">
-              <div className="flex items-center justify-between"><h3 className="text-sm font-black text-cyan-400 uppercase tracking-wider flex items-center gap-2"><Target className="w-4 h-4 sm:w-5 sm:h-5" /> {t('extraction_targets')}</h3><span className="text-[10px] sm:text-xs text-slate-500 font-bold uppercase">{extractionTargets.filter(Boolean).length} / 3</span></div>
-              <div className="flex gap-2">{[0, 1, 2].map(index => renderTargetSlot(extractionTargets[index], index))}</div>
+              <div className="flex items-center justify-between"><h3 className="text-sm font-black text-cyan-400 uppercase tracking-wider flex items-center gap-2"><Target className="w-4 h-4 sm:w-5 sm:h-5" /> {t('extraction_targets')}</h3><span className="text-[10px] sm:text-xs text-slate-500 font-bold uppercase">{extractionTargets.filter(Boolean).length} / 4</span></div>
+              <div className="flex gap-2">{[0, 1, 2, 3].map(index => renderTargetSlot(extractionTargets[index], index))}</div>
             </section>
             <section className="bg-[#12141f] rounded-2xl border border-slate-800 p-4">
               {!showAddFriendInput ? (
