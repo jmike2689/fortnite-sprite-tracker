@@ -1085,6 +1085,7 @@ function MainApp() {
 
   const handlePostSubmit = async () => {
     if (!postText.trim() && postType === 'general') return;
+    if (postType === 'trade' && !postLookingFor && !postOffering) return alert("Trade posts must include at least one Sprite you are looking for or offering.");
     if (PROFANITY_LIST.some(word => postText.toLowerCase().includes(word))) return alert("Transmission blocked: Please keep comms PG-13.");
 
     try {
@@ -1954,7 +1955,13 @@ function MainApp() {
               )}
             </div>
             <div className="pt-4 shrink-0">
-              <button onClick={handlePostSubmit} disabled={!postText.trim() && !postLookingFor && !postOffering} className="w-full bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 disabled:hover:bg-indigo-600 text-white font-black uppercase tracking-wider py-3.5 rounded-xl transition-colors flex items-center justify-center gap-2"><Radio className="w-5 h-5" /> Broadcast</button>
+              <button
+                onClick={handlePostSubmit}
+                disabled={postType === 'general' ? !postText.trim() : (!postLookingFor && !postOffering)}
+                className="w-full bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 disabled:hover:bg-indigo-600 text-white font-black uppercase tracking-wider py-3.5 rounded-xl transition-colors flex items-center justify-center gap-2"
+              >
+                <Radio className="w-5 h-5" /> Broadcast
+              </button>
             </div>
           </div>
         </div>
