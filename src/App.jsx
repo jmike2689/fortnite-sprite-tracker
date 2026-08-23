@@ -487,7 +487,9 @@ const RARITY_WEIGHT = { Mythic: 4, Legendary: 3, Epic: 2, Rare: 1, Unknown: 0 };
 
 const timeAgo = (timestamp) => {
   if (!timestamp) return 'Just now';
-  const seconds = Math.floor((new Date() - timestamp.toDate()) / 1000);
+  const dateObj = typeof timestamp.toDate === 'function' ? timestamp.toDate() : (timestamp instanceof Date ? timestamp : new Date(timestamp));
+  if (isNaN(dateObj?.getTime())) return 'Just now';
+  const seconds = Math.floor((new Date() - dateObj) / 1000);
   let interval = seconds / 31536000;
   if (interval > 1) return Math.floor(interval) + 'y';
   interval = seconds / 2592000;
@@ -498,7 +500,7 @@ const timeAgo = (timestamp) => {
   if (interval > 1) return Math.floor(interval) + 'h';
   interval = seconds / 60;
   if (interval > 1) return Math.floor(interval) + 'm';
-  return Math.floor(seconds) + 's';
+  return Math.max(0, Math.floor(seconds)) + 's';
 };
 
 const NewsCard = ({ news }) => {
@@ -644,6 +646,11 @@ function MainApp() {
   const [editingPostId, setEditingPostId] = useState(null);
   const [activeMenuId, setActiveMenuId] = useState(null);
 
+  // --- SUBCOLLECTION REPLIES STATE ---
+  const [expandedPostId, setExpandedPostId] = useState(null);
+  const [activeReplies, setActiveReplies] = useState([]);
+  const [replyText, setReplyText] = useState("");
+  const [isSubmittingReply, setIsSubmittingReply] = useState(false);
   const [showSpriteSelector, setShowSpriteSelector] = useState(false);
   const [selectorContext, setSelectorContext] = useState('extraction');
   const [targetSlotIndex, setTargetSlotIndex] = useState(null);
@@ -663,6 +670,22 @@ function MainApp() {
     });
     return () => unsubComms();
   }, [user, currentView, commsFilter]);
+
+  // --- LISTEN TO REPLIES FOR THE CURRENTLY EXPANDED THREAD ---
+  useEffect(() => {
+    if (!user || !expandedPostId) {
+      setActiveReplies([]);
+      return;
+    }
+    const repliesQuery = query(
+      firestoreCollection(db, 'comms_posts', expandedPostId, 'replies'),
+      orderBy('timestamp', 'asc')
+    );
+    const unsubReplies = onSnapshot(repliesQuery, (snap) => {
+      setActiveReplies(snap.docs.map(d => ({ id: d.id, ...d.data() })));
+    });
+    return () => unsubReplies();
+  }, [user, expandedPostId]);
 
   useEffect(() => {
     if (!lastRadarSweep) {
@@ -1151,6 +1174,50 @@ function MainApp() {
       if (isLiked) playBeep(220, 'sine', 0.05); else playBeep(880, 'triangle', 0.1);
       await updateDoc(doc(db, 'comms_posts', postId), { likes: isLiked ? arrayRemove(user.uid) : arrayUnion(user.uid) });
     } catch (error) { }
+  };
+
+  const handleReplySubmit = async (postId) => {
+    if (!replyText.trim() || isSubmittingReply) return;
+    if (PROFANITY_LIST.some(word => replyText.toLowerCase().includes(word))) {
+      return alert("Transmission blocked: Please keep comms PG-13.");
+    }
+
+    setIsSubmittingReply(true);
+    try {
+      await addDoc(firestoreCollection(db, 'comms_posts', postId, 'replies'), {
+        authorId: user.uid,
+        authorSpriteId: spriteId,
+        text: replyText.trim(),
+        timestamp: serverTimestamp(),
+        authorAvatar: profileData.trophies?.[0] || null,
+        authorAura: profileData.activeAura || null
+      });
+
+      await updateDoc(doc(db, 'comms_posts', postId), {
+        replyCount: increment(1)
+      });
+
+      setReplyText("");
+      playBeep(880, 'square', 0.1);
+    } catch (e) {
+      alert("Failed to post reply.");
+    } finally {
+      setIsSubmittingReply(false);
+    }
+  };
+
+  const handleDeleteReply = async (postId, replyId) => {
+    const isConfirmed = window.confirm("Delete this reply?");
+    if (!isConfirmed) return;
+    try {
+      await deleteDoc(doc(db, 'comms_posts', postId, 'replies', replyId));
+      await updateDoc(doc(db, 'comms_posts', postId), {
+        replyCount: increment(-1)
+      });
+      playBeep(200, 'sawtooth', 0.1);
+    } catch (e) {
+      alert("Failed to delete reply.");
+    }
   };
 
   const handleQuickAddFriend = async (targetUid, targetSpriteId) => {
@@ -2627,9 +2694,94 @@ function MainApp() {
                           </div>
                         )}
                         {post.text && <p className="text-sm text-slate-300 leading-relaxed whitespace-pre-wrap break-words">{post.text}</p>}
-                        <div className="mt-3 pt-3 border-t border-slate-800/80 flex items-center gap-4">
-                          <button onClick={() => handleToggleLike(post.id, currentLikes)} className={`flex items-center gap-1.5 text-xs font-bold transition-colors ${isLiked ? 'text-cyan-400' : 'text-slate-500 hover:text-slate-400'}`}><Zap className={`w-4 h-4 ${isLiked ? 'fill-cyan-400' : ''}`} /><span>{currentLikes.length}</span></button>
+
+                        {/* --- ACTIONS BAR --- */}
+                        <div className="mt-3 pt-3 border-t border-slate-800/80 flex items-center justify-between">
+                          <div className="flex items-center gap-4">
+                            <button onClick={() => handleToggleLike(post.id, currentLikes)} className={`flex items-center gap-1.5 text-xs font-bold transition-colors ${isLiked ? 'text-cyan-400' : 'text-slate-500 hover:text-slate-400'}`}>
+                              <Zap className={`w-4 h-4 ${isLiked ? 'fill-cyan-400' : ''}`} />
+                              <span>{currentLikes.length}</span>
+                            </button>
+                            <button
+                              onClick={() => {
+                                if (expandedPostId === post.id) {
+                                  setExpandedPostId(null);
+                                } else {
+                                  setExpandedPostId(post.id);
+                                  setReplyText("");
+                                }
+                              }}
+                              className={`flex items-center gap-1.5 text-xs font-bold transition-colors ${expandedPostId === post.id ? 'text-indigo-400' : 'text-slate-500 hover:text-slate-400'}`}
+                            >
+                              <MessageSquare className="w-4 h-4" />
+                              <span>{post.replyCount || 0}</span>
+                            </button>
+                          </div>
+                          {expandedPostId === post.id && (
+                            <span className="text-[10px] font-mono uppercase tracking-wider text-indigo-400 font-bold">Thread Open</span>
+                          )}
                         </div>
+
+                        {/* --- SUBCOLLECTION REPLIES THREAD --- */}
+                        {expandedPostId === post.id && (
+                          <div className="mt-4 pt-4 border-t border-slate-800/60 flex flex-col gap-3 animate-in fade-in duration-200">
+                            {activeReplies.length === 0 ? (
+                              <p className="text-[11px] text-slate-500 italic text-center py-2">No replies yet. Start the conversation!</p>
+                            ) : (
+                              <div className="flex flex-col gap-2.5 max-h-60 overflow-y-auto pr-1">
+                                {activeReplies.map((reply) => {
+                                  const isOwnReply = reply.authorId === user.uid;
+                                  const replyAura = reply.authorAura ? AURA_DICTIONARY[reply.authorAura] : null;
+
+                                  return (
+                                    <div key={reply.id} className="bg-black/40 border border-slate-800/80 rounded-xl p-2.5 flex items-start gap-2.5">
+                                      <div className={`w-7 h-7 rounded-full flex items-center justify-center shrink-0 overflow-hidden ${replyAura ? `bg-black ${replyAura.ring}` : 'bg-indigo-950/60 border border-indigo-500/30 text-indigo-400'}`}>
+                                        {reply.authorAvatar ? (
+                                          <img src={SPRITES_DATABASE.find(s => s.id === reply.authorAvatar.split('_')[0])?.images[reply.authorAvatar.split('_')[1]]} className="w-6 h-6 object-contain" alt="" />
+                                        ) : (
+                                          <span className="text-[9px] font-black uppercase">{reply.authorSpriteId?.charAt(0)}</span>
+                                        )}
+                                      </div>
+                                      <div className="flex-1 min-w-0">
+                                        <div className="flex items-center justify-between">
+                                          <div className="flex items-center gap-1.5">
+                                            <span className={`text-[11px] font-black ${replyAura ? replyAura.text : 'text-slate-200'}`}>@{reply.authorSpriteId}</span>
+                                            <span className="text-[9px] font-mono text-slate-600">{timeAgo(reply.timestamp)}</span>
+                                          </div>
+                                          {(isOwnReply || spriteId?.toLowerCase() === 'imbearkat') && (
+                                            <button onClick={() => handleDeleteReply(post.id, reply.id)} className="text-slate-600 hover:text-red-400 p-0.5 transition-colors">
+                                              <Trash2 className="w-3 h-3" />
+                                            </button>
+                                          )}
+                                        </div>
+                                        <p className="text-xs text-slate-300 mt-0.5 whitespace-pre-wrap break-words leading-relaxed">{reply.text}</p>
+                                      </div>
+                                    </div>
+                                  );
+                                })}
+                              </div>
+                            )}
+
+                            {/* --- TRANSMIT INPUT --- */}
+                            <div className="flex gap-2 mt-1">
+                              <input
+                                type="text"
+                                value={replyText}
+                                onChange={(e) => setReplyText(e.target.value.substring(0, 150))}
+                                placeholder="Transmit reply..."
+                                className={`flex-1 bg-black/60 border border-slate-700 rounded-xl px-3 py-2 ${inputSizeClass} text-white focus:outline-none focus:border-indigo-500`}
+                                onKeyDown={(e) => e.key === 'Enter' && handleReplySubmit(post.id)}
+                              />
+                              <button
+                                onClick={() => handleReplySubmit(post.id)}
+                                disabled={!replyText.trim() || isSubmittingReply}
+                                className="bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white px-4 py-2 rounded-xl text-[10px] sm:text-xs font-black uppercase tracking-wider transition-colors shrink-0"
+                              >
+                                {isSubmittingReply ? "..." : "Send"}
+                              </button>
+                            </div>
+                          </div>
+                        )}
                       </div>
                     </div>
                   );
