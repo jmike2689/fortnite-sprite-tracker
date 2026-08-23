@@ -487,7 +487,9 @@ const RARITY_WEIGHT = { Mythic: 4, Legendary: 3, Epic: 2, Rare: 1, Unknown: 0 };
 
 const timeAgo = (timestamp) => {
   if (!timestamp) return 'Just now';
-  const seconds = Math.floor((new Date() - timestamp.toDate()) / 1000);
+  const dateObj = typeof timestamp.toDate === 'function' ? timestamp.toDate() : (timestamp instanceof Date ? timestamp : new Date(timestamp));
+  if (isNaN(dateObj?.getTime())) return 'Just now';
+  const seconds = Math.floor((new Date() - dateObj) / 1000);
   let interval = seconds / 31536000;
   if (interval > 1) return Math.floor(interval) + 'y';
   interval = seconds / 2592000;
@@ -498,7 +500,7 @@ const timeAgo = (timestamp) => {
   if (interval > 1) return Math.floor(interval) + 'h';
   interval = seconds / 60;
   if (interval > 1) return Math.floor(interval) + 'm';
-  return Math.floor(seconds) + 's';
+  return Math.max(0, Math.floor(seconds)) + 's';
 };
 
 const NewsCard = ({ news }) => {
@@ -644,6 +646,11 @@ function MainApp() {
   const [editingPostId, setEditingPostId] = useState(null);
   const [activeMenuId, setActiveMenuId] = useState(null);
 
+  // --- SUBCOLLECTION REPLIES STATE ---
+  const [expandedPostId, setExpandedPostId] = useState(null);
+  const [activeReplies, setActiveReplies] = useState([]);
+  const [replyText, setReplyText] = useState("");
+  const [isSubmittingReply, setIsSubmittingReply] = useState(false);
   const [showSpriteSelector, setShowSpriteSelector] = useState(false);
   const [selectorContext, setSelectorContext] = useState('extraction');
   const [targetSlotIndex, setTargetSlotIndex] = useState(null);
@@ -663,6 +670,22 @@ function MainApp() {
     });
     return () => unsubComms();
   }, [user, currentView, commsFilter]);
+
+  // --- LISTEN TO REPLIES FOR THE CURRENTLY EXPANDED THREAD ---
+  useEffect(() => {
+    if (!user || !expandedPostId) {
+      setActiveReplies([]);
+      return;
+    }
+    const repliesQuery = query(
+      firestoreCollection(db, 'comms_posts', expandedPostId, 'replies'),
+      orderBy('timestamp', 'asc')
+    );
+    const unsubReplies = onSnapshot(repliesQuery, (snap) => {
+      setActiveReplies(snap.docs.map(d => ({ id: d.id, ...d.data() })));
+    });
+    return () => unsubReplies();
+  }, [user, expandedPostId]);
 
   useEffect(() => {
     if (!lastRadarSweep) {
@@ -1049,7 +1072,7 @@ function MainApp() {
     try { await deleteDoc(doc(db, "friend_requests", req.id)); playBeep(880, 'sine', 0.1); } catch (e) { }
   };
 
-  const cancelFriendRequest = async (reqId) => { try { await deleteDoc(doc(doc(db, "friend_requests", reqId))); } catch (e) { } };
+  const cancelFriendRequest = async (reqId) => { try { await deleteDoc(doc(db, "friend_requests", reqId)); playBeep(220, 'sawtooth', 0.1); } catch (e) { } };
 
   const handleUnfriendExecution = async () => {
     if (!showUnfriendConfirm) return;
@@ -1085,6 +1108,7 @@ function MainApp() {
 
   const handlePostSubmit = async () => {
     if (!postText.trim() && postType === 'general') return;
+    if (postType === 'trade' && !postLookingFor && !postOffering) return alert("Trade posts must include at least one Sprite you are looking for or offering.");
     if (PROFANITY_LIST.some(word => postText.toLowerCase().includes(word))) return alert("Transmission blocked: Please keep comms PG-13.");
 
     try {
@@ -1150,6 +1174,50 @@ function MainApp() {
       if (isLiked) playBeep(220, 'sine', 0.05); else playBeep(880, 'triangle', 0.1);
       await updateDoc(doc(db, 'comms_posts', postId), { likes: isLiked ? arrayRemove(user.uid) : arrayUnion(user.uid) });
     } catch (error) { }
+  };
+
+  const handleReplySubmit = async (postId) => {
+    if (!replyText.trim() || isSubmittingReply) return;
+    if (PROFANITY_LIST.some(word => replyText.toLowerCase().includes(word))) {
+      return alert("Transmission blocked: Please keep comms PG-13.");
+    }
+
+    setIsSubmittingReply(true);
+    try {
+      await addDoc(firestoreCollection(db, 'comms_posts', postId, 'replies'), {
+        authorId: user.uid,
+        authorSpriteId: spriteId,
+        text: replyText.trim(),
+        timestamp: serverTimestamp(),
+        authorAvatar: profileData.trophies?.[0] || null,
+        authorAura: profileData.activeAura || null
+      });
+
+      await updateDoc(doc(db, 'comms_posts', postId), {
+        replyCount: increment(1)
+      });
+
+      setReplyText("");
+      playBeep(880, 'square', 0.1);
+    } catch (e) {
+      alert("Failed to post reply.");
+    } finally {
+      setIsSubmittingReply(false);
+    }
+  };
+
+  const handleDeleteReply = async (postId, replyId) => {
+    const isConfirmed = window.confirm("Delete this reply?");
+    if (!isConfirmed) return;
+    try {
+      await deleteDoc(doc(db, 'comms_posts', postId, 'replies', replyId));
+      await updateDoc(doc(db, 'comms_posts', postId), {
+        replyCount: increment(-1)
+      });
+      playBeep(200, 'sawtooth', 0.1);
+    } catch (e) {
+      alert("Failed to delete reply.");
+    }
   };
 
   const handleQuickAddFriend = async (targetUid, targetSpriteId) => {
@@ -1898,11 +1966,11 @@ function MainApp() {
               </div>
             )}
 
-            <div className="p-4 bg-slate-900/80 rounded-xl border border-slate-700/60 flex items-start relative z-10">
-              <div className="text-amber-400 mr-3 mt-0.5 shrink-0"><Lock className="w-5 h-5" /></div>
+            <div className="p-4 bg-slate-900/80 rounded-xl border border-emerald-500/30 shadow-[0_0_15px_rgba(16,185,129,0.1)] flex items-start relative z-10">
+              <div className="text-emerald-400 mr-3 mt-0.5 shrink-0"><ShoppingBag className="w-5 h-5" /></div>
               <div>
-                <p className="text-xs font-black text-amber-400 mb-1 tracking-wider">HOARD YOUR FRAGMENTS!</p>
-                <p className="text-[10px] sm:text-xs text-slate-400 leading-relaxed font-medium">The Vault expands soon. Save up to unlock Profile Auras, extra Trophy slots, and tactical upgrades in the upcoming Profile Shop.</p>
+                <p className="text-xs font-black text-emerald-400 mb-1 tracking-wider">THE BLACK MARKET IS LIVE!</p>
+                <p className="text-[10px] sm:text-xs text-slate-300 leading-relaxed font-medium">Tap the Shopping Bag icon in the top menu to spend your Fragments on premium Profile Auras, extra Trophy slots, and tactical upgrades.</p>
               </div>
             </div>
           </div>
@@ -1954,7 +2022,13 @@ function MainApp() {
               )}
             </div>
             <div className="pt-4 shrink-0">
-              <button onClick={handlePostSubmit} disabled={!postText.trim() && !postLookingFor && !postOffering} className="w-full bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 disabled:hover:bg-indigo-600 text-white font-black uppercase tracking-wider py-3.5 rounded-xl transition-colors flex items-center justify-center gap-2"><Radio className="w-5 h-5" /> Broadcast</button>
+              <button
+                onClick={handlePostSubmit}
+                disabled={postType === 'general' ? !postText.trim() : (!postLookingFor && !postOffering)}
+                className="w-full bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 disabled:hover:bg-indigo-600 text-white font-black uppercase tracking-wider py-3.5 rounded-xl transition-colors flex items-center justify-center gap-2"
+              >
+                <Radio className="w-5 h-5" /> Broadcast
+              </button>
             </div>
           </div>
         </div>
@@ -1970,8 +2044,8 @@ function MainApp() {
             </header>
             <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-4">
               {SPRITES_DATABASE.map(sprite => {
-                // RESTRICT TRADE BOARD TO ACTIVE SEASON ONLY
-                if ((selectorContext === 'commsLooking' || selectorContext === 'commsOffering') && sprite.season !== 'C7S4') {
+                // RESTRICT TRADE BOARD AND EXTRACTIONS TO ACTIVE SEASON ONLY
+                if ((selectorContext === 'commsLooking' || selectorContext === 'commsOffering' || selectorContext === 'extraction') && sprite.season !== 'C7S4') {
                   return null;
                 }
 
@@ -1989,15 +2063,18 @@ function MainApp() {
                     <span className="text-sm font-black text-white uppercase italic mb-2 block">{sprite.name}</span>
                     <div className="grid grid-cols-6 gap-2">
                       {validVariants.map(v => (
-                        <button key={v} onClick={() => handleSpriteSelect(sprite.id, v)} className="flex flex-col items-center p-2 rounded-lg border border-slate-700 bg-black/40 hover:bg-slate-800 transition-colors">
+                        <button key={v} onClick={() => handleSpriteSelect(sprite.id, v)} className="flex flex-col items-center p-2 rounded-lg border border-slate-700 bg-black/40 hover:bg-slate-800 transition-colors overflow-hidden">
                           <img src={sprite.images[v]} className="w-8 h-8 object-contain mb-1" alt="" />
-                          <span className={`text-[7px] sm:text-[8px] font-black uppercase ${VARIANT_INFO[v]?.color}`}>{t(v)}</span>
+                          <span className={`text-[7px] sm:text-[8px] font-black uppercase truncate w-full text-center ${VARIANT_INFO[v]?.color}`}>
+                            {v === 'holofoil' ? 'Holo' : v === 'cheatmaster' ? 'Cheat' : t(v)}
+                          </span>
                         </button>
                       ))}
                     </div>
                   </div>
                 );
-              })}            </div>
+              })}
+            </div>
           </div>
         </div>
       )}
@@ -2617,9 +2694,94 @@ function MainApp() {
                           </div>
                         )}
                         {post.text && <p className="text-sm text-slate-300 leading-relaxed whitespace-pre-wrap break-words">{post.text}</p>}
-                        <div className="mt-3 pt-3 border-t border-slate-800/80 flex items-center gap-4">
-                          <button onClick={() => handleToggleLike(post.id, currentLikes)} className={`flex items-center gap-1.5 text-xs font-bold transition-colors ${isLiked ? 'text-cyan-400' : 'text-slate-500 hover:text-slate-400'}`}><Zap className={`w-4 h-4 ${isLiked ? 'fill-cyan-400' : ''}`} /><span>{currentLikes.length}</span></button>
+
+                        {/* --- ACTIONS BAR --- */}
+                        <div className="mt-3 pt-3 border-t border-slate-800/80 flex items-center justify-between">
+                          <div className="flex items-center gap-4">
+                            <button onClick={() => handleToggleLike(post.id, currentLikes)} className={`flex items-center gap-1.5 text-xs font-bold transition-colors ${isLiked ? 'text-cyan-400' : 'text-slate-500 hover:text-slate-400'}`}>
+                              <Zap className={`w-4 h-4 ${isLiked ? 'fill-cyan-400' : ''}`} />
+                              <span>{currentLikes.length}</span>
+                            </button>
+                            <button
+                              onClick={() => {
+                                if (expandedPostId === post.id) {
+                                  setExpandedPostId(null);
+                                } else {
+                                  setExpandedPostId(post.id);
+                                  setReplyText("");
+                                }
+                              }}
+                              className={`flex items-center gap-1.5 text-xs font-bold transition-colors ${expandedPostId === post.id ? 'text-indigo-400' : 'text-slate-500 hover:text-slate-400'}`}
+                            >
+                              <MessageSquare className="w-4 h-4" />
+                              <span>{post.replyCount || 0}</span>
+                            </button>
+                          </div>
+                          {expandedPostId === post.id && (
+                            <span className="text-[10px] font-mono uppercase tracking-wider text-indigo-400 font-bold">Thread Open</span>
+                          )}
                         </div>
+
+                        {/* --- SUBCOLLECTION REPLIES THREAD --- */}
+                        {expandedPostId === post.id && (
+                          <div className="mt-4 pt-4 border-t border-slate-800/60 flex flex-col gap-3 animate-in fade-in duration-200">
+                            {activeReplies.length === 0 ? (
+                              <p className="text-[11px] text-slate-500 italic text-center py-2">No replies yet. Start the conversation!</p>
+                            ) : (
+                              <div className="flex flex-col gap-2.5 max-h-60 overflow-y-auto pr-1">
+                                {activeReplies.map((reply) => {
+                                  const isOwnReply = reply.authorId === user.uid;
+                                  const replyAura = reply.authorAura ? AURA_DICTIONARY[reply.authorAura] : null;
+
+                                  return (
+                                    <div key={reply.id} className="bg-black/40 border border-slate-800/80 rounded-xl p-2.5 flex items-start gap-2.5">
+                                      <div className={`w-7 h-7 rounded-full flex items-center justify-center shrink-0 overflow-hidden ${replyAura ? `bg-black ${replyAura.ring}` : 'bg-indigo-950/60 border border-indigo-500/30 text-indigo-400'}`}>
+                                        {reply.authorAvatar ? (
+                                          <img src={SPRITES_DATABASE.find(s => s.id === reply.authorAvatar.split('_')[0])?.images[reply.authorAvatar.split('_')[1]]} className="w-6 h-6 object-contain" alt="" />
+                                        ) : (
+                                          <span className="text-[9px] font-black uppercase">{reply.authorSpriteId?.charAt(0)}</span>
+                                        )}
+                                      </div>
+                                      <div className="flex-1 min-w-0">
+                                        <div className="flex items-center justify-between">
+                                          <div className="flex items-center gap-1.5">
+                                            <span className={`text-[11px] font-black ${replyAura ? replyAura.text : 'text-slate-200'}`}>@{reply.authorSpriteId}</span>
+                                            <span className="text-[9px] font-mono text-slate-600">{timeAgo(reply.timestamp)}</span>
+                                          </div>
+                                          {(isOwnReply || spriteId?.toLowerCase() === 'imbearkat') && (
+                                            <button onClick={() => handleDeleteReply(post.id, reply.id)} className="text-slate-600 hover:text-red-400 p-0.5 transition-colors">
+                                              <Trash2 className="w-3 h-3" />
+                                            </button>
+                                          )}
+                                        </div>
+                                        <p className="text-xs text-slate-300 mt-0.5 whitespace-pre-wrap break-words leading-relaxed">{reply.text}</p>
+                                      </div>
+                                    </div>
+                                  );
+                                })}
+                              </div>
+                            )}
+
+                            {/* --- TRANSMIT INPUT --- */}
+                            <div className="flex gap-2 mt-1">
+                              <input
+                                type="text"
+                                value={replyText}
+                                onChange={(e) => setReplyText(e.target.value.substring(0, 150))}
+                                placeholder="Transmit reply..."
+                                className={`flex-1 bg-black/60 border border-slate-700 rounded-xl px-3 py-2 ${inputSizeClass} text-white focus:outline-none focus:border-indigo-500`}
+                                onKeyDown={(e) => e.key === 'Enter' && handleReplySubmit(post.id)}
+                              />
+                              <button
+                                onClick={() => handleReplySubmit(post.id)}
+                                disabled={!replyText.trim() || isSubmittingReply}
+                                className="bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white px-4 py-2 rounded-xl text-[10px] sm:text-xs font-black uppercase tracking-wider transition-colors shrink-0"
+                              >
+                                {isSubmittingReply ? "..." : "Send"}
+                              </button>
+                            </div>
+                          </div>
+                        )}
                       </div>
                     </div>
                   );
