@@ -482,7 +482,6 @@ const VARIANT_INFO = {
 
 const RARITY_COLORS = { Mythic: "bg-yellow-400 text-black border-yellow-300 font-extrabold", Legendary: "bg-orange-500 text-white border-orange-400", Epic: "bg-purple-600 text-white border-purple-400", Rare: "bg-blue-600 text-white border-blue-400", Unknown: "bg-slate-500 text-white border-slate-400" };
 const RARITY_BG_GRADIENTS = { Mythic: "from-yellow-400 via-yellow-600 to-amber-950", Legendary: "from-orange-500 via-orange-700 to-amber-950", Epic: "from-purple-600 via-purple-800 to-slate-950", Rare: "from-blue-500 via-blue-700 to-slate-950", Unknown: "from-slate-600 via-slate-800 to-slate-950" };
-const SUMMON_COST_MATRIX = { Mythic: { base: "6,750", variant: "10,000" }, Legendary: { base: "4,500", variant: "6,750" }, Epic: { base: "2,700", variant: "4,000" }, Rare: { base: "1,800", variant: "2,700" }, Unknown: { base: "TBD", variant: "TBD" } };
 const RARITY_WEIGHT = { Mythic: 4, Legendary: 3, Epic: 2, Rare: 1, Unknown: 0 };
 
 const timeAgo = (timestamp) => {
@@ -645,6 +644,7 @@ function MainApp() {
   const [postOffering, setPostOffering] = useState(null);
   const [editingPostId, setEditingPostId] = useState(null);
   const [activeMenuId, setActiveMenuId] = useState(null);
+  const [showPerfectOnly, setShowPerfectOnly] = useState(false);
 
   // --- SUBCOLLECTION REPLIES STATE ---
   const [expandedPostId, setExpandedPostId] = useState(null);
@@ -1464,6 +1464,23 @@ function MainApp() {
     });
   }, [richFriends, squadSearchQuery]);
 
+  const displayedComms = useMemo(() => {
+    return commsPosts.filter(post => {
+      if (commsFilter !== 'trade' || !showPerfectOnly) return true;
+      const isOwnPost = user && post.authorId === user.uid;
+
+      if (post.type === 'trade' && post.lookingFor && post.offering && !isOwnPost) {
+        const lfId = post.lookingFor.split('_')[0];
+        const lfVar = post.lookingFor.split('_')[1];
+        const offId = post.offering.split('_')[0];
+        const offVar = post.offering.split('_')[1];
+
+        return collection[lfId]?.[lfVar] === true && !collection[offId]?.[offVar];
+      }
+      return false;
+    });
+  }, [commsPosts, commsFilter, showPerfectOnly, collection, user]);
+
   const formatJoinDate = (timestamp) => {
     if (!timestamp) return 'Unknown';
     const d = new Date(timestamp);
@@ -1472,10 +1489,6 @@ function MainApp() {
 
   const getVariantModifierText = (variant) => {
     return null;
-  };
-
-  const getDynamicSummonCost = (variant = null) => {
-    return 0; // Fallback cost or logic
   };
 
   const renderProfileCard = (id, profData, colRate, mastRate, joinTime, isSelf, masteriesObj, repVouches, uid, unlockedArray = []) => {
@@ -2135,7 +2148,6 @@ function MainApp() {
                   <div className="bg-black/30 rounded-xl p-3 border border-slate-800/60">
                     <p className="text-sm text-slate-300 leading-snug"><span className="font-mono text-[10px] font-black text-cyan-400 block tracking-wider uppercase mb-1">{t('base_ability')}</span>{abilityText}</p>
                     {variantModifier && <p className="text-sm text-slate-200 mt-2 pt-2 border-t border-slate-800/60"><span className="font-mono text-[10px] font-black text-yellow-400 block tracking-wider uppercase mb-1">+{t(v)} {t('modifier')}</span>{variantModifier}</p>}
-                    <div className="flex items-center justify-between mt-3 pt-3 border-t border-slate-800/60"><span className="font-mono text-[10px] font-black text-emerald-400 uppercase tracking-wider">{t('summon_cost')}</span><span className="text-xs font-black text-white">{getDynamicSummonCost(sprite.rarity, v, sprite.id)} {isLocked ? '' : 'Dust'}</span></div>
                   </div>
                   <div className="flex gap-2">
                     {isLocked ? (
@@ -2613,25 +2625,68 @@ function MainApp() {
                 <button onClick={() => setShowCreatePost(true)} className="bg-indigo-600 hover:bg-indigo-500 text-white p-3 rounded-xl shadow-[0_0_15px_rgba(79,70,229,0.4)] transition-all"><MessageSquare className="w-5 h-5" /></button>
               </div>
             </section>
-            <div className="flex bg-[#12141f] rounded-xl border border-slate-800 p-1">
-              <button onClick={() => setCommsFilter('general')} className={`flex-1 py-2 rounded-lg text-xs font-black uppercase tracking-wider transition-colors ${commsFilter === 'general' ? 'bg-indigo-900/40 text-indigo-400 border border-indigo-500/30' : 'text-slate-500 hover:text-slate-300'}`}>General</button>
-              <button onClick={() => setCommsFilter('trade')} className={`flex-1 py-2 rounded-lg text-xs font-black uppercase tracking-wider transition-colors ${commsFilter === 'trade' ? 'bg-cyan-900/40 text-cyan-400 border border-cyan-500/30' : 'text-slate-500 hover:text-slate-300'}`}>Trades</button>
-              <button onClick={() => setCommsFilter('mine')} className={`flex-1 py-2 rounded-lg text-xs font-black uppercase tracking-wider transition-colors ${commsFilter === 'mine' ? 'bg-purple-900/40 text-purple-400 border border-purple-500/30' : 'text-slate-500 hover:text-slate-300'}`}>My Posts</button>
+            <div className="flex flex-col gap-2">
+              <div className="flex bg-[#12141f] rounded-xl border border-slate-800 p-1">
+                <button onClick={() => setCommsFilter('general')} className={`flex-1 py-2 rounded-lg text-xs font-black uppercase tracking-wider transition-colors ${commsFilter === 'general' ? 'bg-indigo-900/40 text-indigo-400 border border-indigo-500/30' : 'text-slate-500 hover:text-slate-300'}`}>General</button>
+                <button onClick={() => setCommsFilter('trade')} className={`flex-1 py-2 rounded-lg text-xs font-black uppercase tracking-wider transition-colors ${commsFilter === 'trade' ? 'bg-cyan-900/40 text-cyan-400 border border-cyan-500/30' : 'text-slate-500 hover:text-slate-300'}`}>Trades</button>
+                <button onClick={() => setCommsFilter('mine')} className={`flex-1 py-2 rounded-lg text-xs font-black uppercase tracking-wider transition-colors ${commsFilter === 'mine' ? 'bg-purple-900/40 text-purple-400 border border-purple-500/30' : 'text-slate-500 hover:text-slate-300'}`}>My Posts</button>
+              </div>
+
+              {commsFilter === 'trade' && (
+                <div className="flex justify-end animate-in fade-in zoom-in-95 duration-200">
+                  <button
+                    onClick={() => setShowPerfectOnly(!showPerfectOnly)}
+                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${showPerfectOnly
+                      ? 'bg-emerald-950/40 text-emerald-400 border border-emerald-500/50 shadow-[0_0_10px_rgba(16,185,129,0.2)]'
+                      : 'bg-[#12141f] text-slate-500 border border-slate-800 hover:text-slate-400'
+                      }`}
+                  >
+                    <Target className="w-3 h-3" /> Perfect Matches Only
+                  </button>
+                </div>
+              )}
             </div>
             <section className="flex flex-col gap-3">
-              {commsPosts.length === 0 ? (
-                <div className="text-center p-8 bg-[#12141f] rounded-2xl border border-slate-800 mt-4"><Radio className="w-12 h-12 text-slate-700 mx-auto mb-4" /><p className="text-sm text-slate-400 font-bold uppercase tracking-widest">No transmissions found.</p></div>
+              {displayedComms.length === 0 ? (
+                <div className="text-center p-8 bg-[#12141f] rounded-2xl border border-slate-800 mt-4">
+                  <Radio className="w-12 h-12 text-slate-700 mx-auto mb-4" />
+                  <p className="text-sm text-slate-400 font-bold uppercase tracking-widest">
+                    {showPerfectOnly ? "No perfect matches right now." : "No transmissions found."}
+                  </p>
+                </div>
               ) : (
-                commsPosts.map(post => {
+                displayedComms.map(post => {
                   const currentLikes = post.likes || []; const isLiked = currentLikes.includes(user.uid); const isOwnPost = post.authorId === user.uid;
                   const isFriend = friendsList.some(f => f.uid === post.authorId); const requestSent = sentRequests.some(r => r.receiverId === post.authorId);
+
+                  // --- PERFECT TRADE DETECTOR ---
+                  let isPerfectTrade = false;
+                  if (post.type === 'trade' && post.lookingFor && post.offering && !isOwnPost) {
+                    const lfId = post.lookingFor.split('_')[0];
+                    const lfVar = post.lookingFor.split('_')[1];
+                    const offId = post.offering.split('_')[0];
+                    const offVar = post.offering.split('_')[1];
+
+                    const iHaveWhatTheyWant = collection[lfId]?.[lfVar] === true;
+                    const iNeedWhatTheyOffer = !collection[offId]?.[offVar];
+
+                    if (iHaveWhatTheyWant && iNeedWhatTheyOffer) {
+                      isPerfectTrade = true;
+                    }
+                  }
 
                   // Dynamically pull the active aura if it is the current user's post (for live testing)
                   const activeAuraKey = isOwnPost ? profileData.activeAura : post.authorAura;
                   const auraObj = activeAuraKey ? AURA_DICTIONARY[activeAuraKey] : null;
 
                   return (
-                    <div key={post.id} className={`relative rounded-2xl transition-all duration-500 overflow-hidden ${auraObj ? (auraObj.isAnimated ? `p-[2px] ${auraObj.profileGlow}` : `border-2 ${auraObj.profileGlow} ${auraObj.profileBg}`) : 'bg-[#151722] border border-slate-800 p-4 shadow-sm hover:border-slate-700'}`}>
+                    <div key={post.id} className={`relative rounded-2xl transition-all duration-500 overflow-hidden ${isPerfectTrade ? 'border-2 border-emerald-400 shadow-[0_0_20px_rgba(16,185,129,0.3)] bg-emerald-950/20 p-4' : auraObj ? (auraObj.isAnimated ? `p-[2px] ${auraObj.profileGlow}` : `border-2 ${auraObj.profileGlow} ${auraObj.profileBg} p-4`) : 'bg-[#151722] border border-slate-800 p-4 shadow-sm hover:border-slate-700'}`}>
+
+                      {isPerfectTrade && (
+                        <div className="absolute top-0 right-0 bg-emerald-500 text-white text-[9px] font-black uppercase tracking-widest px-3 py-1 rounded-bl-xl z-20 shadow-md flex items-center gap-1">
+                          <Target className="w-3 h-3" /> Perfect Trade
+                        </div>
+                      )}
 
                       {/* Animated Spinner Background */}
                       {auraObj?.isAnimated && (
