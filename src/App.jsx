@@ -308,6 +308,19 @@ const SPRITES_DATABASE = [
 
 const PATCH_NOTES = [
   {
+    version: "v2.2.1",
+    date: "08/26/2026",
+    title: "Perfect Trades & Push Notifications!",
+    changes: [
+      "The Perfect Trade Algorithm: The Trade Board now actively cross-references your personal collection against global offers. If a 1-for-1 match is possible, the transmission pops with a glowing emerald border and a 'Perfect Trade' badge!",
+      "Custom Trade Filters: Added a frictionless 'Perfect Matches Only' toggle switch to the Trades tab, allowing you to instantly clear the clutter and only see actionable trades.",
+      "Reply Push Notifications: Get instantly notified on your lock screen the moment another hunter replies to your Comms transmission!",
+      "Live In-App Alerts: Added a glowing red indicator to the navigation bar and a live banner inside the Comms feed so you never miss a conversation.",
+      "Community Safety: Implemented stricter reporting tools, direct user blocking, a 'Manage Blocked Users' settings menu, and an official EULA to keep the network safe.",
+      "Streamlined UI: Cleaned up the inspection modals by completely removing the legacy Summon Cost and Sprite Dust requirements."
+    ]
+  },
+  {
     version: "v2.1.0",
     date: "08/21/2026",
     title: "The Black Market & Comms Upgrades!",
