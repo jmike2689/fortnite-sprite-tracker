@@ -308,6 +308,17 @@ const SPRITES_DATABASE = [
 
 const PATCH_NOTES = [
   {
+    version: "v2.2.2",
+    date: "08/27/2026",
+    title: "Official iOS Release & App Store Launch!",
+    changes: [
+      "🍏 Official iOS Launch: The Spritedex is officially live on the Apple App Store! Head over to the Support tab for the direct download link.",
+      "The Perfect Trade Algorithm: Instantly spot 1-for-1 matches on the Trade Board with glowing emerald borders and dedicated badges.",
+      "Custom Trade Filters: Filter out the noise with the 'Perfect Matches Only' toggle switch in the Trades tab.",
+      "Community Safety Suite: Implemented user blocking and report moderation tools."
+    ]
+  },
+  {
     version: "v2.2.1",
     date: "08/26/2026",
     title: "Perfect Trades & Push Notifications!",
@@ -3051,12 +3062,24 @@ function MainApp() {
                 </button>
               </form>
             </div>
+
+            {/* --- DISCORD COMMUNITY CARD --- */}
             <div className="bg-gradient-to-r from-indigo-900/40 via-blue-900/30 to-slate-900 border-2 border-indigo-500/50 rounded-2xl p-5 shadow-[0_0_20px_rgba(99,102,241,0.15)] flex flex-col items-center text-center">
               <div className="w-12 h-12 bg-indigo-950/80 rounded-full border border-indigo-400 flex items-center justify-center mb-3"><MessageSquare className="w-6 h-6 text-indigo-400" /></div>
               <h4 className="text-lg font-black text-white uppercase italic mb-1 tracking-wider">Join The Discord Network</h4>
               <p className="text-sm text-slate-300 mb-5">Connect with other hunters, coordinate trades, and get live leak bot updates in our official Discord server.</p>
               <a href="https://discord.gg/J3E3fGvEtw" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-500 text-white font-black uppercase tracking-wider py-3 px-6 rounded-xl text-xs sm:text-sm transition-all shadow-lg w-full">Join Discord</a>
             </div>
+
+            {/* --- APPLE APP STORE CARD --- */}
+            <div className="bg-gradient-to-r from-sky-900/40 via-blue-900/30 to-slate-900 border-2 border-sky-500/50 rounded-2xl p-5 shadow-[0_0_20px_rgba(56,189,248,0.15)] flex flex-col items-center text-center">
+              <div className="w-12 h-12 bg-sky-950/80 rounded-full border border-sky-400 flex items-center justify-center mb-3"><Smartphone className="w-6 h-6 text-sky-400" /></div>
+              <h4 className="text-lg font-black text-white uppercase italic mb-1 tracking-wider">Spritedex is on iOS!</h4>
+              <p className="text-sm text-slate-300 mb-5">Download the native iOS app directly on your iPhone or iPad.</p>
+              <a href="https://apps.apple.com/us/app/the-spritedex/id6801018921" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2 bg-sky-600 hover:bg-sky-500 text-white font-black uppercase tracking-wider py-3 px-6 rounded-xl text-xs sm:text-sm transition-all shadow-lg w-full">Download on the App Store</a>
+            </div>
+
+            {/* --- GOOGLE PLAY STORE CARD --- */}
             <div className="bg-gradient-to-r from-teal-900/40 via-emerald-900/30 to-slate-900 border-2 border-teal-500/50 rounded-2xl p-5 shadow-[0_0_20px_rgba(20,184,166,0.15)] flex flex-col items-center text-center">
               <div className="w-12 h-12 bg-teal-950/80 rounded-full border border-teal-400 flex items-center justify-center mb-3"><Smartphone className="w-6 h-6 text-teal-400" /></div>
               <h4 className="text-lg font-black text-white uppercase italic mb-1 tracking-wider">Spritedex is on Android!</h4>
