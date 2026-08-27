@@ -505,7 +505,15 @@ const timeAgo = (timestamp) => {
 const NewsCard = ({ news }) => {
   const [imgFailed, setImgFailed] = useState(false);
   let safeImageUrl = news.imageUrl?.trim();
-  if (safeImageUrl && safeImageUrl.startsWith('//')) safeImageUrl = `https:${safeImageUrl}`;
+
+  if (safeImageUrl) {
+    if (safeImageUrl.startsWith('//')) {
+      safeImageUrl = `https:${safeImageUrl}`;
+    } else if (safeImageUrl.startsWith('http://')) {
+      safeImageUrl = safeImageUrl.replace(/^http:\/\//i, 'https://');
+    }
+  }
+
   const hasValidImage = Boolean(safeImageUrl && !imgFailed);
 
   return (
@@ -551,6 +559,7 @@ function MainApp() {
   const [isAuthLoading, setIsAuthLoading] = useState(false);
   const [authError, setAuthError] = useState("");
   const [showSettingsModal, setShowSettingsModal] = useState(false);
+  const [showBlockedUsersModal, setShowBlockedUsersModal] = useState(false);
   const [showAboutModal, setShowAboutModal] = useState(false);
   const [showNewsModal, setShowNewsModal] = useState(false);
   const [showShopModal, setShowShopModal] = useState(false);
@@ -558,6 +567,7 @@ function MainApp() {
   const [password, setPassword] = useState("");
   const [resetSent, setResetSent] = useState(false);
   const [isLoginMode, setIsLoginMode] = useState(true);
+  const [eulaAccepted, setEulaAccepted] = useState(false);
 
   const [spriteId, setSpriteId] = useState(null);
   const [isSettingSpriteId, setIsSettingSpriteId] = useState(false);
@@ -609,6 +619,15 @@ function MainApp() {
 
   const [unlockedMilestones, setUnlockedMilestones] = useState([]);
   const [reputationVouches, setReputationVouches] = useState([]);
+  const [blockedUsers, setBlockedUsers] = useState([]);
+  const [hasUnreadReplies, setHasUnreadReplies] = useState(false);
+
+  const clearUnreadReplies = async () => {
+    setHasUnreadReplies(false);
+    if (user) {
+      try { await updateDoc(doc(db, "users", user.uid), { hasUnreadReplies: false }); } catch (e) { }
+    }
+  };
 
   const [fSearchQuery, setFSearchQuery] = useState('');
   const [showFFilters, setShowFFilters] = useState(false);
@@ -716,6 +735,7 @@ function MainApp() {
   useEffect(() => {
     const handleBackButton = ({ canGoBack }) => {
       if (showSettingsModal) return setShowSettingsModal(false);
+      if (showBlockedUsersModal) return setShowBlockedUsersModal(false);
       if (showAboutModal) return setShowAboutModal(false);
       if (showNewsModal) return setShowNewsModal(false);
       if (showShopModal) return setShowShopModal(false);
@@ -748,9 +768,10 @@ function MainApp() {
       setSpriteId(null); setDesiredSpriteId(''); setFriendsList([]); setPendingRequests([]);
       setSentRequests([]); setRichFriends([]); setActiveViewingFriend(null); setHasCheckedVersion(false);
       setFragments(0); setLastRadarSweep(null); setSweepStreak(0); setDailyIntel(""); setNewsFeed([]);
-      setUnlockedMilestones([]); setReputationVouches([]);
+      setUnlockedMilestones([]); setReputationVouches([]); setBlockedUsers([]);
       return;
     }
+
     const setupPushNotifications = async () => {
       try {
         const platform = await CapApp.getInfo();
@@ -779,6 +800,8 @@ function MainApp() {
         setSweepStreak(data.sweepStreak || 0); setDailyIntel(data.dailyIntel || "");
         setUnlockedMilestones(data.unlockedMilestones || []);
         setReputationVouches(data.reputationVouches || []);
+        setBlockedUsers(data.blockedUsers || []);
+        setHasUnreadReplies(data.hasUnreadReplies || false);
 
         const now = new Date();
         const todayString = now.toISOString().split('T')[0];
@@ -1168,6 +1191,40 @@ function MainApp() {
     try { await updateDoc(doc(db, 'comms_posts', postId), { reports: increment(1) }); alert("Transmission flagged for review by Command."); setActiveMenuId(null); } catch (error) { }
   };
 
+  const handleBlockUser = async (targetUid, targetSpriteId) => {
+    const isConfirmed = window.confirm(`Block @${targetSpriteId}? You will no longer see their transmissions or replies.`);
+    if (!isConfirmed) return;
+
+    try {
+      const blockData = { uid: targetUid, spriteId: targetSpriteId };
+      setBlockedUsers(prev => [...prev, blockData]);
+      await updateDoc(doc(db, "users", user.uid), { blockedUsers: arrayUnion(blockData) });
+      await addDoc(firestoreCollection(db, "mail"), {
+        to: "prosyncts@gmail.com",
+        message: {
+          subject: "⚠️ System Alert: User Blocked",
+          text: `User ${spriteId} (${user.uid}) just blocked ${targetSpriteId} (${targetUid}). Please review the blocked account's recent transmissions for abusive content.`
+        }
+      });
+      alert(`Transmission severed. @${targetSpriteId} has been blocked.`);
+      setActiveMenuId(null);
+      playBeep(200, 'sawtooth', 0.1);
+    } catch (e) {
+      console.error(e);
+      alert("Error executing block.");
+    }
+  };
+
+  const handleUnblockUser = async (blockObj) => {
+    try {
+      setBlockedUsers(prev => prev.filter(u => (u.uid || u) !== (blockObj.uid || blockObj)));
+      await updateDoc(doc(db, "users", user.uid), { blockedUsers: arrayRemove(blockObj) });
+      playBeep(440, 'sine', 0.1);
+    } catch (e) {
+      console.error(e);
+      alert("Error unblocking user.");
+    }
+  };
   const handleToggleLike = async (postId, currentLikes = []) => {
     const isLiked = currentLikes.includes(user.uid);
     try {
@@ -1176,7 +1233,7 @@ function MainApp() {
     } catch (error) { }
   };
 
-  const handleReplySubmit = async (postId) => {
+  const handleReplySubmit = async (postId, postAuthorId) => {
     if (!replyText.trim() || isSubmittingReply) return;
     if (PROFANITY_LIST.some(word => replyText.toLowerCase().includes(word))) {
       return alert("Transmission blocked: Please keep comms PG-13.");
@@ -1196,6 +1253,10 @@ function MainApp() {
       await updateDoc(doc(db, 'comms_posts', postId), {
         replyCount: increment(1)
       });
+
+      if (postAuthorId && postAuthorId !== user.uid) {
+        await updateDoc(doc(db, "users", postAuthorId), { hasUnreadReplies: true });
+      }
 
       setReplyText("");
       playBeep(880, 'square', 0.1);
@@ -1466,6 +1527,7 @@ function MainApp() {
 
   const displayedComms = useMemo(() => {
     return commsPosts.filter(post => {
+      if (blockedUsers.some(b => (b.uid || b) === post.authorId)) return false;
       if (commsFilter !== 'trade' || !showPerfectOnly) return true;
       const isOwnPost = user && post.authorId === user.uid;
 
@@ -1688,7 +1750,21 @@ function MainApp() {
               <div className="flex justify-between items-center mb-2"><label className="block text-slate-300 text-xs font-medium uppercase tracking-wide">Password</label></div>
               <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} className={`w-full bg-slate-900/60 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-all ${inputSizeClass}`} placeholder="••••••••" required />
             </div>
-            <button type="submit" disabled={isAuthLoading} className="w-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-medium rounded-xl py-3 px-4 shadow-lg shadow-purple-900/30 transition-all duration-200 transform active:scale-[0.98] mt-2 text-sm disabled:opacity-50">
+
+            <div className="flex items-start gap-3 mt-4 mb-2 bg-slate-900/40 p-3 rounded-xl border border-slate-800">
+              <input
+                type="checkbox"
+                id="eula-check"
+                checked={eulaAccepted}
+                onChange={(e) => setEulaAccepted(e.target.checked)}
+                className="mt-0.5 w-4 h-4 rounded border-slate-700 text-purple-600 focus:ring-purple-500 bg-slate-950 accent-purple-500 shrink-0 cursor-pointer"
+              />
+              <label htmlFor="eula-check" className="text-[10px] sm:text-xs text-slate-400 leading-snug cursor-pointer select-none">
+                I have read and agree to the <a href="/privacy-policy" target="_blank" className="text-purple-400 font-bold hover:underline" onClick={(e) => e.stopPropagation()}>End User License Agreement (EULA)</a>. I understand that abusive behavior or inappropriate content will result in an immediate ban.
+              </label>
+            </div>
+
+            <button type="submit" disabled={isAuthLoading || !eulaAccepted} className={`w-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-medium rounded-xl py-3 px-4 shadow-lg shadow-purple-900/30 transition-all duration-200 transform active:scale-[0.98] mt-2 text-sm ${(isAuthLoading || !eulaAccepted) ? 'opacity-50 cursor-not-allowed grayscale-[30%]' : ''}`}>
               {isAuthLoading ? (lang === 'es' ? 'Cargando...' : 'Loading...') : (isLoginMode ? (lang === 'es' ? 'Iniciar Sesión' : 'Sign In') : (lang === 'es' ? 'Crear Cuenta' : 'Create Account'))}
             </button>
           </form>
@@ -1758,9 +1834,45 @@ function MainApp() {
                 <Info className="w-6 h-6 text-slate-400" /><span className="text-base font-bold text-slate-200">{t('about')}</span>
               </button>
               <div className="h-px bg-slate-800/50 my-2" />
+
+              <button onClick={() => { setShowSettingsModal(false); setShowBlockedUsersModal(true); }} className="flex items-center justify-between p-4 rounded-2xl hover:bg-slate-800/50 transition-colors text-left w-full group">
+                <div className="flex items-center gap-4">
+                  <UserMinus className="w-6 h-6 text-amber-500/70 group-hover:text-amber-400" />
+                  <span className="text-base font-bold text-amber-500/70 group-hover:text-amber-400">Manage Blocked Users</span>
+                </div>
+                {blockedUsers.length > 0 && <span className="text-[10px] font-black text-slate-400 bg-slate-900 border border-slate-700 px-2 py-1 rounded-md">{blockedUsers.length} Blocked</span>}
+              </button>
+
               <button onClick={handleDeleteAccount} className="flex items-center gap-4 p-4 rounded-2xl hover:bg-red-950/30 transition-colors text-left group">
                 <Trash2 className="w-6 h-6 text-red-500/70 group-hover:text-red-400" /><span className="text-base font-bold text-red-500/70 group-hover:text-red-400">Delete Account</span>
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* --- MANAGE BLOCKED USERS MODAL --- */}
+      {showBlockedUsersModal && (
+        <div className="fixed inset-0 z-[90] flex items-center justify-center p-4 bg-black/90 backdrop-blur-md animate-in fade-in duration-200">
+          <div className="bg-[#12141f] border-2 border-slate-700 rounded-2xl flex flex-col max-w-sm w-full h-[60vh] relative overflow-hidden shadow-2xl">
+            <header className="p-4 border-b border-slate-800 flex justify-between items-center bg-[#0e1017]">
+              <h3 className="text-md sm:text-lg font-black tracking-tight text-white uppercase italic flex items-center gap-2"><UserMinus className="w-5 h-5 text-amber-500" /> Blocked Users</h3>
+              <button onClick={() => setShowBlockedUsersModal(false)} className="text-slate-400 hover:text-white"><X className="w-6 h-6" /></button>
+            </header>
+            <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-3">
+              {blockedUsers.length === 0 ? (
+                <div className="text-center p-8">
+                  <UserMinus className="w-10 h-10 text-slate-700 mx-auto mb-3" />
+                  <p className="text-sm text-slate-500 font-bold uppercase tracking-wider">No users blocked</p>
+                </div>
+              ) : (
+                blockedUsers.map((blockedUser, idx) => (
+                  <div key={idx} className="bg-slate-900 border border-slate-800 rounded-xl p-3 flex items-center justify-between">
+                    <span className="text-sm font-bold text-white">@{blockedUser.spriteId || 'Unknown'}</span>
+                    <button onClick={() => handleUnblockUser(blockedUser)} className="bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wider transition-colors">Unblock</button>
+                  </div>
+                ))
+              )}
             </div>
           </div>
         </div>
@@ -2615,6 +2727,12 @@ function MainApp() {
         {/* --- COMMS VIEW --- */}
         {currentView === 'comms' && (
           <div className="flex flex-col gap-4 animate-in fade-in duration-300">
+            {hasUnreadReplies && (
+              <div onClick={clearUnreadReplies} className="bg-indigo-900/80 border-2 border-indigo-400 p-3 rounded-xl flex items-center justify-between shadow-[0_0_20px_rgba(99,102,241,0.4)] animate-pulse cursor-pointer">
+                <span className="text-xs font-black text-white uppercase tracking-widest flex items-center gap-2"><MessageSquare className="w-5 h-5 text-indigo-300" /> New Replies Received!</span>
+                <button className="text-indigo-300 hover:text-white bg-black/40 rounded-full p-1"><X className="w-4 h-4" /></button>
+              </div>
+            )}
             <section className="bg-gradient-to-br from-indigo-900/40 to-blue-900/20 border-2 border-indigo-500/50 rounded-2xl p-5 relative overflow-hidden">
               <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/10 rounded-full blur-[50px] pointer-events-none" />
               <div className="flex justify-between items-start relative z-10">
@@ -2729,11 +2847,13 @@ function MainApp() {
                                 ) : (
                                   <>
                                     <button onClick={() => handleReportPost(post.id)} className="w-full flex items-center gap-2 px-3 py-2 text-xs font-bold text-amber-400 hover:bg-amber-950 transition-colors"><Flag className="w-4 h-4" /> Report</button>
+                                    <button onClick={() => handleBlockUser(post.authorId, post.authorSpriteId)} className="w-full flex items-center gap-2 px-3 py-2 text-xs font-bold text-red-400 hover:bg-red-950 transition-colors border-t border-slate-800"><UserMinus className="w-4 h-4" /> Block User</button>
                                     {spriteId?.toLowerCase() === 'imbearkat' && (
                                       <button onClick={() => handleDeletePost(post.id)} className="w-full flex items-center gap-2 px-3 py-2 text-xs font-bold text-red-400 hover:bg-red-950 hover:text-red-300 transition-colors border-t border-slate-800"><Trash2 className="w-4 h-4" /> Delete (Admin)</button>
                                     )}
                                   </>
                                 )}
+
                               </div>
                             )}
                           </div>
@@ -2784,7 +2904,7 @@ function MainApp() {
                               <p className="text-[11px] text-slate-500 italic text-center py-2">No replies yet. Start the conversation!</p>
                             ) : (
                               <div className="flex flex-col gap-2.5 max-h-60 overflow-y-auto pr-1">
-                                {activeReplies.map((reply) => {
+                                {activeReplies.filter(reply => !blockedUsers.some(b => (b.uid || b) === reply.authorId)).map((reply) => {
                                   const isOwnReply = reply.authorId === user.uid;
                                   const replyAura = reply.authorAura ? AURA_DICTIONARY[reply.authorAura] : null;
 
@@ -2825,10 +2945,10 @@ function MainApp() {
                                 onChange={(e) => setReplyText(e.target.value.substring(0, 150))}
                                 placeholder="Transmit reply..."
                                 className={`flex-1 bg-black/60 border border-slate-700 rounded-xl px-3 py-2 ${inputSizeClass} text-white focus:outline-none focus:border-indigo-500`}
-                                onKeyDown={(e) => e.key === 'Enter' && handleReplySubmit(post.id)}
+                                onKeyDown={(e) => e.key === 'Enter' && handleReplySubmit(post.id, post.authorId)}
                               />
                               <button
-                                onClick={() => handleReplySubmit(post.id)}
+                                onClick={() => handleReplySubmit(post.id, post.authorId)}
                                 disabled={!replyText.trim() || isSubmittingReply}
                                 className="bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white px-4 py-2 rounded-xl text-[10px] sm:text-xs font-black uppercase tracking-wider transition-colors shrink-0"
                               >
@@ -2943,8 +3063,10 @@ function MainApp() {
           <button onClick={() => { setCurrentView('mastery'); setActiveViewingFriend(null); playBeep(523, 'sine', 0.05); }} className={`flex-1 flex flex-col items-center gap-1 py-1 transition-colors ${currentView === 'mastery' && !activeViewingFriend ? 'text-yellow-400' : 'text-slate-600'}`}>
             <Crown className="w-5 h-5" /><span className="text-[8px] sm:text-[9px] font-black uppercase tracking-wider">{t('mastery')}</span>
           </button>
-          <button onClick={() => { setCurrentView('comms'); setActiveViewingFriend(null); playBeep(587, 'sine', 0.05); }} className={`flex-1 flex flex-col items-center gap-1 py-1 transition-colors ${currentView === 'comms' && !activeViewingFriend ? 'text-indigo-400' : 'text-slate-600'}`}>
-            <Radio className="w-5 h-5" /><span className="text-[8px] sm:text-[9px] font-black uppercase tracking-wider">Comms</span>
+          <button onClick={() => { setCurrentView('comms'); setActiveViewingFriend(null); playBeep(587, 'sine', 0.05); if (hasUnreadReplies) clearUnreadReplies(); }} className={`flex-1 flex flex-col items-center gap-1 py-1 transition-colors relative ${currentView === 'comms' && !activeViewingFriend ? 'text-indigo-400' : 'text-slate-600'}`}>
+            <Radio className="w-5 h-5" />
+            {hasUnreadReplies && <div className="absolute top-1 right-[25%] sm:right-[35%] w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-[#0e1017] animate-pulse"></div>}
+            <span className="text-[8px] sm:text-[9px] font-black uppercase tracking-wider">Comms</span>
           </button>
           <button onClick={() => { setCurrentView('friends'); setActiveViewingFriend(null); playBeep(659, 'sine', 0.05); }} className={`flex-1 flex flex-col items-center gap-1 py-1 transition-colors ${(currentView === 'friends' || activeViewingFriend) ? 'text-blue-400' : 'text-slate-600'}`}>
             <Users className="w-5 h-5" /><span className="text-[8px] sm:text-[9px] font-black uppercase tracking-wider">Squad</span>

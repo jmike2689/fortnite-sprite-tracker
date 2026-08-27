@@ -376,3 +376,51 @@ exports.cleanupOldNews = functions.pubsub.schedule("0 3 * * *") // Runs daily at
 
         return null;
     });
+
+// --- 7. COMMS REPLY PUSH NOTIFICATION ---
+exports.sendReplyNotification = functions.firestore
+    .document("comms_posts/{postId}/replies/{replyId}")
+    .onCreate(async (snap, context) => {
+        const replyData = snap.data();
+        const postId = context.params.postId;
+
+        // Get the parent post to find out who to notify
+        const postDoc = await db.collection('comms_posts').doc(postId).get();
+        if (!postDoc.exists) return null;
+
+        const postData = postDoc.data();
+        const targetUserId = postData.authorId;
+
+        // Don't notify the user if they are replying to their own post
+        if (replyData.authorId === targetUserId) return null;
+
+        // Get the target user's push token and data
+        const userDoc = await db.collection("users").doc(targetUserId).get();
+        if (!userDoc.exists) return null;
+
+        const userData = userDoc.data();
+        const deviceToken = userData.fcmToken;
+
+        if (!deviceToken) {
+            console.log(`User ${targetUserId} has no FCM token.`);
+            return null;
+        }
+
+        const payload = {
+            token: deviceToken,
+            notification: {
+                title: `💬 New Reply from @${replyData.authorSpriteId || "Hunter"}`,
+                body: replyData.text.length > 50 ? replyData.text.substring(0, 50) + "..." : replyData.text,
+            },
+            data: { route: "comms" }
+        };
+
+        try {
+            await admin.messaging().send(payload);
+            console.log("Successfully sent Comms reply notification.");
+        } catch (error) {
+            console.error("Error sending reply push notification:", error);
+        }
+
+        return null;
+    });
