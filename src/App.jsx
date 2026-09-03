@@ -66,6 +66,36 @@ import stormScoutBase from './assets/Storm Scount Base.webp';
 import stormScoutGold from './assets/Storm Scout Gold.webp';
 import stormScoutCheatMaster from './assets/Storm Scout Cheat Master.webp';
 
+// --- NEW SPRITES & LOOT HACKER IMPORTS ---
+import jackrabbitLootHacker from './assets/Jackrabbit Hacker.webp';
+import shadowLootHacker from './assets/Shadow Loot Hacker.webp';
+import bushLootHacker from './assets/Bush Loot Hacker.webp';
+import tailsLootHacker from './assets/Tails Loot Hacker.webp';
+import killswitchLootHacker from './assets/Killswitch Loot Hacker.webp';
+import adventureLootHacker from './assets/Adventure Loot Hacker.webp';
+import klomboLootHacker from './assets/Klombo Loot Hacker.webp';
+import jonesyLootHacker from './assets/Jonesy Loot Hacker.webp';
+import sonicLootHacker from './assets/Sonic Loot Hacker.webp';
+import crownLootHacker from './assets/Crown Loot Hacker.webp';
+import eightBitLootHacker from './assets/8-Bit Loot Hacker.webp';
+
+import xrayBase from './assets/X-Ray Base.webp';
+import xrayGold from './assets/X-Ray Gold.webp';
+import xrayCheatMaster from './assets/X-Ray Cheat Master.webp';
+import xrayLootHacker from './assets/X-Ray Loot Hacker.webp';
+
+import overshieldBase from './assets/Overshield Base.webp';
+import overshieldGold from './assets/Overshield Gold.webp';
+import overshieldCheatMaster from './assets/Overshield Cheat Master.webp';
+import overshieldLootHacker from './assets/Overshield Loot Hacker.webp';
+
+import megaManBase from './assets/Mega Man Base.webp';
+
+import onigiriBase from './assets/Onigiri Base.webp';
+import onigiriGold from './assets/Onigiri Gold.webp';
+import onigiriCheatMaster from './assets/Onigiri Cheat Master.webp';
+import onigiriLootHacker from './assets/Onigiri Loot Hacker.webp';
+
 // --- EXISTING IMPORTS ---
 import ironMouseBase from './assets/Iron Mouse Base.webp';
 import peelyBase from './assets/Peely Base.webp';
@@ -186,7 +216,7 @@ import gemPunk from './assets/Gem Punk.webp';
 import gemAura from './assets/Gem Aura.webp';
 import quackZeroPoint from './assets/Quack Zero Point.webp';
 
-const variantsList = ['base', 'gold', 'gummy', 'galaxy', 'holofoil', 'cube', 'gem', 'quack', 'cheatmaster'];
+const variantsList = ['base', 'gold', 'gummy', 'galaxy', 'holofoil', 'cube', 'gem', 'quack', 'cheatmaster', 'loothacker'];
 const LOCKED_VARIANTS = {};
 
 const isVariantLocked = (spriteId, variant) => {
@@ -292,21 +322,35 @@ const SPRITES_DATABASE = [
   { id: "air", name: "Air", rarity: "Rare", season: 'C7S3', images: { base: airBase, gold: airGold, gummy: airGummy, galaxy: airGalaxy, holofoil: airHolofoil }, variants: ['base', 'gold', 'gummy', 'galaxy', 'holofoil'], baseAbility: { en: "Increases sprinting speed and jump height. Also nullifies fall damage. Jump height increased with each Level Up!", es: "Aumenta la velocidad de esprint y la altura de salto. También anula el daño por caída. ¡Altura de salto aumentada con cada nivel!" } },
 
   // --- NEW SEASON 4 SPRITES ---
-  { id: "jackrabbit", name: "Jackrabbit", rarity: "Legendary", season: 'C7S4', images: { base: jackrabbitBase, gold: jackrabbitGold, cheatmaster: jackrabbitCheatMaster }, variants: ['base', 'gold', 'cheatmaster'], baseAbility: { en: "Grants the ability to perform another jump while mid-air! Cooldown between jumps decreases with each Level Up!", es: "Grants the ability to perform another jump while mid-air! Cooldown between jumps decreases with each Level Up!" } },
-  { id: "shadow", name: "Shadow", rarity: "Epic", season: 'C7S4', images: { base: shadowBase, gold: shadowGold, cheatmaster: shadowCheatMaster }, variants: ['base', 'gold', 'cheatmaster'], baseAbility: { en: "Automatically reload unequipped weapons over time. Reloads equipped weapon at max level. Automatic reload gets faster with each Level Up!", es: "Automatically reload unequipped weapons over time. Reloads equipped weapon at max level. Automatic reload gets faster with each Level Up!" } },
-  { id: "bush", name: "Bush", rarity: "Rare", season: 'C7S4', images: { base: bushBase, gold: bushGold, cheatmaster: bushCheatMaster }, variants: ['base', 'gold', 'cheatmaster'], baseAbility: { en: "Grants a bush on you after a duration, gain a bush on elimination at max level. Time between bush activating decreases with each Level Up!", es: "Grants a bush on you after a duration, gain a bush on elimination at max level. Time between bush activating decreases with each Level Up!" } },
-  { id: "tails", name: "Tails", rarity: "Epic", season: 'C7S4', images: { base: tailsBase, gold: tailsGold, cheatmaster: tailsCheatMaster }, variants: ['base', 'gold', 'cheatmaster'], baseAbility: { en: "Grants the ability to hover with the Help of Tails! Hover speed increased with each Level Up!", es: "Grants the ability to hover with the Help of Tails! Hover speed increased with each Level Up!" } },
-  { id: "killswitch", name: "Killswitch", rarity: "Epic", season: 'C7S4', images: { base: killswitchBase, gold: killswitchGold, cheatmaster: killswitchCheatMaster }, variants: ['base', 'gold', 'cheatmaster'], baseAbility: { en: "Enter Hangtime with improved accuracy when aiming while jumping and falling. Accuracy increases with each Level Up!", es: "Enter Hangtime with improved accuracy when aiming while jumping and falling. Accuracy increases with each Level Up!" } },
-  { id: "adventure", name: "Adventure", rarity: "Rare", season: 'C7S4', images: { base: adventureBase, gold: adventureGold, cheatmaster: adventureCheatMaster }, variants: ['base', 'gold', 'cheatmaster'], baseAbility: { en: "Upgrades a random item in the player's inventory with each Level Up!", es: "Upgrades a random item in the player's inventory with each Level Up!" } },
-  { id: "klombo", name: "Klombo", rarity: "Mythic", season: 'C7S4', images: { base: klomboBase, gold: klomboGold, cheatmaster: klomboCheatMaster }, variants: ['base', 'gold', 'cheatmaster'], baseAbility: { en: "Grants random items at each level, only levels up by consuming items. Item quality increases with each Level Up!", es: "Grants random items at each level, only levels up by consuming items. Item quality increases with each Level Up!" } },
-  { id: "jonesy", name: "Jonesy", rarity: "Rare", season: 'C7S4', images: { base: jonesyBase, gold: jonesyGold, cheatmaster: jonesyCheatMaster }, variants: ['base', 'gold', 'cheatmaster'], baseAbility: { en: "Recover some health or shields after being damaged after a short duration. Increase amount healed with each Level Up!", es: "Recover some health or shields after being damaged after a short duration. Increase amount healed with each Level Up!" } },
-  { id: "sonic", name: "Sonic", rarity: "Epic", season: 'C7S4', images: { base: sonicBase, gold: sonicGold, cheatmaster: sonicCheatMaster }, variants: ['base', 'gold', 'cheatmaster'], baseAbility: { en: "Gotta Go Fast! Sprint faster with each Level Up!", es: "Gotta Go Fast! Sprint faster with each Level Up!" } },
-  { id: "crown", name: "Crown", rarity: "Mythic", season: 'C7S4', images: { base: crownBase, gold: crownGold, cheatmaster: crownCheatMaster }, variants: ['base', 'gold', 'cheatmaster'], baseAbility: { en: "Only levels up by winning matches. Level up faster with Crown Wins. New variants unlocked after mastering!", es: "Only levels up by winning matches. Level up faster with Crown Wins. New variants unlocked after mastering!" } },
-  { id: "eight-bit", name: "8-Bit", rarity: "Rare", season: 'C7S4', images: { base: eightBitBase, gold: eightBitGold, cheatmaster: eightBitCheatMaster }, variants: ['base', 'gold', 'cheatmaster'], baseAbility: { en: "Find an 8-Bit Shotgun in your first chest and gain a score multiplier for it.", es: "Find an 8-Bit Shotgun in your first chest and gain a score multiplier for it." } },
-  { id: "storm-scout", name: "Storm Scout", rarity: "Rare", season: 'C7S4', images: { base: stormScoutBase, gold: stormScoutGold, cheatmaster: stormScoutCheatMaster }, variants: ['base', 'gold', 'cheatmaster'], baseAbility: { en: "Applies Overdrive after taking a certain amount of storm damage. Reveals future Storm Circles at max level. Reduces damage to trigger overdrive with each Level Up!", es: "Applies Overdrive after taking a certain amount of storm damage. Reveals future Storm Circles at max level. Reduces damage to trigger overdrive with each Level Up!" } }
+  { id: "jackrabbit", name: "Jackrabbit", rarity: "Legendary", season: 'C7S4', images: { base: jackrabbitBase, gold: jackrabbitGold, cheatmaster: jackrabbitCheatMaster, loothacker: jackrabbitLootHacker }, variants: ['base', 'gold', 'cheatmaster', 'loothacker'], baseAbility: { en: "Grants the ability to perform another jump while mid-air! Cooldown between jumps decreases with each Level Up!", es: "Grants the ability to perform another jump while mid-air! Cooldown between jumps decreases with each Level Up!" } },
+  { id: "shadow", name: "Shadow", rarity: "Epic", season: 'C7S4', images: { base: shadowBase, gold: shadowGold, cheatmaster: shadowCheatMaster, loothacker: shadowLootHacker }, variants: ['base', 'gold', 'cheatmaster', 'loothacker'], baseAbility: { en: "Automatically reload unequipped weapons over time. Reloads equipped weapon at max level. Automatic reload gets faster with each Level Up!", es: "Automatically reload unequipped weapons over time. Reloads equipped weapon at max level. Automatic reload gets faster with each Level Up!" } },
+  { id: "bush", name: "Bush", rarity: "Rare", season: 'C7S4', images: { base: bushBase, gold: bushGold, cheatmaster: bushCheatMaster, loothacker: bushLootHacker }, variants: ['base', 'gold', 'cheatmaster', 'loothacker'], baseAbility: { en: "Grants a bush on you after a duration, gain a bush on elimination at max level. Time between bush activating decreases with each Level Up!", es: "Grants a bush on you after a duration, gain a bush on elimination at max level. Time between bush activating decreases with each Level Up!" } },
+  { id: "tails", name: "Tails", rarity: "Epic", season: 'C7S4', images: { base: tailsBase, gold: tailsGold, cheatmaster: tailsCheatMaster, loothacker: tailsLootHacker }, variants: ['base', 'gold', 'cheatmaster', 'loothacker'], baseAbility: { en: "Grants the ability to hover with the Help of Tails! Hover speed increased with each Level Up!", es: "Grants the ability to hover with the Help of Tails! Hover speed increased with each Level Up!" } },
+  { id: "killswitch", name: "Killswitch", rarity: "Epic", season: 'C7S4', images: { base: killswitchBase, gold: killswitchGold, cheatmaster: killswitchCheatMaster, loothacker: killswitchLootHacker }, variants: ['base', 'gold', 'cheatmaster', 'loothacker'], baseAbility: { en: "Enter Hangtime with improved accuracy when aiming while jumping and falling. Accuracy increases with each Level Up!", es: "Enter Hangtime with improved accuracy when aiming while jumping and falling. Accuracy increases with each Level Up!" } },
+  { id: "adventure", name: "Adventure", rarity: "Rare", season: 'C7S4', images: { base: adventureBase, gold: adventureGold, cheatmaster: adventureCheatMaster, loothacker: adventureLootHacker }, variants: ['base', 'gold', 'cheatmaster', 'loothacker'], baseAbility: { en: "Upgrades a random item in the player's inventory with each Level Up!", es: "Upgrades a random item in the player's inventory with each Level Up!" } },
+  { id: "klombo", name: "Klombo", rarity: "Mythic", season: 'C7S4', images: { base: klomboBase, gold: klomboGold, cheatmaster: klomboCheatMaster, loothacker: klomboLootHacker }, variants: ['base', 'gold', 'cheatmaster', 'loothacker'], baseAbility: { en: "Grants random items at each level, only levels up by consuming items. Item quality increases with each Level Up!", es: "Grants random items at each level, only levels up by consuming items. Item quality increases with each Level Up!" } },
+  { id: "jonesy", name: "Jonesy", rarity: "Rare", season: 'C7S4', images: { base: jonesyBase, gold: jonesyGold, cheatmaster: jonesyCheatMaster, loothacker: jonesyLootHacker }, variants: ['base', 'gold', 'cheatmaster', 'loothacker'], baseAbility: { en: "Recover some health or shields after being damaged after a short duration. Increase amount healed with each Level Up!", es: "Recover some health or shields after being damaged after a short duration. Increase amount healed with each Level Up!" } },
+  { id: "sonic", name: "Sonic", rarity: "Epic", season: 'C7S4', images: { base: sonicBase, gold: sonicGold, cheatmaster: sonicCheatMaster, loothacker: sonicLootHacker }, variants: ['base', 'gold', 'cheatmaster', 'loothacker'], baseAbility: { en: "Gotta Go Fast! Sprint faster with each Level Up!", es: "Gotta Go Fast! Sprint faster with each Level Up!" } },
+  { id: "crown", name: "Crown", rarity: "Mythic", season: 'C7S4', images: { base: crownBase, gold: crownGold, cheatmaster: crownCheatMaster, loothacker: crownLootHacker }, variants: ['base', 'gold', 'cheatmaster', 'loothacker'], baseAbility: { en: "Only levels up by winning matches. Level up faster with Crown Wins. New variants unlocked after mastering!", es: "Only levels up by winning matches. Level up faster with Crown Wins. New variants unlocked after mastering!" } },
+  { id: "eight-bit", name: "8-Bit", rarity: "Rare", season: 'C7S4', images: { base: eightBitBase, gold: eightBitGold, cheatmaster: eightBitCheatMaster, loothacker: eightBitLootHacker }, variants: ['base', 'gold', 'cheatmaster', 'loothacker'], baseAbility: { en: "Find an 8-Bit Shotgun in your first chest and gain a score multiplier for it.", es: "Find an 8-Bit Shotgun in your first chest and gain a score multiplier for it." } },
+  { id: "storm-scout", name: "Storm Scout", rarity: "Rare", season: 'C7S4', images: { base: stormScoutBase, gold: stormScoutGold, cheatmaster: stormScoutCheatMaster }, variants: ['base', 'gold', 'cheatmaster'], baseAbility: { en: "Applies Overdrive after taking a certain amount of storm damage. Reveals future Storm Circles at max level. Reduces damage to trigger overdrive with each Level Up!", es: "Applies Overdrive after taking a certain amount of storm damage. Reveals future Storm Circles at max level. Reduces damage to trigger overdrive with each Level Up!" } },
+  { id: "x-ray", name: "X-Ray", rarity: "Legendary", season: 'C7S4', images: { base: xrayBase, gold: xrayGold, cheatmaster: xrayCheatMaster, loothacker: xrayLootHacker }, variants: ['base', 'gold', 'cheatmaster', 'loothacker'], baseAbility: { en: "Periodically mark enemies in an area around you. Mark more often and in a larger radius with each Level Up!", es: "Periodically mark enemies in an area around you. Mark more often and in a larger radius with each Level Up!" } },
+  { id: "overshield", name: "Overshield", rarity: "Rare", season: 'C7S4', images: { base: overshieldBase, gold: overshieldGold, cheatmaster: overshieldCheatMaster, loothacker: overshieldLootHacker }, variants: ['base', 'gold', 'cheatmaster', 'loothacker'], baseAbility: { en: "Grants overshield, scaling with level.", es: "Grants overshield, scaling with level." } },
+  { id: "mega-man", name: "Mega Man", rarity: "Rare", season: 'C7S4', images: { base: megaManBase }, variants: ['base'], baseAbility: { en: "Slip and slide around with reduced friction while Sliding. Slide farther with each Level Up!", es: "Slip and slide around with reduced friction while Sliding. Slide farther with each Level Up!" } },
+  { id: "onigiri", name: "Onigiri", rarity: "Rare", season: 'C7S4', images: { base: onigiriBase, gold: onigiriGold, cheatmaster: onigiriCheatMaster, loothacker: onigiriLootHacker }, variants: ['base', 'gold', 'cheatmaster', 'loothacker'], baseAbility: { en: "Applies Overdrive after eating or drinking a Consumable. Overdrive lasts longer with each Level Up!", es: "Applies Overdrive after eating or drinking a Consumable. Overdrive lasts longer with each Level Up!" } }
 ];
 
 const PATCH_NOTES = [
+  {
+    version: "v2.3.0",
+    date: "09/03/2026",
+    title: "The Loot Hacker Update!",
+    changes: [
+      "New Sprites: X-Ray, Overshield, Mega Man, and Onigiri have been added to the tracking pool!",
+      "New Variant Discovered: Track down the elusive 'Loot Hacker' variant across majority of C7S4 Sprites.",
+      "Restored Intel: Variant ability descriptions have been restored inside the Inspection Modal."
+    ]
+  },
   {
     version: "v2.2.2",
     date: "08/27/2026",
@@ -501,7 +545,8 @@ const VARIANT_INFO = {
   cube: { name: "Cube", color: "text-violet-500", bgColor: "bg-violet-500" },
   gem: { name: "Gem", color: "text-emerald-400", bgColor: "bg-emerald-400" },
   quack: { name: "Quack", color: "text-yellow-300", bgColor: "bg-yellow-300" },
-  cheatmaster: { name: "Cheat Master", color: "text-red-500", bgColor: "bg-red-500" }
+  cheatmaster: { name: "Cheat Master", color: "text-green-500", bgColor: "bg-green-500" },
+  loothacker: { name: "Loot Hacker", color: "text-purple-300", bgColor: "bg-purple-300" }
 };
 
 const RARITY_COLORS = { Mythic: "bg-yellow-400 text-black border-yellow-300 font-extrabold", Legendary: "bg-orange-500 text-white border-orange-400", Epic: "bg-purple-600 text-white border-purple-400", Rare: "bg-blue-600 text-white border-blue-400", Unknown: "bg-slate-500 text-white border-slate-400" };
@@ -1366,7 +1411,7 @@ function MainApp() {
       if (permStatus.display !== 'granted') return;
       const pending = await LocalNotifications.getPending();
       if (pending.notifications.length > 0) await LocalNotifications.cancel({ notifications: pending.notifications });
-      const triggerDate = new Date(Date.now() + 22 * 60 * 60 * 1000);
+      const triggerDate = new Date(Date.now() + 24 * 60 * 60 * 1000);
       await LocalNotifications.schedule({
         notifications: [{ title: "⚠️ Streak at Risk!", body: `Your Daily Radar is fully charged. Sweep now to protect your ${currentStreak}-Day Streak!`, id: 1001, schedule: { at: triggerDate, allowWhileIdle: true } }]
       });
@@ -1574,7 +1619,15 @@ function MainApp() {
   };
 
   const getVariantModifierText = (variant) => {
-    return null;
+    switch (variant) {
+      case 'cheatmaster': return "Button mash! All inputs are correct when entering cheat codes found in the world.";
+      case 'gold': return "Gain 3x bonus XP from eliminations.";
+      case 'gummy': return "Gain 20% more Sprite Dust upon extraction.";
+      case 'galaxy': return "Gain 30% more Ammo whenever picked up in the world.";
+      case 'holofoil': return "5% chance for your squad to find rare Sprite Variants from looting chests.";
+      case 'loothacker': return "Increases chances of spawning items from your Loot Hacks.";
+      default: return null;
+    }
   };
 
   const renderProfileCard = (id, profData, colRate, mastRate, joinTime, isSelf, masteriesObj, repVouches, uid, unlockedArray = []) => {
@@ -2215,7 +2268,7 @@ function MainApp() {
                         <button key={v} onClick={() => handleSpriteSelect(sprite.id, v)} className="flex flex-col items-center p-2 rounded-lg border border-slate-700 bg-black/40 hover:bg-slate-800 transition-colors overflow-hidden">
                           <img src={sprite.images[v]} className="w-8 h-8 object-contain mb-1" alt="" />
                           <span className={`text-[7px] sm:text-[8px] font-black uppercase truncate w-full text-center ${VARIANT_INFO[v]?.color}`}>
-                            {v === 'holofoil' ? 'Holo' : v === 'cheatmaster' ? 'Cheat' : t(v)}
+                            {v === 'holofoil' ? 'Holo' : v === 'cheatmaster' ? 'Cheat' : v === 'loothacker' ? 'Hacker' : t(v)}
                           </span>
                         </button>
                       ))}
@@ -2437,7 +2490,7 @@ function MainApp() {
                   <div>
                     <span className="text-[9px] text-slate-500 font-black uppercase tracking-widest mb-1.5 block">{t('variant_type')}</span>
                     <div className="flex flex-wrap gap-1.5">
-                      {['All', 'Base', 'Gold', 'Gummy', 'Galaxy', 'Holofoil', 'Cube', 'Gem', 'Quack', 'Cheatmaster'].map(variant => (
+                      {['All', 'Base', 'Gold', 'Gummy', 'Galaxy', 'Holofoil', 'Cube', 'Gem', 'Quack', 'Cheatmaster', 'Loot Hacker'].map(variant => (
                         <button key={variant} onClick={() => setFVariantFilter(variant)} className={`px-3 py-1.5 text-[10px] font-black tracking-wider rounded-lg border uppercase ${fVariantFilter === variant ? 'bg-purple-500 text-white border-purple-400' : 'bg-black/40 text-slate-400 border-slate-800'}`}>
                           {t(variant.toLowerCase())}
                         </button>
@@ -2511,7 +2564,7 @@ function MainApp() {
                                 </>
                               )}
                             </div>
-                            <span className="text-[7px] sm:text-[8px] font-bold uppercase text-slate-500 tracking-wider whitespace-nowrap">{v === 'holofoil' ? 'Holo' : v === 'cheatmaster' ? 'Cheat' : t(v)}</span>
+                            <span className="text-[7px] sm:text-[8px] font-bold uppercase text-slate-500 tracking-wider whitespace-nowrap">{v === 'holofoil' ? 'Holo' : v === 'cheatmaster' ? 'Cheat' : v === 'loothacker' ? 'Hacker' : t(v)}</span>
                           </div>
                         );
                       })}
@@ -2681,7 +2734,7 @@ function MainApp() {
                   <div>
                     <span className="text-[9px] text-slate-500 font-black uppercase tracking-widest mb-1.5 block">{t('variant_type')}</span>
                     <div className="flex flex-wrap gap-1.5">
-                      {['All', 'Base', 'Gold', 'Gummy', 'Galaxy', 'Holofoil', 'Cube', 'Gem', 'Quack', 'Cheatmaster'].map(variant => (
+                      {['All', 'Base', 'Gold', 'Gummy', 'Galaxy', 'Holofoil', 'Cube', 'Gem', 'Quack', 'Cheatmaster', 'Loot Hacker'].map(variant => (
                         <button key={variant} onClick={() => setVariantFilter(variant)} className={`px-3 py-1.5 text-[10px] font-black tracking-wider rounded-lg border uppercase ${variantFilter === variant ? 'bg-purple-500 text-white border-purple-400' : 'bg-black/40 text-slate-400 border-slate-800'}`}>
                           {t(variant.toLowerCase())}
                         </button>
@@ -2734,7 +2787,7 @@ function MainApp() {
                                 <div onMouseDown={(e) => handleDotPressStart(e, sprite.id, v)} onMouseUp={handleDotPressEnd} onMouseLeave={handleDotPressEnd} onTouchStart={(e) => handleDotPressStart(e, sprite.id, v)} onTouchEnd={handleDotPressEnd} onClick={(e) => e.stopPropagation()} className={`w-6 h-6 sm:w-8 sm:h-8 rounded-full flex items-center justify-center border-2 transition-all duration-300 relative select-none cursor-pointer ${activeHoldId === `${sprite.id}_${v}` ? 'scale-[1.3] ring-2 ring-cyan-400 shadow-[0_0_20px_rgba(34,211,238,0.8)]' : ''} ${isLocked ? 'bg-slate-950/80 border-slate-800/60 opacity-60' : isMasteryView && isMastered ? 'bg-yellow-900/40 border-yellow-400' : isCollected ? `bg-slate-900 border-${VARIANT_INFO[v]?.color.split('-')[1]}-500/70` : 'bg-black border-slate-800'}`}>
                                   {isLocked ? <Lock className="w-3 h-3 sm:w-4 sm:h-4 text-slate-600" /> : (<>{isCollected && <div className={`w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full ${VARIANT_INFO[v]?.bgColor} ${(isMasteryView && isMastered) ? 'opacity-30' : 'opacity-100'}`} />}{isMasteryView && isMastered && <Crown className="w-4 h-4 sm:w-5 sm:h-5 text-yellow-400 drop-shadow-[0_0_2px_rgba(255,215,0,0.8)] absolute z-10" />}</>)}
                                 </div>
-                                <span className="text-[7px] sm:text-[8px] font-bold uppercase text-slate-500 tracking-wider whitespace-nowrap">{v === 'holofoil' ? 'Holo' : v === 'cheatmaster' ? 'Cheat' : t(v)}</span>
+                                <span className="text-[7px] sm:text-[8px] font-bold uppercase text-slate-500 tracking-wider whitespace-nowrap">{v === 'holofoil' ? 'Holo' : v === 'cheatmaster' ? 'Cheat' : v === 'loothacker' ? 'Hacker' : t(v)}</span>
                               </div>
                             )
                           })}
