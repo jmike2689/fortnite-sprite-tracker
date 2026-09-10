@@ -78,6 +78,7 @@ import jonesyLootHacker from './assets/Jonesy Loot Hacker.webp';
 import sonicLootHacker from './assets/Sonic Loot Hacker.webp';
 import crownLootHacker from './assets/Crown Loot Hacker.webp';
 import eightBitLootHacker from './assets/8-Bit Loot Hacker.webp';
+import stormScoutLootHacker from './assets/Storm Scout Loot Hacker.webp';
 
 import xrayBase from './assets/X-Ray Base.webp';
 import xrayGold from './assets/X-Ray Gold.webp';
@@ -326,14 +327,14 @@ const SPRITES_DATABASE = [
   { id: "shadow", name: "Shadow", rarity: "Epic", season: 'C7S4', images: { base: shadowBase, gold: shadowGold, cheatmaster: shadowCheatMaster, loothacker: shadowLootHacker }, variants: ['base', 'gold', 'cheatmaster', 'loothacker'], baseAbility: { en: "Automatically reload unequipped weapons over time. Reloads equipped weapon at max level. Automatic reload gets faster with each Level Up!", es: "Automatically reload unequipped weapons over time. Reloads equipped weapon at max level. Automatic reload gets faster with each Level Up!" } },
   { id: "bush", name: "Bush", rarity: "Rare", season: 'C7S4', images: { base: bushBase, gold: bushGold, cheatmaster: bushCheatMaster, loothacker: bushLootHacker }, variants: ['base', 'gold', 'cheatmaster', 'loothacker'], baseAbility: { en: "Grants a bush on you after a duration, gain a bush on elimination at max level. Time between bush activating decreases with each Level Up!", es: "Grants a bush on you after a duration, gain a bush on elimination at max level. Time between bush activating decreases with each Level Up!" } },
   { id: "tails", name: "Tails", rarity: "Epic", season: 'C7S4', images: { base: tailsBase, gold: tailsGold, cheatmaster: tailsCheatMaster, loothacker: tailsLootHacker }, variants: ['base', 'gold', 'cheatmaster', 'loothacker'], baseAbility: { en: "Grants the ability to hover with the Help of Tails! Hover speed increased with each Level Up!", es: "Grants the ability to hover with the Help of Tails! Hover speed increased with each Level Up!" } },
-  { id: "killswitch", name: "Killswitch", rarity: "Epic", season: 'C7S4', images: { base: killswitchBase, gold: killswitchGold, cheatmaster: killswitchCheatMaster, loothacker: killswitchLootHacker }, variants: ['base', 'gold', 'cheatmaster', 'loothacker'], baseAbility: { en: "Enter Hangtime with improved accuracy when aiming while jumping and falling. Accuracy increases with each Level Up!", es: "Enter Hangtime with improved accuracy when aiming while jumping and falling. Accuracy increases with each Level Up!" } },
+  { id: "killswitch", name: "Killswitch", rarity: "Legendary", season: 'C7S4', images: { base: killswitchBase, gold: killswitchGold, cheatmaster: killswitchCheatMaster, loothacker: killswitchLootHacker }, variants: ['base', 'gold', 'cheatmaster', 'loothacker'], baseAbility: { en: "Enter Hangtime with improved accuracy when aiming while jumping and falling. Accuracy increases with each Level Up!", es: "Enter Hangtime with improved accuracy when aiming while jumping and falling. Accuracy increases with each Level Up!" } },
   { id: "adventure", name: "Adventure", rarity: "Rare", season: 'C7S4', images: { base: adventureBase, gold: adventureGold, cheatmaster: adventureCheatMaster, loothacker: adventureLootHacker }, variants: ['base', 'gold', 'cheatmaster', 'loothacker'], baseAbility: { en: "Upgrades a random item in the player's inventory with each Level Up!", es: "Upgrades a random item in the player's inventory with each Level Up!" } },
   { id: "klombo", name: "Klombo", rarity: "Mythic", season: 'C7S4', images: { base: klomboBase, gold: klomboGold, cheatmaster: klomboCheatMaster, loothacker: klomboLootHacker }, variants: ['base', 'gold', 'cheatmaster', 'loothacker'], baseAbility: { en: "Grants random items at each level, only levels up by consuming items. Item quality increases with each Level Up!", es: "Grants random items at each level, only levels up by consuming items. Item quality increases with each Level Up!" } },
   { id: "jonesy", name: "Jonesy", rarity: "Rare", season: 'C7S4', images: { base: jonesyBase, gold: jonesyGold, cheatmaster: jonesyCheatMaster, loothacker: jonesyLootHacker }, variants: ['base', 'gold', 'cheatmaster', 'loothacker'], baseAbility: { en: "Recover some health or shields after being damaged after a short duration. Increase amount healed with each Level Up!", es: "Recover some health or shields after being damaged after a short duration. Increase amount healed with each Level Up!" } },
   { id: "sonic", name: "Sonic", rarity: "Epic", season: 'C7S4', images: { base: sonicBase, gold: sonicGold, cheatmaster: sonicCheatMaster, loothacker: sonicLootHacker }, variants: ['base', 'gold', 'cheatmaster', 'loothacker'], baseAbility: { en: "Gotta Go Fast! Sprint faster with each Level Up!", es: "Gotta Go Fast! Sprint faster with each Level Up!" } },
   { id: "crown", name: "Crown", rarity: "Mythic", season: 'C7S4', images: { base: crownBase, gold: crownGold, cheatmaster: crownCheatMaster, loothacker: crownLootHacker }, variants: ['base', 'gold', 'cheatmaster', 'loothacker'], baseAbility: { en: "Only levels up by winning matches. Level up faster with Crown Wins. New variants unlocked after mastering!", es: "Only levels up by winning matches. Level up faster with Crown Wins. New variants unlocked after mastering!" } },
   { id: "eight-bit", name: "8-Bit", rarity: "Rare", season: 'C7S4', images: { base: eightBitBase, gold: eightBitGold, cheatmaster: eightBitCheatMaster, loothacker: eightBitLootHacker }, variants: ['base', 'gold', 'cheatmaster', 'loothacker'], baseAbility: { en: "Find an 8-Bit Shotgun in your first chest and gain a score multiplier for it.", es: "Find an 8-Bit Shotgun in your first chest and gain a score multiplier for it." } },
-  { id: "storm-scout", name: "Storm Scout", rarity: "Rare", season: 'C7S4', images: { base: stormScoutBase, gold: stormScoutGold, cheatmaster: stormScoutCheatMaster }, variants: ['base', 'gold', 'cheatmaster'], baseAbility: { en: "Applies Overdrive after taking a certain amount of storm damage. Reveals future Storm Circles at max level. Reduces damage to trigger overdrive with each Level Up!", es: "Applies Overdrive after taking a certain amount of storm damage. Reveals future Storm Circles at max level. Reduces damage to trigger overdrive with each Level Up!" } },
+  { id: "storm-scout", name: "Storm Scout", rarity: "Rare", season: 'C7S4', images: { base: stormScoutBase, gold: stormScoutGold, cheatmaster: stormScoutCheatMaster, loothacker: stormScoutLootHacker }, variants: ['base', 'gold', 'cheatmaster', 'loothacker'], baseAbility: { en: "Applies Overdrive after taking a certain amount of storm damage. Reveals future Storm Circles at max level. Reduces damage to trigger overdrive with each Level Up!", es: "Applies Overdrive after taking a certain amount of storm damage. Reveals future Storm Circles at max level. Reduces damage to trigger overdrive with each Level Up!" } },
   { id: "x-ray", name: "X-Ray", rarity: "Legendary", season: 'C7S4', images: { base: xrayBase, gold: xrayGold, cheatmaster: xrayCheatMaster, loothacker: xrayLootHacker }, variants: ['base', 'gold', 'cheatmaster', 'loothacker'], baseAbility: { en: "Periodically mark enemies in an area around you. Mark more often and in a larger radius with each Level Up!", es: "Periodically mark enemies in an area around you. Mark more often and in a larger radius with each Level Up!" } },
   { id: "overshield", name: "Overshield", rarity: "Rare", season: 'C7S4', images: { base: overshieldBase, gold: overshieldGold, cheatmaster: overshieldCheatMaster, loothacker: overshieldLootHacker }, variants: ['base', 'gold', 'cheatmaster', 'loothacker'], baseAbility: { en: "Grants overshield, scaling with level.", es: "Grants overshield, scaling with level." } },
   { id: "mega-man", name: "Mega Man", rarity: "Rare", season: 'C7S4', images: { base: megaManBase }, variants: ['base'], baseAbility: { en: "Slip and slide around with reduced friction while Sliding. Slide farther with each Level Up!", es: "Slip and slide around with reduced friction while Sliding. Slide farther with each Level Up!" } },
@@ -341,6 +342,16 @@ const SPRITES_DATABASE = [
 ];
 
 const PATCH_NOTES = [
+  {
+    version: "v2.3.1",
+    date: "09/10/2026",
+    title: "Comms Optimization & Bug Fixes!",
+    changes: [
+      "Touch Controls Fixed: Resolved a touch-interference bug where long-pressing a Sprite occasionally reversed its collection status.",
+      "Tracker Accuracy: Corrected Killswitch's rarity to Legendary and successfully decrypted the missing Storm Scout Loot Hacker variant.",
+      "Comms Network Upgrades: Added duplicate-transmission protection to prevent Trade Board spam, improved network scrolling, and implemented an auto-cleaning cycle to keep the feed lightning fast."
+    ]
+  },
   {
     version: "v2.3.0",
     date: "09/03/2026",
@@ -733,6 +744,9 @@ function MainApp() {
   const [editingPostId, setEditingPostId] = useState(null);
   const [activeMenuId, setActiveMenuId] = useState(null);
   const [showPerfectOnly, setShowPerfectOnly] = useState(false);
+  const [isSubmittingPost, setIsSubmittingPost] = useState(false);
+  const [postLimit, setPostLimit] = useState(30);
+  const [rawFetchedCount, setRawFetchedCount] = useState(0);
 
   // --- SUBCOLLECTION REPLIES STATE ---
   const [expandedPostId, setExpandedPostId] = useState(null);
@@ -748,8 +762,10 @@ function MainApp() {
 
   useEffect(() => {
     if (!user || currentView !== 'comms') return;
-    const q = query(firestoreCollection(db, 'comms_posts'), orderBy('timestamp', 'desc'), limit(100));
+    // The limit is now dynamic based on the postLimit state
+    const q = query(firestoreCollection(db, 'comms_posts'), orderBy('timestamp', 'desc'), limit(postLimit));
     const unsubComms = onSnapshot(q, snap => {
+      setRawFetchedCount(snap.docs.length); // Track the raw database count
       const allPosts = snap.docs.map(d => ({ id: d.id, ...d.data() }));
       let filteredPosts = allPosts;
       if (commsFilter === 'mine') filteredPosts = allPosts.filter(p => p.authorId === user.uid);
@@ -757,7 +773,7 @@ function MainApp() {
       setCommsPosts(filteredPosts.filter(post => (post.reports || 0) < 3 || post.authorId === user.uid));
     });
     return () => unsubComms();
-  }, [user, currentView, commsFilter]);
+  }, [user, currentView, commsFilter, postLimit]); // Added postLimit to dependency array
 
   // --- LISTEN TO REPLIES FOR THE CURRENTLY EXPANDED THREAD ---
   useEffect(() => {
@@ -1061,10 +1077,16 @@ function MainApp() {
   };
 
   const handleDotPressStart = (e, spriteId, variant) => {
-    e.stopPropagation(); setActiveHoldId(`${spriteId}_${variant}`);
+    e.stopPropagation();
+    // Prevent duplicate timers from mobile touch + mouse events firing simultaneously
+    if (dotHoldTimer.current) return;
+
+    setActiveHoldId(`${spriteId}_${variant}`);
     try { Haptics.impact({ style: ImpactStyle.Light }); } catch (err) { }
+
     dotHoldTimer.current = setTimeout(() => {
       setActiveHoldId(null);
+      dotHoldTimer.current = null; // Clear the timer ref after execution
       try { Haptics.impact({ style: ImpactStyle.Heavy }); } catch (err) { }
       if (isMasteryView) toggleMastery(spriteId, variant); else handleToggleCheck(spriteId, variant);
     }, 700);
@@ -1072,7 +1094,10 @@ function MainApp() {
 
   const handleDotPressEnd = (e) => {
     e.stopPropagation();
-    if (dotHoldTimer.current) clearTimeout(dotHoldTimer.current);
+    if (dotHoldTimer.current) {
+      clearTimeout(dotHoldTimer.current);
+      dotHoldTimer.current = null; // Clear the timer ref on cancel
+    }
     setActiveHoldId(null);
   };
 
@@ -1199,13 +1224,28 @@ function MainApp() {
   };
 
   const handlePostSubmit = async () => {
+    if (isSubmittingPost) return;
     if (!postText.trim() && postType === 'general') return;
     if (postType === 'trade' && !postLookingFor && !postOffering) return alert("Trade posts must include at least one Sprite you are looking for or offering.");
     if (PROFANITY_LIST.some(word => postText.toLowerCase().includes(word))) return alert("Transmission blocked: Please keep comms PG-13.");
 
+    // Prevent duplicate copy-paste transmissions from the same user
+    const normalizedNew = postText.trim().toLowerCase();
+    const existingDuplicate = commsPosts.find(p =>
+      p.authorId === user.uid &&
+      p.text?.trim().toLowerCase() === normalizedNew &&
+      p.lookingFor === (postLookingFor || null) &&
+      p.offering === (postOffering || null)
+    );
+
+    if (existingDuplicate && !editingPostId) {
+      return alert("Duplicate transmission: You already have this exact transmission active on the board.");
+    }
+
+    setIsSubmittingPost(true);
+
     try {
       if (editingPostId) {
-        // Update an existing transmission
         await updateDoc(doc(db, 'comms_posts', editingPostId), {
           text: postText.trim(),
           type: postType,
@@ -1215,7 +1255,6 @@ function MainApp() {
           authorAura: profileData.activeAura || null
         });
       } else {
-        // Create a brand new transmission
         await addDoc(firestoreCollection(db, 'comms_posts'), {
           authorId: user.uid,
           authorSpriteId: spriteId,
@@ -1224,6 +1263,7 @@ function MainApp() {
           lookingFor: postLookingFor,
           offering: postOffering,
           timestamp: serverTimestamp(),
+          expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // Auto-delete after 7 days
           reports: 0,
           likes: [],
           authorAvatar: profileData.trophies?.[0] || null,
@@ -1231,16 +1271,16 @@ function MainApp() {
         });
       }
 
-      // Clean up UI state after successful post
       setShowCreatePost(false);
       setPostText("");
       setPostLookingFor(null);
       setPostOffering(null);
       setEditingPostId(null);
       playBeep(880, 'square', 0.1);
-
     } catch (e) {
       alert("Failed to send transmission.");
+    } finally {
+      setIsSubmittingPost(false);
     }
   };
 
@@ -2226,7 +2266,7 @@ function MainApp() {
             <div className="pt-4 shrink-0">
               <button
                 onClick={handlePostSubmit}
-                disabled={postType === 'general' ? !postText.trim() : (!postLookingFor && !postOffering)}
+                disabled={isSubmittingPost || (postType === 'general' ? !postText.trim() : (!postLookingFor && !postOffering))}
                 className="w-full bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 disabled:hover:bg-indigo-600 text-white font-black uppercase tracking-wider py-3.5 rounded-xl transition-colors flex items-center justify-center gap-2"
               >
                 <Radio className="w-5 h-5" /> Broadcast
@@ -2784,7 +2824,7 @@ function MainApp() {
                             if (statusFilter === 'Missing' && isCollected && !isMasteryView) return null;
                             return (
                               <div key={v} className="flex flex-col items-center gap-1">
-                                <div onMouseDown={(e) => handleDotPressStart(e, sprite.id, v)} onMouseUp={handleDotPressEnd} onMouseLeave={handleDotPressEnd} onTouchStart={(e) => handleDotPressStart(e, sprite.id, v)} onTouchEnd={handleDotPressEnd} onClick={(e) => e.stopPropagation()} className={`w-6 h-6 sm:w-8 sm:h-8 rounded-full flex items-center justify-center border-2 transition-all duration-300 relative select-none cursor-pointer ${activeHoldId === `${sprite.id}_${v}` ? 'scale-[1.3] ring-2 ring-cyan-400 shadow-[0_0_20px_rgba(34,211,238,0.8)]' : ''} ${isLocked ? 'bg-slate-950/80 border-slate-800/60 opacity-60' : isMasteryView && isMastered ? 'bg-yellow-900/40 border-yellow-400' : isCollected ? `bg-slate-900 border-${VARIANT_INFO[v]?.color.split('-')[1]}-500/70` : 'bg-black border-slate-800'}`}>
+                                <div onContextMenu={(e) => e.preventDefault()} onMouseDown={(e) => handleDotPressStart(e, sprite.id, v)} onMouseUp={handleDotPressEnd} onMouseLeave={handleDotPressEnd} onTouchStart={(e) => handleDotPressStart(e, sprite.id, v)} onTouchEnd={handleDotPressEnd} onClick={(e) => e.stopPropagation()} className={`w-6 h-6 sm:w-8 sm:h-8 rounded-full flex items-center justify-center border-2 transition-all duration-300 relative select-none cursor-pointer ${activeHoldId === `${sprite.id}_${v}` ? 'scale-[1.3] ring-2 ring-cyan-400 shadow-[0_0_20px_rgba(34,211,238,0.8)]' : ''} ${isLocked ? 'bg-slate-950/80 border-slate-800/60 opacity-60' : isMasteryView && isMastered ? 'bg-yellow-900/40 border-yellow-400' : isCollected ? `bg-slate-900 border-${VARIANT_INFO[v]?.color.split('-')[1]}-500/70` : 'bg-black border-slate-800'}`}>
                                   {isLocked ? <Lock className="w-3 h-3 sm:w-4 sm:h-4 text-slate-600" /> : (<>{isCollected && <div className={`w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full ${VARIANT_INFO[v]?.bgColor} ${(isMasteryView && isMastered) ? 'opacity-30' : 'opacity-100'}`} />}{isMasteryView && isMastered && <Crown className="w-4 h-4 sm:w-5 sm:h-5 text-yellow-400 drop-shadow-[0_0_2px_rgba(255,215,0,0.8)] absolute z-10" />}</>)}
                                 </div>
                                 <span className="text-[7px] sm:text-[8px] font-bold uppercase text-slate-500 tracking-wider whitespace-nowrap">{v === 'holofoil' ? 'Holo' : v === 'cheatmaster' ? 'Cheat' : v === 'loothacker' ? 'Hacker' : t(v)}</span>
@@ -3038,6 +3078,16 @@ function MainApp() {
                     </div>
                   );
                 })
+              )}
+
+              {/* Only show Load More if the raw database query hit the limit */}
+              {rawFetchedCount >= postLimit && (
+                <button
+                  onClick={() => setPostLimit(prev => prev + 20)}
+                  className="w-full py-3 mt-2 bg-indigo-950/40 hover:bg-indigo-900/60 border border-indigo-500/30 text-indigo-400 font-black uppercase tracking-wider rounded-xl transition-colors"
+                >
+                  Load Older Transmissions
+                </button>
               )}
             </section>
           </div>
