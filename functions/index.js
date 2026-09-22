@@ -377,49 +377,89 @@ exports.cleanupOldNews = functions.pubsub.schedule("0 3 * * *") // Runs daily at
         return null;
     });
 
-// --- 7. COMMS REPLY PUSH NOTIFICATION ---
+// --- 7. COMMS REPLY PUSH NOTIFICATION & MENTIONS ---
 exports.sendReplyNotification = functions.firestore
     .document("comms_posts/{postId}/replies/{replyId}")
     .onCreate(async (snap, context) => {
         const replyData = snap.data();
         const postId = context.params.postId;
+        const replyAuthorId = replyData.authorId;
+        const replyText = replyData.text || "";
 
-        // Get the parent post to find out who to notify
+        // 1. Get the parent post to notify the author
         const postDoc = await db.collection('comms_posts').doc(postId).get();
         if (!postDoc.exists) return null;
 
         const postData = postDoc.data();
-        const targetUserId = postData.authorId;
+        const postAuthorId = postData.authorId;
 
-        // Don't notify the user if they are replying to their own post
-        if (replyData.authorId === targetUserId) return null;
+        // Keep track of unique users to notify to prevent duplicate buzzes
+        const targetUserIds = new Set();
 
-        // Get the target user's push token and data
-        const userDoc = await db.collection("users").doc(targetUserId).get();
-        if (!userDoc.exists) return null;
-
-        const userData = userDoc.data();
-        const deviceToken = userData.fcmToken;
-
-        if (!deviceToken) {
-            console.log(`User ${targetUserId} has no FCM token.`);
-            return null;
+        // Add the original post author (unless they are the one replying)
+        if (postAuthorId && postAuthorId !== replyAuthorId) {
+            targetUserIds.add(postAuthorId);
         }
 
-        const payload = {
-            token: deviceToken,
-            notification: {
-                title: `💬 New Reply from @${replyData.authorSpriteId || "Hunter"}`,
-                body: replyData.text.length > 50 ? replyData.text.substring(0, 50) + "..." : replyData.text,
-            },
-            data: { route: "comms" }
-        };
+        // 2. Parse @mentions from the text using the exact same frontend regex
+        const mentionedUsernames = [...new Set(replyText.match(/@([a-zA-Z0-9]+)/g)?.map(m => m.slice(1).toLowerCase()) || [])];
 
-        try {
-            await admin.messaging().send(payload);
-            console.log("Successfully sent Comms reply notification.");
-        } catch (error) {
-            console.error("Error sending reply push notification:", error);
+        if (mentionedUsernames.length > 0) {
+            for (const username of mentionedUsernames) {
+                // Don't notify the person writing the reply if they tagged themselves
+                if (username === replyData.authorSpriteId?.toLowerCase()) continue;
+
+                try {
+                    const userQuery = await db.collection("users").where("spriteId", "==", username).get();
+                    if (!userQuery.empty) {
+                        targetUserIds.add(userQuery.docs[0].id);
+                    }
+                } catch (err) {
+                    console.error("Error looking up mentioned user:", err);
+                }
+            }
+        }
+
+        // If no one to notify, exit early
+        if (targetUserIds.size === 0) return null;
+
+        // 3. Build and send the push notifications
+        const notifications = [];
+        const bodyText = replyText.length > 50 ? replyText.substring(0, 50) + "..." : replyText;
+
+        for (const targetId of targetUserIds) {
+            const targetDoc = await db.collection("users").doc(targetId).get();
+            if (!targetDoc.exists) continue;
+
+            const deviceToken = targetDoc.data().fcmToken;
+            if (!deviceToken) continue;
+
+            // Dynamically change the notification title based on if they were mentioned
+            let notificationTitle = `💬 New Reply from @${replyData.authorSpriteId || "Hunter"}`;
+            if (targetId !== postAuthorId) {
+                notificationTitle = `🔔 @${replyData.authorSpriteId || "Hunter"} mentioned you!`;
+            }
+
+            const payload = {
+                token: deviceToken,
+                notification: {
+                    title: notificationTitle,
+                    body: bodyText,
+                },
+                data: { route: "comms" }
+            };
+
+            notifications.push(admin.messaging().send(payload));
+        }
+
+        if (notifications.length > 0) {
+            try {
+                // Use allSettled so if one token is bad, the rest still send successfully
+                await Promise.allSettled(notifications);
+                console.log(`Successfully sent ${notifications.length} Comms push notifications.`);
+            } catch (error) {
+                console.error("Error sending reply push notifications:", error);
+            }
         }
 
         return null;

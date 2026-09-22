@@ -398,6 +398,17 @@ const SPRITES_DATABASE = [
 
 const PATCH_NOTES = [
   {
+    version: "v2.4.1",
+    date: "09/21/2026",
+    title: "The @Mention Update & Hotfixes!",
+    changes: [
+      "Targeted Comms Alerts: The @mention system is live! Tag other hunters by their Sprite ID in your replies to instantly ping them.",
+      "Smart Thread Tracking: The 'My Posts' tab and individual threads will now pulse with a red badge so you know exactly which transmission received a reply.",
+      "UI Optimization: Resolved a critical issue where corrupted profile data was causing broken avatar images to appear in the Comms feed.",
+      "Filter Patch: Fixed a strict-spacing bug that was preventing the Loot Hacker and Bounty Hunter variants from filtering correctly."
+    ]
+  },
+  {
     version: "v2.4.0",
     date: "09/17/2026",
     title: "New Sprites & The Bounty Hunter Variant!",
@@ -817,6 +828,10 @@ function MainApp() {
   // --- SUBCOLLECTION REPLIES STATE ---
   const [expandedPostId, setExpandedPostId] = useState(null);
   const [activeReplies, setActiveReplies] = useState([]);
+  const [readThreadCounts, setReadThreadCounts] = useState(() => {
+    try { return JSON.parse(localStorage.getItem('spritedex_thread_counts')) || {}; }
+    catch { return {}; }
+  });
   const [replyText, setReplyText] = useState("");
   const [isSubmittingReply, setIsSubmittingReply] = useState(false);
   const [showSpriteSelector, setShowSpriteSelector] = useState(false);
@@ -1433,6 +1448,19 @@ function MainApp() {
         await updateDoc(doc(db, "users", postAuthorId), { hasUnreadReplies: true });
       }
 
+      // --- @MENTION SYSTEM ---
+      const mentionedUsernames = [...new Set(replyText.match(/@([a-zA-Z0-9]+)/g)?.map(m => m.slice(1).toLowerCase()) || [])];
+      for (const username of mentionedUsernames) {
+        if (username === spriteId?.toLowerCase()) continue; // Don't notify yourself
+        try {
+          const userQuery = query(firestoreCollection(db, "users"), where("spriteId", "==", username));
+          const querySnapshot = await getDocs(userQuery);
+          if (!querySnapshot.empty) {
+            await updateDoc(doc(db, "users", querySnapshot.docs[0].id), { hasUnreadReplies: true });
+          }
+        } catch (mentionErr) { console.error("Mention failed:", mentionErr); }
+      }
+
       setReplyText("");
       playBeep(880, 'square', 0.1);
     } catch (e) {
@@ -1630,7 +1658,7 @@ function MainApp() {
   const handleAcknowledgeTransmission = async () => { setShowTransmission(false); if (user) { try { await setDoc(doc(db, "users", user.uid), { lastSeenVersion: PATCH_NOTES[0].version }, { merge: true }); } catch (err) { } } };
 
   const isMasteryView = currentView === 'mastery';
-  const displayVariantKey = variantFilter === 'All' ? 'All' : variantFilter.toLowerCase();
+  const displayVariantKey = variantFilter === 'All' ? 'All' : variantFilter.replace(/\s+/g, '').toLowerCase();
 
   const filteredSprites = useMemo(() => {
     return [...SPRITES_DATABASE].filter(sprite => {
@@ -1659,12 +1687,12 @@ function MainApp() {
       if (!activeViewingFriend) return false;
       const matchesSearch = sprite.name.toLowerCase().includes(fSearchQuery.toLowerCase());
       const matchesRarity = fRarityFilter === 'All' || sprite.rarity === fRarityFilter;
-      const matchesVariant = fVariantFilter === 'All' || sprite.variants.includes(fVariantFilter === 'All' ? 'base' : fVariantFilter.toLowerCase());
+      const matchesVariant = fVariantFilter === 'All' || sprite.variants.includes(fVariantFilter === 'All' ? 'base' : fVariantFilter.replace(/\s+/g, '').toLowerCase());
       const matchesSeason = fSeasonFilter === 'All' || sprite.season === fSeasonFilter;
 
       let matchesStatus = true;
       if (fStatusFilter !== 'All') {
-        const displayV = fVariantFilter === 'All' ? 'All' : fVariantFilter.toLowerCase();
+        const displayV = fVariantFilter === 'All' ? 'All' : fVariantFilter.replace(/\s+/g, '').toLowerCase();
         const friendStatus = activeViewingFriend.sprites[sprite.id] || {};
         const friendMastery = activeViewingFriend.mastery[sprite.id] || {};
 
@@ -2628,7 +2656,7 @@ function MainApp() {
               const friendStatus = activeViewingFriend.sprites[sprite.id] || {};
               const friendMastery = activeViewingFriend.mastery[sprite.id] || {};
 
-              const displayVariant = fVariantFilter === 'All' ? 'base' : fVariantFilter.toLowerCase();
+              const displayVariant = fVariantFilter === 'All' ? 'base' : fVariantFilter.replace(/\s+/g, '').toLowerCase();
               const validInitialVariant = sprite.variants.includes(displayVariant) ? displayVariant : 'base';
               const hasAnyVariant = variantsList.some(v => friendStatus[v]);
               const isCardMatch = variantsList.some(v => extractionTargets.includes(`${sprite.id}_${v}`) && friendStatus[v]);
@@ -2871,7 +2899,7 @@ function MainApp() {
               )}
               <div className="flex flex-col gap-4 animate-in fade-in duration-300">
                 {filteredSprites.map(sprite => {
-                  const displayVariant = variantFilter === 'All' ? 'base' : variantFilter.toLowerCase();
+                  const displayVariant = variantFilter === 'All' ? 'base' : variantFilter.replace(/\s+/g, '').toLowerCase();
                   const validInitialVariant = sprite.variants.includes(displayVariant) ? displayVariant : 'base';
                   const hasAnyVariant = variantsList.some(v => collection[sprite.id]?.[v]);
                   return (
@@ -2931,7 +2959,10 @@ function MainApp() {
               <div className="flex bg-[#12141f] rounded-xl border border-slate-800 p-1">
                 <button onClick={() => setCommsFilter('general')} className={`flex-1 py-2 rounded-lg text-xs font-black uppercase tracking-wider transition-colors ${commsFilter === 'general' ? 'bg-indigo-900/40 text-indigo-400 border border-indigo-500/30' : 'text-slate-500 hover:text-slate-300'}`}>General</button>
                 <button onClick={() => setCommsFilter('trade')} className={`flex-1 py-2 rounded-lg text-xs font-black uppercase tracking-wider transition-colors ${commsFilter === 'trade' ? 'bg-cyan-900/40 text-cyan-400 border border-cyan-500/30' : 'text-slate-500 hover:text-slate-300'}`}>Trades</button>
-                <button onClick={() => setCommsFilter('mine')} className={`flex-1 py-2 rounded-lg text-xs font-black uppercase tracking-wider transition-colors ${commsFilter === 'mine' ? 'bg-purple-900/40 text-purple-400 border border-purple-500/30' : 'text-slate-500 hover:text-slate-300'}`}>My Posts</button>
+                <button onClick={() => setCommsFilter('mine')} className={`flex-1 py-2 rounded-lg text-xs font-black uppercase tracking-wider transition-colors relative ${commsFilter === 'mine' ? 'bg-purple-900/40 text-purple-400 border border-purple-500/30' : 'text-slate-500 hover:text-slate-300'}`}>
+                  My Posts
+                  {hasUnreadReplies && <div className="absolute top-1.5 right-2 sm:right-6 w-2.5 h-2.5 bg-red-500 rounded-full animate-pulse border border-[#12141f]"></div>}
+                </button>
               </div>
 
               {commsFilter === 'trade' && (
@@ -2980,6 +3011,9 @@ function MainApp() {
                   // Dynamically pull the active aura if it is the current user's post (for live testing)
                   const activeAuraKey = isOwnPost ? profileData.activeAura : post.authorAura;
                   const auraObj = activeAuraKey ? AURA_DICTIONARY[activeAuraKey] : null;
+
+                  // Check if this specific post has new replies the user hasn't seen
+                  const hasNewReplies = isOwnPost && (post.replyCount || 0) > (readThreadCounts[post.id] || 0);
 
                   return (
                     <div key={post.id} className={`relative rounded-2xl transition-all duration-500 overflow-hidden ${isPerfectTrade ? 'border-2 border-emerald-400 shadow-[0_0_20px_rgba(16,185,129,0.3)] bg-emerald-950/20 p-4' : auraObj ? (auraObj.isAnimated ? `p-[2px] ${auraObj.profileGlow}` : `border-2 ${auraObj.profileGlow} ${auraObj.profileBg} p-4`) : 'bg-[#151722] border border-slate-800 p-4 shadow-sm hover:border-slate-700'}`}>
@@ -3068,12 +3102,20 @@ function MainApp() {
                                 } else {
                                   setExpandedPostId(post.id);
                                   setReplyText("");
+                                  // Mark thread as read in local storage
+                                  const newCounts = { ...readThreadCounts, [post.id]: post.replyCount || 0 };
+                                  setReadThreadCounts(newCounts);
+                                  localStorage.setItem('spritedex_thread_counts', JSON.stringify(newCounts));
                                 }
                               }}
-                              className={`flex items-center gap-1.5 text-xs font-bold transition-colors ${expandedPostId === post.id ? 'text-indigo-400' : 'text-slate-500 hover:text-slate-400'}`}
+                              className={`flex items-center gap-1.5 text-xs font-bold transition-colors relative ${expandedPostId === post.id ? 'text-indigo-400' : hasNewReplies ? 'text-red-400' : 'text-slate-500 hover:text-slate-400'}`}
                             >
-                              <MessageSquare className="w-4 h-4" />
+                              <div className="relative">
+                                <MessageSquare className="w-4 h-4" />
+                                {hasNewReplies && <div className="absolute -top-1 -right-1.5 w-2 h-2 bg-red-500 rounded-full animate-pulse border border-[#151722]"></div>}
+                              </div>
                               <span>{post.replyCount || 0}</span>
+                              {hasNewReplies && <span className="text-[9px] font-black uppercase text-red-500 ml-1 bg-red-950/50 px-1.5 py-0.5 rounded border border-red-500/30">New</span>}
                             </button>
                           </div>
                           {expandedPostId === post.id && (
