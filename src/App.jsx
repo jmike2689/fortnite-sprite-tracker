@@ -3419,7 +3419,7 @@ function MainApp() {
         );
 
         return (
-          <div className="absolute top-0 left-0 w-0 h-0 pointer-events-none -z-50">
+          <div className="fixed top-0 left-0 w-0 h-0 overflow-hidden pointer-events-none -z-50">
             <div id="full-collection-export" className="w-[1000px] bg-[#0b0c10] p-10 border-4 border-cyan-500/30 flex flex-col opacity-0">
 
               {/* Main Header */}
