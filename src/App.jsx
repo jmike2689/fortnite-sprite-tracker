@@ -6,8 +6,11 @@ import { Haptics, ImpactStyle } from '@capacitor/haptics';
 import { PushNotifications } from '@capacitor/push-notifications';
 import { LocalNotifications } from '@capacitor/local-notifications';
 import { Capacitor } from '@capacitor/core';
+import { toPng } from 'html-to-image';
+import { Share } from '@capacitor/share';
+import { Filesystem, Directory } from '@capacitor/filesystem';
 import {
-  Search, CheckCircle, Circle, Volume2, VolumeX, Percent, RotateCcw, AlertTriangle, X, Eye, Crown, Users, UserPlus, ChevronLeft, ChevronRight, Check, XCircle, UserMinus, Target, Plus, FileText, Radar, Newspaper, Info, Mail, Lock, List, Filter, ChevronDown, ChevronUp, ShoppingCart, ShoppingBag, Smartphone, Globe, Settings, LogOut, History, AtSign, User as UserIcon, Edit3, Save, Tv, Gamepad2, Calendar, Award, Video, Music, Play, Trash2, MessageSquare, Radio, MoreHorizontal, Flag, Zap
+  Search, CheckCircle, Circle, Volume2, VolumeX, Percent, RotateCcw, AlertTriangle, X, Eye, Crown, Users, UserPlus, ChevronLeft, ChevronRight, Check, XCircle, UserMinus, Target, Plus, FileText, Radar, Newspaper, Info, Mail, Lock, List, Filter, ChevronDown, ChevronUp, ShoppingCart, ShoppingBag, Smartphone, Globe, Settings, LogOut, History, AtSign, User as UserIcon, Edit3, Save, Tv, Gamepad2, Calendar, Award, Video, Music, Play, Trash2, MessageSquare, Radio, MoreHorizontal, Flag, Zap, Share2
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { useAuth } from './AuthContext';
@@ -398,6 +401,17 @@ const SPRITES_DATABASE = [
 
 const PATCH_NOTES = [
   {
+    version: "v2.5.0",
+    date: "09/26/2026",
+    title: "The Collector Card Update!",
+    changes: [
+      "Collector Card Export: Flex your full inventory! You can now generate and download a high-res poster of your entire collection directly from your Profile to share with your Squad.",
+      "Enhanced Mobile UI: We've scaled up the Sprite thumbnails and variant dots across the app to make viewing, tapping, and tracking much easier on mobile devices.",
+      "Visual Polish: Squashed a rendering bug with our CSS engine to ensure your variant borders and Mastery rings glow with the correct colors.",
+      "Backend Fortification: Deployed massive database security upgrades to protect the Black Market economy and ensure robust data integrity for all players."
+    ]
+  },
+  {
     version: "v2.4.1",
     date: "09/21/2026",
     title: "The @Mention Update & Hotfixes!",
@@ -624,17 +638,17 @@ const getUnlockedMilestone = (collectedCount, masteredCount, unlockedArray = [])
 const PROFANITY_LIST = ['fuck', 'shit', 'bitch', 'asshole', 'cunt', 'dick', 'pussy', 'whore', 'slut', 'fag', 'nigger', 'nigga', 'cock', 'bastard', 'crap'];
 
 const VARIANT_INFO = {
-  base: { name: "Base", color: "text-blue-400", bgColor: "bg-blue-400" },
-  gold: { name: "Gold", color: "text-amber-400", bgColor: "bg-amber-400" },
-  gummy: { name: "Gummy", color: "text-pink-500", bgColor: "bg-pink-500" },
-  galaxy: { name: "Galaxy", color: "text-purple-400", bgColor: "bg-purple-400" },
-  holofoil: { name: "Holofoil", color: "text-sky-400", bgColor: "bg-sky-400" },
-  cube: { name: "Cube", color: "text-violet-500", bgColor: "bg-violet-500" },
-  gem: { name: "Gem", color: "text-emerald-400", bgColor: "bg-emerald-400" },
-  quack: { name: "Quack", color: "text-yellow-300", bgColor: "bg-yellow-300" },
-  cheatmaster: { name: "Cheat Master", color: "text-green-500", bgColor: "bg-green-500" },
-  loothacker: { name: "Loot Hacker", color: "text-purple-300", bgColor: "bg-purple-300" },
-  bountyhunter: { name: "Bounty Hunter", color: "text-red-500", bgColor: "bg-red-500" }
+  base: { name: "Base", color: "text-blue-400", bgColor: "bg-blue-400", borderColor: "border-blue-500/70" },
+  gold: { name: "Gold", color: "text-amber-400", bgColor: "bg-amber-400", borderColor: "border-amber-500/70" },
+  gummy: { name: "Gummy", color: "text-pink-500", bgColor: "bg-pink-500", borderColor: "border-pink-500/70" },
+  galaxy: { name: "Galaxy", color: "text-purple-400", bgColor: "bg-purple-400", borderColor: "border-purple-500/70" },
+  holofoil: { name: "Holofoil", color: "text-sky-400", bgColor: "bg-sky-400", borderColor: "border-sky-500/70" },
+  cube: { name: "Cube", color: "text-violet-500", bgColor: "bg-violet-500", borderColor: "border-violet-500/70" },
+  gem: { name: "Gem", color: "text-emerald-400", bgColor: "bg-emerald-400", borderColor: "border-emerald-500/70" },
+  quack: { name: "Quack", color: "text-yellow-300", bgColor: "bg-yellow-300", borderColor: "border-yellow-500/70" },
+  cheatmaster: { name: "Cheat Master", color: "text-green-500", bgColor: "bg-green-500", borderColor: "border-green-500/70" },
+  loothacker: { name: "Loot Hacker", color: "text-purple-300", bgColor: "bg-purple-300", borderColor: "border-purple-500/70" },
+  bountyhunter: { name: "Bounty Hunter", color: "text-red-500", bgColor: "bg-red-500", borderColor: "border-red-500/70" }
 };
 
 const RARITY_COLORS = { Mythic: "bg-yellow-400 text-black border-yellow-300 font-extrabold", Legendary: "bg-orange-500 text-white border-orange-400", Epic: "bg-purple-600 text-white border-purple-400", Rare: "bg-blue-600 text-white border-blue-400", Unknown: "bg-slate-500 text-white border-slate-400" };
@@ -820,6 +834,7 @@ function MainApp() {
   const [postOffering, setPostOffering] = useState(null);
   const [editingPostId, setEditingPostId] = useState(null);
   const [activeMenuId, setActiveMenuId] = useState(null);
+  const [isExporting, setIsExporting] = useState(false);
   const [showPerfectOnly, setShowPerfectOnly] = useState(false);
   const [isSubmittingPost, setIsSubmittingPost] = useState(false);
   const [postLimit, setPostLimit] = useState(30);
@@ -838,6 +853,49 @@ function MainApp() {
   const [selectorContext, setSelectorContext] = useState('extraction');
   const [targetSlotIndex, setTargetSlotIndex] = useState(null);
   const [trophySlotIndex, setTrophySlotIndex] = useState(null);
+
+  const handleShareProfile = async () => {
+    if (isExporting) return;
+    setIsExporting(true);
+    try {
+      const element = document.getElementById('full-collection-export');
+      if (!element) return;
+
+      // We pass style: { opacity: '1' } so the cloned camera version is fully visible
+      const base64Image = await toPng(element, {
+        pixelRatio: 2,
+        backgroundColor: '#0b0c10',
+        style: {
+          opacity: '1'
+        }
+      });
+
+      if (Capacitor.isNativePlatform()) {
+        const fileName = `Spritedex_Dossier_${new Date().getTime()}.png`;
+        const savedFile = await Filesystem.writeFile({
+          path: fileName,
+          data: base64Image.split(',')[1],
+          directory: Directory.Cache
+        });
+
+        await Share.share({
+          title: 'My Spritedex Profile',
+          text: `Check out my Hunter Dossier! Add me: @${spriteId}`,
+          url: savedFile.uri,
+        });
+      } else {
+        const link = document.createElement('a');
+        link.href = base64Image;
+        link.download = `Spritedex_Dossier_${spriteId}.png`;
+        link.click();
+      }
+    } catch (error) {
+      console.error("Export failed:", error);
+      alert("Failed to generate dossier image. Check console for details.");
+    } finally {
+      setIsExporting(false);
+    }
+  };
 
   useEffect(() => { document.title = "Spritedex"; }, []);
 
@@ -1773,13 +1831,13 @@ function MainApp() {
     const glowClass = auraDef ? auraDef.profileGlow : (unlockedBg ? unlockedBg.glow : "");
 
     return (
-      <div className="relative mt-2 mb-4">
+      <div id={isSelf ? "export-dossier" : undefined} className="relative mt-2 mb-4">
         {(unlockedBg || auraDef) && !auraDef?.isAnimated && (<div className={`absolute inset-0 rounded-2xl border-2 ${glowClass} animate-pulse pointer-events-none opacity-90`}></div>)}
 
         <div className={`rounded-2xl border-2 p-5 relative overflow-hidden transition-all ${auraDef?.isAnimated ? `p-[2px] ${glowClass}` : bgClass}`}>
 
           {auraDef?.isAnimated && (
-            <div className={`absolute inset-[-150%] animate-[spin_4s_linear_infinite] ${auraDef.spinnerClass} pointer-events-none z-0`} />
+            <div data-html2canvas-ignore="true" className={`absolute inset-[-150%] animate-[spin_4s_linear_infinite] ${auraDef.spinnerClass} pointer-events-none z-0`} />
           )}
 
           <div className={auraDef?.isAnimated ? `relative rounded-[14px] p-4 h-full w-full z-10 ${auraDef.profileBg}` : "h-full w-full relative z-10"}>
@@ -1796,9 +1854,14 @@ function MainApp() {
                 </div>
               </div>
               {isSelf && (
-                <button onClick={() => isEditingProfile ? handleSaveProfile() : setIsEditingProfile(true)} className="p-2 bg-black/40 hover:bg-black/60 rounded-xl border border-white/10 text-white transition-colors relative z-20">
-                  {isEditingProfile ? <Save className="w-5 h-5 text-emerald-400" /> : <Edit3 className="w-5 h-5" />}
-                </button>
+                <div className="flex items-center gap-2 relative z-20" data-html2canvas-ignore="true">
+                  <button onClick={handleShareProfile} disabled={isExporting} className="p-2 bg-indigo-600/80 hover:bg-indigo-500 rounded-xl border border-indigo-400/50 text-white transition-colors shadow-[0_0_10px_rgba(79,70,229,0.3)]">
+                    {isExporting ? <span className="animate-pulse font-bold text-[10px]">...</span> : <Share2 className="w-5 h-5" />}
+                  </button>
+                  <button onClick={() => isEditingProfile ? handleSaveProfile() : setIsEditingProfile(true)} className="p-2 bg-black/40 hover:bg-black/60 rounded-xl border border-white/10 text-white transition-colors">
+                    {isEditingProfile ? <Save className="w-5 h-5 text-emerald-400" /> : <Edit3 className="w-5 h-5" />}
+                  </button>
+                </div>
               )}
             </div>
 
@@ -2671,7 +2734,7 @@ function MainApp() {
 
               return (
                 <div key={sprite.id} className={`flex items-center gap-4 rounded-2xl p-4 hover:bg-slate-800/80 transition-all ${cardClass}`}>
-                  <div className={`w-14 h-14 sm:w-16 sm:h-16 rounded-xl p-1.5 border-2 transition-all shrink-0 ${imageBoxClass}`}>
+                  <div className={`w-16 h-16 sm:w-20 sm:h-20 rounded-xl p-1 border-2 transition-all shrink-0 ${imageBoxClass}`}>
                     <img src={sprite.images[validInitialVariant]} loading="lazy" className="w-full h-full object-contain drop-shadow-md" alt="" />
                   </div>
                   <div className="flex-1 flex flex-col justify-center min-w-0">
@@ -2691,11 +2754,11 @@ function MainApp() {
 
                         return (
                           <div key={v} className="flex flex-col items-center gap-1">
-                            <div className={`w-6 h-6 sm:w-8 sm:h-8 rounded-full flex items-center justify-center border-2 transition-all relative ${isLocked ? 'bg-slate-950/80 border-slate-800/60 opacity-60' : isMastered ? 'bg-yellow-900/40 border-yellow-400' : isCollected ? `bg-slate-900 border-${VARIANT_INFO[v]?.color.split('-')[1]}-500/70` : 'bg-black border-slate-800'}`}>
-                              {isLocked ? <Lock className="w-3 h-3 sm:w-4 sm:h-4 text-slate-600" /> : (
+                            <div className={`w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center border-2 transition-all relative ${isLocked ? 'bg-slate-950/80 border-slate-800/60 opacity-60' : isMastered ? 'bg-yellow-900/40 border-yellow-400' : isCollected ? `bg-slate-900 ${VARIANT_INFO[v]?.borderColor}` : 'bg-black border-slate-800'}`}>
+                              {isLocked ? <Lock className="w-4 h-4 sm:w-5 sm:h-5 text-slate-600" /> : (
                                 <>
-                                  {isCollected && <div className={`w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full ${VARIANT_INFO[v]?.bgColor} ${isMastered ? 'opacity-30' : 'opacity-100'}`} />}
-                                  {isMastered && <Crown className="w-4 h-4 sm:w-5 sm:h-5 text-yellow-400 drop-shadow-[0_0_2px_rgba(255,215,0,0.8)] absolute z-10" />}
+                                  {isCollected && <div className={`w-3.5 h-3.5 sm:w-4 sm:h-4 rounded-full ${VARIANT_INFO[v]?.bgColor} ${isMastered ? 'opacity-30' : 'opacity-100'}`} />}
+                                  {isMastered && <Crown className="w-5 h-5 sm:w-6 sm:h-6 text-yellow-400 drop-shadow-[0_0_2px_rgba(255,215,0,0.8)] absolute z-10" />}
                                 </>
                               )}
                             </div>
@@ -2716,7 +2779,7 @@ function MainApp() {
       <header className={`sticky top-0 z-50 bg-[#0e1017]/95 backdrop-blur-md border-b-2 border-cyan-500/80 shadow-[0_4px_20px_rgba(0,240,255,0.15)] px-4 pb-4 ${Capacitor.getPlatform() === 'ios' ? 'pt-14' : 'pt-4'}`}>
         <div className="max-w-md mx-auto flex items-center justify-between">
           <div>
-            <h1 onClick={calculateFragmentStats} className="text-2xl sm:text-3xl font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-yellow-400 to-pink-500 uppercase italic cursor-pointer">SPRITEDEX</h1>            {user && <p className="text-[10px] sm:text-xs font-mono text-slate-400 uppercase tracking-widest mt-0.5">ID: {spriteId}</p>}
+            <h1 className="text-2xl sm:text-3xl font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-yellow-400 to-pink-500 uppercase italic">SPRITEDEX</h1>            {user && <p className="text-[10px] sm:text-xs font-mono text-slate-400 uppercase tracking-widest mt-0.5">ID: {spriteId}</p>}
           </div>
           <div className="flex items-center gap-2.5">
             {user && (
@@ -2904,7 +2967,7 @@ function MainApp() {
                   const hasAnyVariant = variantsList.some(v => collection[sprite.id]?.[v]);
                   return (
                     <div key={sprite.id} onClick={() => setSelectedSprite({ id: sprite.id, variant: validInitialVariant })} className="flex items-center gap-4 bg-[#151722] border border-slate-800/90 rounded-2xl p-4 hover:bg-slate-800/80 transition-colors cursor-pointer shadow-sm">
-                      <div className={`w-14 h-14 sm:w-16 sm:h-16 rounded-xl p-1.5 border-2 transition-all shrink-0 ${hasAnyVariant ? 'bg-cyan-950/40 border-cyan-500/50' : 'bg-slate-900 border-slate-800 grayscale opacity-60'}`}>
+                      <div className={`w-16 h-16 sm:w-20 sm:h-20 rounded-xl p-1 border-2 transition-all shrink-0 ${hasAnyVariant ? 'bg-cyan-950/40 border-cyan-500/50' : 'bg-slate-900 border-slate-800 grayscale opacity-60'}`}>
                         <img src={sprite.images[validInitialVariant]} loading="lazy" className="w-full h-full object-contain drop-shadow-md" alt="" />
                       </div>
                       <div className="flex-1 flex flex-col justify-center min-w-0">
@@ -2919,8 +2982,8 @@ function MainApp() {
                             if (statusFilter === 'Missing' && isCollected && !isMasteryView) return null;
                             return (
                               <div key={v} className="flex flex-col items-center gap-1">
-                                <div onContextMenu={(e) => e.preventDefault()} onMouseDown={(e) => handleDotPressStart(e, sprite.id, v)} onMouseUp={handleDotPressEnd} onMouseLeave={handleDotPressEnd} onTouchStart={(e) => handleDotPressStart(e, sprite.id, v)} onTouchEnd={handleDotPressEnd} onClick={(e) => e.stopPropagation()} className={`w-6 h-6 sm:w-8 sm:h-8 rounded-full flex items-center justify-center border-2 transition-all duration-300 relative select-none cursor-pointer ${activeHoldId === `${sprite.id}_${v}` ? 'scale-[1.3] ring-2 ring-cyan-400 shadow-[0_0_20px_rgba(34,211,238,0.8)]' : ''} ${isLocked ? 'bg-slate-950/80 border-slate-800/60 opacity-60' : isMasteryView && isMastered ? 'bg-yellow-900/40 border-yellow-400' : isCollected ? `bg-slate-900 border-${VARIANT_INFO[v]?.color.split('-')[1]}-500/70` : 'bg-black border-slate-800'}`}>
-                                  {isLocked ? <Lock className="w-3 h-3 sm:w-4 sm:h-4 text-slate-600" /> : (<>{isCollected && <div className={`w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full ${VARIANT_INFO[v]?.bgColor} ${(isMasteryView && isMastered) ? 'opacity-30' : 'opacity-100'}`} />}{isMasteryView && isMastered && <Crown className="w-4 h-4 sm:w-5 sm:h-5 text-yellow-400 drop-shadow-[0_0_2px_rgba(255,215,0,0.8)] absolute z-10" />}</>)}
+                                <div onContextMenu={(e) => e.preventDefault()} onMouseDown={(e) => handleDotPressStart(e, sprite.id, v)} onMouseUp={handleDotPressEnd} onMouseLeave={handleDotPressEnd} onTouchStart={(e) => handleDotPressStart(e, sprite.id, v)} onTouchEnd={handleDotPressEnd} onClick={(e) => e.stopPropagation()} className={`w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center border-2 transition-all duration-300 relative select-none cursor-pointer ${activeHoldId === `${sprite.id}_${v}` ? 'scale-[1.3] ring-2 ring-cyan-400 shadow-[0_0_20px_rgba(34,211,238,0.8)]' : ''} ${isLocked ? 'bg-slate-950/80 border-slate-800/60 opacity-60' : isMasteryView && isMastered ? 'bg-yellow-900/40 border-yellow-400' : isCollected ? `bg-slate-900 ${VARIANT_INFO[v]?.borderColor}` : 'bg-black border-slate-800'}`}>
+                                  {isLocked ? <Lock className="w-4 h-4 sm:w-5 sm:h-5 text-slate-600" /> : (<>{isCollected && <div className={`w-3.5 h-3.5 sm:w-4 sm:h-4 rounded-full ${VARIANT_INFO[v]?.bgColor} ${(isMasteryView && isMastered) ? 'opacity-30' : 'opacity-100'}`} />}{isMasteryView && isMastered && <Crown className="w-5 h-5 sm:w-6 sm:h-6 text-yellow-400 drop-shadow-[0_0_2px_rgba(255,215,0,0.8)] absolute z-10" />}</>)}
                                 </div>
                                 <span className="text-[7px] sm:text-[8px] font-bold uppercase text-slate-500 tracking-wider whitespace-nowrap">{v === 'holofoil' ? 'Holo' : v === 'cheatmaster' ? 'Cheat' : v === 'loothacker' ? 'Hacker' : v === 'bountyhunter' ? 'Bounty' : t(v)}</span>
                               </div>
@@ -3301,6 +3364,108 @@ function MainApp() {
           </section>
         )}
       </main>
+
+      {/* --- HIDDEN DOSSIER POSTER FOR EXPORT --- */}
+      {user && (() => {
+        // Separate sprites by season
+        const s4Sprites = SPRITES_DATABASE.filter(s => s.season !== 'C7S3');
+        const s3Sprites = SPRITES_DATABASE.filter(s => s.season === 'C7S3');
+
+        // Helper to calculate accurate variants math for a specific season
+        const getStats = (sprites) => {
+          let possible = 0, collected = 0;
+          sprites.forEach(s => {
+            possible += s.variants.length;
+            collected += s.variants.filter(v => collection[s.id]?.[v]).length;
+          });
+          return {
+            possible,
+            collected,
+            percentage: possible === 0 ? 0 : Math.round((collected / possible) * 100)
+          };
+        };
+
+        const s4Stats = getStats(s4Sprites);
+        const s3Stats = getStats(s3Sprites);
+
+        // Check if the user actually owns anything in these seasons to prevent empty sections
+        const hasS4 = s4Sprites.some(s => variantsList.some(v => collection[s.id]?.[v]));
+        const hasS3 = s3Sprites.some(s => variantsList.some(v => collection[s.id]?.[v]));
+
+        const renderGrid = (sprites) => (
+          <div className="grid grid-cols-6 gap-5">
+            {sprites.filter(s => variantsList.some(v => collection[s.id]?.[v])).map(sprite => {
+              const ownedVariants = sprite.variants.filter(v => collection[sprite.id]?.[v]);
+              const displayVariant = ownedVariants.includes('base') ? 'base' : ownedVariants[0];
+              return (
+                <div key={sprite.id} className="bg-[#151722] border-2 border-slate-800 rounded-2xl p-4 flex flex-col items-center text-center shadow-lg">
+                  <div className="w-20 h-20 bg-slate-900 rounded-xl p-2 border border-slate-700/50 flex items-center justify-center mb-3 shadow-inner">
+                    <img src={sprite.images[displayVariant]} className="w-full h-full object-contain drop-shadow-md" alt="" />
+                  </div>
+                  <span className="text-sm font-black text-white uppercase italic truncate w-full mb-3">{sprite.name}</span>
+                  <div className="flex flex-wrap justify-center gap-1.5">
+                    {ownedVariants.map(v => (
+                      <div key={v} className={`w-4 h-4 rounded-full border border-slate-900 shadow-sm relative ${VARIANT_INFO[v]?.bgColor}`}>
+                        {mastery[sprite.id]?.[v] && (
+                          <Crown className="w-3 h-3 text-yellow-400 absolute -top-1.5 -left-1 drop-shadow-[0_0_2px_rgba(255,215,0,0.8)]" />
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        );
+
+        return (
+          <div className="absolute top-0 left-0 w-0 h-0 pointer-events-none -z-50">
+            <div id="full-collection-export" className="w-[1000px] bg-[#0b0c10] p-10 border-4 border-cyan-500/30 flex flex-col opacity-0">
+
+              {/* Main Header */}
+              <div className="flex justify-between items-end border-b-2 border-slate-800 pb-6 mb-8">
+                <div>
+                  <h1 className="text-5xl font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-yellow-400 to-pink-500 uppercase italic mb-2">SPRITEDEX</h1>
+                  <h2 className="text-3xl font-black text-white uppercase italic">@{spriteId} <span className="text-slate-500 text-2xl font-bold">| COLLECTOR CARD</span></h2>
+                </div>
+              </div>
+
+              {/* Season 4 Section */}
+              {hasS4 && (
+                <div className={hasS3 ? "mb-10" : "mb-4"}>
+                  <div className="flex justify-between items-end border-b border-slate-700/50 pb-2 mb-6">
+                    <h3 className="text-2xl font-black text-cyan-400 italic">CHAPTER 7 : SEASON 4</h3>
+                    <div className="text-right">
+                      <span className="text-2xl font-black text-white font-mono block mb-0.5">{s4Stats.percentage}% COMPLETE</span>
+                      <span className="text-sm font-bold text-slate-400 uppercase tracking-widest">{s4Stats.collected} / {s4Stats.possible} SECURED</span>
+                    </div>
+                  </div>
+                  {renderGrid(s4Sprites)}
+                </div>
+              )}
+
+              {/* Season 3 Section */}
+              {hasS3 && (
+                <div className="mb-4">
+                  <div className="flex justify-between items-end border-b border-slate-700/50 pb-2 mb-6">
+                    <h3 className="text-2xl font-black text-slate-400 italic">CHAPTER 7 : SEASON 3 <span className="text-sm bg-slate-800 px-2 py-1 rounded ml-2 not-italic text-slate-300 tracking-wider">VAULTED</span></h3>
+                    <div className="text-right">
+                      <span className="text-2xl font-black text-white font-mono block mb-0.5">{s3Stats.percentage}% COMPLETE</span>
+                      <span className="text-sm font-bold text-slate-400 uppercase tracking-widest">{s3Stats.collected} / {s3Stats.possible} SECURED</span>
+                    </div>
+                  </div>
+                  {renderGrid(s3Sprites)}
+                </div>
+              )}
+
+              <div className="mt-6 pt-6 border-t border-slate-800 text-center flex items-center justify-between">
+                <span className="text-slate-600 text-sm font-bold uppercase tracking-widest">Generated by Spritedex</span>
+                <span className="text-slate-600 text-sm font-bold uppercase tracking-widest">{new Date().toLocaleDateString()}</span>
+              </div>
+            </div>
+          </div>
+        );
+      })()}
 
       {/* --- BOTTOM NAVIGATION BAR --- */}
       <nav className="fixed bottom-4 left-0 right-0 z-50 flex justify-center px-4">
