@@ -604,7 +604,7 @@ const PATCH_NOTES = [
 // Absolute total for profile milestone unlocks
 const totalPossibleStatic = SPRITES_DATABASE.reduce((acc, sprite) => acc + sprite.variants.filter(v => !isVariantLocked(sprite.id, v)).length, 0);
 
-// --- MILESTONES FOR DOSSIER UNLOCKS ---
+// --- MILESTONES FOR COLLECTOR CARD UNLOCKS ---
 const MILESTONES = [
   { type: 'mastery', count: 10, name: "Bronze Initiate", bg: "bg-gradient-to-br from-amber-900/40 to-orange-900/20 border-amber-700/50", glow: "shadow-[0_0_20px_rgba(180,83,9,0.8)] border-amber-500", textColor: "text-amber-500" },
   { type: 'mastery', count: 25, name: "Silver Hunter", bg: "bg-gradient-to-br from-slate-400/20 to-slate-300/10 border-slate-400/50", glow: "shadow-[0_0_20px_rgba(148,163,184,0.8)] border-slate-400", textColor: "text-slate-400" },
@@ -879,7 +879,7 @@ function MainApp() {
       });
 
       if (Capacitor.isNativePlatform()) {
-        const fileName = `Spritedex_Dossier_${new Date().getTime()}.png`;
+        const fileName = `Spritedex_CollectorCard_${new Date().getTime()}.png`;
         const savedFile = await Filesystem.writeFile({
           path: fileName,
           data: base64Image.split(',')[1],
@@ -894,12 +894,12 @@ function MainApp() {
       } else {
         const link = document.createElement('a');
         link.href = base64Image;
-        link.download = `Spritedex_Dossier_${spriteId}.png`;
+        link.download = `Spritedex_CollectorCard_${spriteId}.png`;
         link.click();
       }
     } catch (error) {
       console.error("Export failed:", error);
-      alert("Failed to generate dossier image. Check console for details.");
+      alert("Failed to generate Collector Card image. Check console for details.");
     } finally {
       setIsExporting(false);
     }
@@ -1839,7 +1839,7 @@ function MainApp() {
     const glowClass = auraDef ? auraDef.profileGlow : (unlockedBg ? unlockedBg.glow : "");
 
     return (
-      <div id={isSelf ? "export-dossier" : undefined} className="relative mt-2 mb-4">
+      <div id={isSelf ? "export-collector-card" : undefined} className="relative mt-2 mb-4">
         {(unlockedBg || auraDef) && !auraDef?.isAnimated && (<div className={`absolute inset-0 rounded-2xl border-2 ${glowClass} animate-pulse pointer-events-none opacity-90`}></div>)}
 
         <div className={`rounded-2xl border-2 p-5 relative overflow-hidden transition-all ${auraDef?.isAnimated ? `p-[2px] ${glowClass}` : bgClass}`}>
@@ -3373,7 +3373,7 @@ function MainApp() {
         )}
       </main>
 
-      {/* --- HIDDEN DOSSIER POSTER FOR EXPORT --- */}
+      {/* --- HIDDEN COLLECTOR CARD POSTER FOR EXPORT --- */}
       {user && (() => {
         // Separate sprites by season
         const s4Sprites = SPRITES_DATABASE.filter(s => s.season !== 'C7S3');
