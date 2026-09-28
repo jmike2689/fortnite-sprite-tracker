@@ -861,12 +861,18 @@ function MainApp() {
       const element = document.getElementById('full-collection-export');
       if (!element) return;
 
-      // We pass style: { opacity: '1' } so the cloned camera version is fully visible
+      // --- 🍎 iOS WEBKIT HACK ---
+      // Safari aggressively drops off-screen images to save RAM, causing blank boxes.
+      // We run a fast "dry run" first to force the engine to cache and decode the sprites.
+      await toPng(element, { cacheBust: true, style: { opacity: '1' } });
+
+      // --- ACTUAL EXPORT ---
+      // Now that WebKit is warmed up, it will capture all the images perfectly.
       const base64Image = await toPng(element, {
         pixelRatio: 2,
         backgroundColor: '#0b0c10',
         useCORS: true,
-        cacheBust: true, // Forces iOS Safari to fully load images into the canvas
+        cacheBust: true,
         style: {
           opacity: '1'
         }
@@ -882,7 +888,7 @@ function MainApp() {
 
         await Share.share({
           title: 'My Spritedex Profile',
-          text: `Check out my Hunter Dossier! Add me: @${spriteId}`,
+          text: `Check out my Collector Card! Add me: @${spriteId}`,
           url: savedFile.uri,
         });
       } else {
