@@ -148,6 +148,31 @@ import morganaCheatMaster from './assets/Morgana Cheat Master.webp';
 import morganaLootHacker from './assets/Morgana Loot Hacker.webp';
 import morganaBountyHunter from './assets/Morgana Bounty Hunter.webp';
 
+// --- NEW C7S4 SPRITES (WAVE 3) IMPORTS ---
+import spookyBase from './assets/Spooky Base.webp';
+import spookyGold from './assets/Spooky Gold.webp';
+import spookyCheatMaster from './assets/Spooky Cheat Master.webp';
+import spookyLootHacker from './assets/Spooky Loot Hacker.webp';
+import spookyBountyHunter from './assets/Spooky Bounty Hunter.webp';
+
+import vampireBase from './assets/Vampire Base.webp';
+import vampireGold from './assets/Vampire Gold.webp';
+import vampireCheatMaster from './assets/Vampire Cheat Master.webp';
+import vampireLootHacker from './assets/Vampire Loot Hacker.webp';
+import vampireBountyHunter from './assets/Vampire Bounty Hunter.webp';
+
+import deerBase from './assets/Deer Base.webp';
+import deerGold from './assets/Deer Gold.webp';
+import deerCheatMaster from './assets/Deer Cheat Master.webp';
+import deerLootHacker from './assets/Deer Loot Hacker.webp';
+import deerBountyHunter from './assets/Deer Bounty Hunter.webp';
+
+import dumpsterBase from './assets/Dumpster Base.webp';
+import dumpsterGold from './assets/Dumster Gold.webp';
+import dumpsterCheatMaster from './assets/Dumster Cheat Master.webp';
+import dumpsterLootHacker from './assets/Dumster Loot Hacker.webp';
+import dumpsterBountyHunter from './assets/Dumster Bounty Hunter.webp';
+
 // --- EXISTING IMPORTS ---
 import ironMouseBase from './assets/Iron Mouse Base.webp';
 import peelyBase from './assets/Peely Base.webp';
@@ -396,10 +421,27 @@ const SPRITES_DATABASE = [
   { id: "birthday", name: "Birthday", rarity: "Rare", season: 'C7S4', images: { base: birthdayBase, gold: birthdayGold, cheatmaster: birthdayCheatMaster, loothacker: birthdayLootHacker, bountyhunter: birthdayBountyHunter }, variants: ['base', 'gold', 'cheatmaster', 'loothacker', 'bountyhunter'], baseAbility: { en: "Opening chests has a chance to spawn a piece of cake. Eliminations can spawn cake at max level. Chance to spawn cake increases with each Level Up!", es: "Opening chests has a chance to spawn a piece of cake. Eliminations can spawn cake at max level. Chance to spawn cake increases with each Level Up!" } },
   { id: "crash-bandicoot", name: "Crash Bandicoot", rarity: "Legendary", season: 'C7S4', images: { base: crashBandicootBase, gold: crashBandicootGold, cheatmaster: crashBandicootCheatMaster, loothacker: crashBandicootLootHacker, bountyhunter: crashBandicootBountyHunter }, variants: ['base', 'gold', 'cheatmaster', 'loothacker', 'bountyhunter'], baseAbility: { en: "(Active - Jump In Air) Triggers a whirlwind attack, damaging and knocking back nearby enemies. Damage increases and cooldown decreases with each Level Up!", es: "(Active - Jump In Air) Triggers a whirlwind attack, damaging and knocking back nearby enemies. Damage increases and cooldown decreases with each Level Up!" } },
   { id: "pond", name: "Pond", rarity: "Epic", season: 'C7S4', images: { base: pondBase, gold: pondGold, cheatmaster: pondCheatMaster, loothacker: pondLootHacker, bountyhunter: pondBountyHunter }, variants: ['base', 'gold', 'cheatmaster', 'loothacker', 'bountyhunter'], baseAbility: { en: "(Active) - Jump shortly after landing to trigger a Super Jump, if charges are present. Gain charges over time. Super jump strength increases and cooldown decreases with each Level Up!", es: "(Active) - Jump shortly after landing to trigger a Super Jump, if charges are present. Gain charges over time. Super jump strength increases and cooldown decreases with each Level Up!" } },
-  { id: "morgana", name: "Morgana", rarity: "Epic", season: 'C7S4', images: { base: morganaBase, gold: morganaGold, cheatmaster: morganaCheatMaster, loothacker: morganaLootHacker, bountyhunter: morganaBountyHunter }, variants: ['base', 'gold', 'cheatmaster', 'loothacker', 'bountyhunter'], baseAbility: { en: "Increases the effectiveness of healing items. Healing effectiveness increases with each Level Up!", es: "Increases the effectiveness of healing items. Healing effectiveness increases with each Level Up!" } }
+  { id: "morgana", name: "Morgana", rarity: "Epic", season: 'C7S4', images: { base: morganaBase, gold: morganaGold, cheatmaster: morganaCheatMaster, loothacker: morganaLootHacker, bountyhunter: morganaBountyHunter }, variants: ['base', 'gold', 'cheatmaster', 'loothacker', 'bountyhunter'], baseAbility: { en: "Increases the effectiveness of healing items. Healing effectiveness increases with each Level Up!", es: "Increases the effectiveness of healing items. Healing effectiveness increases with each Level Up!" } },
+
+  // --- NEW WAVE 3 SPRITES ---
+  { id: "spooky-dash", name: "Spooky Dash", rarity: "Mythic", season: 'C7S4', images: { base: spookyBase, gold: spookyGold, cheatmaster: spookyCheatMaster, loothacker: spookyLootHacker, bountyhunter: spookyBountyHunter }, variants: ['base', 'gold', 'cheatmaster', 'loothacker', 'bountyhunter'], baseAbility: { en: "(Active - Jump in Air) Spooky Dash lets you phase through some objects. Gains charge over time. Charge cooldown decreases with each Level Up!", es: "(Active - Jump in Air) Spooky Dash lets you phase through some objects. Gains charge over time. Charge cooldown decreases with each Level Up!" } },
+  { id: "vampire", name: "Vampire", rarity: "Legendary", season: 'C7S4', images: { base: vampireBase, gold: vampireGold, cheatmaster: vampireCheatMaster, loothacker: vampireLootHacker, bountyhunter: vampireBountyHunter }, variants: ['base', 'gold', 'cheatmaster', 'loothacker', 'bountyhunter'], baseAbility: { en: "Recover health when damaging an enemy. Health recovered percent increases with each Level Up!", es: "Recover health when damaging an enemy. Health recovered percent increases with each Level Up!" } },
+  { id: "the-deer", name: "The Deer", rarity: "Legendary", season: 'C7S4', images: { base: deerBase, gold: deerGold, cheatmaster: deerCheatMaster, loothacker: deerLootHacker, bountyhunter: deerBountyHunter }, variants: ['base', 'gold', 'cheatmaster', 'loothacker', 'bountyhunter'], baseAbility: { en: "Melee attacks deal more damage. Melee attack damage increases with each Level Up!", es: "Melee attacks deal more damage. Melee attack damage increases with each Level Up!" } },
+  { id: "dumpster-dive", name: "Dumpster Dive", rarity: "Epic", season: 'C7S4', images: { base: dumpsterBase, gold: dumpsterGold, cheatmaster: dumpsterCheatMaster, loothacker: dumpsterLootHacker, bountyhunter: dumpsterBountyHunter }, variants: ['base', 'gold', 'cheatmaster', 'loothacker', 'bountyhunter'], baseAbility: { en: "Food provides bonus healing. Find food when jumping out of hiding props, and a small chance when opening containers. Find better food with each Level Up!", es: "Food provides bonus healing. Find food when jumping out of hiding props, and a small chance when opening containers. Find better food with each Level Up!" } }
 ];
 
 const PATCH_NOTES = [
+  {
+    version: "v2.6.0",
+    date: "10/01/2026",
+    title: "Wave 3 Sprites & Export Fixes!",
+    changes: [
+      "New Sprites Dropped: Spooky Dash, Vampire, The Deer, and Dumpster Dive have officially entered the tracking pool for Chapter 7 Season 4!",
+      "Collector Card Export Fix: Resolved a critical iOS engine bug where exported Collector Cards would occasionally save with blank images. Your full high-res collection should now export perfectly to your camera roll on all devices.",
+      "Accidental Tap Prevention: Increased the long-press timer on tracking dots to 1.2 seconds to prevent accidental checkmarks while scrolling through your list.",
+      "Restored Intel: Restored the missing variant ability descriptions for Cube, Gem, and Quack inside the Inspection Modal."
+    ]
+  },
   {
     version: "v2.5.0",
     date: "09/26/2026",
@@ -1236,7 +1278,7 @@ function MainApp() {
       dotHoldTimer.current = null; // Clear the timer ref after execution
       try { Haptics.impact({ style: ImpactStyle.Heavy }); } catch (err) { }
       if (isMasteryView) toggleMastery(spriteId, variant); else handleToggleCheck(spriteId, variant);
-    }, 700);
+    }, 1200); // Increased to 1.2 seconds to prevent accidental taps
   };
 
   const handleDotPressEnd = (e) => {
@@ -1827,6 +1869,9 @@ function MainApp() {
       case 'holofoil': return "5% chance for your squad to find rare Sprite Variants from looting chests.";
       case 'loothacker': return "Increases chances of spawning items from your Loot Hacks.";
       case 'bountyhunter': return "Chance to find sprites when eliminating opponents. Only gains sprite XP from eliminations, unless sprite has special XP rules.";
+      case 'cube': return "• Triggers Overdrive while you are caught in the Storm.";
+      case 'gem': return "Take 30% less Fall damage";
+      case 'quack': return "Gives 50% Sprite XP earned to all other Sprites in your inventory";
       default: return null;
     }
   };
