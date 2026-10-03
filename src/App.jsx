@@ -10,7 +10,7 @@ import { toPng } from 'html-to-image';
 import { Share } from '@capacitor/share';
 import { Filesystem, Directory } from '@capacitor/filesystem';
 import {
-  Search, CheckCircle, Circle, Volume2, VolumeX, Percent, RotateCcw, AlertTriangle, X, Eye, Crown, Users, UserPlus, ChevronLeft, ChevronRight, Check, XCircle, UserMinus, Target, Plus, FileText, Radar, Newspaper, Info, Mail, Lock, List, Filter, ChevronDown, ChevronUp, ShoppingCart, ShoppingBag, Smartphone, Globe, Settings, LogOut, History, AtSign, User as UserIcon, Edit3, Save, Tv, Gamepad2, Calendar, Award, Video, Music, Play, Trash2, MessageSquare, Radio, MoreHorizontal, Flag, Zap, Share2
+  Search, CheckCircle, Circle, Volume2, VolumeX, Percent, RotateCcw, AlertTriangle, X, Eye, Crown, Users, UserPlus, ChevronLeft, ChevronRight, Check, XCircle, UserMinus, Target, Plus, FileText, Radar, Newspaper, Info, Mail, Lock, List, Filter, ChevronDown, ChevronUp, ShoppingCart, ShoppingBag, Smartphone, Globe, Settings, LogOut, History, AtSign, User as UserIcon, Edit3, Save, Tv, Gamepad2, Calendar, Award, Video, Music, Play, Trash2, MessageSquare, Radio, MoreHorizontal, Flag, Zap, Share2, PawPrint
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { useAuth } from './AuthContext';
@@ -19,6 +19,8 @@ import { sendPasswordResetEmail, onAuthStateChanged, deleteUser } from 'firebase
 import { auth, db } from './firebase';
 
 import { translations } from './locales';
+import PetView, { PetAttentionDot, PetReminderSync } from './pet/PetView';
+import { isPetEnabledFor } from './pet/petLogic';
 
 // --- CHAPTER 7 SEASON 4 IMPORTS ---
 import jackrabbitBase from './assets/Jackrabbit Base.webp';
@@ -466,7 +468,7 @@ const SPRITES_DATABASE = [
 
 const PATCH_NOTES = [
   {
-    version: "v2.6.0",
+    version: "v2.7.0",
     date: "10/02/2026",
     title: "Halloween Event, Profile Overhaul & Wave 3 Sprites!",
     changes: [
@@ -824,6 +826,7 @@ function MainApp() {
   const [showAboutModal, setShowAboutModal] = useState(false);
   const [showNewsModal, setShowNewsModal] = useState(false);
   const [showShopModal, setShowShopModal] = useState(false);
+  const [petOverlay, setPetOverlay] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [resetSent, setResetSent] = useState(false);
@@ -1058,6 +1061,7 @@ function MainApp() {
 
   useEffect(() => {
     const handleBackButton = ({ canGoBack }) => {
+      if (petOverlay) { window.dispatchEvent(new Event('spritedex-pet-back')); return; }
       if (showSettingsModal) return setShowSettingsModal(false);
       if (showBlockedUsersModal) return setShowBlockedUsersModal(false);
       if (showAboutModal) return setShowAboutModal(false);
@@ -1078,7 +1082,7 @@ function MainApp() {
     };
     const listener = CapApp.addListener('backButton', handleBackButton);
     return () => { listener.then(handle => handle.remove()); };
-  }, [showSettingsModal, showAboutModal, showNewsModal, showShopModal, selectedSprite, showPatchNotes, showTransmission, showSpriteSelector, showUnfriendConfirm, showResetConfirm, showAddFriendInput, showRadarModal, showCreatePost, activeViewingFriend, currentView]);
+  }, [petOverlay, showSettingsModal, showAboutModal, showNewsModal, showShopModal, selectedSprite, showPatchNotes, showTransmission, showSpriteSelector, showUnfriendConfirm, showResetConfirm, showAddFriendInput, showRadarModal, showCreatePost, activeViewingFriend, currentView]);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, () => { setIsInitializing(false); });
@@ -1397,6 +1401,7 @@ function MainApp() {
     const isConfirmed = window.confirm("WARNING: This will permanently delete your account, your Spritedex collection, and all saved progress. This action cannot be undone. Are you absolutely sure?");
     if (isConfirmed) {
       try {
+        try { await deleteDoc(doc(db, "pets", user.uid)); } catch (e) { /* the pet is optional, never block account deletion */ }
         await deleteDoc(doc(db, "users", user.uid));
         await deleteUser(auth.currentUser);
         setShowSettingsModal(false);
@@ -1719,8 +1724,7 @@ function MainApp() {
       let permStatus = await LocalNotifications.checkPermissions();
       if (permStatus.display === 'prompt') permStatus = await LocalNotifications.requestPermissions();
       if (permStatus.display !== 'granted') return;
-      const pending = await LocalNotifications.getPending();
-      if (pending.notifications.length > 0) await LocalNotifications.cancel({ notifications: pending.notifications });
+      await LocalNotifications.cancel({ notifications: [{ id: 1001 }] });
       const triggerDate = new Date(Date.now() + 24 * 60 * 60 * 1000);
       await LocalNotifications.schedule({
         notifications: [{ title: "⚠️ Streak at Risk!", body: `Your Daily Radar is fully charged. Sweep now to protect your ${currentStreak}-Day Streak!`, id: 1001, schedule: { at: triggerDate, allowWhileIdle: true } }]
@@ -2988,6 +2992,11 @@ function MainApp() {
       </header>
 
       <main className="flex-1 max-w-md w-full mx-auto p-4 flex flex-col gap-5 pb-24">
+        {/* --- SPRITE PET VIEW --- */}
+        {currentView === 'pet' && user && isPetEnabledFor(user.uid) && (
+          <PetView uid={user.uid} spritesDatabase={SPRITES_DATABASE} collection={collection} playBeep={playBeep} onOverlayChange={setPetOverlay} />
+        )}
+
         {/* --- PROFILE VIEW --- */}
         {currentView === 'profile' && user && (
           <div className="flex flex-col gap-5 animate-in fade-in duration-300">
@@ -3650,6 +3659,10 @@ function MainApp() {
         );
       })()}
 
+      {isPetEnabledFor(user?.uid) && (
+        <PetReminderSync uid={user.uid} spritesDatabase={SPRITES_DATABASE} onOpenPet={() => { setCurrentView('pet'); setActiveViewingFriend(null); }} />
+      )}
+
       {/* --- BOTTOM NAVIGATION BAR --- */}
       <nav className="fixed bottom-4 left-0 right-0 z-50 flex justify-center px-4">
         <div className="bg-[#0e1017]/95 backdrop-blur-md border border-slate-800 rounded-2xl w-full max-w-md px-1 py-2 flex justify-between shadow-2xl">
@@ -3667,6 +3680,13 @@ function MainApp() {
           <button onClick={() => { setCurrentView('friends'); setActiveViewingFriend(null); playBeep(659, 'sine', 0.05); }} className={`flex-1 flex flex-col items-center gap-1 py-1 transition-colors ${(currentView === 'friends' || activeViewingFriend) ? 'text-blue-400' : 'text-slate-600'}`}>
             <Users className="w-5 h-5" /><span className="text-[8px] sm:text-[9px] font-black uppercase tracking-wider">Squad</span>
           </button>
+          {isPetEnabledFor(user?.uid) && (
+            <button onClick={() => { setCurrentView('pet'); setActiveViewingFriend(null); playBeep(720, 'sine', 0.05); }} className={`flex-1 flex flex-col items-center gap-1 py-1 transition-colors relative ${currentView === 'pet' && !activeViewingFriend ? 'text-pink-400' : 'text-slate-600'}`}>
+              <PawPrint className="w-5 h-5" />
+              <PetAttentionDot uid={user.uid} />
+              <span className="text-[8px] sm:text-[9px] font-black uppercase tracking-wider">Pet</span>
+            </button>
+          )}
           <button onClick={() => { setCurrentView('feedback'); setActiveViewingFriend(null); playBeep(784, 'sine', 0.05); }} className={`flex-1 flex flex-col items-center gap-1 py-1 transition-colors ${currentView === 'feedback' && !activeViewingFriend ? 'text-emerald-400' : 'text-slate-600'}`}>
             <MessageSquare className="w-5 h-5" /><span className="text-[8px] sm:text-[9px] font-black uppercase tracking-wider">Support</span>
           </button>
