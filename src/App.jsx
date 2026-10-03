@@ -173,6 +173,32 @@ import dumpsterCheatMaster from './assets/Dumster Cheat Master.webp';
 import dumpsterLootHacker from './assets/Dumster Loot Hacker.webp';
 import dumpsterBountyHunter from './assets/Dumster Bounty Hunter.webp';
 
+// --- TRICK OR TREAT VARIANTS IMPORTS ---
+import trtJackrabbit from './assets/TrT Jackrabbit.webp';
+import trtShadow from './assets/TrT Shadow.webp';
+import trtBush from './assets/TrT Bush.webp';
+import trtTails from './assets/TrT Tails.webp';
+import trtKillswitch from './assets/TrT Killswitch.webp';
+import trtAdventure from './assets/TrT Adventure.webp';
+import trtKlombo from './assets/TrT Klombo.webp';
+import trtJonesy from './assets/TrT Jonesy.webp';
+import trtSonic from './assets/TrT Sonic.webp';
+import trtCrown from './assets/TrT Crown.webp';
+import trtEightBit from './assets/TrT 8-Bit.webp';
+import trtStormScout from './assets/TrT Storm Scout.webp';
+import trtXRay from './assets/TrT X-Ray.webp';
+import trtOvershield from './assets/TrT Overshield.webp';
+import trtOnigiri from './assets/TrT Onigiri.webp';
+import trtBlinky from './assets/TrT Blinky.webp';
+import trtBirthday from './assets/TrT Birthday.webp';
+import trtCrashBandicoot from './assets/TrT Crash Bandicoot.webp';
+import trtPond from './assets/TrT Pond.webp';
+import trtMorgana from './assets/TrT Morgana.webp';
+import trtSpookyDash from './assets/TrT Spooky Dash.webp';
+import trtVampire from './assets/TrT Vampire.webp';
+import trtTheDeer from './assets/TrT The Deer.webp';
+import trtDumpster from './assets/TrT Dumpster Diver.webp';
+
 // --- EXISTING IMPORTS ---
 import ironMouseBase from './assets/Iron Mouse Base.webp';
 import peelyBase from './assets/Peely Base.webp';
@@ -293,7 +319,7 @@ import gemPunk from './assets/Gem Punk.webp';
 import gemAura from './assets/Gem Aura.webp';
 import quackZeroPoint from './assets/Quack Zero Point.webp';
 
-const variantsList = ['base', 'gold', 'gummy', 'galaxy', 'holofoil', 'cube', 'gem', 'quack', 'cheatmaster', 'loothacker', 'bountyhunter'];
+const variantsList = ['base', 'gold', 'gummy', 'galaxy', 'holofoil', 'cube', 'gem', 'quack', 'cheatmaster', 'loothacker', 'bountyhunter', 'trickortreat'];
 const LOCKED_VARIANTS = {};
 
 const isVariantLocked = (spriteId, variant) => {
@@ -367,6 +393,14 @@ const AURA_DICTIONARY = {
     ring: 'border-2 border-yellow-400 shadow-[0_0_12px_rgba(250,204,21,0.8)] text-yellow-400',
     profileGlow: 'shadow-[0_0_30px_rgba(250,204,21,0.3)] border-yellow-400/50',
     profileBg: 'bg-[#151722]'
+  },
+  'spectral_haunt': {
+    name: 'Spectral Haunt', tier: 4, isAnimated: true,
+    spinnerClass: 'bg-[conic-gradient(from_0deg,transparent_0%,#ea580c_20%,#9333ea_40%,#ea580c_60%,#9333ea_80%,transparent_100%)] opacity-80',
+    text: 'text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-purple-500 drop-shadow-[0_0_8px_rgba(249,115,22,0.8)]',
+    ring: 'border-2 border-orange-500 shadow-[0_0_15px_rgba(147,51,234,0.8)] text-orange-500',
+    profileGlow: 'shadow-[0_0_30px_rgba(147,51,234,0.5)] border-orange-500/50',
+    profileBg: "bg-[#0c0510] bg-[url('data:image/svg+xml,%3Csvg%20width=%2260%22%20height=%2260%22%20viewBox=%220%200%2060%2060%22%20xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cpath%20d=%22M30%2020%20C30%2010%2040%2010%2040%2020%20C40%2030%2035%2035%2030%2040%20C25%2035%2020%2030%2020%2020%20C20%2010%2030%2010%2030%2020%20Z%22%20fill=%22%239333ea%22%20fill-opacity=%220.08%22/%3E%3Ccircle%20cx=%2227%22%20cy=%2218%22%20r=%221.5%22%20fill=%22%23ea580c%22%20fill-opacity=%220.2%22/%3E%3Ccircle%20cx=%2233%22%20cy=%2218%22%20r=%221.5%22%20fill=%22%23ea580c%22%20fill-opacity=%220.2%22/%3E%3C/svg%3E')]"
   }
 };
 
@@ -399,38 +433,51 @@ const SPRITES_DATABASE = [
   { id: "air", name: "Air", rarity: "Rare", season: 'C7S3', images: { base: airBase, gold: airGold, gummy: airGummy, galaxy: airGalaxy, holofoil: airHolofoil }, variants: ['base', 'gold', 'gummy', 'galaxy', 'holofoil'], baseAbility: { en: "Increases sprinting speed and jump height. Also nullifies fall damage. Jump height increased with each Level Up!", es: "Aumenta la velocidad de esprint y la altura de salto. También anula el daño por caída. ¡Altura de salto aumentada con cada nivel!" } },
 
   // --- NEW SEASON 4 SPRITES ---
-  { id: "jackrabbit", name: "Jackrabbit", rarity: "Legendary", season: 'C7S4', images: { base: jackrabbitBase, gold: jackrabbitGold, cheatmaster: jackrabbitCheatMaster, loothacker: jackrabbitLootHacker, bountyhunter: jackrabbitBountyHunter }, variants: ['base', 'gold', 'cheatmaster', 'loothacker', 'bountyhunter'], baseAbility: { en: "Grants the ability to perform another jump while mid-air! Cooldown between jumps decreases with each Level Up!", es: "Grants the ability to perform another jump while mid-air! Cooldown between jumps decreases with each Level Up!" } },
-  { id: "shadow", name: "Shadow", rarity: "Epic", season: 'C7S4', images: { base: shadowBase, gold: shadowGold, cheatmaster: shadowCheatMaster, loothacker: shadowLootHacker, bountyhunter: shadowBountyHunter }, variants: ['base', 'gold', 'cheatmaster', 'loothacker', 'bountyhunter'], baseAbility: { en: "Automatically reload unequipped weapons over time. Reloads equipped weapon at max level. Automatic reload gets faster with each Level Up!", es: "Automatically reload unequipped weapons over time. Reloads equipped weapon at max level. Automatic reload gets faster with each Level Up!" } },
-  { id: "bush", name: "Bush", rarity: "Rare", season: 'C7S4', images: { base: bushBase, gold: bushGold, cheatmaster: bushCheatMaster, loothacker: bushLootHacker, bountyhunter: bushBountyHunter }, variants: ['base', 'gold', 'cheatmaster', 'loothacker', 'bountyhunter'], baseAbility: { en: "Grants a bush on you after a duration, gain a bush on elimination at max level. Time between bush activating decreases with each Level Up!", es: "Grants a bush on you after a duration, gain a bush on elimination at max level. Time between bush activating decreases with each Level Up!" } },
-  { id: "tails", name: "Tails", rarity: "Epic", season: 'C7S4', images: { base: tailsBase, gold: tailsGold, cheatmaster: tailsCheatMaster, loothacker: tailsLootHacker, bountyhunter: tailsBountyHunter }, variants: ['base', 'gold', 'cheatmaster', 'loothacker', 'bountyhunter'], baseAbility: { en: "Grants the ability to hover with the Help of Tails! Hover speed increased with each Level Up!", es: "Grants the ability to hover with the Help of Tails! Hover speed increased with each Level Up!" } },
-  { id: "killswitch", name: "Killswitch", rarity: "Legendary", season: 'C7S4', images: { base: killswitchBase, gold: killswitchGold, cheatmaster: killswitchCheatMaster, loothacker: killswitchLootHacker, bountyhunter: killswitchBountyHunter }, variants: ['base', 'gold', 'cheatmaster', 'loothacker', 'bountyhunter'], baseAbility: { en: "Enter Hangtime with improved accuracy when aiming while jumping and falling. Accuracy increases with each Level Up!", es: "Enter Hangtime with improved accuracy when aiming while jumping and falling. Accuracy increases with each Level Up!" } },
-  { id: "adventure", name: "Adventure", rarity: "Rare", season: 'C7S4', images: { base: adventureBase, gold: adventureGold, cheatmaster: adventureCheatMaster, loothacker: adventureLootHacker, bountyhunter: adventureBountyHunter }, variants: ['base', 'gold', 'cheatmaster', 'loothacker', 'bountyhunter'], baseAbility: { en: "Upgrades a random item in the player's inventory with each Level Up!", es: "Upgrades a random item in the player's inventory with each Level Up!" } },
-  { id: "klombo", name: "Klombo", rarity: "Mythic", season: 'C7S4', images: { base: klomboBase, gold: klomboGold, cheatmaster: klomboCheatMaster, loothacker: klomboLootHacker, bountyhunter: klomboBountyHunter }, variants: ['base', 'gold', 'cheatmaster', 'loothacker', 'bountyhunter'], baseAbility: { en: "Grants random items at each level, only levels up by consuming items. Item quality increases with each Level Up!", es: "Grants random items at each level, only levels up by consuming items. Item quality increases with each Level Up!" } },
-  { id: "jonesy", name: "Jonesy", rarity: "Rare", season: 'C7S4', images: { base: jonesyBase, gold: jonesyGold, cheatmaster: jonesyCheatMaster, loothacker: jonesyLootHacker, bountyhunter: jonesyBountyHunter }, variants: ['base', 'gold', 'cheatmaster', 'loothacker', 'bountyhunter'], baseAbility: { en: "Recover some health or shields after being damaged after a short duration. Increase amount healed with each Level Up!", es: "Recover some health or shields after being damaged after a short duration. Increase amount healed with each Level Up!" } },
-  { id: "sonic", name: "Sonic", rarity: "Epic", season: 'C7S4', images: { base: sonicBase, gold: sonicGold, cheatmaster: sonicCheatMaster, loothacker: sonicLootHacker, bountyhunter: sonicBountyHunter }, variants: ['base', 'gold', 'cheatmaster', 'loothacker', 'bountyhunter'], baseAbility: { en: "Gotta Go Fast! Sprint faster with each Level Up!", es: "Gotta Go Fast! Sprint faster with each Level Up!" } },
-  { id: "crown", name: "Crown", rarity: "Mythic", season: 'C7S4', images: { base: crownBase, gold: crownGold, cheatmaster: crownCheatMaster, loothacker: crownLootHacker, bountyhunter: crownBountyHunter }, variants: ['base', 'gold', 'cheatmaster', 'loothacker', 'bountyhunter'], baseAbility: { en: "Only levels up by winning matches. Level up faster with Crown Wins. New variants unlocked after mastering!", es: "Only levels up by winning matches. Level up faster with Crown Wins. New variants unlocked after mastering!" } },
-  { id: "eight-bit", name: "8-Bit", rarity: "Rare", season: 'C7S4', images: { base: eightBitBase, gold: eightBitGold, cheatmaster: eightBitCheatMaster, loothacker: eightBitLootHacker, bountyhunter: eightBitBountyHunter }, variants: ['base', 'gold', 'cheatmaster', 'loothacker', 'bountyhunter'], baseAbility: { en: "Find an 8-Bit Shotgun in your first chest and gain a score multiplier for it.", es: "Find an 8-Bit Shotgun in your first chest and gain a score multiplier for it." } },
-  { id: "storm-scout", name: "Storm Scout", rarity: "Rare", season: 'C7S4', images: { base: stormScoutBase, gold: stormScoutGold, cheatmaster: stormScoutCheatMaster, loothacker: stormScoutLootHacker, bountyhunter: stormScoutBountyHunter }, variants: ['base', 'gold', 'cheatmaster', 'loothacker', 'bountyhunter'], baseAbility: { en: "Applies Overdrive after taking a certain amount of storm damage. Reveals future Storm Circles at max level. Reduces damage to trigger overdrive with each Level Up!", es: "Applies Overdrive after taking a certain amount of storm damage. Reveals future Storm Circles at max level. Reduces damage to trigger overdrive with each Level Up!" } },
-  { id: "x-ray", name: "X-Ray", rarity: "Legendary", season: 'C7S4', images: { base: xrayBase, gold: xrayGold, cheatmaster: xrayCheatMaster, loothacker: xrayLootHacker, bountyhunter: xrayBountyHunter }, variants: ['base', 'gold', 'cheatmaster', 'loothacker', 'bountyhunter'], baseAbility: { en: "Periodically mark enemies in an area around you. Mark more often and in a larger radius with each Level Up!", es: "Periodically mark enemies in an area around you. Mark more often and in a larger radius with each Level Up!" } },
-  { id: "overshield", name: "Overshield", rarity: "Rare", season: 'C7S4', images: { base: overshieldBase, gold: overshieldGold, cheatmaster: overshieldCheatMaster, loothacker: overshieldLootHacker, bountyhunter: overshieldBountyHunter }, variants: ['base', 'gold', 'cheatmaster', 'loothacker', 'bountyhunter'], baseAbility: { en: "Grants overshield, scaling with level.", es: "Grants overshield, scaling with level." } },
+  { id: "jackrabbit", name: "Jackrabbit", rarity: "Legendary", season: 'C7S4', images: { base: jackrabbitBase, gold: jackrabbitGold, cheatmaster: jackrabbitCheatMaster, loothacker: jackrabbitLootHacker, bountyhunter: jackrabbitBountyHunter, trickortreat: trtJackrabbit }, variants: ['base', 'gold', 'cheatmaster', 'loothacker', 'bountyhunter', 'trickortreat'], baseAbility: { en: "Grants the ability to perform another jump while mid-air! Cooldown between jumps decreases with each Level Up!", es: "Grants the ability to perform another jump while mid-air! Cooldown between jumps decreases with each Level Up!" } },
+  { id: "shadow", name: "Shadow", rarity: "Epic", season: 'C7S4', images: { base: shadowBase, gold: shadowGold, cheatmaster: shadowCheatMaster, loothacker: shadowLootHacker, bountyhunter: shadowBountyHunter, trickortreat: trtShadow }, variants: ['base', 'gold', 'cheatmaster', 'loothacker', 'bountyhunter', 'trickortreat'], baseAbility: { en: "Automatically reload unequipped weapons over time. Reloads equipped weapon at max level. Automatic reload gets faster with each Level Up!", es: "Automatically reload unequipped weapons over time. Reloads equipped weapon at max level. Automatic reload gets faster with each Level Up!" } },
+  { id: "bush", name: "Bush", rarity: "Rare", season: 'C7S4', images: { base: bushBase, gold: bushGold, cheatmaster: bushCheatMaster, loothacker: bushLootHacker, bountyhunter: bushBountyHunter, trickortreat: trtBush }, variants: ['base', 'gold', 'cheatmaster', 'loothacker', 'bountyhunter', 'trickortreat'], baseAbility: { en: "Grants a bush on you after a duration, gain a bush on elimination at max level. Time between bush activating decreases with each Level Up!", es: "Grants a bush on you after a duration, gain a bush on elimination at max level. Time between bush activating decreases with each Level Up!" } },
+  { id: "tails", name: "Tails", rarity: "Epic", season: 'C7S4', images: { base: tailsBase, gold: tailsGold, cheatmaster: tailsCheatMaster, loothacker: tailsLootHacker, bountyhunter: tailsBountyHunter, trickortreat: trtTails }, variants: ['base', 'gold', 'cheatmaster', 'loothacker', 'bountyhunter', 'trickortreat'], baseAbility: { en: "Grants the ability to hover with the Help of Tails! Hover speed increased with each Level Up!", es: "Grants the ability to hover with the Help of Tails! Hover speed increased with each Level Up!" } },
+  { id: "killswitch", name: "Killswitch", rarity: "Legendary", season: 'C7S4', images: { base: killswitchBase, gold: killswitchGold, cheatmaster: killswitchCheatMaster, loothacker: killswitchLootHacker, bountyhunter: killswitchBountyHunter, trickortreat: trtKillswitch }, variants: ['base', 'gold', 'cheatmaster', 'loothacker', 'bountyhunter', 'trickortreat'], baseAbility: { en: "Enter Hangtime with improved accuracy when aiming while jumping and falling. Accuracy increases with each Level Up!", es: "Enter Hangtime with improved accuracy when aiming while jumping and falling. Accuracy increases with each Level Up!" } },
+  { id: "adventure", name: "Adventure", rarity: "Rare", season: 'C7S4', images: { base: adventureBase, gold: adventureGold, cheatmaster: adventureCheatMaster, loothacker: adventureLootHacker, bountyhunter: adventureBountyHunter, trickortreat: trtAdventure }, variants: ['base', 'gold', 'cheatmaster', 'loothacker', 'bountyhunter', 'trickortreat'], baseAbility: { en: "Upgrades a random item in the player's inventory with each Level Up!", es: "Upgrades a random item in the player's inventory with each Level Up!" } },
+  { id: "klombo", name: "Klombo", rarity: "Mythic", season: 'C7S4', images: { base: klomboBase, gold: klomboGold, cheatmaster: klomboCheatMaster, loothacker: klomboLootHacker, bountyhunter: klomboBountyHunter, trickortreat: trtKlombo }, variants: ['base', 'gold', 'cheatmaster', 'loothacker', 'bountyhunter', 'trickortreat'], baseAbility: { en: "Grants random items at each level, only levels up by consuming items. Item quality increases with each Level Up!", es: "Grants random items at each level, only levels up by consuming items. Item quality increases with each Level Up!" } },
+  { id: "jonesy", name: "Jonesy", rarity: "Rare", season: 'C7S4', images: { base: jonesyBase, gold: jonesyGold, cheatmaster: jonesyCheatMaster, loothacker: jonesyLootHacker, bountyhunter: jonesyBountyHunter, trickortreat: trtJonesy }, variants: ['base', 'gold', 'cheatmaster', 'loothacker', 'bountyhunter', 'trickortreat'], baseAbility: { en: "Recover some health or shields after being damaged after a short duration. Increase amount healed with each Level Up!", es: "Recover some health or shields after being damaged after a short duration. Increase amount healed with each Level Up!" } },
+  { id: "sonic", name: "Sonic", rarity: "Epic", season: 'C7S4', images: { base: sonicBase, gold: sonicGold, cheatmaster: sonicCheatMaster, loothacker: sonicLootHacker, bountyhunter: sonicBountyHunter, trickortreat: trtSonic }, variants: ['base', 'gold', 'cheatmaster', 'loothacker', 'bountyhunter', 'trickortreat'], baseAbility: { en: "Gotta Go Fast! Sprint faster with each Level Up!", es: "Gotta Go Fast! Sprint faster with each Level Up!" } },
+  { id: "crown", name: "Crown", rarity: "Mythic", season: 'C7S4', images: { base: crownBase, gold: crownGold, cheatmaster: crownCheatMaster, loothacker: crownLootHacker, bountyhunter: crownBountyHunter, trickortreat: trtCrown }, variants: ['base', 'gold', 'cheatmaster', 'loothacker', 'bountyhunter', 'trickortreat'], baseAbility: { en: "Only levels up by winning matches. Level up faster with Crown Wins. New variants unlocked after mastering!", es: "Only levels up by winning matches. Level up faster with Crown Wins. New variants unlocked after mastering!" } },
+  { id: "eight-bit", name: "8-Bit", rarity: "Rare", season: 'C7S4', images: { base: eightBitBase, gold: eightBitGold, cheatmaster: eightBitCheatMaster, loothacker: eightBitLootHacker, bountyhunter: eightBitBountyHunter, trickortreat: trtEightBit }, variants: ['base', 'gold', 'cheatmaster', 'loothacker', 'bountyhunter', 'trickortreat'], baseAbility: { en: "Find an 8-Bit Shotgun in your first chest and gain a score multiplier for it.", es: "Find an 8-Bit Shotgun in your first chest and gain a score multiplier for it." } },
+  { id: "storm-scout", name: "Storm Scout", rarity: "Rare", season: 'C7S4', images: { base: stormScoutBase, gold: stormScoutGold, cheatmaster: stormScoutCheatMaster, loothacker: stormScoutLootHacker, bountyhunter: stormScoutBountyHunter, trickortreat: trtStormScout }, variants: ['base', 'gold', 'cheatmaster', 'loothacker', 'bountyhunter', 'trickortreat'], baseAbility: { en: "Applies Overdrive after taking a certain amount of storm damage. Reveals future Storm Circles at max level. Reduces damage to trigger overdrive with each Level Up!", es: "Applies Overdrive after taking a certain amount of storm damage. Reveals future Storm Circles at max level. Reduces damage to trigger overdrive with each Level Up!" } },
+  { id: "x-ray", name: "X-Ray", rarity: "Legendary", season: 'C7S4', images: { base: xrayBase, gold: xrayGold, cheatmaster: xrayCheatMaster, loothacker: xrayLootHacker, bountyhunter: xrayBountyHunter, trickortreat: trtXRay }, variants: ['base', 'gold', 'cheatmaster', 'loothacker', 'bountyhunter', 'trickortreat'], baseAbility: { en: "Periodically mark enemies in an area around you. Mark more often and in a larger radius with each Level Up!", es: "Periodically mark enemies in an area around you. Mark more often and in a larger radius with each Level Up!" } },
+  { id: "overshield", name: "Overshield", rarity: "Rare", season: 'C7S4', images: { base: overshieldBase, gold: overshieldGold, cheatmaster: overshieldCheatMaster, loothacker: overshieldLootHacker, bountyhunter: overshieldBountyHunter, trickortreat: trtOvershield }, variants: ['base', 'gold', 'cheatmaster', 'loothacker', 'bountyhunter', 'trickortreat'], baseAbility: { en: "Grants overshield, scaling with level.", es: "Grants overshield, scaling with level." } },
   { id: "mega-man", name: "Mega Man", rarity: "Rare", season: 'C7S4', images: { base: megaManBase }, variants: ['base'], baseAbility: { en: "Slip and slide around with reduced friction while Sliding. Slide farther with each Level Up!", es: "Slip and slide around with reduced friction while Sliding. Slide farther with each Level Up!" } },
-  { id: "onigiri", name: "Onigiri", rarity: "Rare", season: 'C7S4', images: { base: onigiriBase, gold: onigiriGold, cheatmaster: onigiriCheatMaster, loothacker: onigiriLootHacker, bountyhunter: onigiriBountyHunter }, variants: ['base', 'gold', 'cheatmaster', 'loothacker', 'bountyhunter'], baseAbility: { en: "Applies Overdrive after eating or drinking a Consumable. Overdrive lasts longer with each Level Up!", es: "Applies Overdrive after eating or drinking a Consumable. Overdrive lasts longer with each Level Up!" } },
+  { id: "onigiri", name: "Onigiri", rarity: "Rare", season: 'C7S4', images: { base: onigiriBase, gold: onigiriGold, cheatmaster: onigiriCheatMaster, loothacker: onigiriLootHacker, bountyhunter: onigiriBountyHunter, trickortreat: trtOnigiri }, variants: ['base', 'gold', 'cheatmaster', 'loothacker', 'bountyhunter', 'trickortreat'], baseAbility: { en: "Applies Overdrive after eating or drinking a Consumable. Overdrive lasts longer with each Level Up!", es: "Applies Overdrive after eating or drinking a Consumable. Overdrive lasts longer with each Level Up!" } },
 
   // --- NEW WAVE 2 SPRITES ---
-  { id: "blinky", name: "Blinky", rarity: "Legendary", season: 'C7S4', images: { base: blinkyBase, gold: blinkyGold, cheatmaster: blinkyCheatMaster, loothacker: blinkyLootHacker, bountyhunter: blinkyBountyHunter }, variants: ['base', 'gold', 'cheatmaster', 'loothacker', 'bountyhunter'], baseAbility: { en: "Grants cloak for a duration when you take damage. Cloak duration increases with each Level Up!", es: "Grants cloak for a duration when you take damage. Cloak duration increases with each Level Up!" } },
-  { id: "birthday", name: "Birthday", rarity: "Rare", season: 'C7S4', images: { base: birthdayBase, gold: birthdayGold, cheatmaster: birthdayCheatMaster, loothacker: birthdayLootHacker, bountyhunter: birthdayBountyHunter }, variants: ['base', 'gold', 'cheatmaster', 'loothacker', 'bountyhunter'], baseAbility: { en: "Opening chests has a chance to spawn a piece of cake. Eliminations can spawn cake at max level. Chance to spawn cake increases with each Level Up!", es: "Opening chests has a chance to spawn a piece of cake. Eliminations can spawn cake at max level. Chance to spawn cake increases with each Level Up!" } },
-  { id: "crash-bandicoot", name: "Crash Bandicoot", rarity: "Legendary", season: 'C7S4', images: { base: crashBandicootBase, gold: crashBandicootGold, cheatmaster: crashBandicootCheatMaster, loothacker: crashBandicootLootHacker, bountyhunter: crashBandicootBountyHunter }, variants: ['base', 'gold', 'cheatmaster', 'loothacker', 'bountyhunter'], baseAbility: { en: "(Active - Jump In Air) Triggers a whirlwind attack, damaging and knocking back nearby enemies. Damage increases and cooldown decreases with each Level Up!", es: "(Active - Jump In Air) Triggers a whirlwind attack, damaging and knocking back nearby enemies. Damage increases and cooldown decreases with each Level Up!" } },
-  { id: "pond", name: "Pond", rarity: "Epic", season: 'C7S4', images: { base: pondBase, gold: pondGold, cheatmaster: pondCheatMaster, loothacker: pondLootHacker, bountyhunter: pondBountyHunter }, variants: ['base', 'gold', 'cheatmaster', 'loothacker', 'bountyhunter'], baseAbility: { en: "(Active) - Jump shortly after landing to trigger a Super Jump, if charges are present. Gain charges over time. Super jump strength increases and cooldown decreases with each Level Up!", es: "(Active) - Jump shortly after landing to trigger a Super Jump, if charges are present. Gain charges over time. Super jump strength increases and cooldown decreases with each Level Up!" } },
-  { id: "morgana", name: "Morgana", rarity: "Epic", season: 'C7S4', images: { base: morganaBase, gold: morganaGold, cheatmaster: morganaCheatMaster, loothacker: morganaLootHacker, bountyhunter: morganaBountyHunter }, variants: ['base', 'gold', 'cheatmaster', 'loothacker', 'bountyhunter'], baseAbility: { en: "Increases the effectiveness of healing items. Healing effectiveness increases with each Level Up!", es: "Increases the effectiveness of healing items. Healing effectiveness increases with each Level Up!" } },
+  { id: "blinky", name: "Blinky", rarity: "Legendary", season: 'C7S4', images: { base: blinkyBase, gold: blinkyGold, cheatmaster: blinkyCheatMaster, loothacker: blinkyLootHacker, bountyhunter: blinkyBountyHunter, trickortreat: trtBlinky }, variants: ['base', 'gold', 'cheatmaster', 'loothacker', 'bountyhunter', 'trickortreat'], baseAbility: { en: "Grants cloak for a duration when you take damage. Cloak duration increases with each Level Up!", es: "Grants cloak for a duration when you take damage. Cloak duration increases with take damage. Cloak duration increases with each Level Up!" } },
+  { id: "birthday", name: "Birthday", rarity: "Rare", season: 'C7S4', images: { base: birthdayBase, gold: birthdayGold, cheatmaster: birthdayCheatMaster, loothacker: birthdayLootHacker, bountyhunter: birthdayBountyHunter, trickortreat: trtBirthday }, variants: ['base', 'gold', 'cheatmaster', 'loothacker', 'bountyhunter', 'trickortreat'], baseAbility: { en: "Opening chests has a chance to spawn a piece of cake. Eliminations can spawn cake at max level. Chance to spawn cake increases with each Level Up!", es: "Opening chests has a chance to spawn a piece of cake. Eliminations can spawn cake at max level. Chance to spawn cake increases with each Level Up!" } },
+  { id: "crash-bandicoot", name: "Crash Bandicoot", rarity: "Legendary", season: 'C7S4', images: { base: crashBandicootBase, gold: crashBandicootGold, cheatmaster: crashBandicootCheatMaster, loothacker: crashBandicootLootHacker, bountyhunter: crashBandicootBountyHunter, trickortreat: trtCrashBandicoot }, variants: ['base', 'gold', 'cheatmaster', 'loothacker', 'bountyhunter', 'trickortreat'], baseAbility: { en: "(Active - Jump In Air) Triggers a whirlwind attack, damaging and knocking back nearby enemies. Damage increases and cooldown decreases with each Level Up!", es: "(Active - Jump In Air) Triggers a whirlwind attack, damaging and knocking back nearby enemies. Damage increases and cooldown decreases with each Level Up!" } },
+  { id: "pond", name: "Pond", rarity: "Epic", season: 'C7S4', images: { base: pondBase, gold: pondGold, cheatmaster: pondCheatMaster, loothacker: pondLootHacker, bountyhunter: pondBountyHunter, trickortreat: trtPond }, variants: ['base', 'gold', 'cheatmaster', 'loothacker', 'bountyhunter', 'trickortreat'], baseAbility: { en: "(Active) - Jump shortly after landing to trigger a Super Jump, if charges are present. Gain charges over time. Super jump strength increases and cooldown decreases with each Level Up!", es: "(Active) - Jump shortly after landing to trigger a Super Jump, if charges are present. Gain charges over time. Super jump strength increases and cooldown decreases with each Level Up!" } },
+  { id: "morgana", name: "Morgana", rarity: "Epic", season: 'C7S4', images: { base: morganaBase, gold: morganaGold, cheatmaster: morganaCheatMaster, loothacker: morganaLootHacker, bountyhunter: morganaBountyHunter, trickortreat: trtMorgana }, variants: ['base', 'gold', 'cheatmaster', 'loothacker', 'bountyhunter', 'trickortreat'], baseAbility: { en: "Increases the effectiveness of healing items. Healing effectiveness increases with each Level Up!", es: "Increases the effectiveness of healing items. Healing effectiveness increases with each Level Up!" } },
 
   // --- NEW WAVE 3 SPRITES ---
-  { id: "spooky-dash", name: "Spooky Dash", rarity: "Mythic", season: 'C7S4', images: { base: spookyBase, gold: spookyGold, cheatmaster: spookyCheatMaster, loothacker: spookyLootHacker, bountyhunter: spookyBountyHunter }, variants: ['base', 'gold', 'cheatmaster', 'loothacker', 'bountyhunter'], baseAbility: { en: "(Active - Jump in Air) Spooky Dash lets you phase through some objects. Gains charge over time. Charge cooldown decreases with each Level Up!", es: "(Active - Jump in Air) Spooky Dash lets you phase through some objects. Gains charge over time. Charge cooldown decreases with each Level Up!" } },
-  { id: "vampire", name: "Vampire", rarity: "Legendary", season: 'C7S4', images: { base: vampireBase, gold: vampireGold, cheatmaster: vampireCheatMaster, loothacker: vampireLootHacker, bountyhunter: vampireBountyHunter }, variants: ['base', 'gold', 'cheatmaster', 'loothacker', 'bountyhunter'], baseAbility: { en: "Recover health when damaging an enemy. Health recovered percent increases with each Level Up!", es: "Recover health when damaging an enemy. Health recovered percent increases with each Level Up!" } },
-  { id: "the-deer", name: "The Deer", rarity: "Legendary", season: 'C7S4', images: { base: deerBase, gold: deerGold, cheatmaster: deerCheatMaster, loothacker: deerLootHacker, bountyhunter: deerBountyHunter }, variants: ['base', 'gold', 'cheatmaster', 'loothacker', 'bountyhunter'], baseAbility: { en: "Melee attacks deal more damage. Melee attack damage increases with each Level Up!", es: "Melee attacks deal more damage. Melee attack damage increases with each Level Up!" } },
-  { id: "dumpster-dive", name: "Dumpster Dive", rarity: "Epic", season: 'C7S4', images: { base: dumpsterBase, gold: dumpsterGold, cheatmaster: dumpsterCheatMaster, loothacker: dumpsterLootHacker, bountyhunter: dumpsterBountyHunter }, variants: ['base', 'gold', 'cheatmaster', 'loothacker', 'bountyhunter'], baseAbility: { en: "Food provides bonus healing. Find food when jumping out of hiding props, and a small chance when opening containers. Find better food with each Level Up!", es: "Food provides bonus healing. Find food when jumping out of hiding props, and a small chance when opening containers. Find better food with each Level Up!" } }
+  { id: "spooky-dash", name: "Spooky Dash", rarity: "Mythic", season: 'C7S4', images: { base: spookyBase, gold: spookyGold, cheatmaster: spookyCheatMaster, loothacker: spookyLootHacker, bountyhunter: spookyBountyHunter, trickortreat: trtSpookyDash }, variants: ['base', 'gold', 'cheatmaster', 'loothacker', 'bountyhunter', 'trickortreat'], baseAbility: { en: "(Active - Jump in Air) Spooky Dash lets you phase through some objects. Gains charge over time. Charge cooldown decreases with each Level Up!", es: "(Active - Jump in Air) Spooky Dash lets you phase through some objects. Gains charge over time. Charge cooldown decreases with each Level Up!" } },
+  { id: "vampire", name: "Vampire", rarity: "Legendary", season: 'C7S4', images: { base: vampireBase, gold: vampireGold, cheatmaster: vampireCheatMaster, loothacker: vampireLootHacker, bountyhunter: vampireBountyHunter, trickortreat: trtVampire }, variants: ['base', 'gold', 'cheatmaster', 'loothacker', 'bountyhunter', 'trickortreat'], baseAbility: { en: "Recover health when damaging an enemy. Health recovered percent increases with each Level Up!", es: "Recover health when damaging an enemy. Health recovered percent increases with each Level Up!" } },
+  { id: "the-deer", name: "The Deer", rarity: "Legendary", season: 'C7S4', images: { base: deerBase, gold: deerGold, cheatmaster: deerCheatMaster, loothacker: deerLootHacker, bountyhunter: deerBountyHunter, trickortreat: trtTheDeer }, variants: ['base', 'gold', 'cheatmaster', 'loothacker', 'bountyhunter', 'trickortreat'], baseAbility: { en: "Melee attacks deal more damage. Melee attack damage increases with each Level Up!", es: "Melee attacks deal more damage. Melee attack damage increases with each Level Up!" } },
+  { id: "dumpster-dive", name: "Dumpster Dive", rarity: "Epic", season: 'C7S4', images: { base: dumpsterBase, gold: dumpsterGold, cheatmaster: dumpsterCheatMaster, loothacker: dumpsterLootHacker, bountyhunter: dumpsterBountyHunter, trickortreat: trtDumpster }, variants: ['base', 'gold', 'cheatmaster', 'loothacker', 'bountyhunter', 'trickortreat'], baseAbility: { en: "Food provides bonus healing. Find food when jumping out of hiding props, and a small chance when opening containers. Find better food with each Level Up!", es: "Food provides bonus healing. Find food when jumping out of hiding props, and a small chance when opening containers. Find better food with each Level Up!" } }
 ];
 
 const PATCH_NOTES = [
+  {
+    version: "v2.6.0",
+    date: "10/02/2026",
+    title: "Halloween Event, Profile Overhaul & Wave 3 Sprites!",
+    changes: [
+      "🎃 LIMITED TIME AURA: The animated 'Spectral Haunt' Profile Aura has arrived in the Black Market! Attainable for 1,250 Fragments, it will vanish from the store at the end of October—buy it now and keep it forever!",
+      "Modernized Profile Cards: Completely overhauled the profile UI with a sleek glassmorphic design, dynamic avatar headshots from your #1 Trophy slot, and cleanly labeled social link pills.",
+      "Real-Time Season Filters: You can now toggle between All Seasons, C7S3, and C7S4 directly on profile cards to update collection and mastery percentages in real-time.",
+      "Wave 3 Sprites & 'Trick or Treat' Variant: Spooky Dash, Vampire, The Deer, and Dumpster Dive have entered the pool, alongside the new orange-themed Trick or Treat variant (chance to find candy when opening containers).",
+      "Black Market Price Cuts: Permanently slashed fragment prices on Tiers 1–3 Auras (1,000 / 2,500 / 5,000) to make styling your profile more accessible.",
+      "Slot Bug Fixes: Resolved the visual free-unlock bug for the 5th Trophy and 4th Extraction Target slots so they correctly tie to database purchase flags."
+    ]
+  },
   {
     version: "v2.6.0",
     date: "10/01/2026",
@@ -690,7 +737,8 @@ const VARIANT_INFO = {
   quack: { name: "Quack", color: "text-yellow-300", bgColor: "bg-yellow-300", borderColor: "border-yellow-500/70" },
   cheatmaster: { name: "Cheat Master", color: "text-green-500", bgColor: "bg-green-500", borderColor: "border-green-500/70" },
   loothacker: { name: "Loot Hacker", color: "text-purple-300", bgColor: "bg-purple-300", borderColor: "border-purple-500/70" },
-  bountyhunter: { name: "Bounty Hunter", color: "text-red-500", bgColor: "bg-red-500", borderColor: "border-red-500/70" }
+  bountyhunter: { name: "Bounty Hunter", color: "text-red-500", bgColor: "bg-red-500", borderColor: "border-red-500/70" },
+  trickortreat: { name: "Trick or Treat", color: "text-orange-500", bgColor: "bg-orange-500", borderColor: "border-orange-500/70" }
 };
 
 const RARITY_COLORS = { Mythic: "bg-yellow-400 text-black border-yellow-300 font-extrabold", Legendary: "bg-orange-500 text-white border-orange-400", Epic: "bg-purple-600 text-white border-purple-400", Rare: "bg-blue-600 text-white border-blue-400", Unknown: "bg-slate-500 text-white border-slate-400" };
@@ -793,6 +841,8 @@ function MainApp() {
 
   // LocalStorage Defaulting
   const [seasonFilter, setSeasonFilter] = useState(localStorage.getItem('spritedex_seasonFilter') || 'All');
+  const [profileSeasonFilter, setProfileSeasonFilter] = useState('All');
+  const [fProfileSeasonFilter, setFProfileSeasonFilter] = useState('All');
 
   const [rarityFilter, setRarityFilter] = useState('All');
   const [variantFilter, setVariantFilter] = useState('All');
@@ -1231,7 +1281,7 @@ function MainApp() {
     if (isVariantLocked(spriteId, variant)) return;
     const currentVal = collection[spriteId]?.[variant]; const newVal = !currentVal;
     if (newVal) {
-      if (variant === 'holofoil' || variant === 'cube' || variant === 'gem' || variant === 'quack' || variant === 'cheatmaster') playBeep(1200, 'square', 0.15);
+      if (variant === 'holofoil' || variant === 'cube' || variant === 'gem' || variant === 'quack' || variant === 'cheatmaster' || variant === 'trickortreat') playBeep(1200, 'square', 0.15);
       else if (variant === 'galaxy') playBeep(880, 'triangle', 0.15);
       else if (variant === 'gold') playBeep(659, 'sine', 0.1);
       else if (variant === 'gummy') playBeep(587, 'sine', 0.1);
@@ -1297,21 +1347,39 @@ function MainApp() {
 
       let usersWithFragments = 0;
       let totalFragments = 0;
+      let auraCounts = {};
 
-      // 2. Loop through every user and tally up their fragments
+      // 2. Loop through every user and tally up their fragments and auras
       usersQuery.forEach(doc => {
         const data = doc.data();
+
+        // Count Fragments
         if (data.fragments && data.fragments > 0) {
           usersWithFragments++;
           totalFragments += data.fragments;
+        }
+
+        // Count Auras
+        if (data.profile && data.profile.purchasedAuras) {
+          data.profile.purchasedAuras.forEach(aura => {
+            auraCounts[aura] = (auraCounts[aura] || 0) + 1;
+          });
         }
       });
 
       // 3. Calculate the average
       const averageFragments = usersWithFragments > 0 ? Math.round(totalFragments / usersWithFragments) : 0;
 
-      // 4. Show you the results
-      alert(`📊 FRAGMENT ECONOMY STATS:\n\nTotal Players Hoarding: ${usersWithFragments}\nTotal Fragments Mined: ${totalFragments.toLocaleString()}\nAverage Per Player: ${averageFragments.toLocaleString()}`);
+      // 4. Format Aura text
+      let auraText = "AURAS OWNED:\n";
+      if (Object.keys(auraCounts).length === 0) auraText += "None yet!";
+      for (const [key, count] of Object.entries(auraCounts)) {
+        const auraName = AURA_DICTIONARY[key]?.name || key;
+        auraText += `- ${auraName}: ${count}\n`;
+      }
+
+      // 5. Show you the results
+      alert(`📊 ECONOMY STATS:\n\nPlayers w/ Fragments: ${usersWithFragments}\nTotal Mined: ${totalFragments.toLocaleString()}\nAverage Per Player: ${averageFragments.toLocaleString()}\n\n${auraText}`);
 
     } catch (error) {
       alert("Failed to fetch stats. Check console for error.");
@@ -1872,65 +1940,139 @@ function MainApp() {
       case 'cube': return "• Triggers Overdrive while you are caught in the Storm.";
       case 'gem': return "Take 30% less Fall damage";
       case 'quack': return "Gives 50% Sprite XP earned to all other Sprites in your inventory";
+      case 'trickortreat': return "Chance to find candy when opening containers.";
       default: return null;
     }
   };
 
-  const renderProfileCard = (id, profData, colRate, mastRate, joinTime, isSelf, masteriesObj, repVouches, uid, unlockedArray = []) => {
-    const unlockedBg = getUnlockedMilestone(Math.round((colRate / 100) * totalPossibleStatic), Math.round((mastRate / 100) * totalPossibleStatic), unlockedArray);
+  const renderProfileCard = (id, profData, userCollection, userMastery, joinTime, isSelf, repVouches, uid, unlockedArray = []) => {
+    // 1. Determine active filter state (Self vs Friend)
+    const currentFilter = isSelf ? profileSeasonFilter : fProfileSeasonFilter;
+    const setCurrentFilter = isSelf ? setProfileSeasonFilter : setFProfileSeasonFilter;
+
+    // 2. Dynamically calculate stats based on the selected Profile Filter
+    const activeSprites = currentFilter === 'All' ? SPRITES_DATABASE : SPRITES_DATABASE.filter(s => s.season === currentFilter);
+    const possible = activeSprites.reduce((acc, sprite) => acc + sprite.variants.filter(v => !isVariantLocked(sprite.id, v)).length, 0);
+    const tCol = activeSprites.reduce((acc, sprite) => acc + sprite.variants.filter(v => !isVariantLocked(sprite.id, v) && (userCollection[sprite.id] || {})[v]).length, 0);
+    const tMast = activeSprites.reduce((acc, sprite) => acc + sprite.variants.filter(v => !isVariantLocked(sprite.id, v) && (userMastery[sprite.id] || {})[v]).length, 0);
+    const colRate = possible > 0 ? Math.round((tCol / possible) * 100) : 0;
+    const mastRate = possible > 0 ? Math.round((tMast / possible) * 100) : 0;
+
+    // 3. Keep Global Stats strictly for unlocking Milestones (Milestones require entire vault completion)
+    const globalCol = SPRITES_DATABASE.reduce((acc, sprite) => acc + sprite.variants.filter(v => !isVariantLocked(sprite.id, v) && (userCollection[sprite.id] || {})[v]).length, 0);
+    const globalMast = SPRITES_DATABASE.reduce((acc, sprite) => acc + sprite.variants.filter(v => !isVariantLocked(sprite.id, v) && (userMastery[sprite.id] || {})[v]).length, 0);
+
+    const unlockedBg = getUnlockedMilestone(Math.round((globalCol / totalPossibleStatic) * 100), Math.round((globalMast / totalPossibleStatic) * 100), unlockedArray);
     const auraDef = profData.activeAura ? AURA_DICTIONARY[profData.activeAura] : null;
 
     const bgClass = auraDef ? auraDef.profileBg : (unlockedBg ? unlockedBg.bg : "bg-slate-900 border-slate-800");
     const glowClass = auraDef ? auraDef.profileGlow : (unlockedBg ? unlockedBg.glow : "");
 
+    // 4. Generate Avatar from #1 Trophy Case Slot
+    const mainAvatar = profData.trophies?.[0];
+    const avatarImg = mainAvatar ? SPRITES_DATABASE.find(s => s.id === mainAvatar.split('_')[0])?.images[mainAvatar.split('_')[1]] : null;
+
     return (
-      <div id={isSelf ? "export-collector-card" : undefined} className="relative mt-2 mb-4">
-        {(unlockedBg || auraDef) && !auraDef?.isAnimated && (<div className={`absolute inset-0 rounded-2xl border-2 ${glowClass} animate-pulse pointer-events-none opacity-90`}></div>)}
+      <div id={isSelf ? "export-collector-card" : undefined} className="relative mt-2 mb-6">
+        {(unlockedBg || auraDef) && !auraDef?.isAnimated && (<div className={`absolute inset-0 rounded-3xl border-2 ${glowClass} animate-pulse pointer-events-none opacity-90`}></div>)}
 
-        <div className={`rounded-2xl border-2 p-5 relative overflow-hidden transition-all ${auraDef?.isAnimated ? `p-[2px] ${glowClass}` : bgClass}`}>
-
+        <div className={`rounded-3xl border-2 p-5 relative overflow-hidden transition-all shadow-xl ${auraDef?.isAnimated ? `p-[2px] ${glowClass}` : bgClass}`}>
           {auraDef?.isAnimated && (
             <div data-html2canvas-ignore="true" className={`absolute inset-[-150%] animate-[spin_4s_linear_infinite] ${auraDef.spinnerClass} pointer-events-none z-0`} />
           )}
 
-          <div className={auraDef?.isAnimated ? `relative rounded-[14px] p-4 h-full w-full z-10 ${auraDef.profileBg}` : "h-full w-full relative z-10"}>
-            <div className="flex items-start justify-between mb-4">
-              <div>
-                <div className="flex items-center gap-2">
-                  <h2 className={`text-xl sm:text-2xl font-black uppercase italic tracking-tight ${auraDef ? auraDef.text : 'text-white'}`}>@{id}</h2>
-                  {unlockedBg && !auraDef && <span className="text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md border bg-black/40 text-slate-200 border-white/20">{unlockedBg.name}</span>}
-                  {auraDef && <span className={`text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md border bg-black/60 ${auraDef.text} border-current opacity-80`}>{auraDef.name}</span>}
+          <div className={auraDef?.isAnimated ? `relative rounded-[22px] p-5 h-full w-full z-10 ${auraDef.profileBg}` : "h-full w-full relative z-10"}>
+
+            {/* --- HEADER --- */}
+            <div className="flex justify-between items-start mb-5">
+              <div className="flex items-center gap-4">
+                <div className="w-14 h-14 rounded-2xl bg-black/40 border border-white/10 flex items-center justify-center p-2 shrink-0 shadow-inner overflow-hidden relative">
+                  {avatarImg ? <img src={avatarImg} className="w-full h-full object-contain relative z-10" alt="" /> : <UserIcon className="w-6 h-6 text-slate-500 relative z-10" />}
                 </div>
-                <div className="flex items-center gap-2 mt-1">
-                  <span className="text-[10px] font-mono text-slate-400 flex items-center gap-1"><Calendar className="w-3 h-3" /> Joined {formatJoinDate(joinTime)}</span>
-                  <span className="text-[10px] font-black text-amber-400 bg-amber-950/40 px-1.5 py-0.5 rounded border border-amber-500/30 flex items-center gap-1">⭐ {repVouches?.length || 0} Rep</span>
+                <div>
+                  <h2 className={`text-xl sm:text-2xl font-black uppercase italic tracking-tight mb-1 ${auraDef ? auraDef.text : 'text-white'}`}>@{id}</h2>
+                  <div className="flex flex-wrap items-center gap-1.5">
+                    {unlockedBg && !auraDef && <span className="text-[8px] font-black uppercase tracking-wider px-2 py-0.5 rounded bg-white/10 text-white backdrop-blur-sm border border-white/20">{unlockedBg.name}</span>}
+                    {auraDef && <span className={`text-[8px] font-black uppercase tracking-wider px-2 py-0.5 rounded bg-black/60 ${auraDef.text} border-current opacity-80`}>{auraDef.name}</span>}
+                    <span className="text-[9px] font-black text-amber-400 bg-amber-950/40 px-1.5 py-0.5 rounded border border-amber-500/30">⭐ {repVouches?.length || 0} Rep</span>
+                    <span className="text-[9px] font-mono text-slate-400 bg-black/30 px-1.5 py-0.5 rounded ml-1">Joined {formatJoinDate(joinTime)}</span>
+                  </div>
                 </div>
               </div>
               {isSelf && (
                 <div className="flex items-center gap-2 relative z-20" data-html2canvas-ignore="true">
-                  <button onClick={handleShareProfile} disabled={isExporting} className="p-2 bg-indigo-600/80 hover:bg-indigo-500 rounded-xl border border-indigo-400/50 text-white transition-colors shadow-[0_0_10px_rgba(79,70,229,0.3)]">
-                    {isExporting ? <span className="animate-pulse font-bold text-[10px]">...</span> : <Share2 className="w-5 h-5" />}
+                  <button onClick={handleShareProfile} disabled={isExporting} className="p-2.5 bg-indigo-600/80 hover:bg-indigo-500 rounded-xl border border-indigo-400/50 text-white transition-colors shadow-[0_0_10px_rgba(79,70,229,0.3)]">
+                    {isExporting ? <span className="animate-pulse font-bold text-[10px]">...</span> : <Share2 className="w-4 h-4" />}
                   </button>
-                  <button onClick={() => isEditingProfile ? handleSaveProfile() : setIsEditingProfile(true)} className="p-2 bg-black/40 hover:bg-black/60 rounded-xl border border-white/10 text-white transition-colors">
-                    {isEditingProfile ? <Save className="w-5 h-5 text-emerald-400" /> : <Edit3 className="w-5 h-5" />}
+                  <button onClick={() => isEditingProfile ? handleSaveProfile() : setIsEditingProfile(true)} className="p-2.5 bg-black/40 hover:bg-black/60 rounded-xl border border-white/10 text-white transition-colors">
+                    {isEditingProfile ? <Save className="w-4 h-4 text-emerald-400" /> : <Edit3 className="w-4 h-4" />}
                   </button>
                 </div>
               )}
             </div>
 
-            <div className="flex gap-2 mb-4">
-              <div className="flex-1 bg-black/30 border border-white/5 rounded-xl p-2 text-center">
-                <span className="block text-xl font-black text-cyan-400">{colRate}%</span>
-                <span className="block text-[8px] font-mono uppercase text-slate-500 tracking-wider">Collected</span>
-              </div>
-              <div className="flex-1 bg-black/30 border border-white/5 rounded-xl p-2 text-center">
-                <span className="block text-xl font-black text-yellow-400">{mastRate}%</span>
-                <span className="block text-[8px] font-mono uppercase text-slate-500 tracking-wider">Mastered</span>
-              </div>
-            </div>
+            {/* --- REAL-TIME STATS TOGGLE & PROGRESS BARS --- */}
+            {!isEditingProfile && (
+              <>
+                <div className="bg-black/40 p-1 rounded-xl mb-4 flex border border-white/5 shadow-inner" data-html2canvas-ignore="true">
+                  {['All', 'C7S3', 'C7S4'].map(s => (
+                    <button key={s} onClick={() => setCurrentFilter(s)} className={`flex-1 py-1.5 text-[10px] font-black uppercase tracking-wider rounded-lg transition-all duration-300 ${currentFilter === s ? 'bg-indigo-600 text-white shadow-md' : 'text-slate-500 hover:text-slate-300 hover:bg-white/5'}`}>
+                      {s === 'All' ? 'All Seasons' : s}
+                    </button>
+                  ))}
+                </div>
 
-            {isEditingProfile ? (
-              <div className="space-y-3 mb-4">
+                <div className="bg-black/30 border border-white/5 rounded-2xl p-4 mb-5 flex flex-col gap-4 shadow-sm">
+                  <div>
+                    <div className="flex justify-between items-end mb-1.5">
+                      <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">Collection</span>
+                      <span className="text-sm leading-none font-black text-cyan-400">{colRate}%</span>
+                    </div>
+                    <div className="h-2 w-full bg-slate-950 rounded-full overflow-hidden border border-slate-800/80">
+                      <div className="h-full bg-gradient-to-r from-cyan-600 to-cyan-400 rounded-full transition-all duration-500" style={{ width: `${colRate}%` }}></div>
+                    </div>
+                  </div>
+                  <div>
+                    <div className="flex justify-between items-end mb-1.5">
+                      <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">Mastery</span>
+                      <span className="text-sm leading-none font-black text-yellow-400">{mastRate}%</span>
+                    </div>
+                    <div className="h-2 w-full bg-slate-950 rounded-full overflow-hidden border border-slate-800/80">
+                      <div className="h-full bg-gradient-to-r from-yellow-600 to-yellow-400 rounded-full transition-all duration-500" style={{ width: `${mastRate}%` }}></div>
+                    </div>
+                  </div>
+                </div>
+              </>
+            )}
+
+            {/* --- BIO & SOCIALS (DISPLAY MODE) --- */}
+            {!isEditingProfile && (profData.bio || profData.epicName || profData.twitchName || profData.tiktokName || profData.youtubeName || profData.kickName) && (
+              <div className="mb-5 flex flex-col gap-3">
+                {profData.bio && <p className="text-sm text-slate-300 italic px-3 py-2.5 border-l-2 border-indigo-500 bg-indigo-500/10 rounded-r-xl">"{profData.bio}"</p>}
+
+                <div className="flex flex-col gap-3 mt-1">
+                  {profData.epicName && (
+                    <div className="flex items-center gap-2 text-xs font-black uppercase text-slate-400 tracking-wider bg-black/40 px-3 py-1.5 rounded-lg border border-white/5 w-fit">
+                      <Gamepad2 className="w-4 h-4 text-blue-400" />
+                      <span className="text-[10px] text-slate-500 mr-1">EPIC ID</span>
+                      <span className="text-white">{profData.epicName}</span>
+                    </div>
+                  )}
+
+                  <div className="flex flex-wrap gap-1 sm:gap-1.5">
+                    {profData.twitchName && <a href={`https://twitch.tv/${profData.twitchName}`} target="_blank" rel="noopener noreferrer" className="px-1.5 sm:px-2.5 py-1.5 rounded-full bg-purple-500/10 border border-purple-500/20 flex items-center justify-center gap-1 sm:gap-1.5 text-purple-400 hover:bg-purple-500/20 hover:border-purple-500/40 transition-all"><Tv className="w-3 h-3 sm:w-3.5 sm:h-3.5" /><span className="text-[8px] sm:text-[9px] font-black uppercase tracking-wider">Twitch</span></a>}
+                    {profData.tiktokName && <a href={`https://tiktok.com/@${profData.tiktokName}`} target="_blank" rel="noopener noreferrer" className="px-1.5 sm:px-2.5 py-1.5 rounded-full bg-pink-500/10 border border-pink-500/20 flex items-center justify-center gap-1 sm:gap-1.5 text-pink-400 hover:bg-pink-500/20 hover:border-pink-500/40 transition-all"><Music className="w-3 h-3 sm:w-3.5 sm:h-3.5" /><span className="text-[8px] sm:text-[9px] font-black uppercase tracking-wider">TikTok</span></a>}
+                    {profData.youtubeName && <a href={`https://youtube.com/@${profData.youtubeName}`} target="_blank" rel="noopener noreferrer" className="px-1.5 sm:px-2.5 py-1.5 rounded-full bg-red-500/10 border border-red-500/20 flex items-center justify-center gap-1 sm:gap-1.5 text-red-400 hover:bg-red-500/20 hover:border-red-500/40 transition-all"><Video className="w-3 h-3 sm:w-3.5 sm:h-3.5" /><span className="text-[8px] sm:text-[9px] font-black uppercase tracking-wider">YouTube</span></a>}
+                    {profData.kickName && <a href={`https://kick.com/${profData.kickName}`} target="_blank" rel="noopener noreferrer" className="px-1.5 sm:px-2.5 py-1.5 rounded-full bg-green-500/10 border border-green-500/20 flex items-center justify-center gap-1 sm:gap-1.5 text-green-400 hover:bg-green-500/20 hover:border-green-500/40 transition-all"><Play className="w-3 h-3 sm:w-3.5 sm:h-3.5" /><span className="text-[8px] sm:text-[9px] font-black uppercase tracking-wider">Kick</span></a>}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* --- EDIT MODE INPUTS --- */}
+            {isEditingProfile && (
+              <div className="space-y-3 mb-6 bg-black/20 p-3 rounded-2xl border border-white/5">
+                <span className="block text-[10px] font-black uppercase tracking-widest text-slate-500 mb-2">Edit Bio & Links</span>
                 <textarea value={profileData.bio} onChange={(e) => setProfileData({ ...profileData, bio: e.target.value.substring(0, 100) })} placeholder="Enter bio (max 100 chars)..." className={`w-full bg-black/40 border border-white/10 rounded-xl p-3 ${inputSizeClass} text-white focus:outline-none focus:border-cyan-500 resize-none h-20`} />
                 <div className="grid grid-cols-2 gap-2">
                   <div className="relative col-span-2">
@@ -1954,18 +2096,17 @@ function MainApp() {
                     <input type="text" value={profileData.kickName} onChange={(e) => setProfileData({ ...profileData, kickName: e.target.value })} placeholder="Kick Channel" className={`w-full bg-black/40 border border-white/10 rounded-xl pl-9 pr-3 py-2 ${inputSizeClass} text-white focus:outline-none focus:border-green-500`} />
                   </div>
 
-                  {/* PLAYER AURA SELECTION (Only shows if they own at least one aura) */}
                   {profileData.purchasedAuras?.length > 0 && (
                     <div className="col-span-2 mt-4 p-3 bg-black/40 rounded-xl border border-slate-700 flex flex-col gap-3">
                       <span className="block text-[10px] font-black text-emerald-400 uppercase tracking-widest"><Eye className="w-3 h-3 inline mr-1" /> Equip Aura</span>
                       <div className="flex flex-wrap gap-2">
                         <button onClick={() => setProfileData({ ...profileData, activeAura: null })} className={`px-3 py-1.5 text-[10px] font-bold rounded-lg border transition-colors ${!profileData.activeAura ? 'bg-slate-700 text-white border-slate-500' : 'bg-black text-slate-500 border-slate-700 hover:text-slate-300'}`}>None</button>
                         {profileData.purchasedAuras.map(auraKey => {
-                          const auraDef = AURA_DICTIONARY[auraKey];
-                          if (!auraDef) return null;
+                          const aDef = AURA_DICTIONARY[auraKey];
+                          if (!aDef) return null;
                           return (
                             <button key={auraKey} onClick={() => setProfileData({ ...profileData, activeAura: auraKey })} className={`px-2 py-1.5 text-[10px] font-bold rounded-lg border transition-colors ${profileData.activeAura === auraKey ? 'bg-indigo-600 text-white border-indigo-400 shadow-[0_0_10px_rgba(79,70,229,0.4)]' : 'bg-black text-slate-400 border-slate-700 hover:border-slate-500'}`}>
-                              {auraDef.name}
+                              {aDef.name}
                             </button>
                           )
                         })}
@@ -1973,24 +2114,26 @@ function MainApp() {
                     </div>
                   )}
 
-                  {/* MASTER CHEAT UNLOCK MENU (RESTRICTED TO ADMIN) */}
                   {id?.toLowerCase() === 'imbearkat' && (
                     <div className="col-span-2 mt-4 p-3 bg-black/60 rounded-xl border border-red-900/50 flex flex-col gap-3 shadow-[inset_0_0_20px_rgba(220,38,38,0.1)]">
-                      <span className="block text-[10px] font-black text-red-500 uppercase tracking-widest"><Crown className="w-3 h-3 inline mr-1" /> Admin Override (ImBearKat Only)</span>
-
-                      <div className="border-b border-red-900/30 pb-3">
-                        <button onClick={() => setProfileData({ ...profileData, activeAura: null })} className={`px-3 py-1.5 text-[10px] font-bold rounded-lg border transition-colors ${!profileData.activeAura ? 'bg-slate-700 text-white border-slate-500' : 'bg-black text-slate-500 border-slate-700 hover:text-slate-300'}`}>
-                          Default (Milestones Only)
-                        </button>
+                      <div className="flex justify-between items-center">
+                        <span className="block text-[10px] font-black text-red-500 uppercase tracking-widest"><Crown className="w-3 h-3 inline mr-1" /> Admin Override</span>
+                        <button onClick={(e) => { e.preventDefault(); calculateFragmentStats(); }} className="bg-red-900/50 hover:bg-red-800/50 text-red-400 px-2 py-1 rounded text-[9px] font-bold uppercase tracking-wider border border-red-500/30 transition-colors">Run Econ Check</button>
                       </div>
-
-                      {[1, 2, 3].map(tierLevel => (
+                      <div className="border-b border-red-900/30 pb-3">
+                        <button onClick={() => setProfileData({ ...profileData, activeAura: null })} className={`px-3 py-1.5 text-[10px] font-bold rounded-lg border transition-colors ${!profileData.activeAura ? 'bg-slate-700 text-white border-slate-500' : 'bg-black text-slate-500 border-slate-700 hover:text-slate-300'}`}>Default (Milestones Only)</button>
+                      </div>
+                      {[1, 2, 3, 4].map(tierLevel => (
                         <div key={tierLevel}>
-                          <span className="block text-[9px] text-slate-500 font-bold uppercase tracking-widest mb-1.5">Tier {tierLevel} Auras</span>
+                          <span className={`block text-[9px] font-bold uppercase tracking-widest mb-1.5 ${tierLevel === 4 ? 'text-orange-500' : 'text-slate-500'}`}>{tierLevel === 4 ? 'Limited Auras' : `Tier ${tierLevel} Auras`}</span>
                           <div className="flex flex-wrap gap-2">
-                            {Object.entries(AURA_DICTIONARY).filter(([_, aura]) => aura.tier === tierLevel).map(([key, aura]) => (
-                              <button key={key} onClick={() => setProfileData({ ...profileData, activeAura: key })} className={`px-2 py-1.5 text-[10px] font-bold rounded-lg border transition-colors ${profileData.activeAura === key ? 'bg-indigo-600 text-white border-indigo-400 shadow-[0_0_10px_rgba(79,70,229,0.4)]' : 'bg-black text-slate-400 border-slate-700 hover:border-slate-500'}`}>
-                                {aura.name}
+                            {Object.entries(AURA_DICTIONARY).filter(([_, aura]) => aura.tier === tierLevel).map(([key, a]) => (
+                              <button key={key} onClick={() => {
+                                const currentAuras = profileData.purchasedAuras || [];
+                                const newAuras = currentAuras.includes(key) ? currentAuras : [...currentAuras, key];
+                                setProfileData({ ...profileData, activeAura: key, purchasedAuras: newAuras });
+                              }} className={`px-2 py-1.5 text-[10px] font-bold rounded-lg border transition-colors ${profileData.activeAura === key ? 'bg-indigo-600 text-white border-indigo-400 shadow-[0_0_10px_rgba(79,70,229,0.4)]' : 'bg-black text-slate-400 border-slate-700 hover:border-slate-500'}`}>
+                                {a.name}
                               </button>
                             ))}
                           </div>
@@ -2000,39 +2143,23 @@ function MainApp() {
                   )}
                 </div>
               </div>
-            ) : (
-              <div className="mb-4">
-                {profData.bio && <p className="text-sm text-slate-300 italic mb-3 bg-black/20 p-3 rounded-xl border-l-2 border-indigo-500">"{profData.bio}"</p>}
-                <div className="flex flex-col gap-2">
-                  {profData.epicName && (
-                    <div className="w-full bg-blue-950/40 border border-blue-500/30 p-3 rounded-xl flex items-center justify-between shadow-inner">
-                      <div className="flex items-center gap-2"><Gamepad2 className="w-5 h-5 text-blue-400" /><span className="text-[10px] font-mono text-blue-300 uppercase tracking-widest">Epic ID</span></div>
-                      <span className="text-sm font-black text-white">{profData.epicName}</span>
-                    </div>
-                  )}
-                  <div className="grid grid-cols-2 gap-2">
-                    {profData.twitchName && (<a href={`https://twitch.tv/${profData.twitchName}`} target="_blank" rel="noopener noreferrer" className="bg-purple-900/30 hover:bg-purple-800/40 border border-purple-500/30 text-purple-300 p-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-colors"><Tv className="w-4 h-4 text-purple-400" /> Twitch</a>)}
-                    {profData.tiktokName && (<a href={`https://tiktok.com/@${profData.tiktokName}`} target="_blank" rel="noopener noreferrer" className="bg-pink-900/30 hover:bg-pink-800/40 border border-pink-500/30 text-pink-300 p-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-colors"><Music className="w-4 h-4 text-pink-400" /> TikTok</a>)}
-                    {profData.youtubeName && (<a href={`https://youtube.com/@${profData.youtubeName}`} target="_blank" rel="noopener noreferrer" className="bg-red-900/30 hover:bg-red-800/40 border border-red-500/30 text-red-300 p-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-colors"><Video className="w-4 h-4 text-red-400" /> YouTube</a>)}
-                    {profData.kickName && (<a href={`https://kick.com/${profData.kickName}`} target="_blank" rel="noopener noreferrer" className="bg-green-900/30 hover:bg-green-800/40 border border-green-500/30 text-green-300 p-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-colors"><Play className="w-4 h-4 text-green-400" /> Kick</a>)}
-                  </div>
-                </div>
-              </div>
             )}
 
+            {/* --- TROPHY CASE --- */}
             <div>
               <h3 className="text-xs font-black text-slate-400 uppercase tracking-wider mb-2 flex items-center gap-1.5"><Award className="w-4 h-4" /> Trophy Case</h3>
               <div className="flex gap-2">
-                {[0, 1, 2, 3, 4].map(index => renderTrophySlot(profData.trophies?.[index], index, isSelf, isEditingProfile, masteriesObj))}
+                {[0, 1, 2, 3].concat(profData.unlockedTrophySlot ? [4] : []).map(index => renderTrophySlot(profData.trophies?.[index], index, isSelf, isEditingProfile, userMastery))}
               </div>
             </div>
 
+            {/* --- VOUCH BUTTON --- */}
             {!isSelf && uid && (
-              <div className="mt-4 pt-4 border-t border-slate-800">
+              <div className="mt-5 pt-5 border-t border-slate-800">
                 <button
                   onClick={handleVouch}
                   disabled={repVouches?.includes(user.uid)}
-                  className={`w-full py-2.5 rounded-xl text-xs font-black uppercase tracking-wider flex items-center justify-center gap-2 transition-colors ${repVouches?.includes(user.uid) ? 'bg-amber-900/40 text-amber-500/50 border border-amber-500/20' : 'bg-amber-600 hover:bg-amber-500 text-white shadow-[0_0_10px_rgba(217,119,6,0.4)]'}`}
+                  className={`w-full py-3 rounded-xl text-xs font-black uppercase tracking-wider flex items-center justify-center gap-2 transition-colors ${repVouches?.includes(user.uid) ? 'bg-amber-900/40 text-amber-500/50 border border-amber-500/20' : 'bg-amber-600 hover:bg-amber-500 text-white shadow-[0_0_10px_rgba(217,119,6,0.4)]'}`}
                 >
                   <Award className="w-4 h-4" /> {repVouches?.includes(user.uid) ? 'Vouched ✓' : 'Vouch Trader (+1 Rep)'}
                 </button>
@@ -2300,12 +2427,14 @@ function MainApp() {
               <section>
                 <h4 className="text-xs font-black text-slate-500 uppercase tracking-widest mb-3 flex items-center gap-2"><Eye className="w-4 h-4" /> Profile and Comms Auras</h4>
                 <div className="flex flex-col gap-4">
-                  {[1, 2, 3].map(tier => (
-                    <div key={tier} className="bg-slate-900/50 border border-slate-800 rounded-xl p-3">
-                      <span className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 border-b border-slate-800 pb-2">Tier {tier}</span>
+                  {[4, 1, 2, 3].map(tier => (
+                    <div key={tier} className={`rounded-xl p-3 ${tier === 4 ? 'bg-orange-950/20 border-2 border-orange-500/50 shadow-[0_0_20px_rgba(249,115,22,0.1)]' : 'bg-slate-900/50 border border-slate-800'}`}>
+                      <span className={`block text-[10px] font-black uppercase tracking-widest mb-3 border-b pb-2 ${tier === 4 ? 'text-orange-400 border-orange-500/30' : 'text-slate-400 border-slate-800'}`}>
+                        {tier === 4 ? '💀 Limited Edition (October)' : `Tier ${tier}`}
+                      </span>
                       <div className="flex flex-col gap-3">
                         {Object.entries(AURA_DICTIONARY).filter(([_, aura]) => aura.tier === tier).map(([key, aura]) => {
-                          const cost = tier === 1 ? 1500 : tier === 2 ? 3500 : 7500;
+                          const cost = tier === 1 ? 1000 : tier === 2 ? 2500 : tier === 3 ? 5000 : 1250;
                           const isOwned = profileData.purchasedAuras?.includes(key);
 
                           return (
@@ -2349,7 +2478,8 @@ function MainApp() {
                                 className={`w-full py-2.5 rounded-lg text-xs font-black tracking-wider transition-all duration-300 ${isOwned ? (profileData.activeAura === key ? 'bg-emerald-950/30 text-emerald-500 border border-emerald-500/50 cursor-default' : 'bg-indigo-600 hover:bg-indigo-500 text-white shadow-[0_0_10px_rgba(79,70,229,0.3)]') : 'bg-black/40 border border-slate-700 text-slate-400 hover:text-cyan-300 hover:border-cyan-500/50 hover:bg-cyan-950/30'}`}
                               >
                                 {isOwned ? (profileData.activeAura === key ? 'EQUIPPED ✓' : 'EQUIP') : `${cost.toLocaleString()} Fragments`}
-                              </button>                            </div>
+                              </button>
+                            </div>
                           );
                         })}
                       </div>
@@ -2519,7 +2649,7 @@ function MainApp() {
                         <button key={v} onClick={() => handleSpriteSelect(sprite.id, v)} className="flex flex-col items-center p-2 rounded-lg border border-slate-700 bg-black/40 hover:bg-slate-800 transition-colors overflow-hidden">
                           <img src={sprite.images[v]} className="w-8 h-8 object-contain mb-1" alt="" />
                           <span className={`text-[7px] sm:text-[8px] font-black uppercase truncate w-full text-center ${VARIANT_INFO[v]?.color}`}>
-                            {v === 'holofoil' ? 'Holo' : v === 'cheatmaster' ? 'Cheat' : v === 'loothacker' ? 'Hacker' : v === 'bountyhunter' ? 'Bounty' : t(v)}
+                            {v === 'holofoil' ? 'Holo' : v === 'cheatmaster' ? 'Cheat' : v === 'loothacker' ? 'Hacker' : v === 'bountyhunter' ? 'Bounty' : v === 'trickortreat' ? 'TrT' : t(v)}
                           </span>
                         </button>
                       ))}
@@ -2691,7 +2821,7 @@ function MainApp() {
           </header>
 
           <div className="max-w-md w-full mx-auto p-4 flex flex-col gap-4 mt-2">
-            {renderProfileCard(activeViewingFriend.spriteId, activeViewingFriend.profile, activeViewingFriend.completionRate, activeViewingFriend.masteryRate, activeViewingFriend.creationTime, false, activeViewingFriend.mastery, activeViewingFriend.reputationVouches, activeViewingFriend.uid, activeViewingFriend.unlockedMilestones)}
+            {renderProfileCard(activeViewingFriend.spriteId, activeViewingFriend.profile, activeViewingFriend.sprites, activeViewingFriend.mastery, activeViewingFriend.creationTime, false, activeViewingFriend.reputationVouches, activeViewingFriend.uid, activeViewingFriend.unlockedMilestones)}
 
             <div className="h-px w-full bg-gradient-to-r from-transparent via-slate-700 to-transparent my-2" />
 
@@ -2741,7 +2871,7 @@ function MainApp() {
                   <div>
                     <span className="text-[9px] text-slate-500 font-black uppercase tracking-widest mb-1.5 block">{t('variant_type')}</span>
                     <div className="flex flex-wrap gap-1.5">
-                      {['All', 'Base', 'Gold', 'Gummy', 'Galaxy', 'Holofoil', 'Cube', 'Gem', 'Quack', 'Cheatmaster', 'Loot Hacker', 'Bounty Hunter'].map(variant => (
+                      {['All', 'Base', 'Gold', 'Gummy', 'Galaxy', 'Holofoil', 'Cube', 'Gem', 'Quack', 'Cheatmaster', 'Loot Hacker', 'Bounty Hunter', 'Trick or Treat'].map(variant => (
                         <button key={variant} onClick={() => setFVariantFilter(variant)} className={`px-3 py-1.5 text-[10px] font-black tracking-wider rounded-lg border uppercase ${fVariantFilter === variant ? 'bg-purple-500 text-white border-purple-400' : 'bg-black/40 text-slate-400 border-slate-800'}`}>
                           {t(variant.toLowerCase())}
                         </button>
@@ -2815,7 +2945,7 @@ function MainApp() {
                                 </>
                               )}
                             </div>
-                            <span className="text-[7px] sm:text-[8px] font-bold uppercase text-slate-500 tracking-wider whitespace-nowrap">{v === 'holofoil' ? 'Holo' : v === 'cheatmaster' ? 'Cheat' : v === 'loothacker' ? 'Hacker' : v === 'bountyhunter' ? 'Bounty' : t(v)}</span>
+                            <span className="text-[7px] sm:text-[8px] font-bold uppercase text-slate-500 tracking-wider whitespace-nowrap">{v === 'holofoil' ? 'Holo' : v === 'cheatmaster' ? 'Cheat' : v === 'loothacker' ? 'Hacker' : v === 'bountyhunter' ? 'Bounty' : v === 'trickortreat' ? 'TrT' : t(v)}</span>
                           </div>
                         );
                       })}
@@ -2861,7 +2991,7 @@ function MainApp() {
         {/* --- PROFILE VIEW --- */}
         {currentView === 'profile' && user && (
           <div className="flex flex-col gap-5 animate-in fade-in duration-300">
-            {renderProfileCard(spriteId, profileData, completionRate, masteryRate, user.metadata?.creationTime, true, mastery, reputationVouches, user.uid, unlockedMilestones)}
+            {renderProfileCard(spriteId, profileData, collection, mastery, user.metadata?.creationTime, true, reputationVouches, user.uid, unlockedMilestones)}
             <div className="bg-[#12141f] rounded-2xl border border-slate-800 p-5 shadow-xl">
               <h3 className="text-sm font-black text-white uppercase italic tracking-wider mb-4 flex items-center gap-2"><Eye className="w-4 h-4 text-cyan-400" /> Milestone Unlocks</h3>
               <p className="text-xs text-slate-400 leading-relaxed mb-4">Grind Masteries and full collections to automatically unlock prestigious backgrounds for your Profile.</p>
@@ -2985,7 +3115,7 @@ function MainApp() {
                   <div>
                     <span className="text-[9px] text-slate-500 font-black uppercase tracking-widest mb-1.5 block">{t('variant_type')}</span>
                     <div className="flex flex-wrap gap-1.5">
-                      {['All', 'Base', 'Gold', 'Gummy', 'Galaxy', 'Holofoil', 'Cube', 'Gem', 'Quack', 'Cheatmaster', 'Loot Hacker', 'Bounty Hunter'].map(variant => (
+                      {['All', 'Base', 'Gold', 'Gummy', 'Galaxy', 'Holofoil', 'Cube', 'Gem', 'Quack', 'Cheatmaster', 'Loot Hacker', 'Bounty Hunter', 'Trick or Treat'].map(variant => (
                         <button key={variant} onClick={() => setVariantFilter(variant)} className={`px-3 py-1.5 text-[10px] font-black tracking-wider rounded-lg border uppercase ${variantFilter === variant ? 'bg-purple-500 text-white border-purple-400' : 'bg-black/40 text-slate-400 border-slate-800'}`}>
                           {t(variant.toLowerCase())}
                         </button>
@@ -3038,7 +3168,7 @@ function MainApp() {
                                 <div onContextMenu={(e) => e.preventDefault()} onMouseDown={(e) => handleDotPressStart(e, sprite.id, v)} onMouseUp={handleDotPressEnd} onMouseLeave={handleDotPressEnd} onTouchStart={(e) => handleDotPressStart(e, sprite.id, v)} onTouchEnd={handleDotPressEnd} onClick={(e) => e.stopPropagation()} className={`w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center border-2 transition-all duration-300 relative select-none cursor-pointer ${activeHoldId === `${sprite.id}_${v}` ? 'scale-[1.3] ring-2 ring-cyan-400 shadow-[0_0_20px_rgba(34,211,238,0.8)]' : ''} ${isLocked ? 'bg-slate-950/80 border-slate-800/60 opacity-60' : isMasteryView && isMastered ? 'bg-yellow-900/40 border-yellow-400' : isCollected ? `bg-slate-900 ${VARIANT_INFO[v]?.borderColor}` : 'bg-black border-slate-800'}`}>
                                   {isLocked ? <Lock className="w-4 h-4 sm:w-5 sm:h-5 text-slate-600" /> : (<>{isCollected && <div className={`w-3.5 h-3.5 sm:w-4 sm:h-4 rounded-full ${VARIANT_INFO[v]?.bgColor} ${(isMasteryView && isMastered) ? 'opacity-30' : 'opacity-100'}`} />}{isMasteryView && isMastered && <Crown className="w-5 h-5 sm:w-6 sm:h-6 text-yellow-400 drop-shadow-[0_0_2px_rgba(255,215,0,0.8)] absolute z-10" />}</>)}
                                 </div>
-                                <span className="text-[7px] sm:text-[8px] font-bold uppercase text-slate-500 tracking-wider whitespace-nowrap">{v === 'holofoil' ? 'Holo' : v === 'cheatmaster' ? 'Cheat' : v === 'loothacker' ? 'Hacker' : v === 'bountyhunter' ? 'Bounty' : t(v)}</span>
+                                <span className="text-[7px] sm:text-[8px] font-bold uppercase text-slate-500 tracking-wider whitespace-nowrap">{v === 'holofoil' ? 'Holo' : v === 'cheatmaster' ? 'Cheat' : v === 'loothacker' ? 'Hacker' : v === 'bountyhunter' ? 'Bounty' : v === 'trickortreat' ? 'TrT' : t(v)}</span>
                               </div>
                             )
                           })}
@@ -3322,8 +3452,8 @@ function MainApp() {
           <div className="flex flex-col gap-4 animate-in fade-in duration-300">
             <section className="bg-gradient-to-br from-indigo-900/40 to-blue-900/20 border-2 border-indigo-500/50 rounded-2xl p-5"><div className="flex items-center gap-3 mb-2"><Users className="w-6 h-6 sm:w-7 sm:h-7 text-indigo-400" /><h2 className="text-xl sm:text-2xl font-black text-indigo-400 uppercase italic">{t('sprite_squad')}</h2></div></section>
             <section className="bg-[#12141f] rounded-2xl border border-slate-800 p-4 flex flex-col gap-3">
-              <div className="flex items-center justify-between"><h3 className="text-sm font-black text-cyan-400 uppercase tracking-wider flex items-center gap-2"><Target className="w-4 h-4 sm:w-5 sm:h-5" /> {t('extraction_targets')}</h3><span className="text-[10px] sm:text-xs text-slate-500 font-bold uppercase">{extractionTargets.filter(Boolean).length} / 4</span></div>
-              <div className="flex gap-2">{[0, 1, 2, 3].map(index => renderTargetSlot(extractionTargets[index], index))}</div>
+              <div className="flex items-center justify-between"><h3 className="text-sm font-black text-cyan-400 uppercase tracking-wider flex items-center gap-2"><Target className="w-4 h-4 sm:w-5 sm:h-5" /> {t('extraction_targets')}</h3><span className="text-[10px] sm:text-xs text-slate-500 font-bold uppercase">{extractionTargets.filter(Boolean).length} / {profileData.unlockedTargetSlot ? 4 : 3}</span></div>
+              <div className="flex gap-2">{[0, 1, 2].concat(profileData.unlockedTargetSlot ? [3] : []).map(index => renderTargetSlot(extractionTargets[index], index))}</div>
             </section>
             <section className="bg-[#12141f] rounded-2xl border border-slate-800 p-4">
               {!showAddFriendInput ? (
