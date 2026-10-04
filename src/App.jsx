@@ -10,7 +10,7 @@ import { toPng } from 'html-to-image';
 import { Share } from '@capacitor/share';
 import { Filesystem, Directory } from '@capacitor/filesystem';
 import {
-  Search, CheckCircle, Circle, Volume2, VolumeX, Percent, RotateCcw, AlertTriangle, X, Eye, Crown, Users, UserPlus, ChevronLeft, ChevronRight, Check, XCircle, UserMinus, Target, Plus, FileText, Radar, Newspaper, Info, Mail, Lock, List, Filter, ChevronDown, ChevronUp, ShoppingCart, ShoppingBag, Smartphone, Globe, Settings, LogOut, History, AtSign, User as UserIcon, Edit3, Save, Tv, Gamepad2, Calendar, Award, Video, Music, Play, Trash2, MessageSquare, Radio, MoreHorizontal, Flag, Zap, Share2, PawPrint
+  Search, CheckCircle, Circle, Volume2, VolumeX, Percent, RotateCcw, AlertTriangle, X, Eye, Crown, Users, UserPlus, ChevronLeft, ChevronRight, Check, XCircle, UserMinus, Target, Plus, FileText, Radar, Newspaper, Info, Mail, Lock, List, Filter, ChevronDown, ChevronUp, ShoppingCart, ShoppingBag, Smartphone, Settings, LogOut, History, AtSign, User as UserIcon, Edit3, Save, Tv, Gamepad2, Calendar, Award, Video, Music, Play, Trash2, MessageSquare, Radio, MoreHorizontal, Flag, Zap, Share2, PawPrint
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { useAuth } from './AuthContext';
@@ -18,7 +18,6 @@ import { doc, getDoc, setDoc, updateDoc, collection as firestoreCollection, quer
 import { sendPasswordResetEmail, onAuthStateChanged, deleteUser } from 'firebase/auth';
 import { auth, db } from './firebase';
 
-import { translations } from './locales';
 import PetView, { PetAttentionDot, PetReminderSync } from './pet/PetView';
 import { isPetEnabledFor } from './pet/petLogic';
 import PetBadgeCard from './pet/PetBadgeCard';
@@ -409,62 +408,62 @@ const AURA_DICTIONARY = {
 
 
 const SPRITES_DATABASE = [
-  { id: "iron-mouse", name: "Iron Mouse", rarity: "Mythic", season: 'C7S3', images: { base: ironMouseBase }, variants: ['base'], baseAbility: { en: "Regenerate health over time when low. While regenerating, gain Cloak and low gravity! Health regenerated to increases at each Level Up: 60 Health -> 70 Health -> 80 Health -> 90 Health -> 100 Health", es: "Regenera salud con el tiempo cuando está baja. ¡Mientras te regeneras, obtienes Camuflaje y baja gravedad! La salud regenerada aumenta en cada Nivel: 60 Salud -> 70 Salud -> 80 Salud -> 90 Salud -> 100 Salud" } },
-  { id: "john-wick", name: "John Wick", rarity: "Mythic", season: 'C7S3', images: { base: johnWickBase }, variants: ['base'], baseAbility: { en: "Reveals nearby enemies after you knock or eliminate another player. Sprite level stays exactly as found. Only Sprite usable in Fortnite Reload (Simpsons Reload Mode). Claiming in Reload unlocks it for Battle Royale and other modes.", es: "Revela enemigos cercanos después de derribar o eliminar a otro jugador. Su nivel se mantiene exactamente como se encontró. Es el único Sprite utilizable en Fortnite Recarga. Reclamarlo en Recarga lo desbloquea para Battle Royale y otros modos." } },
-  { id: "peely", name: "Peely", rarity: "Legendary", season: 'C7S3', images: { base: peelyBase, gold: peelyGold, gummy: peelyGummy, galaxy: peelyGalaxy, holofoil: peelyHolofoil }, variants: ['base', 'gold', 'gummy', 'galaxy', 'holofoil'], baseAbility: { en: "Emits a ping for players with rare sprites nearby, but marks you on the map. Ping radius increases at each Level Up: 40m -> 50m -> 60m -> 70m -> 80m", es: "Emite un ping para los jugadores con sprites raros cercanos, pero te marca en el mapa. El radio del ping aumenta en cada Nivel: 40m -> 50m -> 60m -> 70m -> 80m" } },
-  { id: "llama", name: "Llama", rarity: "Legendary", season: 'C7S3', images: { base: llamaBase, gold: llamaGold, gummy: llamaGummy, galaxy: llamaGalaxy, gem: llamaGem }, variants: ['base', 'gold', 'gummy', 'galaxy', 'gem'], baseAbility: { en: "Opening ammo boxes has a chance to grant a weapon upgrade. Chance increases at each Level Up: 5% -> 10% -> 15% -> 17% -> 20%", es: "Abrir cajas de munición tiene la posibilidad de otorgar una mejora de arma. La probabilidad aumenta en cada Nivel: 5% -> 10% -> 15% -> 17% -> 20%" } },
-  { id: "zero-point", name: "Zero Point", rarity: "Mythic", season: 'C7S3', images: { base: zpBase, gold: zpGold, gummy: zpGummy, galaxy: zpGalaxy, holofoil: zpHolofoil, cube: zpCube, gem: gemZeroPoint, quack: quackZeroPoint }, variants: ['base', 'gold', 'gummy', 'galaxy', 'holofoil', 'cube', 'gem', 'quack'], baseAbility: { en: "Spawn a Shield Bubble Jr. when you use a healing item on yourself (excluding splashes and grenades). Duration at each Level Up: 6s -> 7s -> 8s -> 9s -> 10s.", es: "Genera una Burbuja Escudo Jr. cuando usas un objeto de curación en ti mismo (excluyendo salpicones y granadas). Duración por nivel: 6s -> 7s -> 8s -> 9s -> 10s." } },
-  { id: "burnt-peanut", name: "Burnt Peanut", rarity: "Mythic", season: 'C7S3', images: { base: peanutBase, gold: peanutBase, gummy: peanutBase, galaxy: peanutBase }, variants: ['base'], baseAbility: { en: "Goop! When eliminating players, you may find more loot. Sometimes mythic! Chance at each Level Up: 20% -> 30% -> 40% -> 50% -> 60% chance (10% chance to find Mythic at Max Level!).", es: "¡Pringue! Al eliminar jugadores, puedes encontrar más botín. ¡A veces mítico! Probabilidad por nivel: 20% -> 30% -> 40% -> 50% -> 60% (¡10% de encontrar Mítico al Nivel Máximo!)." } },
-  { id: "batman", name: "Batman", rarity: "Mythic", season: 'C7S3', images: { base: batmanBase, gold: batmanGold, gummy: batmanGummy, galaxy: batmanGalaxy, holofoil: batmanHolofoil, cube: cubeBatman }, variants: ['base', 'gold', 'gummy', 'galaxy', 'holofoil', 'cube'], baseAbility: { en: "Grants the ability to launch in the air and deploy the Bat Cape!", es: "¡Otorga la habilidad de lanzarte en el aire y desplegar la capa de murciélago!" } },
-  { id: "vini-jr", name: "Vini Jr", rarity: "Mythic", season: 'C7S3', images: { base: viniBase, gold: viniBase, gummy: viniBase, galaxy: viniBase, holofoil: viniBase }, variants: ['base'], baseAbility: { en: "Sprinting for a short time makes your slide destructive. Slidekicking enemies increases rate of fire and reload speed. Increases in power at each Level Up: 40 dmg / 10% fire rate -> 45 dmg / 20% fire rate -> 50 dmg / 30% fire rate -> 55 dmg / 40% fire rate -> 60 dmg / 50% fire rate", es: "Esprintar por poco tiempo hace que tu deslizamiento sea destructivo. Patear enemigos deslizándote aumenta la cadencia de fuego y recarga. Aumentos: 40 daño / 10% cadencia -> 45 / 20% -> 50 / 30% -> 55 / 40% -> 60 / 50%." } },
-  { id: "pollo", name: "Pollo", rarity: "Mythic", season: 'C7S3', images: { base: polloBase, gold: polloBase, gummy: polloBase, galaxy: polloBase, holofoil: polloBase }, variants: ['base'], baseAbility: { en: "Upon earning an elimination, slowly replenish shield for you and nearby squad members for a duration. Duration increases at each Level Up: 6 Seconds -> 7 Seconds -> 8 Seconds -> 9 Seconds -> 10 Seconds", es: "Al conseguir una eliminación, repón lentamente el escudo para ti y miembros cercanos del escuadrón. Duración: 6s -> 7s -> 8s -> 9s -> 10s." } },
-  { id: "dream", name: "Dream", rarity: "Legendary", season: 'C7S3', images: { base: dreamBase, gold: dreamGold, gummy: dreamGummy, galaxy: dreamGalaxy, cube: cubeDream }, variants: ['base', 'gold', 'gummy', 'galaxy', 'cube'], baseAbility: { en: "Grants a random item at each level, exploding with legendary loot at Max Level. Loot value increases at each Level Up!", es: "Otorga un objeto aleatorio en cada nivel, explotando con botín legendario en el Nivel Máximo. ¡El valor del botín aumenta!" } },
-  { id: "punk", name: "Punk", rarity: "Legendary", season: 'C7S3', images: { base: punkBase, gold: punkGold, gummy: punkGummy, galaxy: punkGalaxy, cube: cubePunk, gem: gemPunk }, variants: ['base', 'gold', 'gummy', 'galaxy', 'cube'], baseAbility: { en: "Does nothing until Level 5, in which it will always grant a buff for unlimited ammo.", es: "No hace nada hasta el Nivel 5, en el que siempre otorgará un potenciador de munición ilimitada." } },
-  { id: "boss", name: "Boss", rarity: "Legendary", season: 'C7S3', images: { base: bossBase, gold: bossGold, gummy: bossGummy, galaxy: bossGalaxy, cube: cubeBoss }, variants: ['base', 'gold', 'gummy', 'galaxy', 'cube'], baseAbility: { en: "Grants an increase to your max HP and Shield. Increases at each Level Up: 5 -> 10 -> 15 -> 20 -> 25 HP/Shield.", es: "Otorga un aumento a tu vida máxima y Escudo. Aumenta: 5 -> 10 -> 15 -> 20 -> 25 PV/Escudo." } },
-  { id: "grim", name: "Grim", rarity: "Mythic", season: 'C7S3', images: { base: grimBase, gold: grimGold, gummy: grimGummy, galaxy: grimGalaxy, holofoil: grimHolofoil, cube: cubeGrim, gem: grimGem }, variants: ['base', 'gold', 'gummy', 'galaxy', 'holofoil', 'cube', 'gem'], baseAbility: { en: "Players who attack you are marked for a duration. Duration at each Level Up: 3s -> 3.5s -> 4s -> 4.5s -> 5s.", es: "Los jugadores que te ataquen quedan marcados. Duración: 3s -> 3.5s -> 4s -> 4.5s -> 5s." } },
-  { id: "seven", name: "Seven", rarity: "Legendary", season: 'C7S3', images: { base: sevenBase, gold: sevenGold, gummy: sevenGummy, galaxy: sevenGalaxy, holofoil: sevenHolofoil }, variants: ['base', 'gold', 'gummy', 'galaxy', 'holofoil'], baseAbility: { en: "Enemy player foot trails are visible in the world for your Squad. Duration increases at each Level Up: 10 Seconds -> 15 Seconds -> 20 Seconds -> 25 Seconds -> 30 Second foot trails.", es: "Los rastros de los jugadores enemigos son visibles para tu Escuadrón. Duración: 10s -> 15s -> 20s -> 25s -> 30s." } },
-  { id: "duck", name: "Duck", rarity: "Epic", season: 'C7S3', images: { base: duckBase, gold: duckGold, gummy: duckGummy, galaxy: duckGalaxy, gem: gemDuck }, variants: ['base', 'gold', 'gummy', 'galaxy', 'gem'], baseAbility: { en: "Emoting or Jamming replenishes shields. Increases in power at each Level Up: 2 -> 3 -> 4 -> 6 -> 8 Shield per tick.", es: "Hacer un gesto o improvisar repone los escudos. Poder: 2 -> 3 -> 4 -> 6 -> 8 Escudo por tick." } },
-  { id: "demon", name: "Demon", rarity: "Epic", season: 'C7S3', images: { base: demonBase, gold: demonGold, gummy: demonGummy, galaxy: demonGalaxy, gem: gemDemon }, variants: ['base', 'gold', 'gummy', 'galaxy', 'gem'], baseAbility: { en: "Siphon some health and shields when you eliminate an opponent. Increases in power at each Level Up: 10 -> 15 -> 20 -> 25 -> 30 Healing per elimination.", es: "Sifón de salud y escudo cuando eliminas a un oponente. Poder: 10 -> 15 -> 20 -> 25 -> 30 Curación." } },
-  { id: "ghost", name: "Ghost", rarity: "Epic", season: 'C7S3', images: { base: ghostBase, gold: ghostGold, gummy: ghostGummy, galaxy: ghostGalaxy, holofoil: ghostHolofoil }, variants: ['base', 'gold', 'gummy', 'galaxy', 'holofoil'], baseAbility: { en: "Grants cloak for a duration upon reloading. Increases in duration at each Level Up: 3s -> 3.5s -> 4s -> 4.5s -> 5s.", es: "Otorga camuflaje por una duración al recargar. Duración: 3s -> 3.5s -> 4s -> 4.5s -> 5s." } },
-  { id: "king", name: "King", rarity: "Epic", season: 'C7S3', images: { base: kingBase, gold: kingGold, gummy: kingGummy, galaxy: kingGalaxy, holofoil: kingHolofoil }, variants: ['base', 'gold', 'gummy', 'galaxy', 'holofoil'], baseAbility: { en: "Your Pickaxe deals more damage. Increases in damage at each Level Up: 30 -> 40 -> 60 -> 80 -> 120 bonus damage.", es: "Tu pico inflige más daño. Daño: 30 -> 40 -> 60 -> 80 -> 120 daño adicional." } },
-  { id: "aura", name: "Aura", rarity: "Epic", season: 'C7S3', images: { base: auraBase, gold: auraGold, gummy: auraGummy, galaxy: auraGalaxy, gem: gemAura }, variants: ['base', 'gold', 'gummy', 'galaxy', 'gem'], baseAbility: { en: "Gain a Shock Rock charge when you deal enough damage to enemies! Required damage decreases at each Level Up: 175 -> 150 -> 125 -> 100 -> 75 Damage to trigger.", es: "¡Obtén una carga de Roca de Choque al infligir suficiente daño a enemigos! Daño requerido: 175 -> 150 -> 125 -> 100 -> 75 Daño." } },
-  { id: "striker", name: "Striker", rarity: "Epic", season: 'C7S3', images: { base: strikerBase, gold: strikerGold, gummy: strikerGummy, galaxy: strikerGalaxy, holofoil: strikerHolofoil }, variants: ['base', 'gold', 'gummy', 'galaxy', 'holofoil'], baseAbility: { en: "Gain the Overdrive effect when you Mantle, Hurdle, or Wall Scramble. Duration increases at each Level Up: 6s -> 7s -> 8s -> 9s -> 10s of Overdrive.", es: "Obtén el efecto Sobrecarga cuando trepas, saltas o te encaramas. Duración: 6s -> 7s -> 8s -> 9s -> 10s." } },
-  { id: "water", name: "Water", rarity: "Rare", season: 'C7S3', images: { base: waterBase, gold: waterGold, gummy: waterGummy, galaxy: waterGalaxy, holofoil: waterHolofoil, gem: gemWater, quack: waterQuack }, variants: ['base', 'gold', 'gummy', 'galaxy', 'holofoil', 'gem', 'quack'], baseAbility: { en: "Replenish shields while standing in water! Increases in power at each Level Up: 2 -> 3 -> 4 -> 5 -> 6 Shield per tick.", es: "¡Repón escudos mientras estás en el agua! Poder: 2 -> 3 -> 4 -> 5 -> 6 Escudo por tick." } },
-  { id: "earth", name: "Earth", rarity: "Rare", season: 'C7S3', images: { base: earthBase, gold: earthGold, gummy: earthGummy, galaxy: earthGalaxy, cube: cubeEarth, gem: gemEarth, quack: earthQuack }, variants: ['base', 'gold', 'gummy', 'galaxy', 'cube', 'gem', 'quack'], baseAbility: { en: "You have a chance to find additional rare items when opening chests. Chance increases at each Level Up: 10% -> 12.5% -> 15% -> 17.5% -> 20% chance.", es: "Tienes la posibilidad de encontrar objetos raros adicionales al abrir cofres. Probabilidad: 10% -> 12.5% -> 15% -> 17.5% -> 20%." } },
-  { id: "fire", name: "Fire", rarity: "Rare", season: 'C7S3', images: { base: fireBase, gold: fireGold, gummy: fireGummy, galaxy: fireGalaxy, holofoil: fireHolofoil, cube: cubeFire, quack: fireQuack }, variants: ['base', 'gold', 'gummy', 'galaxy', 'holofoil', 'cube', 'quack'], baseAbility: { en: "Creates a fiery burst when you deal enough damage to an enemy! Required damage decreases at each Level Up: 150 -> 125 -> 100 -> 75 -> 50 Damage to trigger.", es: "¡Crea un estallido ardiente cuando infliges suficiente daño a un enemigo! Daño requerido: 150 -> 125 -> 100 -> 75 -> 50 Daño." } },
-  { id: "fishy", name: "Fishy", rarity: "Rare", season: 'C7S3', images: { base: fishyBase, gold: fishyGold, gummy: fishyGummy, galaxy: fishyGalaxy, cube: cubeFishy }, variants: ['base', 'gold', 'gummy', 'galaxy', 'cube'], baseAbility: { en: "Swim speed greatly increased. Taking damage also briefly increases movement speed. Tiers: 25%/10% -> 50%/20% -> 100%/30% -> 150%/40% -> 200%/50% bonuses.", es: "Aumenta enormemente la velocidad de nado. Recibir daño también aumenta brevemente la velocidad de movimiento. Bonificaciones: 25%/10% -> 50%/20% -> 100%/30% -> 150%/40% -> 200%/50%." } },
-  { id: "air", name: "Air", rarity: "Rare", season: 'C7S3', images: { base: airBase, gold: airGold, gummy: airGummy, galaxy: airGalaxy, holofoil: airHolofoil }, variants: ['base', 'gold', 'gummy', 'galaxy', 'holofoil'], baseAbility: { en: "Increases sprinting speed and jump height. Also nullifies fall damage. Jump height increased with each Level Up!", es: "Aumenta la velocidad de esprint y la altura de salto. También anula el daño por caída. ¡Altura de salto aumentada con cada nivel!" } },
+  { id: "iron-mouse", name: "Iron Mouse", rarity: "Mythic", season: 'C7S3', images: { base: ironMouseBase }, variants: ['base'], baseAbility: "Regenerate health over time when low. While regenerating, gain Cloak and low gravity! Health regenerated to increases at each Level Up: 60 Health -> 70 Health -> 80 Health -> 90 Health -> 100 Health" },
+  { id: "john-wick", name: "John Wick", rarity: "Mythic", season: 'C7S3', images: { base: johnWickBase }, variants: ['base'], baseAbility: "Reveals nearby enemies after you knock or eliminate another player. Sprite level stays exactly as found. Only Sprite usable in Fortnite Reload (Simpsons Reload Mode). Claiming in Reload unlocks it for Battle Royale and other modes." },
+  { id: "peely", name: "Peely", rarity: "Legendary", season: 'C7S3', images: { base: peelyBase, gold: peelyGold, gummy: peelyGummy, galaxy: peelyGalaxy, holofoil: peelyHolofoil }, variants: ['base', 'gold', 'gummy', 'galaxy', 'holofoil'], baseAbility: "Emits a ping for players with rare sprites nearby, but marks you on the map. Ping radius increases at each Level Up: 40m -> 50m -> 60m -> 70m -> 80m" },
+  { id: "llama", name: "Llama", rarity: "Legendary", season: 'C7S3', images: { base: llamaBase, gold: llamaGold, gummy: llamaGummy, galaxy: llamaGalaxy, gem: llamaGem }, variants: ['base', 'gold', 'gummy', 'galaxy', 'gem'], baseAbility: "Opening ammo boxes has a chance to grant a weapon upgrade. Chance increases at each Level Up: 5% -> 10% -> 15% -> 17% -> 20%" },
+  { id: "zero-point", name: "Zero Point", rarity: "Mythic", season: 'C7S3', images: { base: zpBase, gold: zpGold, gummy: zpGummy, galaxy: zpGalaxy, holofoil: zpHolofoil, cube: zpCube, gem: gemZeroPoint, quack: quackZeroPoint }, variants: ['base', 'gold', 'gummy', 'galaxy', 'holofoil', 'cube', 'gem', 'quack'], baseAbility: "Spawn a Shield Bubble Jr. when you use a healing item on yourself (excluding splashes and grenades). Duration at each Level Up: 6s -> 7s -> 8s -> 9s -> 10s." },
+  { id: "burnt-peanut", name: "Burnt Peanut", rarity: "Mythic", season: 'C7S3', images: { base: peanutBase, gold: peanutBase, gummy: peanutBase, galaxy: peanutBase }, variants: ['base'], baseAbility: "Goop! When eliminating players, you may find more loot. Sometimes mythic! Chance at each Level Up: 20% -> 30% -> 40% -> 50% -> 60% chance (10% chance to find Mythic at Max Level!)." },
+  { id: "batman", name: "Batman", rarity: "Mythic", season: 'C7S3', images: { base: batmanBase, gold: batmanGold, gummy: batmanGummy, galaxy: batmanGalaxy, holofoil: batmanHolofoil, cube: cubeBatman }, variants: ['base', 'gold', 'gummy', 'galaxy', 'holofoil', 'cube'], baseAbility: "Grants the ability to launch in the air and deploy the Bat Cape!" },
+  { id: "vini-jr", name: "Vini Jr", rarity: "Mythic", season: 'C7S3', images: { base: viniBase, gold: viniBase, gummy: viniBase, galaxy: viniBase, holofoil: viniBase }, variants: ['base'], baseAbility: "Sprinting for a short time makes your slide destructive. Slidekicking enemies increases rate of fire and reload speed. Increases in power at each Level Up: 40 dmg / 10% fire rate -> 45 dmg / 20% fire rate -> 50 dmg / 30% fire rate -> 55 dmg / 40% fire rate -> 60 dmg / 50% fire rate" },
+  { id: "pollo", name: "Pollo", rarity: "Mythic", season: 'C7S3', images: { base: polloBase, gold: polloBase, gummy: polloBase, galaxy: polloBase, holofoil: polloBase }, variants: ['base'], baseAbility: "Upon earning an elimination, slowly replenish shield for you and nearby squad members for a duration. Duration increases at each Level Up: 6 Seconds -> 7 Seconds -> 8 Seconds -> 9 Seconds -> 10 Seconds" },
+  { id: "dream", name: "Dream", rarity: "Legendary", season: 'C7S3', images: { base: dreamBase, gold: dreamGold, gummy: dreamGummy, galaxy: dreamGalaxy, cube: cubeDream }, variants: ['base', 'gold', 'gummy', 'galaxy', 'cube'], baseAbility: "Grants a random item at each level, exploding with legendary loot at Max Level. Loot value increases at each Level Up!" },
+  { id: "punk", name: "Punk", rarity: "Legendary", season: 'C7S3', images: { base: punkBase, gold: punkGold, gummy: punkGummy, galaxy: punkGalaxy, cube: cubePunk, gem: gemPunk }, variants: ['base', 'gold', 'gummy', 'galaxy', 'cube'], baseAbility: "Does nothing until Level 5, in which it will always grant a buff for unlimited ammo." },
+  { id: "boss", name: "Boss", rarity: "Legendary", season: 'C7S3', images: { base: bossBase, gold: bossGold, gummy: bossGummy, galaxy: bossGalaxy, cube: cubeBoss }, variants: ['base', 'gold', 'gummy', 'galaxy', 'cube'], baseAbility: "Grants an increase to your max HP and Shield. Increases at each Level Up: 5 -> 10 -> 15 -> 20 -> 25 HP/Shield." },
+  { id: "grim", name: "Grim", rarity: "Mythic", season: 'C7S3', images: { base: grimBase, gold: grimGold, gummy: grimGummy, galaxy: grimGalaxy, holofoil: grimHolofoil, cube: cubeGrim, gem: grimGem }, variants: ['base', 'gold', 'gummy', 'galaxy', 'holofoil', 'cube', 'gem'], baseAbility: "Players who attack you are marked for a duration. Duration at each Level Up: 3s -> 3.5s -> 4s -> 4.5s -> 5s." },
+  { id: "seven", name: "Seven", rarity: "Legendary", season: 'C7S3', images: { base: sevenBase, gold: sevenGold, gummy: sevenGummy, galaxy: sevenGalaxy, holofoil: sevenHolofoil }, variants: ['base', 'gold', 'gummy', 'galaxy', 'holofoil'], baseAbility: "Enemy player foot trails are visible in the world for your Squad. Duration increases at each Level Up: 10 Seconds -> 15 Seconds -> 20 Seconds -> 25 Seconds -> 30 Second foot trails." },
+  { id: "duck", name: "Duck", rarity: "Epic", season: 'C7S3', images: { base: duckBase, gold: duckGold, gummy: duckGummy, galaxy: duckGalaxy, gem: gemDuck }, variants: ['base', 'gold', 'gummy', 'galaxy', 'gem'], baseAbility: "Emoting or Jamming replenishes shields. Increases in power at each Level Up: 2 -> 3 -> 4 -> 6 -> 8 Shield per tick." },
+  { id: "demon", name: "Demon", rarity: "Epic", season: 'C7S3', images: { base: demonBase, gold: demonGold, gummy: demonGummy, galaxy: demonGalaxy, gem: gemDemon }, variants: ['base', 'gold', 'gummy', 'galaxy', 'gem'], baseAbility: "Siphon some health and shields when you eliminate an opponent. Increases in power at each Level Up: 10 -> 15 -> 20 -> 25 -> 30 Healing per elimination." },
+  { id: "ghost", name: "Ghost", rarity: "Epic", season: 'C7S3', images: { base: ghostBase, gold: ghostGold, gummy: ghostGummy, galaxy: ghostGalaxy, holofoil: ghostHolofoil }, variants: ['base', 'gold', 'gummy', 'galaxy', 'holofoil'], baseAbility: "Grants cloak for a duration upon reloading. Increases in duration at each Level Up: 3s -> 3.5s -> 4s -> 4.5s -> 5s." },
+  { id: "king", name: "King", rarity: "Epic", season: 'C7S3', images: { base: kingBase, gold: kingGold, gummy: kingGummy, galaxy: kingGalaxy, holofoil: kingHolofoil }, variants: ['base', 'gold', 'gummy', 'galaxy', 'holofoil'], baseAbility: "Your Pickaxe deals more damage. Increases in damage at each Level Up: 30 -> 40 -> 60 -> 80 -> 120 bonus damage." },
+  { id: "aura", name: "Aura", rarity: "Epic", season: 'C7S3', images: { base: auraBase, gold: auraGold, gummy: auraGummy, galaxy: auraGalaxy, gem: gemAura }, variants: ['base', 'gold', 'gummy', 'galaxy', 'gem'], baseAbility: "Gain a Shock Rock charge when you deal enough damage to enemies! Required damage decreases at each Level Up: 175 -> 150 -> 125 -> 100 -> 75 Damage to trigger." },
+  { id: "striker", name: "Striker", rarity: "Epic", season: 'C7S3', images: { base: strikerBase, gold: strikerGold, gummy: strikerGummy, galaxy: strikerGalaxy, holofoil: strikerHolofoil }, variants: ['base', 'gold', 'gummy', 'galaxy', 'holofoil'], baseAbility: "Gain the Overdrive effect when you Mantle, Hurdle, or Wall Scramble. Duration increases at each Level Up: 6s -> 7s -> 8s -> 9s -> 10s of Overdrive." },
+  { id: "water", name: "Water", rarity: "Rare", season: 'C7S3', images: { base: waterBase, gold: waterGold, gummy: waterGummy, galaxy: waterGalaxy, holofoil: waterHolofoil, gem: gemWater, quack: waterQuack }, variants: ['base', 'gold', 'gummy', 'galaxy', 'holofoil', 'gem', 'quack'], baseAbility: "Replenish shields while standing in water! Increases in power at each Level Up: 2 -> 3 -> 4 -> 5 -> 6 Shield per tick." },
+  { id: "earth", name: "Earth", rarity: "Rare", season: 'C7S3', images: { base: earthBase, gold: earthGold, gummy: earthGummy, galaxy: earthGalaxy, cube: cubeEarth, gem: gemEarth, quack: earthQuack }, variants: ['base', 'gold', 'gummy', 'galaxy', 'cube', 'gem', 'quack'], baseAbility: "You have a chance to find additional rare items when opening chests. Chance increases at each Level Up: 10% -> 12.5% -> 15% -> 17.5% -> 20% chance." },
+  { id: "fire", name: "Fire", rarity: "Rare", season: 'C7S3', images: { base: fireBase, gold: fireGold, gummy: fireGummy, galaxy: fireGalaxy, holofoil: fireHolofoil, cube: cubeFire, quack: fireQuack }, variants: ['base', 'gold', 'gummy', 'galaxy', 'holofoil', 'cube', 'quack'], baseAbility: "Creates a fiery burst when you deal enough damage to an enemy! Required damage decreases at each Level Up: 150 -> 125 -> 100 -> 75 -> 50 Damage to trigger." },
+  { id: "fishy", name: "Fishy", rarity: "Rare", season: 'C7S3', images: { base: fishyBase, gold: fishyGold, gummy: fishyGummy, galaxy: fishyGalaxy, cube: cubeFishy }, variants: ['base', 'gold', 'gummy', 'galaxy', 'cube'], baseAbility: "Swim speed greatly increased. Taking damage also briefly increases movement speed. Tiers: 25%/10% -> 50%/20% -> 100%/30% -> 150%/40% -> 200%/50% bonuses." },
+  { id: "air", name: "Air", rarity: "Rare", season: 'C7S3', images: { base: airBase, gold: airGold, gummy: airGummy, galaxy: airGalaxy, holofoil: airHolofoil }, variants: ['base', 'gold', 'gummy', 'galaxy', 'holofoil'], baseAbility: "Increases sprinting speed and jump height. Also nullifies fall damage. Jump height increased with each Level Up!" },
 
   // --- NEW SEASON 4 SPRITES ---
-  { id: "jackrabbit", name: "Jackrabbit", rarity: "Legendary", season: 'C7S4', images: { base: jackrabbitBase, gold: jackrabbitGold, cheatmaster: jackrabbitCheatMaster, loothacker: jackrabbitLootHacker, bountyhunter: jackrabbitBountyHunter, trickortreat: trtJackrabbit }, variants: ['base', 'gold', 'cheatmaster', 'loothacker', 'bountyhunter', 'trickortreat'], baseAbility: { en: "Grants the ability to perform another jump while mid-air! Cooldown between jumps decreases with each Level Up!", es: "Grants the ability to perform another jump while mid-air! Cooldown between jumps decreases with each Level Up!" } },
-  { id: "shadow", name: "Shadow", rarity: "Epic", season: 'C7S4', images: { base: shadowBase, gold: shadowGold, cheatmaster: shadowCheatMaster, loothacker: shadowLootHacker, bountyhunter: shadowBountyHunter, trickortreat: trtShadow }, variants: ['base', 'gold', 'cheatmaster', 'loothacker', 'bountyhunter', 'trickortreat'], baseAbility: { en: "Automatically reload unequipped weapons over time. Reloads equipped weapon at max level. Automatic reload gets faster with each Level Up!", es: "Automatically reload unequipped weapons over time. Reloads equipped weapon at max level. Automatic reload gets faster with each Level Up!" } },
-  { id: "bush", name: "Bush", rarity: "Rare", season: 'C7S4', images: { base: bushBase, gold: bushGold, cheatmaster: bushCheatMaster, loothacker: bushLootHacker, bountyhunter: bushBountyHunter, trickortreat: trtBush }, variants: ['base', 'gold', 'cheatmaster', 'loothacker', 'bountyhunter', 'trickortreat'], baseAbility: { en: "Grants a bush on you after a duration, gain a bush on elimination at max level. Time between bush activating decreases with each Level Up!", es: "Grants a bush on you after a duration, gain a bush on elimination at max level. Time between bush activating decreases with each Level Up!" } },
-  { id: "tails", name: "Tails", rarity: "Epic", season: 'C7S4', images: { base: tailsBase, gold: tailsGold, cheatmaster: tailsCheatMaster, loothacker: tailsLootHacker, bountyhunter: tailsBountyHunter, trickortreat: trtTails }, variants: ['base', 'gold', 'cheatmaster', 'loothacker', 'bountyhunter', 'trickortreat'], baseAbility: { en: "Grants the ability to hover with the Help of Tails! Hover speed increased with each Level Up!", es: "Grants the ability to hover with the Help of Tails! Hover speed increased with each Level Up!" } },
-  { id: "killswitch", name: "Killswitch", rarity: "Legendary", season: 'C7S4', images: { base: killswitchBase, gold: killswitchGold, cheatmaster: killswitchCheatMaster, loothacker: killswitchLootHacker, bountyhunter: killswitchBountyHunter, trickortreat: trtKillswitch }, variants: ['base', 'gold', 'cheatmaster', 'loothacker', 'bountyhunter', 'trickortreat'], baseAbility: { en: "Enter Hangtime with improved accuracy when aiming while jumping and falling. Accuracy increases with each Level Up!", es: "Enter Hangtime with improved accuracy when aiming while jumping and falling. Accuracy increases with each Level Up!" } },
-  { id: "adventure", name: "Adventure", rarity: "Rare", season: 'C7S4', images: { base: adventureBase, gold: adventureGold, cheatmaster: adventureCheatMaster, loothacker: adventureLootHacker, bountyhunter: adventureBountyHunter, trickortreat: trtAdventure }, variants: ['base', 'gold', 'cheatmaster', 'loothacker', 'bountyhunter', 'trickortreat'], baseAbility: { en: "Upgrades a random item in the player's inventory with each Level Up!", es: "Upgrades a random item in the player's inventory with each Level Up!" } },
-  { id: "klombo", name: "Klombo", rarity: "Mythic", season: 'C7S4', images: { base: klomboBase, gold: klomboGold, cheatmaster: klomboCheatMaster, loothacker: klomboLootHacker, bountyhunter: klomboBountyHunter, trickortreat: trtKlombo }, variants: ['base', 'gold', 'cheatmaster', 'loothacker', 'bountyhunter', 'trickortreat'], baseAbility: { en: "Grants random items at each level, only levels up by consuming items. Item quality increases with each Level Up!", es: "Grants random items at each level, only levels up by consuming items. Item quality increases with each Level Up!" } },
-  { id: "jonesy", name: "Jonesy", rarity: "Rare", season: 'C7S4', images: { base: jonesyBase, gold: jonesyGold, cheatmaster: jonesyCheatMaster, loothacker: jonesyLootHacker, bountyhunter: jonesyBountyHunter, trickortreat: trtJonesy }, variants: ['base', 'gold', 'cheatmaster', 'loothacker', 'bountyhunter', 'trickortreat'], baseAbility: { en: "Recover some health or shields after being damaged after a short duration. Increase amount healed with each Level Up!", es: "Recover some health or shields after being damaged after a short duration. Increase amount healed with each Level Up!" } },
-  { id: "sonic", name: "Sonic", rarity: "Epic", season: 'C7S4', images: { base: sonicBase, gold: sonicGold, cheatmaster: sonicCheatMaster, loothacker: sonicLootHacker, bountyhunter: sonicBountyHunter, trickortreat: trtSonic }, variants: ['base', 'gold', 'cheatmaster', 'loothacker', 'bountyhunter', 'trickortreat'], baseAbility: { en: "Gotta Go Fast! Sprint faster with each Level Up!", es: "Gotta Go Fast! Sprint faster with each Level Up!" } },
-  { id: "crown", name: "Crown", rarity: "Mythic", season: 'C7S4', images: { base: crownBase, gold: crownGold, cheatmaster: crownCheatMaster, loothacker: crownLootHacker, bountyhunter: crownBountyHunter, trickortreat: trtCrown }, variants: ['base', 'gold', 'cheatmaster', 'loothacker', 'bountyhunter', 'trickortreat'], baseAbility: { en: "Only levels up by winning matches. Level up faster with Crown Wins. New variants unlocked after mastering!", es: "Only levels up by winning matches. Level up faster with Crown Wins. New variants unlocked after mastering!" } },
-  { id: "eight-bit", name: "8-Bit", rarity: "Rare", season: 'C7S4', images: { base: eightBitBase, gold: eightBitGold, cheatmaster: eightBitCheatMaster, loothacker: eightBitLootHacker, bountyhunter: eightBitBountyHunter, trickortreat: trtEightBit }, variants: ['base', 'gold', 'cheatmaster', 'loothacker', 'bountyhunter', 'trickortreat'], baseAbility: { en: "Find an 8-Bit Shotgun in your first chest and gain a score multiplier for it.", es: "Find an 8-Bit Shotgun in your first chest and gain a score multiplier for it." } },
-  { id: "storm-scout", name: "Storm Scout", rarity: "Rare", season: 'C7S4', images: { base: stormScoutBase, gold: stormScoutGold, cheatmaster: stormScoutCheatMaster, loothacker: stormScoutLootHacker, bountyhunter: stormScoutBountyHunter, trickortreat: trtStormScout }, variants: ['base', 'gold', 'cheatmaster', 'loothacker', 'bountyhunter', 'trickortreat'], baseAbility: { en: "Applies Overdrive after taking a certain amount of storm damage. Reveals future Storm Circles at max level. Reduces damage to trigger overdrive with each Level Up!", es: "Applies Overdrive after taking a certain amount of storm damage. Reveals future Storm Circles at max level. Reduces damage to trigger overdrive with each Level Up!" } },
-  { id: "x-ray", name: "X-Ray", rarity: "Legendary", season: 'C7S4', images: { base: xrayBase, gold: xrayGold, cheatmaster: xrayCheatMaster, loothacker: xrayLootHacker, bountyhunter: xrayBountyHunter, trickortreat: trtXRay }, variants: ['base', 'gold', 'cheatmaster', 'loothacker', 'bountyhunter', 'trickortreat'], baseAbility: { en: "Periodically mark enemies in an area around you. Mark more often and in a larger radius with each Level Up!", es: "Periodically mark enemies in an area around you. Mark more often and in a larger radius with each Level Up!" } },
-  { id: "overshield", name: "Overshield", rarity: "Rare", season: 'C7S4', images: { base: overshieldBase, gold: overshieldGold, cheatmaster: overshieldCheatMaster, loothacker: overshieldLootHacker, bountyhunter: overshieldBountyHunter, trickortreat: trtOvershield }, variants: ['base', 'gold', 'cheatmaster', 'loothacker', 'bountyhunter', 'trickortreat'], baseAbility: { en: "Grants overshield, scaling with level.", es: "Grants overshield, scaling with level." } },
-  { id: "mega-man", name: "Mega Man", rarity: "Rare", season: 'C7S4', images: { base: megaManBase }, variants: ['base'], baseAbility: { en: "Slip and slide around with reduced friction while Sliding. Slide farther with each Level Up!", es: "Slip and slide around with reduced friction while Sliding. Slide farther with each Level Up!" } },
-  { id: "onigiri", name: "Onigiri", rarity: "Rare", season: 'C7S4', images: { base: onigiriBase, gold: onigiriGold, cheatmaster: onigiriCheatMaster, loothacker: onigiriLootHacker, bountyhunter: onigiriBountyHunter, trickortreat: trtOnigiri }, variants: ['base', 'gold', 'cheatmaster', 'loothacker', 'bountyhunter', 'trickortreat'], baseAbility: { en: "Applies Overdrive after eating or drinking a Consumable. Overdrive lasts longer with each Level Up!", es: "Applies Overdrive after eating or drinking a Consumable. Overdrive lasts longer with each Level Up!" } },
+  { id: "jackrabbit", name: "Jackrabbit", rarity: "Legendary", season: 'C7S4', images: { base: jackrabbitBase, gold: jackrabbitGold, cheatmaster: jackrabbitCheatMaster, loothacker: jackrabbitLootHacker, bountyhunter: jackrabbitBountyHunter, trickortreat: trtJackrabbit }, variants: ['base', 'gold', 'cheatmaster', 'loothacker', 'bountyhunter', 'trickortreat'], baseAbility: "Grants the ability to perform another jump while mid-air! Cooldown between jumps decreases with each Level Up!" },
+  { id: "shadow", name: "Shadow", rarity: "Epic", season: 'C7S4', images: { base: shadowBase, gold: shadowGold, cheatmaster: shadowCheatMaster, loothacker: shadowLootHacker, bountyhunter: shadowBountyHunter, trickortreat: trtShadow }, variants: ['base', 'gold', 'cheatmaster', 'loothacker', 'bountyhunter', 'trickortreat'], baseAbility: "Automatically reload unequipped weapons over time. Reloads equipped weapon at max level. Automatic reload gets faster with each Level Up!" },
+  { id: "bush", name: "Bush", rarity: "Rare", season: 'C7S4', images: { base: bushBase, gold: bushGold, cheatmaster: bushCheatMaster, loothacker: bushLootHacker, bountyhunter: bushBountyHunter, trickortreat: trtBush }, variants: ['base', 'gold', 'cheatmaster', 'loothacker', 'bountyhunter', 'trickortreat'], baseAbility: "Grants a bush on you after a duration, gain a bush on elimination at max level. Time between bush activating decreases with each Level Up!" },
+  { id: "tails", name: "Tails", rarity: "Epic", season: 'C7S4', images: { base: tailsBase, gold: tailsGold, cheatmaster: tailsCheatMaster, loothacker: tailsLootHacker, bountyhunter: tailsBountyHunter, trickortreat: trtTails }, variants: ['base', 'gold', 'cheatmaster', 'loothacker', 'bountyhunter', 'trickortreat'], baseAbility: "Grants the ability to hover with the Help of Tails! Hover speed increased with each Level Up!" },
+  { id: "killswitch", name: "Killswitch", rarity: "Legendary", season: 'C7S4', images: { base: killswitchBase, gold: killswitchGold, cheatmaster: killswitchCheatMaster, loothacker: killswitchLootHacker, bountyhunter: killswitchBountyHunter, trickortreat: trtKillswitch }, variants: ['base', 'gold', 'cheatmaster', 'loothacker', 'bountyhunter', 'trickortreat'], baseAbility: "Enter Hangtime with improved accuracy when aiming while jumping and falling. Accuracy increases with each Level Up!" },
+  { id: "adventure", name: "Adventure", rarity: "Rare", season: 'C7S4', images: { base: adventureBase, gold: adventureGold, cheatmaster: adventureCheatMaster, loothacker: adventureLootHacker, bountyhunter: adventureBountyHunter, trickortreat: trtAdventure }, variants: ['base', 'gold', 'cheatmaster', 'loothacker', 'bountyhunter', 'trickortreat'], baseAbility: "Upgrades a random item in the player's inventory with each Level Up!" },
+  { id: "klombo", name: "Klombo", rarity: "Mythic", season: 'C7S4', images: { base: klomboBase, gold: klomboGold, cheatmaster: klomboCheatMaster, loothacker: klomboLootHacker, bountyhunter: klomboBountyHunter, trickortreat: trtKlombo }, variants: ['base', 'gold', 'cheatmaster', 'loothacker', 'bountyhunter', 'trickortreat'], baseAbility: "Grants random items at each level, only levels up by consuming items. Item quality increases with each Level Up!" },
+  { id: "jonesy", name: "Jonesy", rarity: "Rare", season: 'C7S4', images: { base: jonesyBase, gold: jonesyGold, cheatmaster: jonesyCheatMaster, loothacker: jonesyLootHacker, bountyhunter: jonesyBountyHunter, trickortreat: trtJonesy }, variants: ['base', 'gold', 'cheatmaster', 'loothacker', 'bountyhunter', 'trickortreat'], baseAbility: "Recover some health or shields after being damaged after a short duration. Increase amount healed with each Level Up!" },
+  { id: "sonic", name: "Sonic", rarity: "Epic", season: 'C7S4', images: { base: sonicBase, gold: sonicGold, cheatmaster: sonicCheatMaster, loothacker: sonicLootHacker, bountyhunter: sonicBountyHunter, trickortreat: trtSonic }, variants: ['base', 'gold', 'cheatmaster', 'loothacker', 'bountyhunter', 'trickortreat'], baseAbility: "Gotta Go Fast! Sprint faster with each Level Up!" },
+  { id: "crown", name: "Crown", rarity: "Mythic", season: 'C7S4', images: { base: crownBase, gold: crownGold, cheatmaster: crownCheatMaster, loothacker: crownLootHacker, bountyhunter: crownBountyHunter, trickortreat: trtCrown }, variants: ['base', 'gold', 'cheatmaster', 'loothacker', 'bountyhunter', 'trickortreat'], baseAbility: "Only levels up by winning matches. Level up faster with Crown Wins. New variants unlocked after mastering!" },
+  { id: "eight-bit", name: "8-Bit", rarity: "Rare", season: 'C7S4', images: { base: eightBitBase, gold: eightBitGold, cheatmaster: eightBitCheatMaster, loothacker: eightBitLootHacker, bountyhunter: eightBitBountyHunter, trickortreat: trtEightBit }, variants: ['base', 'gold', 'cheatmaster', 'loothacker', 'bountyhunter', 'trickortreat'], baseAbility: "Find an 8-Bit Shotgun in your first chest and gain a score multiplier for it." },
+  { id: "storm-scout", name: "Storm Scout", rarity: "Rare", season: 'C7S4', images: { base: stormScoutBase, gold: stormScoutGold, cheatmaster: stormScoutCheatMaster, loothacker: stormScoutLootHacker, bountyhunter: stormScoutBountyHunter, trickortreat: trtStormScout }, variants: ['base', 'gold', 'cheatmaster', 'loothacker', 'bountyhunter', 'trickortreat'], baseAbility: "Applies Overdrive after taking a certain amount of storm damage. Reveals future Storm Circles at max level. Reduces damage to trigger overdrive with each Level Up!" },
+  { id: "x-ray", name: "X-Ray", rarity: "Legendary", season: 'C7S4', images: { base: xrayBase, gold: xrayGold, cheatmaster: xrayCheatMaster, loothacker: xrayLootHacker, bountyhunter: xrayBountyHunter, trickortreat: trtXRay }, variants: ['base', 'gold', 'cheatmaster', 'loothacker', 'bountyhunter', 'trickortreat'], baseAbility: "Periodically mark enemies in an area around you. Mark more often and in a larger radius with each Level Up!" },
+  { id: "overshield", name: "Overshield", rarity: "Rare", season: 'C7S4', images: { base: overshieldBase, gold: overshieldGold, cheatmaster: overshieldCheatMaster, loothacker: overshieldLootHacker, bountyhunter: overshieldBountyHunter, trickortreat: trtOvershield }, variants: ['base', 'gold', 'cheatmaster', 'loothacker', 'bountyhunter', 'trickortreat'], baseAbility: "Grants overshield, scaling with level." },
+  { id: "mega-man", name: "Mega Man", rarity: "Rare", season: 'C7S4', images: { base: megaManBase }, variants: ['base'], baseAbility: "Slip and slide around with reduced friction while Sliding. Slide farther with each Level Up!" },
+  { id: "onigiri", name: "Onigiri", rarity: "Rare", season: 'C7S4', images: { base: onigiriBase, gold: onigiriGold, cheatmaster: onigiriCheatMaster, loothacker: onigiriLootHacker, bountyhunter: onigiriBountyHunter, trickortreat: trtOnigiri }, variants: ['base', 'gold', 'cheatmaster', 'loothacker', 'bountyhunter', 'trickortreat'], baseAbility: "Applies Overdrive after eating or drinking a Consumable. Overdrive lasts longer with each Level Up!" },
 
   // --- NEW WAVE 2 SPRITES ---
-  { id: "blinky", name: "Blinky", rarity: "Legendary", season: 'C7S4', images: { base: blinkyBase, gold: blinkyGold, cheatmaster: blinkyCheatMaster, loothacker: blinkyLootHacker, bountyhunter: blinkyBountyHunter, trickortreat: trtBlinky }, variants: ['base', 'gold', 'cheatmaster', 'loothacker', 'bountyhunter', 'trickortreat'], baseAbility: { en: "Grants cloak for a duration when you take damage. Cloak duration increases with each Level Up!", es: "Grants cloak for a duration when you take damage. Cloak duration increases with take damage. Cloak duration increases with each Level Up!" } },
-  { id: "birthday", name: "Birthday", rarity: "Rare", season: 'C7S4', images: { base: birthdayBase, gold: birthdayGold, cheatmaster: birthdayCheatMaster, loothacker: birthdayLootHacker, bountyhunter: birthdayBountyHunter, trickortreat: trtBirthday }, variants: ['base', 'gold', 'cheatmaster', 'loothacker', 'bountyhunter', 'trickortreat'], baseAbility: { en: "Opening chests has a chance to spawn a piece of cake. Eliminations can spawn cake at max level. Chance to spawn cake increases with each Level Up!", es: "Opening chests has a chance to spawn a piece of cake. Eliminations can spawn cake at max level. Chance to spawn cake increases with each Level Up!" } },
-  { id: "crash-bandicoot", name: "Crash Bandicoot", rarity: "Legendary", season: 'C7S4', images: { base: crashBandicootBase, gold: crashBandicootGold, cheatmaster: crashBandicootCheatMaster, loothacker: crashBandicootLootHacker, bountyhunter: crashBandicootBountyHunter, trickortreat: trtCrashBandicoot }, variants: ['base', 'gold', 'cheatmaster', 'loothacker', 'bountyhunter', 'trickortreat'], baseAbility: { en: "(Active - Jump In Air) Triggers a whirlwind attack, damaging and knocking back nearby enemies. Damage increases and cooldown decreases with each Level Up!", es: "(Active - Jump In Air) Triggers a whirlwind attack, damaging and knocking back nearby enemies. Damage increases and cooldown decreases with each Level Up!" } },
-  { id: "pond", name: "Pond", rarity: "Epic", season: 'C7S4', images: { base: pondBase, gold: pondGold, cheatmaster: pondCheatMaster, loothacker: pondLootHacker, bountyhunter: pondBountyHunter, trickortreat: trtPond }, variants: ['base', 'gold', 'cheatmaster', 'loothacker', 'bountyhunter', 'trickortreat'], baseAbility: { en: "(Active) - Jump shortly after landing to trigger a Super Jump, if charges are present. Gain charges over time. Super jump strength increases and cooldown decreases with each Level Up!", es: "(Active) - Jump shortly after landing to trigger a Super Jump, if charges are present. Gain charges over time. Super jump strength increases and cooldown decreases with each Level Up!" } },
-  { id: "morgana", name: "Morgana", rarity: "Epic", season: 'C7S4', images: { base: morganaBase, gold: morganaGold, cheatmaster: morganaCheatMaster, loothacker: morganaLootHacker, bountyhunter: morganaBountyHunter, trickortreat: trtMorgana }, variants: ['base', 'gold', 'cheatmaster', 'loothacker', 'bountyhunter', 'trickortreat'], baseAbility: { en: "Increases the effectiveness of healing items. Healing effectiveness increases with each Level Up!", es: "Increases the effectiveness of healing items. Healing effectiveness increases with each Level Up!" } },
+  { id: "blinky", name: "Blinky", rarity: "Legendary", season: 'C7S4', images: { base: blinkyBase, gold: blinkyGold, cheatmaster: blinkyCheatMaster, loothacker: blinkyLootHacker, bountyhunter: blinkyBountyHunter, trickortreat: trtBlinky }, variants: ['base', 'gold', 'cheatmaster', 'loothacker', 'bountyhunter', 'trickortreat'], baseAbility: "Grants cloak for a duration when you take damage. Cloak duration increases with each Level Up!" },
+  { id: "birthday", name: "Birthday", rarity: "Rare", season: 'C7S4', images: { base: birthdayBase, gold: birthdayGold, cheatmaster: birthdayCheatMaster, loothacker: birthdayLootHacker, bountyhunter: birthdayBountyHunter, trickortreat: trtBirthday }, variants: ['base', 'gold', 'cheatmaster', 'loothacker', 'bountyhunter', 'trickortreat'], baseAbility: "Opening chests has a chance to spawn a piece of cake. Eliminations can spawn cake at max level. Chance to spawn cake increases with each Level Up!" },
+  { id: "crash-bandicoot", name: "Crash Bandicoot", rarity: "Legendary", season: 'C7S4', images: { base: crashBandicootBase, gold: crashBandicootGold, cheatmaster: crashBandicootCheatMaster, loothacker: crashBandicootLootHacker, bountyhunter: crashBandicootBountyHunter, trickortreat: trtCrashBandicoot }, variants: ['base', 'gold', 'cheatmaster', 'loothacker', 'bountyhunter', 'trickortreat'], baseAbility: "(Active - Jump In Air) Triggers a whirlwind attack, damaging and knocking back nearby enemies. Damage increases and cooldown decreases with each Level Up!" },
+  { id: "pond", name: "Pond", rarity: "Epic", season: 'C7S4', images: { base: pondBase, gold: pondGold, cheatmaster: pondCheatMaster, loothacker: pondLootHacker, bountyhunter: pondBountyHunter, trickortreat: trtPond }, variants: ['base', 'gold', 'cheatmaster', 'loothacker', 'bountyhunter', 'trickortreat'], baseAbility: "(Active) - Jump shortly after landing to trigger a Super Jump, if charges are present. Gain charges over time. Super jump strength increases and cooldown decreases with each Level Up!" },
+  { id: "morgana", name: "Morgana", rarity: "Epic", season: 'C7S4', images: { base: morganaBase, gold: morganaGold, cheatmaster: morganaCheatMaster, loothacker: morganaLootHacker, bountyhunter: morganaBountyHunter, trickortreat: trtMorgana }, variants: ['base', 'gold', 'cheatmaster', 'loothacker', 'bountyhunter', 'trickortreat'], baseAbility: "Increases the effectiveness of healing items. Healing effectiveness increases with each Level Up!" },
 
   // --- NEW WAVE 3 SPRITES ---
-  { id: "spooky-dash", name: "Spooky Dash", rarity: "Mythic", season: 'C7S4', images: { base: spookyBase, gold: spookyGold, cheatmaster: spookyCheatMaster, loothacker: spookyLootHacker, bountyhunter: spookyBountyHunter, trickortreat: trtSpookyDash }, variants: ['base', 'gold', 'cheatmaster', 'loothacker', 'bountyhunter', 'trickortreat'], baseAbility: { en: "(Active - Jump in Air) Spooky Dash lets you phase through some objects. Gains charge over time. Charge cooldown decreases with each Level Up!", es: "(Active - Jump in Air) Spooky Dash lets you phase through some objects. Gains charge over time. Charge cooldown decreases with each Level Up!" } },
-  { id: "vampire", name: "Vampire", rarity: "Legendary", season: 'C7S4', images: { base: vampireBase, gold: vampireGold, cheatmaster: vampireCheatMaster, loothacker: vampireLootHacker, bountyhunter: vampireBountyHunter, trickortreat: trtVampire }, variants: ['base', 'gold', 'cheatmaster', 'loothacker', 'bountyhunter', 'trickortreat'], baseAbility: { en: "Recover health when damaging an enemy. Health recovered percent increases with each Level Up!", es: "Recover health when damaging an enemy. Health recovered percent increases with each Level Up!" } },
-  { id: "the-deer", name: "The Deer", rarity: "Legendary", season: 'C7S4', images: { base: deerBase, gold: deerGold, cheatmaster: deerCheatMaster, loothacker: deerLootHacker, bountyhunter: deerBountyHunter, trickortreat: trtTheDeer }, variants: ['base', 'gold', 'cheatmaster', 'loothacker', 'bountyhunter', 'trickortreat'], baseAbility: { en: "Melee attacks deal more damage. Melee attack damage increases with each Level Up!", es: "Melee attacks deal more damage. Melee attack damage increases with each Level Up!" } },
-  { id: "dumpster-dive", name: "Dumpster Dive", rarity: "Epic", season: 'C7S4', images: { base: dumpsterBase, gold: dumpsterGold, cheatmaster: dumpsterCheatMaster, loothacker: dumpsterLootHacker, bountyhunter: dumpsterBountyHunter, trickortreat: trtDumpster }, variants: ['base', 'gold', 'cheatmaster', 'loothacker', 'bountyhunter', 'trickortreat'], baseAbility: { en: "Food provides bonus healing. Find food when jumping out of hiding props, and a small chance when opening containers. Find better food with each Level Up!", es: "Food provides bonus healing. Find food when jumping out of hiding props, and a small chance when opening containers. Find better food with each Level Up!" } }
+  { id: "spooky-dash", name: "Spooky Dash", rarity: "Mythic", season: 'C7S4', images: { base: spookyBase, gold: spookyGold, cheatmaster: spookyCheatMaster, loothacker: spookyLootHacker, bountyhunter: spookyBountyHunter, trickortreat: trtSpookyDash }, variants: ['base', 'gold', 'cheatmaster', 'loothacker', 'bountyhunter', 'trickortreat'], baseAbility: "(Active - Jump in Air) Spooky Dash lets you phase through some objects. Gains charge over time. Charge cooldown decreases with each Level Up!" },
+  { id: "vampire", name: "Vampire", rarity: "Legendary", season: 'C7S4', images: { base: vampireBase, gold: vampireGold, cheatmaster: vampireCheatMaster, loothacker: vampireLootHacker, bountyhunter: vampireBountyHunter, trickortreat: trtVampire }, variants: ['base', 'gold', 'cheatmaster', 'loothacker', 'bountyhunter', 'trickortreat'], baseAbility: "Recover health when damaging an enemy. Health recovered percent increases with each Level Up!" },
+  { id: "the-deer", name: "The Deer", rarity: "Legendary", season: 'C7S4', images: { base: deerBase, gold: deerGold, cheatmaster: deerCheatMaster, loothacker: deerLootHacker, bountyhunter: deerBountyHunter, trickortreat: trtTheDeer }, variants: ['base', 'gold', 'cheatmaster', 'loothacker', 'bountyhunter', 'trickortreat'], baseAbility: "Melee attacks deal more damage. Melee attack damage increases with each Level Up!" },
+  { id: "dumpster-dive", name: "Dumpster Dive", rarity: "Epic", season: 'C7S4', images: { base: dumpsterBase, gold: dumpsterGold, cheatmaster: dumpsterCheatMaster, loothacker: dumpsterLootHacker, bountyhunter: dumpsterBountyHunter, trickortreat: trtDumpster }, variants: ['base', 'gold', 'cheatmaster', 'loothacker', 'bountyhunter', 'trickortreat'], baseAbility: "Food provides bonus healing. Find food when jumping out of hiding props, and a small chance when opening containers. Find better food with each Level Up!" }
 ];
 
 const PATCH_NOTES = [
@@ -663,7 +662,6 @@ const PATCH_NOTES = [
     changes: [
       "New Sprites Dropped: Added the Mythic John Wick Sprite, alongside newly discovered Llama, Iron Mouse, and Peely Sprites.",
       "Gem & Quack Sprites Unlocked: All variants are now live in-game and ready to be checked off in your collection!",
-      "Language Support: Added full Spanish translation via the new Settings Menu.",
       "Cloud Accounts: Spritedex securely syncs your collection to the cloud so you never lose your progress.",
       "Clean UI Update: Re-proportioned Sprite cards and radio dots for a sleek, uncrowded viewing experience.",
       "Sorting Options: You can now sort alphabetically or by Rarity from the filters tab."
@@ -744,6 +742,14 @@ const VARIANT_INFO = {
   trickortreat: { name: "Trick or Treat", color: "text-orange-500", bgColor: "bg-orange-500", borderColor: "border-orange-500/70" }
 };
 
+// Display names for the filter chips and badges that are looked up by key. Anything not listed shows as the key itself.
+const LABELS = {
+  all: "All", mythic: "Mythic", legendary: "Legendary", epic: "Epic", rare: "Rare", unknown: "Unknown",
+  base: "Base", gold: "Gold", gummy: "Gummy", galaxy: "Galaxy", holofoil: "Holofoil", cube: "Cube", gem: "Gem", quack: "Quack",
+  collected: "Collected", missing: "Missing", i_need: "I Need", they_need: "They Need", mastered: "Mastered", unmastered: "Unmastered"
+};
+const label = (key) => LABELS[key] || key;
+
 const RARITY_COLORS = { Mythic: "bg-yellow-400 text-black border-yellow-300 font-extrabold", Legendary: "bg-orange-500 text-white border-orange-400", Epic: "bg-purple-600 text-white border-purple-400", Rare: "bg-blue-600 text-white border-blue-400", Unknown: "bg-slate-500 text-white border-slate-400" };
 const RARITY_BG_GRADIENTS = { Mythic: "from-yellow-400 via-yellow-600 to-amber-950", Legendary: "from-orange-500 via-orange-700 to-amber-950", Epic: "from-purple-600 via-purple-800 to-slate-950", Rare: "from-blue-500 via-blue-700 to-slate-950", Unknown: "from-slate-600 via-slate-800 to-slate-950" };
 const RARITY_WEIGHT = { Mythic: 4, Legendary: 3, Epic: 2, Rare: 1, Unknown: 0 };
@@ -809,15 +815,6 @@ function MainApp() {
   const responsiveInputSizeClass = isIOS ? 'text-base' : 'text-sm sm:text-base';
 
   const { user, signUp, logIn, logOut } = useAuth();
-
-  const [lang, setLang] = useState(localStorage.getItem('spritedex_lang') || 'en');
-  const t = (key) => translations[lang][key] || key;
-
-  const toggleLang = () => {
-    const nextLang = lang === 'en' ? 'es' : 'en';
-    setLang(nextLang);
-    localStorage.setItem('spritedex_lang', nextLang);
-  };
 
   const [isInitializing, setIsInitializing] = useState(true);
   const [isAuthLoading, setIsAuthLoading] = useState(false);
@@ -1260,12 +1257,12 @@ function MainApp() {
       }
     } catch (err) {
       if (err.code === 'auth/email-already-in-use') {
-        setAuthError(lang === 'es' ? "¡Ya existe una cuenta con este correo!" : "An account with this email already exists!");
+        setAuthError("An account with this email already exists!");
         setIsLoginMode(true);
       } else if (err.code === 'auth/wrong-password' || err.code === 'auth/user-not-found' || err.code === 'auth/invalid-credential') {
-        setAuthError(lang === 'es' ? "Correo o contraseña incorrectos." : "Incorrect email or password.");
+        setAuthError("Incorrect email or password.");
       } else if (err.code === 'auth/weak-password') {
-        setAuthError(lang === 'es' ? "La contraseña debe tener al menos 6 caracteres." : "Password must be at least 6 characters long.");
+        setAuthError("Password must be at least 6 characters long.");
       } else { setAuthError(err.message); }
     } finally { setIsAuthLoading(false); }
   };
@@ -1819,7 +1816,7 @@ function MainApp() {
       <div key={index} className="flex-1 h-12 border-2 border-cyan-500/50 rounded-xl bg-cyan-950/30 relative flex flex-col items-center justify-center overflow-hidden">
         <button onClick={(e) => handleRemoveTarget(index, e)} className="absolute top-0.5 right-0.5 bg-black/80 rounded-full p-0.5 text-slate-400 hover:text-white z-20"><X className="w-2.5 h-2.5" /></button>
         <img src={sprite?.images[v]} className="w-6 h-6 object-contain z-10" alt="" />
-        <span className={`text-[7px] sm:text-[8px] font-black uppercase mt-0.5 z-10 ${VARIANT_INFO[v]?.color}`}>{t(v)}</span>
+        <span className={`text-[7px] sm:text-[8px] font-black uppercase mt-0.5 z-10 ${VARIANT_INFO[v]?.color}`}>{label(v)}</span>
       </div>
     );
   };
@@ -1838,7 +1835,7 @@ function MainApp() {
         {isEditing && <button onClick={(e) => handleRemoveTrophy(index, e)} className="absolute top-1 right-1 bg-black/80 rounded-full p-0.5 text-slate-400 hover:text-white z-20"><X className="w-3 h-3" /></button>}
         {isMastered && <Crown className="absolute top-1 left-1 w-3.5 h-3.5 text-yellow-400 drop-shadow-[0_0_2px_rgba(255,215,0,0.8)] z-20" />}
         <img src={sprite?.images[v]} className="w-10 h-10 sm:w-12 sm:h-12 object-contain z-10" alt="" />
-        <span className={`text-[8px] sm:text-[9px] font-black uppercase mt-1 z-10 ${VARIANT_INFO[v]?.color}`}>{t(v)}</span>
+        <span className={`text-[8px] sm:text-[9px] font-black uppercase mt-1 z-10 ${VARIANT_INFO[v]?.color}`}>{label(v)}</span>
       </div>
     );
   };
@@ -1937,7 +1934,7 @@ function MainApp() {
   const formatJoinDate = (timestamp) => {
     if (!timestamp) return 'Unknown';
     const d = new Date(timestamp);
-    return d.toLocaleDateString(lang === 'en' ? 'en-US' : 'es-ES', { month: 'short', year: 'numeric' });
+    return d.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
   };
 
   const getVariantModifierText = (variant) => {
@@ -2206,7 +2203,7 @@ function MainApp() {
             <img src="/app_icon.webp" className="w-24 h-24 drop-shadow-[0_0_15px_rgba(168,85,247,0.4)] object-contain mb-4 animate-pulse duration-[4000ms]" alt="Spritedex Logo" />
             <h1 className="text-white text-3xl font-extrabold tracking-tight mb-2 bg-gradient-to-r from-white via-slate-200 to-slate-400 bg-clip-text text-transparent">Spritedex</h1>
             <p className="text-purple-400 text-sm font-semibold uppercase tracking-wider mb-1">Master your collection</p>
-            <p className="text-slate-400 text-sm sm:text-base max-w-xs px-2">{t('app_desc')}</p>
+            <p className="text-slate-400 text-sm sm:text-base max-w-xs px-2">Spritedex is your ultimate companion for tracking Battle Royale Sprites. Sync your collection across devices, coordinate in-game drops by viewing your Sprite Squad's Extraction Targets, and keep track of your Mastery crowns all in one secure, real-time interface.</p>
           </div>
 
           <form onSubmit={handleAuth} className="space-y-5">
@@ -2234,19 +2231,19 @@ function MainApp() {
             </div>
 
             <button type="submit" disabled={isAuthLoading || !eulaAccepted} className={`w-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-medium rounded-xl py-3 px-4 shadow-lg shadow-purple-900/30 transition-all duration-200 transform active:scale-[0.98] mt-2 text-sm ${(isAuthLoading || !eulaAccepted) ? 'opacity-50 cursor-not-allowed grayscale-[30%]' : ''}`}>
-              {isAuthLoading ? (lang === 'es' ? 'Cargando...' : 'Loading...') : (isLoginMode ? (lang === 'es' ? 'Iniciar Sesión' : 'Sign In') : (lang === 'es' ? 'Crear Cuenta' : 'Create Account'))}
+              {isAuthLoading ? 'Loading...' : (isLoginMode ? 'Sign In' : 'Create Account')}
             </button>
           </form>
 
           <div className="mt-6 text-center border-t border-white/5 pt-5 flex flex-col gap-3">
             <p className="text-slate-400 text-sm">
-              {isLoginMode ? (lang === 'es' ? '¿No tienes cuenta?' : "Don't have an account?") : (lang === 'es' ? '¿Ya tienes una cuenta?' : "Already have an account?")}{' '}
+              {isLoginMode ? "Don't have an account?" : "Already have an account?"}{' '}
               <button type="button" onClick={() => setIsLoginMode(!isLoginMode)} className="text-purple-400 font-medium hover:text-purple-300 hover:underline transition-all bg-transparent border-none p-0 cursor-pointer">
-                {isLoginMode ? (lang === 'es' ? 'Regístrate' : 'Sign Up') : (lang === 'es' ? 'Inicia Sesión' : 'Sign In')}
+                {isLoginMode ? 'Sign Up' : 'Sign In'}
               </button>
             </p>
-            {isLoginMode && (<button type="button" onClick={handlePasswordReset} className="text-xs text-slate-500 hover:text-slate-300 transition-colors">{resetSent ? (lang === 'es' ? '¡Enlace enviado!' : 'Reset link sent!') : (lang === 'es' ? '¿Olvidaste tu contraseña?' : 'Forgot Password?')}</button>)}
-            <p className="text-[10px] sm:text-xs text-slate-500 mt-2 leading-relaxed max-w-xs mx-auto">{t('disclaimer')}</p>
+            {isLoginMode && (<button type="button" onClick={handlePasswordReset} className="text-xs text-slate-500 hover:text-slate-300 transition-colors">{resetSent ? 'Reset link sent!' : 'Forgot Password?'}</button>)}
+            <p className="text-[10px] sm:text-xs text-slate-500 mt-2 leading-relaxed max-w-xs mx-auto">Unofficial product. Not affiliated with, authorized or endorsed by Epic Games or Fortnite. All materials used are trademarks and/or copyrighted works of Epic Games, Inc.</p>
           </div>
         </div>
       </div>
@@ -2280,27 +2277,23 @@ function MainApp() {
         <div className="fixed inset-0 z-[80] flex flex-col justify-end sm:justify-center items-center bg-black/80 backdrop-blur-sm animate-in fade-in">
           <div className="bg-[#12141f] w-full max-w-md rounded-t-3xl sm:rounded-3xl border-t-2 sm:border-2 border-slate-800 p-6 shadow-2xl animate-in slide-in-from-bottom-10">
             <div className="flex justify-between items-center mb-6">
-              <h2 className="text-xl font-black text-white uppercase italic">{t('settings')}</h2>
+              <h2 className="text-xl font-black text-white uppercase italic">Settings</h2>
               <button onClick={() => setShowSettingsModal(false)} className="p-2 bg-black/40 rounded-full text-slate-400 hover:text-white"><X className="w-5 h-5" /></button>
             </div>
             <div className="flex flex-col gap-2">
               <div className="flex items-center justify-between p-4 rounded-2xl bg-slate-900/50 border border-slate-800">
                 <div>
-                  <span className="block text-xs font-bold text-slate-500 uppercase tracking-wider">{t('logged_in_as')}</span>
+                  <span className="block text-xs font-bold text-slate-500 uppercase tracking-wider">Logged in as</span>
                   <span className="block text-sm font-bold text-white mt-0.5">{user.email}</span>
                 </div>
                 <button onClick={() => { logOut(); setShowSettingsModal(false); }} className="p-2 bg-red-500/10 hover:bg-red-500/20 rounded-xl border border-red-500/20 text-red-400 transition-colors"><LogOut className="w-5 h-5" /></button>
               </div>
               <div className="h-px bg-slate-800/50 my-2" />
-              <button onClick={toggleLang} className="flex items-center justify-between p-4 rounded-2xl hover:bg-slate-800/50 transition-colors">
-                <div className="flex items-center gap-4"><Globe className="w-6 h-6 text-slate-400" /><span className="text-base font-bold text-slate-200">{t('language')}</span></div>
-                <span className="text-sm font-black text-cyan-400">{lang === 'en' ? 'English' : 'Español'}</span>
-              </button>
               <button onClick={() => { setShowSettingsModal(false); setShowPatchNotes(true); }} className="flex items-center gap-4 p-4 rounded-2xl hover:bg-slate-800/50 transition-colors text-left">
-                <History className="w-6 h-6 text-slate-400" /><span className="text-base font-bold text-slate-200">{t('whats_new')}</span>
+                <History className="w-6 h-6 text-slate-400" /><span className="text-base font-bold text-slate-200">What's new</span>
               </button>
               <button onClick={() => { setShowSettingsModal(false); setShowAboutModal(true); }} className="flex items-center gap-4 p-4 rounded-2xl hover:bg-slate-800/50 transition-colors text-left">
-                <Info className="w-6 h-6 text-slate-400" /><span className="text-base font-bold text-slate-200">{t('about')}</span>
+                <Info className="w-6 h-6 text-slate-400" /><span className="text-base font-bold text-slate-200">About</span>
               </button>
               <div className="h-px bg-slate-800/50 my-2" />
 
@@ -2663,7 +2656,7 @@ function MainApp() {
                         <button key={v} onClick={() => handleSpriteSelect(sprite.id, v)} className="flex flex-col items-center p-2 rounded-lg border border-slate-700 bg-black/40 hover:bg-slate-800 transition-colors overflow-hidden">
                           <img src={sprite.images[v]} className="w-8 h-8 object-contain mb-1" alt="" />
                           <span className={`text-[7px] sm:text-[8px] font-black uppercase truncate w-full text-center ${VARIANT_INFO[v]?.color}`}>
-                            {v === 'holofoil' ? 'Holo' : v === 'cheatmaster' ? 'Cheat' : v === 'loothacker' ? 'Hacker' : v === 'bountyhunter' ? 'Bounty' : v === 'trickortreat' ? 'TrT' : t(v)}
+                            {v === 'holofoil' ? 'Holo' : v === 'cheatmaster' ? 'Cheat' : v === 'loothacker' ? 'Hacker' : v === 'bountyhunter' ? 'Bounty' : v === 'trickortreat' ? 'TrT' : label(v)}
                           </span>
                         </button>
                       ))}
@@ -2681,7 +2674,7 @@ function MainApp() {
         <div className="fixed inset-0 z-[90] flex items-center justify-center p-4 bg-black/90 backdrop-blur-md animate-in fade-in duration-200">
           <div className="bg-[#12141f] border-2 border-slate-700 rounded-2xl flex flex-col max-w-sm w-full relative overflow-hidden shadow-2xl">
             <header className="p-4 border-b border-slate-800 flex justify-between items-center bg-[#0e1017]">
-              <h3 className="text-md sm:text-lg font-black tracking-tight text-white uppercase italic flex items-center gap-2"><Info className="w-5 h-5 text-indigo-400" /> {t('about')}</h3>
+              <h3 className="text-md sm:text-lg font-black tracking-tight text-white uppercase italic flex items-center gap-2"><Info className="w-5 h-5 text-indigo-400" /> About</h3>
               <button onClick={() => setShowAboutModal(false)} className="text-slate-400 hover:text-white"><X className="w-6 h-6" /></button>
             </header>
             <div className="p-6 flex flex-col items-center text-center gap-4">
@@ -2690,10 +2683,10 @@ function MainApp() {
                 <h2 className="text-2xl font-black text-white uppercase italic tracking-tight mb-0.5">Spritedex</h2>
                 <span className="text-xs font-mono text-cyan-400 uppercase tracking-widest">Version {PATCH_NOTES[0].version}</span>
               </div>
-              <p className="text-sm text-slate-300 leading-relaxed mt-2">{t('app_desc')}</p>
+              <p className="text-sm text-slate-300 leading-relaxed mt-2">Spritedex is your ultimate companion for tracking Battle Royale Sprites. Sync your collection across devices, coordinate in-game drops by viewing your Sprite Squad's Extraction Targets, and keep track of your Mastery crowns all in one secure, real-time interface.</p>
               <div className="bg-amber-950/20 border border-amber-500/20 rounded-xl p-3 flex items-start gap-2 text-left mt-2">
                 <AlertTriangle className="w-4 h-4 text-amber-500/70 shrink-0 mt-0.5" />
-                <p className="text-[10px] text-slate-400 leading-relaxed">{t('disclaimer')}</p>
+                <p className="text-[10px] text-slate-400 leading-relaxed">Unofficial product. Not affiliated with, authorized or endorsed by Epic Games or Fortnite. All materials used are trademarks and/or copyrighted works of Epic Games, Inc.</p>
               </div>
             </div>
           </div>
@@ -2709,7 +2702,7 @@ function MainApp() {
             const vIndex = validVariants.indexOf(v); const isLocked = isVariantLocked(sprite.id, v);
             const isCollected = collection[sprite.id]?.[v]; const isMastered = mastery[sprite.id]?.[v];
             const variantModifier = getVariantModifierText(v);
-            const abilityText = typeof sprite.baseAbility === 'object' ? sprite.baseAbility[lang] : sprite.baseAbility;
+            const abilityText = sprite.baseAbility;
 
             return (
               <div className="bg-[#12141f] border border-slate-700/80 rounded-3xl w-full max-w-sm overflow-hidden relative shadow-[0_10px_40px_rgba(0,0,0,0.8)]">
@@ -2721,25 +2714,25 @@ function MainApp() {
                 </div>
                 <div className="p-5 flex flex-col gap-4">
                   <div>
-                    <h3 className="text-2xl sm:text-3xl font-black text-white uppercase italic tracking-tight">{v !== 'base' ? `${t(v)} ` : ''}{sprite.name}</h3>
+                    <h3 className="text-2xl sm:text-3xl font-black text-white uppercase italic tracking-tight">{v !== 'base' ? `${label(v)} ` : ''}{sprite.name}</h3>
                     <div className="flex items-center gap-2 mt-1 flex-wrap">
-                      <span className={`text-[9px] sm:text-[10px] font-black uppercase px-2 py-0.5 rounded border ${RARITY_COLORS[sprite.rarity]}`}>{t(sprite.rarity.toLowerCase())}</span>
-                      <span className={`text-[9px] sm:text-[10px] font-black uppercase px-2 py-0.5 rounded border border-slate-700 bg-slate-800 ${VARIANT_INFO[v]?.color}`}>{t(v)}</span>
+                      <span className={`text-[9px] sm:text-[10px] font-black uppercase px-2 py-0.5 rounded border ${RARITY_COLORS[sprite.rarity]}`}>{label(sprite.rarity.toLowerCase())}</span>
+                      <span className={`text-[9px] sm:text-[10px] font-black uppercase px-2 py-0.5 rounded border border-slate-700 bg-slate-800 ${VARIANT_INFO[v]?.color}`}>{label(v)}</span>
                       {sprite.season === 'C7S3' && <span className="text-[9px] sm:text-[10px] font-black uppercase px-2 py-0.5 rounded border border-slate-700 bg-slate-900 text-slate-400">Vaulted</span>}
-                      {isLocked && <span className="text-[9px] sm:text-[10px] font-black uppercase px-2 py-0.5 rounded border border-amber-500/50 bg-amber-950/60 text-amber-400 flex items-center gap-1"><Lock className="w-3 h-3" /> {t('locked_until_release')}</span>}
+                      {isLocked && <span className="text-[9px] sm:text-[10px] font-black uppercase px-2 py-0.5 rounded border border-amber-500/50 bg-amber-950/60 text-amber-400 flex items-center gap-1"><Lock className="w-3 h-3" /> Locked</span>}
                     </div>
                   </div>
                   <div className="bg-black/30 rounded-xl p-3 border border-slate-800/60">
-                    <p className="text-sm text-slate-300 leading-snug"><span className="font-mono text-[10px] font-black text-cyan-400 block tracking-wider uppercase mb-1">{t('base_ability')}</span>{abilityText}</p>
-                    {variantModifier && <p className="text-sm text-slate-200 mt-2 pt-2 border-t border-slate-800/60"><span className="font-mono text-[10px] font-black text-yellow-400 block tracking-wider uppercase mb-1">+{t(v)} {t('modifier')}</span>{variantModifier}</p>}
+                    <p className="text-sm text-slate-300 leading-snug"><span className="font-mono text-[10px] font-black text-cyan-400 block tracking-wider uppercase mb-1">Base Ability:</span>{abilityText}</p>
+                    {variantModifier && <p className="text-sm text-slate-200 mt-2 pt-2 border-t border-slate-800/60"><span className="font-mono text-[10px] font-black text-yellow-400 block tracking-wider uppercase mb-1">+{label(v)} Modifier:</span>{variantModifier}</p>}
                   </div>
                   <div className="flex gap-2">
                     {isLocked ? (
-                      <div className="flex-1 flex flex-col items-center justify-center py-2.5 rounded-xl border-2 bg-slate-900/60 border-amber-500/40 text-amber-400"><Lock className="w-5 h-5 mb-1" /><span className="text-[10px] font-black uppercase tracking-wider">{t('locked_until_release')}</span></div>
+                      <div className="flex-1 flex flex-col items-center justify-center py-2.5 rounded-xl border-2 bg-slate-900/60 border-amber-500/40 text-amber-400"><Lock className="w-5 h-5 mb-1" /><span className="text-[10px] font-black uppercase tracking-wider">Locked</span></div>
                     ) : (
                       <>
-                        {!isMasteryView && <button onClick={() => handleToggleCheck(sprite.id, v)} className={`flex-1 flex flex-col items-center justify-center py-2.5 rounded-xl border-2 transition-all ${isCollected ? 'bg-cyan-900/40 border-cyan-500 text-cyan-400' : 'bg-slate-900/60 border-slate-700 text-slate-400 hover:border-slate-500'}`}>{isCollected ? <CheckCircle className="w-5 h-5 mb-1" /> : <Circle className="w-5 h-5 mb-1 opacity-50" />}<span className="text-[10px] font-black uppercase tracking-wider">{isCollected ? t('collected') : t('collect')}</span></button>}
-                        {isMasteryView && <button onClick={() => toggleMastery(sprite.id, v)} className={`flex-1 flex flex-col items-center justify-center py-2.5 rounded-xl border-2 transition-all ${!isCollected ? 'opacity-30 cursor-not-allowed bg-slate-900 border-slate-800 text-slate-600' : isMastered ? 'bg-yellow-900/40 border-yellow-500 text-yellow-400 shadow-[0_0_15px_rgba(255,215,0,0.2)]' : 'bg-slate-900/60 border-slate-700 text-slate-400 hover:border-yellow-500/50 hover:text-yellow-500'}`}><Crown className="w-5 h-5 mb-1" /><span className="text-[10px] font-black uppercase tracking-wider">{isMastered ? t('mastered') : t('set_lvl_5')}</span></button>}
+                        {!isMasteryView && <button onClick={() => handleToggleCheck(sprite.id, v)} className={`flex-1 flex flex-col items-center justify-center py-2.5 rounded-xl border-2 transition-all ${isCollected ? 'bg-cyan-900/40 border-cyan-500 text-cyan-400' : 'bg-slate-900/60 border-slate-700 text-slate-400 hover:border-slate-500'}`}>{isCollected ? <CheckCircle className="w-5 h-5 mb-1" /> : <Circle className="w-5 h-5 mb-1 opacity-50" />}<span className="text-[10px] font-black uppercase tracking-wider">{isCollected ? "Collected" : "Collect"}</span></button>}
+                        {isMasteryView && <button onClick={() => toggleMastery(sprite.id, v)} className={`flex-1 flex flex-col items-center justify-center py-2.5 rounded-xl border-2 transition-all ${!isCollected ? 'opacity-30 cursor-not-allowed bg-slate-900 border-slate-800 text-slate-600' : isMastered ? 'bg-yellow-900/40 border-yellow-500 text-yellow-400 shadow-[0_0_15px_rgba(255,215,0,0.2)]' : 'bg-slate-900/60 border-slate-700 text-slate-400 hover:border-yellow-500/50 hover:text-yellow-500'}`}><Crown className="w-5 h-5 mb-1" /><span className="text-[10px] font-black uppercase tracking-wider">{isMastered ? "Mastered" : "Set Lvl 5"}</span></button>}
                       </>
                     )}
                   </div>
@@ -2776,7 +2769,7 @@ function MainApp() {
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90 backdrop-blur-md animate-in fade-in duration-200">
           <div className="bg-[#12141f] border-2 border-slate-700 rounded-2xl flex flex-col max-w-sm w-full h-[80vh] relative overflow-hidden">
             <header className="p-4 border-b border-slate-800 flex justify-between items-center bg-[#0e1017]">
-              <h3 className="text-md sm:text-lg font-black tracking-tight text-white uppercase italic flex items-center gap-2"><FileText className="w-5 h-5 text-purple-400" /> {t('whats_new')}</h3>
+              <h3 className="text-md sm:text-lg font-black tracking-tight text-white uppercase italic flex items-center gap-2"><FileText className="w-5 h-5 text-purple-400" /> What's new</h3>
               <button onClick={() => setShowPatchNotes(false)} className="text-slate-400 hover:text-white"><X className="w-6 h-6" /></button>
             </header>
             <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-6">
@@ -2800,10 +2793,10 @@ function MainApp() {
           <div className="bg-[#12141f] border-2 border-red-500/60 rounded-2xl p-6 max-w-sm w-full text-center relative">
             <button onClick={() => { setShowResetConfirm(false); playBeep(440, 'sine', 0.05); }} className="absolute top-4 right-4 p-1 text-slate-400 hover:text-white rounded-lg bg-black/40 border border-slate-800"><X className="w-4 h-4" /></button>
             <div className="mx-auto w-12 h-12 rounded-full bg-red-950/60 border border-red-500/40 flex items-center justify-center mb-4"><AlertTriangle className="w-6 h-6 text-red-400" /></div>
-            <h3 className="text-xl sm:text-2xl font-black tracking-tight text-white uppercase italic">{t('reset_archive')}?</h3>
+            <h3 className="text-xl sm:text-2xl font-black tracking-tight text-white uppercase italic">RESET ARCHIVE?</h3>
             <p className="text-sm sm:text-base text-slate-400 mt-2 leading-relaxed">This action will completely wipe your checked archive configurations. Mastery counts and storage caches will revert back to 0%.</p>
             <div className="grid grid-cols-2 gap-3 mt-6">
-              <button onClick={() => { setShowResetConfirm(false); playBeep(440, 'sine', 0.05); }} className="py-2.5 text-sm font-black uppercase font-mono bg-black/40 text-slate-300 border border-slate-800 rounded-xl hover:bg-black/60">{t('cancel')}</button>
+              <button onClick={() => { setShowResetConfirm(false); playBeep(440, 'sine', 0.05); }} className="py-2.5 text-sm font-black uppercase font-mono bg-black/40 text-slate-300 border border-slate-800 rounded-xl hover:bg-black/60">Cancel</button>
               <button onClick={handleAbsoluteReset} className="py-2.5 text-sm font-black uppercase font-mono bg-gradient-to-r from-red-600 to-rose-700 text-white border border-red-500/40 rounded-xl hover:brightness-110">CONFIRM WIPE</button>
             </div>
           </div>
@@ -2819,7 +2812,7 @@ function MainApp() {
             <h3 className="text-xl sm:text-2xl font-black tracking-tight text-white uppercase italic">REMOVE FRIEND?</h3>
             <p className="text-sm sm:text-base text-slate-400 mt-2 leading-relaxed">Are you sure you want to remove <span className="text-amber-400 font-bold">@{showUnfriendConfirm.spriteId}</span>? This severs connection access across both profiles immediately.</p>
             <div className="grid grid-cols-2 gap-3 mt-6">
-              <button onClick={() => setShowUnfriendConfirm(null)} className="py-2.5 text-sm font-black uppercase font-mono bg-black/40 text-slate-300 border border-slate-800 rounded-xl">{t('cancel')}</button>
+              <button onClick={() => setShowUnfriendConfirm(null)} className="py-2.5 text-sm font-black uppercase font-mono bg-black/40 text-slate-300 border border-slate-800 rounded-xl">Cancel</button>
               <button onClick={handleUnfriendExecution} className="py-2.5 text-sm font-black uppercase font-mono bg-gradient-to-r from-amber-600 to-amber-700 text-white rounded-xl">UNFRIEND</button>
             </div>
           </div>
@@ -2846,18 +2839,18 @@ function MainApp() {
                   <input type="text" placeholder="Search Archive..." value={fSearchQuery} onChange={(e) => setFSearchQuery(e.target.value)} className={`w-full bg-black/50 border-2 border-slate-800 rounded-xl pl-9 pr-3 py-2 ${responsiveInputSizeClass} text-white focus:outline-none focus:border-indigo-500`} />
                 </div>
                 <button onClick={() => setShowFFilters(!showFFilters)} className={`px-4 flex items-center gap-2 rounded-xl border-2 transition-all font-black text-xs uppercase tracking-wider ${showFFilters ? 'bg-indigo-900/40 border-indigo-500 text-indigo-400' : 'bg-slate-900 border-slate-800 text-slate-400 hover:bg-slate-800'}`}>
-                  <Filter className="w-4 h-4" /> {t('filters')} {showFFilters ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                  <Filter className="w-4 h-4" /> Filters {showFFilters ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
                 </button>
               </div>
 
               {showFFilters && (
                 <div className="flex flex-col gap-4 mt-3 pt-3 border-t border-slate-800/80 animate-in slide-in-from-top-2">
                   <div>
-                    <span className="text-[9px] text-slate-500 font-black uppercase tracking-widest mb-1.5 block">{t('sort_by')}</span>
+                    <span className="text-[9px] text-slate-500 font-black uppercase tracking-widest mb-1.5 block">Sort By</span>
                     <div className="flex flex-wrap gap-1.5">
                       {['A-Z', 'Z-A', 'Rarity (High to Low)', 'Rarity (Low to High)'].map(sort => (
                         <button key={sort} onClick={() => setFSortBy(sort)} className={`px-3 py-1.5 text-[10px] font-black tracking-wider rounded-lg border uppercase ${fSortBy === sort ? 'bg-indigo-500 text-white border-indigo-400' : 'bg-black/40 text-slate-400 border-slate-800'}`}>
-                          {sort === 'A-Z' ? t('az_order') : sort === 'Z-A' ? t('za_order') : sort === 'Rarity (High to Low)' ? t('rarity_desc') : t('rarity_asc')}
+                          {sort === 'A-Z' ? "Alphabetical (A-Z)" : sort === 'Z-A' ? "Alphabetical (Z-A)" : sort === 'Rarity (High to Low)' ? "Rarity (High to Low)" : "Rarity (Low to High)"}
                         </button>
                       ))}
                     </div>
@@ -2873,31 +2866,31 @@ function MainApp() {
                     </div>
                   </div>
                   <div>
-                    <span className="text-[9px] text-slate-500 font-black uppercase tracking-widest mb-1.5 block">{t('rarity')}</span>
+                    <span className="text-[9px] text-slate-500 font-black uppercase tracking-widest mb-1.5 block">Rarity</span>
                     <div className="flex flex-wrap gap-1.5">
                       {['All', 'Mythic', 'Legendary', 'Epic', 'Rare', 'Unknown'].map(rarity => (
                         <button key={rarity} onClick={() => setFRarityFilter(rarity)} className={`px-3 py-1.5 text-[10px] font-black tracking-wider rounded-lg border uppercase ${fRarityFilter === rarity ? 'bg-cyan-400 text-black border-cyan-300' : 'bg-black/40 text-slate-400 border-slate-800'}`}>
-                          {t(rarity.toLowerCase())}
+                          {label(rarity.toLowerCase())}
                         </button>
                       ))}
                     </div>
                   </div>
                   <div>
-                    <span className="text-[9px] text-slate-500 font-black uppercase tracking-widest mb-1.5 block">{t('variant_type')}</span>
+                    <span className="text-[9px] text-slate-500 font-black uppercase tracking-widest mb-1.5 block">Variant Type</span>
                     <div className="flex flex-wrap gap-1.5">
                       {['All', 'Base', 'Gold', 'Gummy', 'Galaxy', 'Holofoil', 'Cube', 'Gem', 'Quack', 'Cheatmaster', 'Loot Hacker', 'Bounty Hunter', 'Trick or Treat'].map(variant => (
                         <button key={variant} onClick={() => setFVariantFilter(variant)} className={`px-3 py-1.5 text-[10px] font-black tracking-wider rounded-lg border uppercase ${fVariantFilter === variant ? 'bg-purple-500 text-white border-purple-400' : 'bg-black/40 text-slate-400 border-slate-800'}`}>
-                          {t(variant.toLowerCase())}
+                          {label(variant.toLowerCase())}
                         </button>
                       ))}
                     </div>
                   </div>
                   <div>
-                    <span className="text-[9px] text-slate-500 font-black uppercase tracking-widest mb-1.5 block">{t('collection_status')}</span>
+                    <span className="text-[9px] text-slate-500 font-black uppercase tracking-widest mb-1.5 block">Collection Status</span>
                     <div className="flex flex-wrap gap-1.5">
                       {['All', 'Collected', 'Missing', 'I Need', 'They Need'].map(status => (
                         <button key={status} onClick={() => setFStatusFilter(status)} className={`px-3 py-1.5 text-[10px] font-black tracking-wider rounded-lg border uppercase ${fStatusFilter === status ? 'bg-emerald-500 text-white border-emerald-400' : 'bg-black/40 text-slate-400 border-slate-800'}`}>
-                          {t(status.replace(' ', '_').toLowerCase())}
+                          {label(status.replace(' ', '_').toLowerCase())}
                         </button>
                       ))}
                     </div>
@@ -2937,7 +2930,7 @@ function MainApp() {
                   <div className="flex-1 flex flex-col justify-center min-w-0">
                     <div className="flex flex-col mb-2.5">
                       <span className="font-black text-base sm:text-lg text-white uppercase italic tracking-tight truncate">{sprite.name} {sprite.season === 'C7S3' && <span className="text-[8px] bg-slate-800 text-slate-400 px-1.5 py-0.5 rounded ml-1 not-italic">VAULTED</span>}</span>
-                      <span className={`text-[8px] sm:text-[9px] font-black uppercase tracking-widest ${VARIANT_INFO[validInitialVariant]?.color}`}>{t(validInitialVariant)}</span>
+                      <span className={`text-[8px] sm:text-[9px] font-black uppercase tracking-widest ${VARIANT_INFO[validInitialVariant]?.color}`}>{label(validInitialVariant)}</span>
                     </div>
                     <div className="flex flex-wrap gap-x-3 gap-y-2">
                       {variantsList.map(v => {
@@ -2959,7 +2952,7 @@ function MainApp() {
                                 </>
                               )}
                             </div>
-                            <span className="text-[7px] sm:text-[8px] font-bold uppercase text-slate-500 tracking-wider whitespace-nowrap">{v === 'holofoil' ? 'Holo' : v === 'cheatmaster' ? 'Cheat' : v === 'loothacker' ? 'Hacker' : v === 'bountyhunter' ? 'Bounty' : v === 'trickortreat' ? 'TrT' : t(v)}</span>
+                            <span className="text-[7px] sm:text-[8px] font-bold uppercase text-slate-500 tracking-wider whitespace-nowrap">{v === 'holofoil' ? 'Holo' : v === 'cheatmaster' ? 'Cheat' : v === 'loothacker' ? 'Hacker' : v === 'bountyhunter' ? 'Bounty' : v === 'trickortreat' ? 'TrT' : label(v)}</span>
                           </div>
                         );
                       })}
@@ -3050,12 +3043,12 @@ function MainApp() {
             {currentView === 'sprites' && (
               <section className="sticky top-[86px] sm:top-[94px] z-40 bg-[#151824]/95 backdrop-blur-md rounded-2xl p-4 border-2 border-slate-800 shadow-xl">
                 <div className="flex items-center justify-between mb-2.5">
-                  <span className="text-sm sm:text-base font-black text-gray-200 tracking-wider font-mono">{t('sprite_progress')}</span>
-                  <button onClick={() => { setShowResetConfirm(true); playBeep(330, 'sine', 0.08); }} className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-red-950/30 hover:bg-red-950/60 border border-red-900/40 text-[9px] sm:text-[10px] font-mono font-black text-red-400 tracking-wider uppercase"><RotateCcw className="w-3 h-3" /> {t('reset_archive')}</button>
+                  <span className="text-sm sm:text-base font-black text-gray-200 tracking-wider font-mono">SPRITE PROGRESS</span>
+                  <button onClick={() => { setShowResetConfirm(true); playBeep(330, 'sine', 0.08); }} className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-red-950/30 hover:bg-red-950/60 border border-red-900/40 text-[9px] sm:text-[10px] font-mono font-black text-red-400 tracking-wider uppercase"><RotateCcw className="w-3 h-3" /> RESET ARCHIVE</button>
                 </div>
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center gap-2">
-                    <span className="text-[10px] sm:text-xs text-slate-400 font-mono">{t('completion')}</span>
+                    <span className="text-[10px] sm:text-xs text-slate-400 font-mono">COMPLETION PERCENTAGE</span>
                     <span className="text-[9px] sm:text-[10px] font-black text-cyan-400/80 tracking-widest bg-cyan-950/50 px-2 py-0.5 rounded-md border border-cyan-900/50">{totalCollected}/{currentPossibleStatic}</span>
                   </div>
                   <span className="text-2xl sm:text-3xl font-black text-cyan-400 font-mono">{completionRate}%</span>
@@ -3070,12 +3063,12 @@ function MainApp() {
               <section className="sticky top-[86px] sm:top-[94px] z-40 bg-gradient-to-r from-yellow-900/95 to-amber-900/95 backdrop-blur-md border-2 border-yellow-500/50 rounded-2xl p-5 mb-2 shadow-xl">
                 <div className="flex items-center gap-3 mb-2">
                   <Crown className="w-6 h-6 sm:w-7 sm:h-7 text-yellow-400" />
-                  <h2 className="text-xl sm:text-2xl font-black text-yellow-400 uppercase italic">{t('mastery_vault')}</h2>
+                  <h2 className="text-xl sm:text-2xl font-black text-yellow-400 uppercase italic">Mastery Vault</h2>
                 </div>
                 <div className="mt-2">
                   <div className="flex items-center justify-between mb-1.5">
                     <div className="flex items-center gap-2">
-                      <span className="text-[10px] sm:text-xs text-yellow-500/80 font-mono font-bold tracking-wider">{t('vault_completion')}</span>
+                      <span className="text-[10px] sm:text-xs text-yellow-500/80 font-mono font-bold tracking-wider">VAULT COMPLETION</span>
                       <span className="text-[9px] sm:text-[10px] font-black text-yellow-400/80 tracking-widest bg-yellow-950/50 px-2 py-0.5 rounded-md border border-yellow-700/50">{totalMastered}/{currentPossibleStatic}</span>
                     </div>
                     <span className="text-lg sm:text-xl font-black text-yellow-400 font-mono">{masteryRate}%</span>
@@ -3092,21 +3085,21 @@ function MainApp() {
               <div className="flex gap-2">
                 <div className="relative flex-1">
                   <Search className="w-4 h-4 text-cyan-500/70 absolute left-3 top-3" />
-                  <input type="text" placeholder={t('search')} value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className={`w-full bg-black/50 border-2 border-slate-800 rounded-xl pl-9 pr-3 py-2 ${responsiveInputSizeClass} text-white focus:outline-none focus:border-cyan-500`} />
+                  <input type="text" placeholder="Search sprites..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className={`w-full bg-black/50 border-2 border-slate-800 rounded-xl pl-9 pr-3 py-2 ${responsiveInputSizeClass} text-white focus:outline-none focus:border-cyan-500`} />
                 </div>
                 <button onClick={() => setShowFilters(!showFilters)} className={`px-4 flex items-center gap-2 rounded-xl border-2 transition-all font-black text-xs uppercase tracking-wider ${showFilters ? 'bg-cyan-900/40 border-cyan-500 text-cyan-400' : 'bg-slate-900 border-slate-800 text-slate-400 hover:bg-slate-800'}`}>
-                  <Filter className="w-4 h-4" /> {t('filters')} {showFilters ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                  <Filter className="w-4 h-4" /> Filters {showFilters ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
                 </button>
               </div>
 
               {showFilters && (
                 <div className="flex flex-col gap-4 mt-3 pt-3 border-t border-slate-800/80 animate-in slide-in-from-top-2">
                   <div>
-                    <span className="text-[9px] text-slate-500 font-black uppercase tracking-widest mb-1.5 block">{t('sort_by')}</span>
+                    <span className="text-[9px] text-slate-500 font-black uppercase tracking-widest mb-1.5 block">Sort By</span>
                     <div className="flex flex-wrap gap-1.5">
                       {['A-Z', 'Z-A', 'Rarity (High to Low)', 'Rarity (Low to High)'].map(sort => (
                         <button key={sort} onClick={() => setSortBy(sort)} className={`px-3 py-1.5 text-[10px] font-black tracking-wider rounded-lg border uppercase ${sortBy === sort ? 'bg-indigo-500 text-white border-indigo-400' : 'bg-black/40 text-slate-400 border-slate-800'}`}>
-                          {sort === 'A-Z' ? t('az_order') : sort === 'Z-A' ? t('za_order') : sort === 'Rarity (High to Low)' ? t('rarity_desc') : t('rarity_asc')}
+                          {sort === 'A-Z' ? "Alphabetical (A-Z)" : sort === 'Z-A' ? "Alphabetical (Z-A)" : sort === 'Rarity (High to Low)' ? "Rarity (High to Low)" : "Rarity (Low to High)"}
                         </button>
                       ))}
                     </div>
@@ -3122,31 +3115,31 @@ function MainApp() {
                     </div>
                   </div>
                   <div>
-                    <span className="text-[9px] text-slate-500 font-black uppercase tracking-widest mb-1.5 block">{t('rarity')}</span>
+                    <span className="text-[9px] text-slate-500 font-black uppercase tracking-widest mb-1.5 block">Rarity</span>
                     <div className="flex flex-wrap gap-1.5">
                       {['All', 'Mythic', 'Legendary', 'Epic', 'Rare', 'Unknown'].map(rarity => (
                         <button key={rarity} onClick={() => setRarityFilter(rarity)} className={`px-3 py-1.5 text-[10px] font-black tracking-wider rounded-lg border uppercase ${rarityFilter === rarity ? 'bg-cyan-400 text-black border-cyan-300' : 'bg-black/40 text-slate-400 border-slate-800'}`}>
-                          {t(rarity.toLowerCase())}
+                          {label(rarity.toLowerCase())}
                         </button>
                       ))}
                     </div>
                   </div>
                   <div>
-                    <span className="text-[9px] text-slate-500 font-black uppercase tracking-widest mb-1.5 block">{t('variant_type')}</span>
+                    <span className="text-[9px] text-slate-500 font-black uppercase tracking-widest mb-1.5 block">Variant Type</span>
                     <div className="flex flex-wrap gap-1.5">
                       {['All', 'Base', 'Gold', 'Gummy', 'Galaxy', 'Holofoil', 'Cube', 'Gem', 'Quack', 'Cheatmaster', 'Loot Hacker', 'Bounty Hunter', 'Trick or Treat'].map(variant => (
                         <button key={variant} onClick={() => setVariantFilter(variant)} className={`px-3 py-1.5 text-[10px] font-black tracking-wider rounded-lg border uppercase ${variantFilter === variant ? 'bg-purple-500 text-white border-purple-400' : 'bg-black/40 text-slate-400 border-slate-800'}`}>
-                          {t(variant.toLowerCase())}
+                          {label(variant.toLowerCase())}
                         </button>
                       ))}
                     </div>
                   </div>
                   <div>
-                    <span className="text-[9px] text-slate-500 font-black uppercase tracking-widest mb-1.5 block">{t('collection_status')}</span>
+                    <span className="text-[9px] text-slate-500 font-black uppercase tracking-widest mb-1.5 block">Collection Status</span>
                     <div className="flex flex-wrap gap-1.5">
                       {['All', isMasteryView ? 'Mastered' : 'Collected', isMasteryView ? 'Unmastered' : 'Missing'].map(status => (
                         <button key={status} onClick={() => setStatusFilter(status)} className={`px-3 py-1.5 text-[10px] font-black tracking-wider rounded-lg border uppercase ${statusFilter === status ? 'bg-emerald-500 text-white border-emerald-400' : 'bg-black/40 text-slate-400 border-slate-800'}`}>
-                          {t(status.toLowerCase())}
+                          {label(status.toLowerCase())}
                         </button>
                       ))}
                     </div>
@@ -3159,7 +3152,7 @@ function MainApp() {
               {filteredSprites.length === 0 && (
                 <div className="text-center p-8 bg-[#12141f] rounded-2xl border border-slate-800">
                   <Crown className="w-12 h-12 text-slate-700 mx-auto mb-4" />
-                  <p className="text-sm sm:text-base text-slate-400 font-bold uppercase tracking-widest">{isMasteryView ? t('no_collectables') : t('no_sprites')}</p>
+                  <p className="text-sm sm:text-base text-slate-400 font-bold uppercase tracking-widest">{isMasteryView ? "No Collectables Found" : "No Sprites Found"}</p>
                 </div>
               )}
               <div className="flex flex-col gap-4 animate-in fade-in duration-300">
@@ -3175,7 +3168,7 @@ function MainApp() {
                       <div className="flex-1 flex flex-col justify-center min-w-0">
                         <div className="flex flex-col mb-2.5">
                           <span className="font-black text-base sm:text-lg text-white uppercase italic tracking-tight truncate">{sprite.name} {sprite.season === 'C7S3' && <span className="text-[8px] bg-slate-800 text-slate-400 px-1.5 py-0.5 rounded ml-1 not-italic">VAULTED</span>}</span>
-                          <span className={`text-[8px] sm:text-[9px] font-black uppercase tracking-widest ${VARIANT_INFO[validInitialVariant]?.color}`}>{t(validInitialVariant)}</span>
+                          <span className={`text-[8px] sm:text-[9px] font-black uppercase tracking-widest ${VARIANT_INFO[validInitialVariant]?.color}`}>{label(validInitialVariant)}</span>
                         </div>
                         <div className="flex flex-wrap gap-x-3 gap-y-2">
                           {variantsList.map(v => {
@@ -3187,7 +3180,7 @@ function MainApp() {
                                 <div onContextMenu={(e) => e.preventDefault()} onMouseDown={(e) => handleDotPressStart(e, sprite.id, v)} onMouseUp={handleDotPressEnd} onMouseLeave={handleDotPressEnd} onTouchStart={(e) => handleDotPressStart(e, sprite.id, v)} onTouchEnd={handleDotPressEnd} onClick={(e) => e.stopPropagation()} className={`w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center border-2 transition-all duration-300 relative select-none cursor-pointer ${activeHoldId === `${sprite.id}_${v}` ? 'scale-[1.3] ring-2 ring-cyan-400 shadow-[0_0_20px_rgba(34,211,238,0.8)]' : ''} ${isLocked ? 'bg-slate-950/80 border-slate-800/60 opacity-60' : isMasteryView && isMastered ? 'bg-yellow-900/40 border-yellow-400' : isCollected ? `bg-slate-900 ${VARIANT_INFO[v]?.borderColor}` : 'bg-black border-slate-800'}`}>
                                   {isLocked ? <Lock className="w-4 h-4 sm:w-5 sm:h-5 text-slate-600" /> : (<>{isCollected && <div className={`w-3.5 h-3.5 sm:w-4 sm:h-4 rounded-full ${VARIANT_INFO[v]?.bgColor} ${(isMasteryView && isMastered) ? 'opacity-30' : 'opacity-100'}`} />}{isMasteryView && isMastered && <Crown className="w-5 h-5 sm:w-6 sm:h-6 text-yellow-400 drop-shadow-[0_0_2px_rgba(255,215,0,0.8)] absolute z-10" />}</>)}
                                 </div>
-                                <span className="text-[7px] sm:text-[8px] font-bold uppercase text-slate-500 tracking-wider whitespace-nowrap">{v === 'holofoil' ? 'Holo' : v === 'cheatmaster' ? 'Cheat' : v === 'loothacker' ? 'Hacker' : v === 'bountyhunter' ? 'Bounty' : v === 'trickortreat' ? 'TrT' : t(v)}</span>
+                                <span className="text-[7px] sm:text-[8px] font-bold uppercase text-slate-500 tracking-wider whitespace-nowrap">{v === 'holofoil' ? 'Holo' : v === 'cheatmaster' ? 'Cheat' : v === 'loothacker' ? 'Hacker' : v === 'bountyhunter' ? 'Bounty' : v === 'trickortreat' ? 'TrT' : label(v)}</span>
                               </div>
                             )
                           })}
@@ -3469,32 +3462,32 @@ function MainApp() {
         {/* --- FRIENDS TAB VIEW --- */}
         {currentView === 'friends' && (
           <div className="flex flex-col gap-4 animate-in fade-in duration-300">
-            <section className="bg-gradient-to-br from-indigo-900/40 to-blue-900/20 border-2 border-indigo-500/50 rounded-2xl p-5"><div className="flex items-center gap-3 mb-2"><Users className="w-6 h-6 sm:w-7 sm:h-7 text-indigo-400" /><h2 className="text-xl sm:text-2xl font-black text-indigo-400 uppercase italic">{t('sprite_squad')}</h2></div></section>
+            <section className="bg-gradient-to-br from-indigo-900/40 to-blue-900/20 border-2 border-indigo-500/50 rounded-2xl p-5"><div className="flex items-center gap-3 mb-2"><Users className="w-6 h-6 sm:w-7 sm:h-7 text-indigo-400" /><h2 className="text-xl sm:text-2xl font-black text-indigo-400 uppercase italic">Sprite Squad</h2></div></section>
             <section className="bg-[#12141f] rounded-2xl border border-slate-800 p-4 flex flex-col gap-3">
-              <div className="flex items-center justify-between"><h3 className="text-sm font-black text-cyan-400 uppercase tracking-wider flex items-center gap-2"><Target className="w-4 h-4 sm:w-5 sm:h-5" /> {t('extraction_targets')}</h3><span className="text-[10px] sm:text-xs text-slate-500 font-bold uppercase">{extractionTargets.filter(Boolean).length} / {profileData.unlockedTargetSlot ? 4 : 3}</span></div>
+              <div className="flex items-center justify-between"><h3 className="text-sm font-black text-cyan-400 uppercase tracking-wider flex items-center gap-2"><Target className="w-4 h-4 sm:w-5 sm:h-5" /> Extraction Targets</h3><span className="text-[10px] sm:text-xs text-slate-500 font-bold uppercase">{extractionTargets.filter(Boolean).length} / {profileData.unlockedTargetSlot ? 4 : 3}</span></div>
               <div className="flex gap-2">{[0, 1, 2].concat(profileData.unlockedTargetSlot ? [3] : []).map(index => renderTargetSlot(extractionTargets[index], index))}</div>
             </section>
             <section className="bg-[#12141f] rounded-2xl border border-slate-800 p-4">
               {!showAddFriendInput ? (
-                <button onClick={() => setShowAddFriendInput(true)} className="w-full flex items-center justify-center gap-2 bg-indigo-900/40 hover:bg-indigo-900/60 border border-indigo-500/50 text-indigo-400 py-3 rounded-xl font-black uppercase tracking-wider transition-colors"><Plus className="w-5 h-5" /> {t('add_friend')}</button>
+                <button onClick={() => setShowAddFriendInput(true)} className="w-full flex items-center justify-center gap-2 bg-indigo-900/40 hover:bg-indigo-900/60 border border-indigo-500/50 text-indigo-400 py-3 rounded-xl font-black uppercase tracking-wider transition-colors"><Plus className="w-5 h-5" /> Add Friend</button>
               ) : (
                 <div className="animate-in fade-in zoom-in-95">
-                  <div className="flex items-center justify-between mb-3"><h3 className="text-sm font-black text-slate-400 uppercase tracking-wider">{t('add_friend')}</h3><button onClick={() => { setShowAddFriendInput(false); setFriendSearchQuery(''); setFriendSearchResult(null); setFriendSearchStatus(''); }} className="text-slate-500 hover:text-white"><X className="w-4 h-4" /></button></div>
-                  <div className="flex gap-2"><div className="relative flex-1"><Search className="w-4 h-4 sm:w-5 sm:h-5 text-slate-500 absolute left-3 top-3" /><input type="text" value={friendSearchQuery} onChange={(e) => setFriendSearchQuery(e.target.value)} placeholder={t('search_id')} className={`w-full bg-black border-2 border-slate-800 rounded-xl pl-9 sm:pl-10 pr-3 py-2 ${responsiveInputSizeClass} text-white focus:outline-none focus:border-indigo-500`} /></div><button onClick={handleSearchFriend} className="bg-indigo-600 hover:bg-indigo-500 text-white px-4 rounded-xl transition-colors"><Search className="w-5 h-5" /></button></div>
+                  <div className="flex items-center justify-between mb-3"><h3 className="text-sm font-black text-slate-400 uppercase tracking-wider">Add Friend</h3><button onClick={() => { setShowAddFriendInput(false); setFriendSearchQuery(''); setFriendSearchResult(null); setFriendSearchStatus(''); }} className="text-slate-500 hover:text-white"><X className="w-4 h-4" /></button></div>
+                  <div className="flex gap-2"><div className="relative flex-1"><Search className="w-4 h-4 sm:w-5 sm:h-5 text-slate-500 absolute left-3 top-3" /><input type="text" value={friendSearchQuery} onChange={(e) => setFriendSearchQuery(e.target.value)} placeholder="Search Sprite ID..." className={`w-full bg-black border-2 border-slate-800 rounded-xl pl-9 sm:pl-10 pr-3 py-2 ${responsiveInputSizeClass} text-white focus:outline-none focus:border-indigo-500`} /></div><button onClick={handleSearchFriend} className="bg-indigo-600 hover:bg-indigo-500 text-white px-4 rounded-xl transition-colors"><Search className="w-5 h-5" /></button></div>
                   {friendSearchStatus === 'searching' && <p className="text-sm text-slate-400 mt-3">Searching...</p>}
                   {friendSearchStatus === 'not-found' && <p className="text-sm text-red-400 mt-3 font-bold">Sprite ID not found.</p>}
-                  {friendSearchStatus === 'found' && friendSearchResult && (<div className="mt-4 p-3 bg-indigo-950/30 border border-indigo-500/30 rounded-xl flex justify-between items-center animate-in zoom-in-95"><span className="text-base sm:text-lg font-bold text-white">@{friendSearchResult.spriteId}</span><button onClick={handleSendFriendRequest} className="bg-indigo-500 px-3 py-1.5 rounded-lg text-xs sm:text-sm font-bold text-white flex items-center gap-1 hover:bg-indigo-400"><UserPlus className="w-4 h-4" /> {t('request')}</button></div>)}
+                  {friendSearchStatus === 'found' && friendSearchResult && (<div className="mt-4 p-3 bg-indigo-950/30 border border-indigo-500/30 rounded-xl flex justify-between items-center animate-in zoom-in-95"><span className="text-base sm:text-lg font-bold text-white">@{friendSearchResult.spriteId}</span><button onClick={handleSendFriendRequest} className="bg-indigo-500 px-3 py-1.5 rounded-lg text-xs sm:text-sm font-bold text-white flex items-center gap-1 hover:bg-indigo-400"><UserPlus className="w-4 h-4" /> Request</button></div>)}
                 </div>
               )}
             </section>
             {sentRequests.length > 0 && (
-              <section className="bg-slate-900/50 rounded-2xl border border-slate-800 p-4"><h3 className="text-sm font-black text-slate-400 uppercase tracking-wider mb-3">{t('sent_requests')}</h3>{sentRequests.map(req => (<div key={req.id} className="flex justify-between items-center bg-black/40 p-3 rounded-lg border border-slate-800 mb-2"><span className="text-sm sm:text-base font-bold text-slate-300 tracking-wider">To: @{req.receiverSpriteId}</span><button onClick={() => cancelFriendRequest(req.id)} className="bg-red-900/40 border border-red-800/50 px-3 py-1.5 rounded-lg text-[10px] sm:text-xs font-black uppercase text-red-400"><XCircle className="w-3.5 h-3.5 sm:w-4 sm:h-4 inline" /> {t('cancel')}</button></div>))}</section>
+              <section className="bg-slate-900/50 rounded-2xl border border-slate-800 p-4"><h3 className="text-sm font-black text-slate-400 uppercase tracking-wider mb-3">Sent Requests</h3>{sentRequests.map(req => (<div key={req.id} className="flex justify-between items-center bg-black/40 p-3 rounded-lg border border-slate-800 mb-2"><span className="text-sm sm:text-base font-bold text-slate-300 tracking-wider">To: @{req.receiverSpriteId}</span><button onClick={() => cancelFriendRequest(req.id)} className="bg-red-900/40 border border-red-800/50 px-3 py-1.5 rounded-lg text-[10px] sm:text-xs font-black uppercase text-red-400"><XCircle className="w-3.5 h-3.5 sm:w-4 sm:h-4 inline" /> Cancel</button></div>))}</section>
             )}
             {pendingRequests.length > 0 && (
-              <section className="bg-indigo-950/20 rounded-2xl border border-indigo-500/30 p-4"><h3 className="text-sm font-black text-indigo-400 uppercase tracking-wider mb-3">{t('incoming_requests')}</h3>{pendingRequests.map(req => (<div key={req.id} className="flex justify-between items-center bg-black/40 p-3 rounded-lg border border-slate-800 mb-2"><span className="text-sm sm:text-base font-bold text-white tracking-wider">@{req.senderSpriteId}</span><button onClick={() => acceptFriendRequest(req)} className="bg-emerald-600 px-4 py-2 rounded-lg text-[10px] sm:text-xs font-black uppercase text-white"><Check className="w-3.5 h-3.5 sm:w-4 sm:h-4 inline" /> {t('accept')}</button></div>))}</section>
+              <section className="bg-indigo-950/20 rounded-2xl border border-indigo-500/30 p-4"><h3 className="text-sm font-black text-indigo-400 uppercase tracking-wider mb-3">Incoming Requests</h3>{pendingRequests.map(req => (<div key={req.id} className="flex justify-between items-center bg-black/40 p-3 rounded-lg border border-slate-800 mb-2"><span className="text-sm sm:text-base font-bold text-white tracking-wider">@{req.senderSpriteId}</span><button onClick={() => acceptFriendRequest(req)} className="bg-emerald-600 px-4 py-2 rounded-lg text-[10px] sm:text-xs font-black uppercase text-white"><Check className="w-3.5 h-3.5 sm:w-4 sm:h-4 inline" /> Accept</button></div>))}</section>
             )}
             <section className="bg-[#12141f] rounded-2xl border border-slate-800 p-4">
-              <div className="flex items-center justify-between mb-3"><h3 className="text-sm font-black text-slate-400 uppercase tracking-wider">{t('sprite_squad')} ({richFriends.length})</h3></div>
+              <div className="flex items-center justify-between mb-3"><h3 className="text-sm font-black text-slate-400 uppercase tracking-wider">Sprite Squad ({richFriends.length})</h3></div>
               <div className="flex flex-col gap-2 mb-4"><div className="relative w-full"><Search className="w-4 h-4 text-indigo-500/70 absolute left-3 top-3" /><input type="text" placeholder="Search Squad..." value={squadSearchQuery} onChange={(e) => setSquadSearchQuery(e.target.value)} className={`w-full bg-black/50 border-2 border-slate-800 rounded-xl pl-9 pr-3 py-2 ${inputSizeClass} text-white focus:outline-none focus:border-indigo-500`} /></div></div>
               {filteredSquad.length === 0 ? (
                 <div className="text-center py-6"><Users className="w-10 h-10 sm:w-12 sm:h-12 text-slate-700 mx-auto mb-3" /><p className="text-sm text-slate-500 font-bold uppercase tracking-wider">No Squad Members Found</p></div>
@@ -3677,10 +3670,10 @@ function MainApp() {
       <nav className="fixed bottom-4 left-0 right-0 z-50 flex justify-center px-4">
         <div className="bg-[#0e1017]/95 backdrop-blur-md border border-slate-800 rounded-2xl w-full max-w-md px-1 py-2 flex justify-between shadow-2xl">
           <button onClick={() => { setCurrentView('sprites'); setActiveViewingFriend(null); playBeep(440, 'sine', 0.05); }} className={`flex-1 flex flex-col items-center gap-1 py-1 transition-colors ${currentView === 'sprites' && !activeViewingFriend ? 'text-cyan-400' : 'text-slate-600'}`}>
-            <List className="w-5 h-5" /><span className="text-[8px] sm:text-[9px] font-black uppercase tracking-wider">{t('sprites')}</span>
+            <List className="w-5 h-5" /><span className="text-[8px] sm:text-[9px] font-black uppercase tracking-wider">Sprites</span>
           </button>
           <button onClick={() => { setCurrentView('mastery'); setActiveViewingFriend(null); playBeep(523, 'sine', 0.05); }} className={`flex-1 flex flex-col items-center gap-1 py-1 transition-colors ${currentView === 'mastery' && !activeViewingFriend ? 'text-yellow-400' : 'text-slate-600'}`}>
-            <Crown className="w-5 h-5" /><span className="text-[8px] sm:text-[9px] font-black uppercase tracking-wider">{t('mastery')}</span>
+            <Crown className="w-5 h-5" /><span className="text-[8px] sm:text-[9px] font-black uppercase tracking-wider">Mastery</span>
           </button>
           <button onClick={() => { setCurrentView('comms'); setActiveViewingFriend(null); playBeep(587, 'sine', 0.05); if (hasUnreadReplies) clearUnreadReplies(); }} className={`flex-1 flex flex-col items-center gap-1 py-1 transition-colors relative ${currentView === 'comms' && !activeViewingFriend ? 'text-indigo-400' : 'text-slate-600'}`}>
             <Radio className="w-5 h-5" />
