@@ -1402,6 +1402,13 @@ function MainApp() {
     const isConfirmed = window.confirm("WARNING: This will permanently delete your account, your Spritedex collection, and all saved progress. This action cannot be undone. Are you absolutely sure?");
     if (isConfirmed) {
       try {
+        // Firebase only deletes a login that signed in recently (about 5 minutes). Find that out BEFORE deleting
+        // any data, so a refusal can never leave a login whose profile and pet are already gone.
+        const { authTime } = await auth.currentUser.getIdTokenResult();
+        if (Date.now() - new Date(authTime).getTime() > 4 * 60 * 1000) {
+          alert("For security reasons, you must log out and log back in before deleting your account.");
+          return;
+        }
         try { await deleteDoc(doc(db, "pets", user.uid)); } catch (e) { /* the pet is optional, never block account deletion */ }
         await deleteDoc(doc(db, "users", user.uid));
         await deleteUser(auth.currentUser);
