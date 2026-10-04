@@ -43,6 +43,10 @@ export const PET_CONFIG = {
   },
   warn: { low: 0.25, criticalHealth: 50, lastChanceMs: 12 * HOUR },
   projectionMs: 14 * DAY,
+  // The longest a pet can honestly survive with nobody caring for it is about 73.4 hours. A pet with
+  // no care for this long counts as dead. Keep in step with MAX_GAP_MS in functions/petBadge.js and
+  // the 76 hours in firestore.rules.
+  maxGapMs: 76 * HOUR,
 };
 
 const SIM_STEP = 2 * MINUTE;
@@ -383,7 +387,8 @@ export function planAction(pet, action, nowMs, options = {}) {
     }
     case 'sleep': {
       if (fraction(state.energyEmptyAt, cfg.full.energy) > cfg.sleep.tiredBelow) return fail('Not tired yet.', 'Not tired');
-      state.sleepingSince = now;
+      // Stamped by the server like every other care time, so a sleep cannot be back-dated.
+      state.sleepingSince = SERVER;
       break;
     }
     case 'wake':

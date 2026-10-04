@@ -2,6 +2,7 @@ const functions = require("firebase-functions/v1");
 const admin = require("firebase-admin");
 const { GoogleGenAI } = require("@google/genai");
 const https = require('https');
+const petBadge = require("./petBadge");
 
 admin.initializeApp();
 const db = admin.firestore();
@@ -463,4 +464,14 @@ exports.sendReplyNotification = functions.firestore
         }
 
         return null;
+    });
+
+// --- 8. SPRITE PET "LONGEST LIFE" BADGE ---
+// Keeps the public petBadges/{uid} record (sprite, age, best life) in step with the private pets/{uid}.
+// Retries on failure. The badge logic ignores events it has already applied, so a retry is safe.
+exports.syncPetBadge = functions.runWith({ failurePolicy: true })
+    .firestore.document("pets/{uid}")
+    .onWrite((change, context) => {
+        const eventMs = Date.parse(context.timestamp);
+        return petBadge.syncPetBadge(db, context.params.uid, change, Number.isFinite(eventMs) ? eventMs : Date.now());
     });

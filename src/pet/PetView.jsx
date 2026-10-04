@@ -638,7 +638,13 @@ export default function PetView({ uid, spritesDatabase, collection, playBeep, on
       await task();
     } catch (e) {
       console.error('Sprite pet save failed', e);
-      setNotice({ kind: 'error', text: `Could not save that (${e?.code || 'error'}). Check your connection and try again.` });
+      const refused = e?.code === 'permission-denied';
+      setNotice({
+        kind: 'error',
+        text: refused
+          ? "The server didn't accept that. Check your phone's date and time, then try again."
+          : `Could not save that (${e?.code || 'error'}). Check your connection and try again.`,
+      });
     } finally {
       setBusy(false);
     }

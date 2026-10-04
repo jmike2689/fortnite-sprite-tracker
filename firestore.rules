@@ -1,0 +1,331 @@
+// Spritedex Firestore rules. This file is a copy to paste into the Firebase console
+// (Firestore Database > Rules > select all > paste > Publish). It is not deployed automatically.
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // 1. Allow logged-in users to read the AI Intel
+    match /system/{document=**} {
+      allow read: if request.auth != null;
+      allow write: if false;
+    }
+
+    // 2. Secure User Profiles & Economy
+    match /users/{userId} {
+      // Read access remains open so the @mention scanner and friend search queries function.
+      allow read: if request.auth != null;
+
+      allow create: if request.auth != null && request.auth.uid == userId;
+
+      allow update: if request.auth != null && (
+        // CASE A: User modifying their own profile
+        (request.auth.uid == userId && (
+          // IDENTITY PROTECTION: Prevent changing spriteId once it is set (Safe Accessor)
+          (!request.resource.data.diff(resource.data).affectedKeys().hasAny(['spriteId']) || resource.data.get('spriteId', null) == null)
+
+          &&
+
+          // TIMESTAMP INTEGRITY: Applies whenever lastRadarSweep is touched, independent of fragments.
+          // Forces real server time AND enforces the 24-hour cooldown.
+          (!request.resource.data.diff(resource.data).affectedKeys().hasAny(['lastRadarSweep']) ||
+           (request.resource.data.lastRadarSweep == request.time &&
+            (resource.data.get('lastRadarSweep', null) == null || request.time >= resource.data.lastRadarSweep + duration.value(24, 'h')))
+          )
+
+          &&
+
+          // ECONOMY FIREWALL:
+          // 1. Fragments stay the same or decrease (spending).
+          // 2. IF fragments increase, it must be <= 600 AND the write must also touch lastRadarSweep (which is validated above).
+          (
+            (request.resource.data.get('fragments', 0) <= resource.data.get('fragments', 0)) ||
+            (
+              request.resource.data.get('fragments', 0) - resource.data.get('fragments', 0) <= 600 &&
+              request.resource.data.diff(resource.data).affectedKeys().hasAny(['lastRadarSweep'])
+            )
+          )
+        )) ||
+
+        // CASE B: Cross-user permitted actions
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['friends']) ||
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['hasUnreadReplies']) ||
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['reputationVouches'])
+      );
+    }
+
+    // 3. Allow friend requests to be sent and received
+    match /friend_requests/{document=**} {
+      allow read, write: if request.auth != null;
+    }
+
+    // 4. Secure the Mail collection (Closed Open Relay)
+    match /mail/{document=**} {
+      allow create: if request.auth != null && request.resource.data.to == 'prosyncts@gmail.com';
+    }
+
+    // 5. Allow logged-in users to read the Live News Feed
+    match /news_feed/{document=**} {
+      allow read: if request.auth != null;
+      allow write: if false;
+    }
+
+    // 6. Secure Comms posts and threaded replies
+    match /comms_posts/{postId} {
+      allow read: if request.auth != null;
+      allow create: if request.auth != null && request.resource.data.authorId == request.auth.uid;
+
+      allow update: if request.auth != null && (
+        request.auth.uid == resource.data.authorId
+        || request.resource.data.diff(resource.data).affectedKeys().hasAny(['likes', 'reports', 'replyCount'])
+      );
+
+      allow delete: if request.auth != null && (
+        request.auth.uid == resource.data.authorId ||
+        request.auth.uid == 'G7MQ2w1jijYhXEqXk6DiwMAo2AB3'
+      );
+
+      match /replies/{replyId} {
+        allow read: if request.auth != null;
+        allow create: if request.auth != null && request.resource.data.authorId == request.auth.uid;
+
+        allow delete: if request.auth != null && (
+          request.auth.uid == resource.data.authorId ||
+          request.auth.uid == 'G7MQ2w1jijYhXEqXk6DiwMAo2AB3'
+        );
+      }
+    }
+
+    // 7. Sprite Pets (private). Only the owner can read or write the pet, so its vitals stay private.
+    //    What other players see (sprite, age, best life) lives in petBadges, block 8.
+    //
+    //    The rules below keep a pet honest: it is born at the server's time, every care action is stamped
+    //    with the server's time, nothing can be refilled faster than the game allows, cooldowns are
+    //    enforced, and a pet nobody cared for in 76 hours is dead and can never be revived.
+    match /pets/{petId} {
+
+      function isOwner() {
+        return request.auth != null && request.auth.uid == petId;
+      }
+
+      // Your own account, for the Preview tools (Skip ahead) only.
+      function isPetAdmin() {
+        return request.auth != null && request.auth.uid == 'G7MQ2w1jijYhXEqXk6DiwMAo2AB3';
+      }
+
+      // A pet that has just been adopted: full health, needs no fuller than "full", born right now.
+      function isNewPet() {
+        let n = request.resource.data;
+        return n.ownerId == petId
+          && n.keys().hasOnly(['ownerId', 'spriteId', 'variant', 'bornAt', 'health', 'healthAt',
+               'hungerEmptyAt', 'happinessEmptyAt', 'cleanlinessEmptyAt', 'energyEmptyAt',
+               'sleepingSince', 'sickSince', 'sickImmuneUntil', 'lastFedAt', 'lastPlayedAt',
+               'lastBathedAt', 'lastMedicineAt', 'endedAt', 'endReason', 'history'])
+          && n.spriteId is string
+          && n.variant is string
+          && n.bornAt == request.time
+          && n.healthAt == request.time
+          && n.health == 100
+          && n.get('endedAt', null) == null
+          && n.get('endReason', null) == null
+          && n.get('sleepingSince', null) == null
+          && n.get('sickSince', null) == null
+          && n.get('lastFedAt', null) == null
+          && n.get('lastPlayedAt', null) == null
+          && n.get('lastBathedAt', null) == null
+          && n.get('lastMedicineAt', null) == null
+          && n.hungerEmptyAt <= request.time + duration.value(730, 'm')
+          && n.happinessEmptyAt <= request.time + duration.value(970, 'm')
+          && n.cleanlinessEmptyAt <= request.time + duration.value(1450, 'm')
+          && n.energyEmptyAt <= request.time + duration.value(1210, 'm')
+          && n.sickImmuneUntil <= request.time + duration.value(1450, 'm')
+          && n.history is list;
+      }
+
+      // Left alone, or stamped with this very write's time. Care stamps (lastFedAt...) can only ever be
+      // set to "now", so a cooldown can't be dodged by back-dating.
+      function stampOk(field) {
+        let n = request.resource.data;
+        return n.get(field, null) == resource.data.get(field, null)
+          || n.get(field, null) == request.time;
+      }
+
+      // Never used, or last used at least `minutes` ago.
+      function cooledDown(field, minutes) {
+        return resource.data.get(field, null) == null
+          || request.time >= resource.data.get(field, null) + duration.value(minutes, 'm');
+      }
+
+      // Health only grows as fast as the game heals (2.8 an hour) and stays between 0 and 100.
+      function healthOk() {
+        let n = request.resource.data;
+        let r = resource.data;
+        return n.health is number
+          && n.health >= 0
+          && n.health <= 100
+          && n.health <= r.get('health', 100) + (request.time.toMillis() - r.healthAt.toMillis()) * 2.8 / 3600000 + 1;
+      }
+
+      // Medicine is stamped with this write's time, and can't be repeated within 11 hours
+      // (after a cure the pet is immune for 12, so an honest second dose is never sooner).
+      function gotMedicine() {
+        return request.resource.data.get('lastMedicineAt', null) == request.time
+          && cooledDown('lastMedicineAt', 660);
+      }
+
+      function sicknessOk() {
+        let n = request.resource.data;
+        let r = resource.data;
+        // An illness start can be saved once (never in the future) and stays put until medicine cures it.
+        return (n.get('sickSince', null) == r.get('sickSince', null)
+            || (r.get('sickSince', null) == null && n.sickSince is timestamp && n.sickSince <= request.time + duration.value(5, 'm'))
+            || (n.get('sickSince', null) == null && gotMedicine()))
+          // Immunity after a cure only comes from medicine, and lasts at most 12 hours.
+          && (n.sickImmuneUntil <= r.sickImmuneUntil
+            || (gotMedicine() && n.sickImmuneUntil <= request.time + duration.value(730, 'm')));
+      }
+
+      // While asleep, energy comes back at 3x real time (the sleep itself plus the energy it adds), for at
+      // most 8 hours. A phone clock that is a little off is multiplied by 3, hence 40 minutes of slack.
+      function energyBounded(s) {
+        let e0 = resource.data.energyEmptyAt.toMillis();
+        let e1 = request.resource.data.energyEmptyAt.toMillis();
+        let asleep = request.time.toMillis() - s;
+        return (e1 <= e0 + 3 * asleep + 2400000 || e1 <= s + 3 * asleep + 2400000)
+          && (e1 <= e0 + 86400000 + 2400000 || e1 <= s + 86400000 + 2400000);
+      }
+
+      function wokeRested() {
+        return resource.data.get('sleepingSince', null) != null
+          && energyBounded(resource.data.sleepingSince.toMillis());
+      }
+
+      // Falling asleep is stamped with this write's time. Energy only comes back by sleeping.
+      function sleepOk() {
+        let n = request.resource.data;
+        let r = resource.data;
+        return (n.get('sleepingSince', null) == r.get('sleepingSince', null)
+            || n.get('sleepingSince', null) == null
+            || n.get('sleepingSince', null) == request.time)
+          && (n.energyEmptyAt <= r.energyEmptyAt || wokeRested());
+      }
+
+      // Needs can never be filled past "full" (12h, 16h, 24h, 20h) with 10 minutes of slack for the phone's
+      // clock. Feeding and playing add at most 8 hours, bathing restores to clean. Each one must be stamped
+      // and respect its cooldown (2h, 1h, 6h, each less 10 minutes of slack).
+      function needsOk() {
+        let n = request.resource.data;
+        let r = resource.data;
+        return n.hungerEmptyAt <= request.time + duration.value(730, 'm')
+          && n.happinessEmptyAt <= request.time + duration.value(970, 'm')
+          && n.cleanlinessEmptyAt <= request.time + duration.value(1450, 'm')
+          && n.energyEmptyAt <= request.time + duration.value(1210, 'm')
+          && (n.hungerEmptyAt <= r.hungerEmptyAt
+            || (n.get('lastFedAt', null) == request.time
+              && (n.hungerEmptyAt <= r.hungerEmptyAt + duration.value(490, 'm')
+                || n.hungerEmptyAt <= request.time + duration.value(490, 'm'))
+              && cooledDown('lastFedAt', 110)))
+          && (n.happinessEmptyAt <= r.happinessEmptyAt
+            || (n.get('lastPlayedAt', null) == request.time
+              && (n.happinessEmptyAt <= r.happinessEmptyAt + duration.value(490, 'm')
+                || n.happinessEmptyAt <= request.time + duration.value(490, 'm'))
+              && cooledDown('lastPlayedAt', 50)))
+          && (n.cleanlinessEmptyAt <= r.cleanlinessEmptyAt
+            || (n.get('lastBathedAt', null) == request.time
+              && cooledDown('lastBathedAt', 350)))
+          && stampOk('lastFedAt')
+          && stampOk('lastPlayedAt')
+          && stampOk('lastBathedAt')
+          && stampOk('lastMedicineAt');
+      }
+
+      // An ordinary care action (feed, play, bathe, sleep, wake, medicine) on a living pet.
+      function careWrite() {
+        let n = request.resource.data;
+        let r = resource.data;
+        return n.diff(r).affectedKeys().hasOnly(['hungerEmptyAt', 'happinessEmptyAt', 'cleanlinessEmptyAt',
+               'energyEmptyAt', 'sleepingSince', 'sickSince', 'sickImmuneUntil', 'lastFedAt', 'lastPlayedAt',
+               'lastBathedAt', 'lastMedicineAt', 'health', 'healthAt'])
+          // The heartbeat is always the server's clock.
+          && n.healthAt == request.time
+          // A pet nobody cared for in 76 hours has died, whatever the app says. It can't be fed back to life.
+          && request.time <= r.healthAt + duration.value(76, 'h')
+          && healthOk()
+          && needsOk()
+          && sicknessOk()
+          && sleepOk();
+      }
+
+      // Recording a death or a release.
+      function endWrite() {
+        let n = request.resource.data;
+        let r = resource.data;
+        return n.diff(r).affectedKeys().hasOnly(['endedAt', 'endReason', 'health', 'healthAt', 'sleepingSince'])
+          && n.endedAt is timestamp
+          && n.endReason in ['starvation', 'illness', 'neglect', 'released']
+          && n.healthAt == request.time
+          && n.get('sleepingSince', null) == null
+          // Not dated in the future (a wrong phone clock), and not before the last time it was cared for...
+          && n.endedAt <= request.time + duration.value(2, 'm')
+          && n.endedAt >= r.healthAt - duration.value(1, 's')
+          // ...nor later than the longest a pet can survive on its own.
+          && n.endedAt <= r.healthAt + duration.value(76, 'h')
+          && healthOk();
+      }
+
+      // Unset, or no later than it was.
+      function notLater(field) {
+        let n = request.resource.data;
+        return n.get(field, null) == null
+          || (resource.data.get(field, null) != null && n[field] <= resource.data[field]);
+      }
+
+      // The Preview tools' "Skip ahead": the admin account can only move times earlier, nothing else.
+      function timeTravel() {
+        let n = request.resource.data;
+        let r = resource.data;
+        return isPetAdmin()
+          && n.diff(r).affectedKeys().hasOnly(['bornAt', 'healthAt', 'hungerEmptyAt', 'happinessEmptyAt',
+               'cleanlinessEmptyAt', 'energyEmptyAt', 'sleepingSince', 'sickSince', 'sickImmuneUntil',
+               'lastFedAt', 'lastPlayedAt', 'lastBathedAt', 'lastMedicineAt'])
+          && n.bornAt <= r.bornAt
+          && n.healthAt <= r.healthAt
+          && n.hungerEmptyAt <= r.hungerEmptyAt
+          && n.happinessEmptyAt <= r.happinessEmptyAt
+          && n.cleanlinessEmptyAt <= r.cleanlinessEmptyAt
+          && n.energyEmptyAt <= r.energyEmptyAt
+          && n.sickImmuneUntil <= r.sickImmuneUntil
+          && notLater('sleepingSince')
+          && notLater('sickSince')
+          && notLater('lastFedAt')
+          && notLater('lastPlayedAt')
+          && notLater('lastBathedAt')
+          && notLater('lastMedicineAt');
+      }
+
+      allow read: if isOwner();
+
+      // First adoption.
+      allow create: if isOwner() && isNewPet();
+
+      allow update: if isOwner()
+        && request.resource.data.ownerId == petId
+        && (
+          // Adopting again, once the previous Sprite's end has been recorded.
+          (resource.data.get('endedAt', null) != null && isNewPet())
+          // Everything else is about a living Sprite.
+          || (resource.data.get('endedAt', null) == null && (careWrite() || endWrite() || timeTravel()))
+        );
+
+      // Lets "Delete Account" remove the pet too.
+      allow delete: if isOwner();
+    }
+
+    // 8. Sprite Pet badges: sprite, age and best life. Any signed-in player can read them. Only the
+    //    syncPetBadge Cloud Function writes them (it bypasses these rules), so nobody can edit their own
+    //    best life.
+    match /petBadges/{uid} {
+      allow read: if request.auth != null;
+      allow write: if false;
+    }
+  }
+}

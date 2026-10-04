@@ -21,6 +21,7 @@ import { auth, db } from './firebase';
 import { translations } from './locales';
 import PetView, { PetAttentionDot, PetReminderSync } from './pet/PetView';
 import { isPetEnabledFor } from './pet/petLogic';
+import PetBadgeCard from './pet/PetBadgeCard';
 
 // --- CHAPTER 7 SEASON 4 IMPORTS ---
 import jackrabbitBase from './assets/Jackrabbit Base.webp';
@@ -2046,6 +2047,8 @@ function MainApp() {
                     </div>
                   </div>
                 </div>
+
+                <PetBadgeCard viewerUid={user?.uid} ownerUid={uid} spritesDatabase={SPRITES_DATABASE} />
               </>
             )}
 

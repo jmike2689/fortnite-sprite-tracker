@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { doc, onSnapshot, setDoc, updateDoc, serverTimestamp, Timestamp } from 'firebase/firestore';
 import { db } from '../firebase';
 import { SERVER, NEEDS, newPetFields } from './petLogic';
+import { normalizeBadge } from './petBadge';
 
 // Stored as Firestore Timestamps so security rules can compare them to request.time.
 const TIME_FIELDS = [
@@ -65,6 +66,26 @@ export function usePet(uid) {
   if (!uid) return NO_USER;
   if (state.uid !== uid) return LOADING;
   return { pet: state.pet, loading: false, error: state.error };
+}
+
+const NO_BADGE = { badge: null };
+
+// The public side of someone's pet (sprite, age, best life). Readable for any signed-in player.
+// If it cannot be read (rules not published yet, offline), it simply shows nothing.
+export function usePetBadge(uid) {
+  const [state, setState] = useState({ uid: null, badge: null });
+
+  useEffect(() => {
+    if (!uid) return undefined;
+    return onSnapshot(
+      doc(db, 'petBadges', uid),
+      (snap) => setState({ uid, badge: snap.exists() ? normalizeBadge(snap.data()) : null }),
+      () => setState({ uid, badge: null }),
+    );
+  }, [uid]);
+
+  if (!uid || state.uid !== uid) return NO_BADGE;
+  return { badge: state.badge };
 }
 
 export function adoptPet(uid, spriteId, variant, history = []) {
