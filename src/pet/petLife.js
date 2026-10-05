@@ -38,46 +38,13 @@ export function careHint({ sleeping, wakesIn, sick, allEmpty, urgent, critical, 
   return 'Everything is looking good.';
 }
 
-// ---------------- what the Sprite says ----------------
-// "idle" lines come every so often on their own. "tap" lines come when you tap it. No lines for a Sprite that has passed away.
-export const SPEECH = {
-  idle: {
-    happy: ['Best day ever!', 'I love it here!', "You're the best!", 'Feeling awesome!', 'Wanna play later?'],
-    ok: ['Just hanging out.', "What's up?", 'Nice and cozy.', 'Hi there!', 'La la la...'],
-    hungry: ['My tummy is rumbling.', 'Snack time?', 'Is it dinner yet?', 'I could eat a whole pizza.'],
-    dirty: ['I feel a bit icky.', 'Bath time?', 'I smell like a llama.', 'Splish splash?'],
-    bored: ['Play with me?', "I'm so bored...", "Let's do something!", 'Psst... game time?'],
-    tired: ['So sleepy...', '*yawn*', 'Is it nap time?', 'My eyes feel heavy.'],
-    sick: ["I don't feel good...", 'Ugh... medicine?', 'I feel funny...'],
-    sleeping: ['Zzz...', 'Zzz... five more minutes...'],
-  },
-  tap: {
-    happy: ['Hehe!', 'That tickles!', 'Yay!', 'Do it again!'],
-    ok: ['Hi!', 'Boop!', 'Hehe, hi!', 'You called?'],
-    hungry: ['Got any snacks?', 'Feed me first!', 'My tummy says hi...'],
-    dirty: ["Eww, I'm all icky...", 'Bath first, hugs later!'],
-    bored: ['Play with me!', 'Finally, attention!', "Let's play!"],
-    tired: ['Five more minutes...', 'Hmm? So sleepy...', '*yawn*'],
-    sick: ['I feel awful...', 'Careful... ugh.', 'Medicine please...'],
-    sleeping: ['Zzz...', 'Mmm... zzz...', 'Shh, sleeping!'],
-  },
-};
-
+// The Sprite shows how it feels with movement, hearts, a mood icon and Zzz. It never says anything in words.
 const pick = (list, rng) => list[Math.min(list.length - 1, Math.floor(rng() * list.length))];
-
-// A random line for this mood that is not the one just said (when there is a choice). null when it has nothing to say.
-export function pickSpeech(kind, mood, rng = Math.random, last = null) {
-  const lines = SPEECH[kind]?.[mood];
-  if (!lines || lines.length === 0) return null;
-  return pick(lines.length > 1 ? lines.filter((line) => line !== last) : lines, rng);
-}
 
 // ---------------- when things happen, in milliseconds ----------------
 export const TIMING = {
   wanderFirst: [2500, 5000], wander: [5500, 10500],
   moveFirst: [3500, 7000], move: [9000, 16000],
-  chatterFirst: [6000, 12000], chatter: [22000, 40000],
-  chatterShows: 3600,
   tapGap: 350,
   wanderGlide: 1600,
 };

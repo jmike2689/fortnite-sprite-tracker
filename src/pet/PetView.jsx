@@ -86,7 +86,8 @@ function NeedBar({ need, info }) {
   );
 }
 
-function ActionButton({ action, plan, busy, onClick }) {
+// `compact` is the small version used four across, right under the Sprite.
+function ActionButton({ action, plan, busy, onClick, compact = false }) {
   const style = ACTION_STYLE[action];
   const enabled = plan.ok && !busy;
   const hint = plan.ok ? 'Ready' : plan.retryInMs > 0 ? `in ${formatDuration(plan.retryInMs)}` : plan.short;
@@ -95,10 +96,10 @@ function ActionButton({ action, plan, busy, onClick }) {
       type="button"
       onClick={onClick}
       disabled={!enabled}
-      className={`w-full flex flex-col items-center justify-center gap-1 rounded-2xl border-2 py-3 px-2 transition-all active:scale-95 ${enabled ? style.on : ACTION_OFF}`}
+      className={`w-full flex flex-col items-center justify-center rounded-2xl border-2 transition-all active:scale-95 ${compact ? 'gap-0.5 px-1 py-2' : 'gap-1 px-2 py-3'} ${enabled ? style.on : ACTION_OFF}`}
     >
-      <style.Icon className="w-6 h-6" />
-      <span className="text-[10px] font-black uppercase tracking-wider">{style.label}</span>
+      <style.Icon className={compact ? 'w-5 h-5' : 'w-6 h-6'} />
+      <span className={`text-center font-black uppercase leading-tight ${compact ? 'text-[9px] tracking-wide' : 'text-[10px] tracking-wider'}`}>{style.label}</span>
       <span className="text-[9px] font-mono leading-tight min-h-[12px]">{hint}</span>
     </button>
   );
@@ -109,7 +110,7 @@ function CareGuide() {
   const lines = [
     'Hunger, Happiness, Energy and Cleanliness slowly run down. Each shows five pips, and a need turns red when it is running low.',
     'Feed, Play, Bathe and Lights Out refill a need, never past full.',
-    'Tap your Sprite to say hi. It might have something to say.',
+    'Tap your Sprite to say hi. It shows how it feels with hearts, a little icon and some bouncing.',
     'You can name a Sprite once, when you adopt it. A name is permanent, and only you can see it.',
     'An empty need drains health, and health refills slowly once everything is looked after.',
     'A Sprite you ignore completely lasts about 3 days.',
@@ -492,14 +493,27 @@ export function PetScreen({ pet, now, spritesDatabase, collection, busy, notice,
       </div>
 
       {showGuide && <CareGuide />}
-      {noticeBanner}
 
-      <PetStage sprite={sprite} image={image} moodKey={ev.mood} reaction={reaction} nickname={pet.nickname} phase={phase} interactive onTap={(moodKey) => beep(TAP_BEEP[moodKey])} />
+      {/* The Sprite and what you can do for it stay together, so a care action can be watched as it happens. */}
+      <div className="flex flex-col gap-2.5">
+        <PetStage sprite={sprite} image={image} moodKey={ev.mood} reaction={reaction} nickname={pet.nickname} phase={phase} interactive onTap={(moodKey) => beep(TAP_BEEP[moodKey])} />
 
-      <div className="text-center -mt-1">
-        <p className={`text-sm font-black uppercase tracking-widest ${mood.text}`}>{mood.label}</p>
-        <p className="text-[11px] text-slate-500 mt-0.5">{hint}</p>
+        <div className="text-center -mt-1">
+          <p className={`text-sm font-black uppercase tracking-widest ${mood.text}`}>{mood.label}</p>
+          <p className="text-[11px] text-slate-500 mt-0.5">{hint}</p>
+        </div>
+
+        <section aria-label="Care" className="flex flex-col gap-2">
+          <div className="grid grid-cols-4 gap-1.5">
+            {actionKeys.map((key) => (
+              <ActionButton key={key} compact action={key} plan={plans[key]} busy={busy} onClick={() => (key === 'play' ? setPlayOpen(true) : onAction(key))} />
+            ))}
+          </div>
+          {ev.sick && <ActionButton action="medicine" plan={plans.medicine} busy={busy} onClick={() => onAction('medicine')} />}
+        </section>
       </div>
+
+      {noticeBanner}
 
       {ev.lastChance ? (
         <div className="flex items-start gap-2 rounded-xl border border-red-500/60 bg-red-950/50 px-3 py-2.5 text-xs font-bold text-red-300">
@@ -538,17 +552,6 @@ export function PetScreen({ pet, now, spritesDatabase, collection, busy, notice,
           </div>
         </div>
         {NEEDS.map((need) => <NeedBar key={need} need={need} info={ev.needs[need]} />)}
-      </section>
-
-      <section className="grid grid-cols-2 gap-2.5">
-        {actionKeys.map((key) => (
-          <ActionButton key={key} action={key} plan={plans[key]} busy={busy} onClick={() => (key === 'play' ? setPlayOpen(true) : onAction(key))} />
-        ))}
-        {ev.sick && (
-          <div className="col-span-2">
-            <ActionButton action="medicine" plan={plans.medicine} busy={busy} onClick={() => onAction('medicine')} />
-          </div>
-        )}
       </section>
 
       {reminders && <RemindersCard reminders={reminders} onToggle={onToggleReminders} />}

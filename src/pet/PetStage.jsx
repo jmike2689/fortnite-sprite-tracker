@@ -5,8 +5,8 @@ import { RARITY_EDGE, FALLBACK_EDGE } from './roomLogic';
 import { MOOD_META, REACTION_ICON, REACTION_COLOR } from './petMoods';
 import { cleanNickname } from './petName';
 import {
-  MOVES, ACTION_MOVE, TAP_MOVE, TAP_HEARTS, TIMING, SPEECH, between,
-  canWander, canIdle, nextWander, nextIdleMove, pickSpeech,
+  MOVES, ACTION_MOVE, TAP_MOVE, TAP_HEARTS, TIMING, between,
+  canWander, canIdle, nextWander, nextIdleMove,
 } from './petLife';
 
 const REDUCED_MOTION = '(prefers-reduced-motion: reduce)';
@@ -22,8 +22,9 @@ function useReducedMotion() {
   return reduce;
 }
 
-// The Sprite on its little stage. When `interactive` it wanders, does small idle moves, chats now and then,
-// reacts to care actions and can be tapped. All of that is for show: nothing here changes a stat.
+// The Sprite on its little stage. When `interactive` it wanders, does small idle moves, reacts to care actions and
+// can be tapped. It shows feelings with movement, hearts and little icons, never with words. All of that is for show:
+// nothing here changes a stat.
 // `nickname` (the owner's private name for it, if it was adopted with one) shows on a little nameplate.
 // `phase` is the time of day outside (morning, day, evening or night) and decides how the room looks. When the
 // Sprite is asleep the lights go out, and a Sprite that has passed away has a quiet dark room.
@@ -38,13 +39,10 @@ export default function PetStage({ sprite, image, moodKey, reaction, nickname, p
 
   const moverRef = useRef(null);
   const xRef = useRef(0);
-  const lastSpeech = useRef(null);
   const lastMove = useRef(null);
   const lastTap = useRef(-Infinity);
-  const speechTimer = useRef(null);
   const counter = useRef(0);
   const [stance, setStance] = useState({ x: 0, left: false, mood: null });
-  const [speech, setSpeech] = useState(null);
   const [burst, setBurst] = useState(null);
 
   const playMove = useCallback((name) => {
@@ -53,14 +51,6 @@ export default function PetStage({ sprite, image, moodKey, reaction, nickname, p
     if (reduceMotion || !el || !move || typeof el.animate !== 'function') return;
     el.animate(move.frames, { duration: move.duration, easing: move.easing });
   }, [reduceMotion]);
-
-  const say = useCallback((text, forMood) => {
-    clearTimeout(speechTimer.current);
-    counter.current += 1;
-    setSpeech({ id: counter.current, text, mood: forMood });
-    speechTimer.current = setTimeout(() => setSpeech(null), TIMING.chatterShows);
-  }, []);
-  useEffect(() => () => clearTimeout(speechTimer.current), []);
 
   // Strolls left and right while it is feeling well enough to.
   const wanders = interactive && !reduceMotion && canWander(moodKey);
@@ -100,22 +90,6 @@ export default function PetStage({ sprite, image, moodKey, reaction, nickname, p
     return () => clearTimeout(timer);
   }, [moves, moodKey, playMove]);
 
-  // Says something now and then.
-  const chats = interactive && Boolean(SPEECH.idle[moodKey]);
-  useEffect(() => {
-    if (!chats) return undefined;
-    let timer;
-    const talk = () => {
-      if (!document.hidden) {
-        const line = pickSpeech('idle', moodKey, Math.random, lastSpeech.current);
-        if (line) { lastSpeech.current = line; say(line, moodKey); }
-      }
-      timer = setTimeout(talk, between(TIMING.chatter));
-    };
-    timer = setTimeout(talk, between(TIMING.chatterFirst));
-    return () => clearTimeout(timer);
-  }, [chats, moodKey, say]);
-
   // Each care action gets its own bit of body language.
   const reactionId = reaction?.id;
   const reactionType = reaction?.type;
@@ -129,8 +103,6 @@ export default function PetStage({ sprite, image, moodKey, reaction, nickname, p
     if (now - lastTap.current < TIMING.tapGap) return;
     lastTap.current = now;
     playMove(TAP_MOVE[moodKey] ?? 'hop');
-    const line = pickSpeech('tap', moodKey, Math.random, lastSpeech.current);
-    if (line) { lastSpeech.current = line; say(line, moodKey); }
     const hearts = TAP_HEARTS[moodKey] ?? 0;
     counter.current += 1;
     setBurst(hearts > 0 ? { id: counter.current, count: hearts } : null);
@@ -140,7 +112,6 @@ export default function PetStage({ sprite, image, moodKey, reaction, nickname, p
   const here = wanders && stance.mood === moodKey;
   const x = here ? stance.x : 0;
   const facingLeft = here && stance.left;
-  const visibleSpeech = speech && speech.mood === moodKey ? speech : null;
   const glide = reduceMotion ? 'none' : `transform ${TIMING.wanderGlide}ms ease-in-out`;
 
   const figure = image ? (
@@ -189,16 +160,6 @@ export default function PetStage({ sprite, image, moodKey, reaction, nickname, p
           <div key={moodKey} className="absolute top-5 right-[22%] z-20 flex items-center justify-center w-10 h-10 rounded-2xl bg-white text-slate-900 shadow-lg animate-[petpop_0.3s_ease-out]">
             <Bubble className="w-5 h-5" />
             <span className="absolute -bottom-1 left-2 w-3 h-3 bg-white rotate-45" />
-          </div>
-        )}
-        {visibleSpeech && (
-          <div
-            key={visibleSpeech.id}
-            aria-hidden="true"
-            className="absolute top-3 left-3 z-30 max-w-[58%] origin-bottom-right rounded-2xl bg-white px-3 py-2 text-[11px] font-bold leading-snug text-slate-900 shadow-lg animate-[petpop_0.25s_ease-out] motion-reduce:animate-none"
-          >
-            {visibleSpeech.text}
-            <span className="absolute -bottom-1 right-6 w-3 h-3 bg-white rotate-45" />
           </div>
         )}
         {moodKey === 'sleeping' && (
