@@ -469,6 +469,18 @@ const SPRITES_DATABASE = [
 
 const PATCH_NOTES = [
   {
+    version: "v2.8.0",
+    date: "10/05/2026",
+    title: "Meet the Sprite Pet & More!",
+    changes: [
+      "🐾 NEW: SPRITE PET! Adopt any Sprite you've collected, then feed it, play with it, bathe it and tuck it in. Neglect it and it won't make it! Your longest-lived Sprite shows on your profile card.",
+      "Make It Yours: Name your pet when you adopt it (permanent, and only you can see it). It reacts when you tap it, and its room follows your phone's clock.",
+      "Mini-Games & Reminders: Play Which Chest?, Left or Right and Memory Match, and turn on optional reminders in the iOS and Android apps.",
+      "Filter Fixes: Mastered and Unmastered chips now show only the matching dots, a status picked on one tab no longer lingers on the other, and empty lists explain why.",
+      "More Fixes: Overshield is now Epic and blocking a player hides their Comms posts right away."
+    ]
+  },
+  {
     version: "v2.7.0",
     date: "10/02/2026",
     title: "Halloween Event, Profile Overhaul & Wave 3 Sprites!",
@@ -2749,20 +2761,22 @@ function MainApp() {
 
       {/* --- TRANSMISSION SPLASH SCREEN --- */}
       {showTransmission && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/90 backdrop-blur-md animate-in fade-in duration-300">
-          <div className="bg-[#12141f] border-2 border-cyan-500 shadow-[0_0_40px_rgba(34,211,238,0.2)] rounded-2xl max-w-sm w-full relative overflow-hidden flex flex-col">
+        <div className={`fixed inset-0 z-[60] flex items-center justify-center ${isIOS ? 'px-4 pb-4 pt-14' : 'p-4'} bg-black/90 backdrop-blur-md animate-in fade-in duration-300`}>
+          <div className="bg-[#12141f] border-2 border-cyan-500 shadow-[0_0_40px_rgba(34,211,238,0.2)] rounded-2xl max-w-sm w-full max-h-full relative overflow-hidden flex flex-col">
             <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-cyan-400 to-transparent animate-pulse"></div>
-            <header className="p-5 border-b border-cyan-900/50 flex flex-col items-center text-center">
+            <header className="p-5 border-b border-cyan-900/50 flex flex-col items-center text-center shrink-0">
               <div className="w-12 h-12 bg-cyan-950/50 rounded-full border border-cyan-500/40 flex items-center justify-center mb-3"><Radar className="w-6 h-6 text-cyan-400 animate-pulse" /></div>
               <h2 className="text-xl sm:text-2xl font-black text-cyan-400 uppercase italic tracking-wider">Incoming Transmission</h2>
               <span className="text-[10px] sm:text-xs font-mono text-cyan-600 uppercase tracking-widest mt-1">Update {PATCH_NOTES[0].version} Deployed</span>
             </header>
-            <div className="p-5 flex flex-col gap-4">
+            <div className="p-5 flex flex-col gap-4 overflow-y-auto overscroll-contain">
               <h3 className="text-md sm:text-lg font-bold text-white text-center">{PATCH_NOTES[0].title}</h3>
               <ul className="space-y-3">
                 {PATCH_NOTES[0].changes.map((change, idx) => (<li key={idx} className="flex items-start gap-2 text-sm text-slate-300 leading-relaxed"><CheckCircle className="w-4 h-4 text-cyan-500 shrink-0 mt-0.5" />{change}</li>))}
               </ul>
-              <button onClick={handleAcknowledgeTransmission} className="w-full mt-4 bg-cyan-600 hover:bg-cyan-500 text-white font-black uppercase tracking-wider py-3 rounded-xl transition-colors">Acknowledge</button>
+            </div>
+            <div className="p-5 pt-4 border-t border-cyan-900/50 shrink-0">
+              <button onClick={handleAcknowledgeTransmission} className="w-full bg-cyan-600 hover:bg-cyan-500 text-white font-black uppercase tracking-wider py-3 rounded-xl transition-colors">Acknowledge</button>
             </div>
           </div>
         </div>
