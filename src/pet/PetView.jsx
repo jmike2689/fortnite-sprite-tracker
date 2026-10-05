@@ -4,10 +4,13 @@ import { App as CapApp } from '@capacitor/app';
 import { Haptics, ImpactStyle } from '@capacitor/haptics';
 import { LocalNotifications } from '@capacitor/local-notifications';
 import {
-  PawPrint, Utensils, Heart, Droplets, Zap, Moon, Sun, Pill, Gamepad2, Bath, Ghost, HeartPulse,
+  PawPrint, Utensils, Heart, Droplets, Zap, Moon, Sun, Pill, Gamepad2, Bath, HeartPulse,
   TriangleAlert, Info, Sparkles, Bell, BellOff,
 } from 'lucide-react';
 import PlayHub from './games/PlayHub';
+import PetStage from './PetStage';
+import { PET_STYLES, MOOD_META } from './petMoods';
+import { PIPS, pipsFilled, needWord, healthTier, HEALTH_WORD, careHint, TAP_BEEP } from './petLife';
 import { usePet, adoptPet, savePetFields } from './petData';
 import { syncPetReminders, getReminderStatus, requestReminderPermission, setRemindersEnabled, scheduleTestReminder } from './petReminders';
 import {
@@ -15,35 +18,11 @@ import {
   formatDuration, describeCause, petToolsEnabledFor,
 } from './petLogic';
 
-const PET_STYLES = `
-@keyframes petfloat { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
-@keyframes petbounce { 0%,100% { transform: translateY(0) scale(1,1); } 35% { transform: translateY(-16px) scale(0.97,1.04); } 70% { transform: translateY(0) scale(1.05,0.95); } }
-@keyframes petsway { 0%,100% { transform: rotate(-3deg); } 50% { transform: rotate(3deg); } }
-@keyframes petshiver { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-2px); } 75% { transform: translateX(2px); } }
-@keyframes petbreathe { 0%,100% { transform: scale(1); } 50% { transform: scale(1.04); } }
-@keyframes petzzz { 0% { opacity: 0; transform: translate(0,0) scale(0.7); } 25% { opacity: 1; } 100% { opacity: 0; transform: translate(16px,-36px) scale(1.2); } }
-@keyframes petheart { 0% { opacity: 0; transform: translateY(0) scale(0.6); } 25% { opacity: 1; } 100% { opacity: 0; transform: translateY(-48px) scale(1.1); } }
-@keyframes petpop { 0% { opacity: 0; transform: scale(0.6); } 100% { opacity: 1; transform: scale(1); } }
-@keyframes petghost { 0%,100% { transform: translateY(0); opacity: 0.7; } 50% { transform: translateY(-10px); opacity: 1; } }
-`;
-
 const NEED_META = {
   hunger: { label: 'Hunger', Icon: Utensils, bar: 'bg-orange-400', text: 'text-orange-300' },
   happiness: { label: 'Happiness', Icon: Heart, bar: 'bg-pink-400', text: 'text-pink-300' },
   cleanliness: { label: 'Cleanliness', Icon: Droplets, bar: 'bg-cyan-400', text: 'text-cyan-300' },
   energy: { label: 'Energy', Icon: Zap, bar: 'bg-yellow-300', text: 'text-yellow-200' },
-};
-
-const MOOD_META = {
-  happy: { label: 'Feeling great', text: 'text-emerald-300', anim: 'animate-[petbounce_1.8s_ease-in-out_infinite] motion-reduce:animate-none', tone: '', bubble: null },
-  ok: { label: 'Doing fine', text: 'text-slate-300', anim: 'animate-[petfloat_3.4s_ease-in-out_infinite] motion-reduce:animate-none', tone: '', bubble: null },
-  hungry: { label: 'Hungry', text: 'text-orange-300', anim: 'animate-[petsway_2.6s_ease-in-out_infinite] motion-reduce:animate-none', tone: 'saturate-50', bubble: Utensils },
-  dirty: { label: 'Needs a bath', text: 'text-cyan-300', anim: 'animate-[petsway_2.6s_ease-in-out_infinite] motion-reduce:animate-none', tone: 'saturate-50', bubble: Droplets },
-  bored: { label: 'Bored', text: 'text-pink-300', anim: 'animate-[petsway_2.6s_ease-in-out_infinite] motion-reduce:animate-none', tone: 'saturate-50', bubble: Heart },
-  tired: { label: 'Sleepy', text: 'text-yellow-200', anim: 'animate-[petsway_2.6s_ease-in-out_infinite] motion-reduce:animate-none', tone: 'saturate-50', bubble: Moon },
-  sick: { label: 'Sick', text: 'text-lime-300', anim: 'animate-[petshiver_0.5s_ease-in-out_infinite] motion-reduce:animate-none', tone: 'saturate-50 hue-rotate-60', bubble: Pill },
-  sleeping: { label: 'Sleeping', text: 'text-indigo-300', anim: 'animate-[petbreathe_4s_ease-in-out_infinite] motion-reduce:animate-none', tone: 'brightness-75', bubble: null },
-  dead: { label: 'Passed away', text: 'text-slate-400', anim: '', tone: 'grayscale opacity-60', bubble: null },
 };
 
 const ACTION_STYLE = {
@@ -56,16 +35,6 @@ const ACTION_STYLE = {
 };
 const ACTION_OFF = 'bg-slate-900/60 border-slate-800 text-slate-600';
 
-const REACTION_ICON = { feed: Utensils, play: Heart, bathe: Droplets, medicine: Pill, sleep: Moon, wake: Sun };
-const REACTION_COLOR = { feed: 'text-orange-300', play: 'text-pink-300', bathe: 'text-cyan-300', medicine: 'text-lime-300', sleep: 'text-indigo-300', wake: 'text-amber-300' };
-
-const RARITY_SCENE = {
-  Mythic: 'from-yellow-500/40 via-amber-700/30 to-slate-950',
-  Legendary: 'from-orange-500/40 via-orange-800/30 to-slate-950',
-  Epic: 'from-purple-500/40 via-purple-800/30 to-slate-950',
-  Rare: 'from-blue-500/40 via-blue-800/30 to-slate-950',
-};
-const FALLBACK_SCENE = 'from-slate-600/40 via-slate-800/30 to-slate-950';
 const RARITY_WEIGHT = { Mythic: 4, Legendary: 3, Epic: 2, Rare: 1 };
 
 const VARIANT_LABELS = {
@@ -77,11 +46,17 @@ const variantLabel = (v) => VARIANT_LABELS[v] || (v ? v.charAt(0).toUpperCase() 
 const hoursLabel = (ms) => `${Math.round(ms / 3600000)}h`;
 const spriteNameOf = (spritesDatabase, pet) => (pet ? spritesDatabase?.find((s) => s.id === pet.spriteId)?.name || 'Your Sprite' : null);
 const spriteImage = (sprite, variant) => sprite?.images?.[variant] || sprite?.images?.base || null;
-const healthBarClass = (h) => (h >= 60 ? 'bg-emerald-400' : h >= 30 ? 'bg-amber-400' : 'bg-red-500 animate-pulse');
+const HEALTH_BAR = { healthy: 'bg-emerald-400', weak: 'bg-amber-400', critical: 'bg-red-500 animate-pulse motion-reduce:animate-none' };
+const HEALTH_TEXT = { healthy: 'text-emerald-300', weak: 'text-amber-300', critical: 'text-red-400' };
 
+// The app's playBeep takes pitch, wave and length as separate arguments. The pet code passes one [pitch, wave, seconds] array.
+const playTone = (playBeep, tone) => { if (playBeep && tone) playBeep(...tone); };
+
+// Needs show as five pips and a word, never as a percentage or a countdown.
 function NeedBar({ need, info }) {
   const meta = NEED_META[need];
-  const pct = Math.round(info.level * 100);
+  const filled = pipsFilled(info.level);
+  const word = needWord(info.level, info.remainingMs, PET_CONFIG.warn.low);
   const low = info.level < PET_CONFIG.warn.low;
   return (
     <div>
@@ -89,74 +64,19 @@ function NeedBar({ need, info }) {
         <span className={`flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest ${meta.text}`}>
           <meta.Icon className="w-3.5 h-3.5" /> {meta.label}
         </span>
-        <span className="text-[10px] font-mono text-slate-400">
-          {info.remainingMs > 0 ? `${pct}% - ${formatDuration(info.remainingMs)}` : 'EMPTY'}
-        </span>
+        <span className={`text-[10px] font-black uppercase tracking-widest ${low ? 'text-red-400' : 'text-slate-400'}`}>{word}</span>
       </div>
-      <div
-        role="progressbar"
-        aria-label={meta.label}
-        aria-valuemin={0}
-        aria-valuemax={100}
-        aria-valuenow={pct}
-        className="h-2 w-full bg-slate-950 rounded-full overflow-hidden border border-slate-800/80"
-      >
-        <div className={`h-full rounded-full transition-all duration-500 ${low ? 'bg-red-500 animate-pulse' : meta.bar}`} style={{ width: `${pct}%` }} />
-      </div>
-    </div>
-  );
-}
-
-function PetStage({ sprite, image, moodKey, reaction }) {
-  const mood = MOOD_META[moodKey] || MOOD_META.ok;
-  const Bubble = mood.bubble;
-  const Reaction = reaction ? REACTION_ICON[reaction.type] : null;
-  const scene = RARITY_SCENE[sprite?.rarity] || FALLBACK_SCENE;
-  return (
-    <div className={`relative rounded-3xl border-2 border-white/10 overflow-hidden bg-gradient-to-b ${scene}`}>
-      <div className="relative flex items-end justify-center h-64 pb-10">
-        <div className="absolute bottom-8 w-40 h-5 rounded-[50%] bg-black/50 blur-md" />
-        {image ? (
-          <img
-            src={image}
-            alt={sprite?.name || 'Sprite'}
-            draggable={false}
-            className={`relative z-10 w-44 h-44 object-contain select-none drop-shadow-[0_10px_18px_rgba(0,0,0,0.55)] ${mood.anim} ${mood.tone}`}
-          />
-        ) : (
-          <PawPrint className="relative z-10 w-24 h-24 text-slate-500 mb-6" />
-        )}
-
-        {Bubble && (
-          <div key={moodKey} className="absolute top-5 right-[22%] z-20 flex items-center justify-center w-10 h-10 rounded-2xl bg-white text-slate-900 shadow-lg animate-[petpop_0.3s_ease-out]">
-            <Bubble className="w-5 h-5" />
-            <span className="absolute -bottom-1 left-2 w-3 h-3 bg-white rotate-45" />
-          </div>
-        )}
-        {moodKey === 'sleeping' && (
-          <div className="absolute top-8 right-[30%] z-20 text-indigo-200 font-black pointer-events-none">
-            {[0, 1, 2].map((i) => (
-              <span key={i} className="absolute text-xl opacity-0 animate-[petzzz_2.4s_ease-in-out_infinite] motion-reduce:animate-none" style={{ animationDelay: `${i * 0.8}s` }}>Z</span>
-            ))}
-          </div>
-        )}
-        {moodKey === 'happy' && [0, 1, 2].map((i) => (
-          <Heart
+      <div aria-hidden="true" className="flex gap-1.5">
+        {Array.from({ length: PIPS }, (_, i) => (
+          <span
             key={i}
-            className="absolute z-20 w-4 h-4 text-pink-400 fill-pink-400 opacity-0 animate-[petheart_2.8s_ease-out_infinite] motion-reduce:animate-none"
-            style={{ left: `${38 + i * 12}%`, bottom: '55%', animationDelay: `${i * 0.9}s` }}
+            className={`h-2.5 flex-1 rounded-full border transition-colors duration-500 ${
+              i < filled
+                ? `border-transparent ${low ? 'bg-red-500 animate-pulse motion-reduce:animate-none' : meta.bar}`
+                : 'bg-slate-950 border-slate-800/80'
+            }`}
           />
         ))}
-        {moodKey === 'dead' && (
-          <Ghost className="absolute top-8 right-[30%] z-20 w-9 h-9 text-slate-300 animate-[petghost_3s_ease-in-out_infinite] motion-reduce:animate-none" />
-        )}
-        {Reaction && (
-          <Reaction
-            key={reaction.id}
-            className={`absolute z-30 w-8 h-8 opacity-0 animate-[petheart_1.1s_ease-out_forwards] ${REACTION_COLOR[reaction.type]}`}
-            style={{ left: '48%', bottom: '58%' }}
-          />
-        )}
       </div>
     </div>
   );
@@ -183,8 +103,9 @@ function ActionButton({ action, plan, busy, onClick }) {
 function CareGuide() {
   const c = PET_CONFIG;
   const lines = [
-    `Hunger lasts ${hoursLabel(c.full.hunger)} when full, Happiness ${hoursLabel(c.full.happiness)}, Energy ${hoursLabel(c.full.energy)} and Cleanliness ${hoursLabel(c.full.cleanliness)}.`,
+    'Hunger, Happiness, Energy and Cleanliness slowly run down. Each shows five pips, and a need turns red when it is running low.',
     'Feed, Play, Bathe and Lights Out refill a need, never past full.',
+    'Tap your Sprite to say hi. It might have something to say.',
     'An empty need drains health, and health refills slowly once everything is looked after.',
     'A Sprite you ignore completely lasts about 3 days.',
     `A sick Sprite needs medicine within ${hoursLabel(c.sickness.deathMs)}, and a dirty one gets sick.`,
@@ -352,7 +273,7 @@ function RemindersCard({ reminders, onToggle }) {
   );
 }
 
-function PreviewToolsCard({ tools }) {
+function PreviewToolsCard({ tools, ev }) {
   const button = 'flex-1 py-2 rounded-xl border border-dashed border-slate-600 bg-black/30 text-[10px] font-black uppercase tracking-wider text-slate-300 hover:bg-slate-800 transition-colors';
   return (
     <div className="rounded-2xl border border-dashed border-slate-700 bg-slate-900/40 p-3.5">
@@ -363,6 +284,17 @@ function PreviewToolsCard({ tools }) {
         <button type="button" className={button} onClick={() => tools.onSkip(6)}>Skip 6h</button>
         <button type="button" className={button} onClick={() => tools.onSkip(24)}>Skip 24h</button>
       </div>
+      {ev && (
+        <dl className="mt-2.5 grid grid-cols-2 gap-x-3 gap-y-1 font-mono text-[10px] text-slate-400">
+          <div className="flex justify-between gap-2"><dt>Health</dt><dd>{Math.round(ev.health)}%</dd></div>
+          {NEEDS.map((need) => (
+            <div key={need} className="flex justify-between gap-2">
+              <dt>{NEED_META[need].label}</dt>
+              <dd>{ev.needs[need].remainingMs > 0 ? `${Math.round(ev.needs[need].level * 100)}% ${formatDuration(ev.needs[need].remainingMs)}` : 'empty'}</dd>
+            </div>
+          ))}
+        </dl>
+      )}
     </div>
   );
 }
@@ -385,6 +317,9 @@ export function PetScreen({ pet, now, spritesDatabase, collection, busy, notice,
     onOverlayChange(playOpen);
     return () => onOverlayChange(false);
   }, [playOpen, onOverlayChange]);
+
+  // The mini-games and Sprite taps hand over a [pitch, wave, seconds] array.
+  const beep = useCallback((tone) => playTone(playBeep, tone), [playBeep]);
 
   const sprite = pet ? spritesDatabase?.find((s) => s.id === pet.spriteId) : null;
   const image = pet ? spriteImage(sprite, pet.variant) : null;
@@ -463,11 +398,18 @@ export function PetScreen({ pet, now, spritesDatabase, collection, busy, notice,
   }
 
   const mood = MOOD_META[ev.mood] || MOOD_META.ok;
-  const hint = ev.sleeping
-    ? `Sleeping. Wakes in ${formatDuration(ev.sleepEndMs - now)}.`
-    : ev.nextEmpty
-      ? `${NEED_META[ev.nextEmpty].label} runs out in ${formatDuration(ev.needs[ev.nextEmpty].remainingMs)}.`
-      : 'Every need is empty. Act now!';
+  // The need with the fewest pips is the one worth a nudge.
+  const lowestNeed = NEEDS.reduce((a, n) => (a === null || ev.needs[n].level < ev.needs[a].level ? n : a), null);
+  const hint = careHint({
+    sleeping: ev.sleeping,
+    wakesIn: ev.sleeping ? formatDuration(ev.sleepEndMs - now) : '',
+    sick: ev.sick,
+    allEmpty: !ev.nextEmpty,
+    urgent: ev.urgent ? { label: NEED_META[ev.urgent].label, empty: ev.needs[ev.urgent].remainingMs <= 0 } : null,
+    critical: ev.critical,
+    lowest: { label: NEED_META[lowestNeed].label, level: ev.needs[lowestNeed].level },
+  });
+  const healthLevel = healthTier(ev.health, PET_CONFIG.warn.criticalHealth);
 
   const actionKeys = ev.sleeping ? ['feed', 'play', 'bathe', 'wake'] : ['feed', 'play', 'bathe', 'sleep'];
   const plans = {};
@@ -498,7 +440,7 @@ export function PetScreen({ pet, now, spritesDatabase, collection, busy, notice,
       {showGuide && <CareGuide />}
       {noticeBanner}
 
-      <PetStage sprite={sprite} image={image} moodKey={ev.mood} reaction={reaction} />
+      <PetStage sprite={sprite} image={image} moodKey={ev.mood} reaction={reaction} interactive onTap={(moodKey) => beep(TAP_BEEP[moodKey])} />
 
       <div className="text-center -mt-1">
         <p className={`text-sm font-black uppercase tracking-widest ${mood.text}`}>{mood.label}</p>
@@ -527,7 +469,7 @@ export function PetScreen({ pet, now, spritesDatabase, collection, busy, notice,
         <div>
           <div className="flex items-center justify-between mb-1">
             <span className="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest text-emerald-300"><HeartPulse className="w-3.5 h-3.5" /> Health</span>
-            <span className="text-[10px] font-mono text-slate-400">{Math.round(ev.health)}%</span>
+            <span className={`text-[10px] font-black uppercase tracking-widest ${HEALTH_TEXT[healthLevel]}`}>{HEALTH_WORD[healthLevel]}</span>
           </div>
           <div
             role="progressbar"
@@ -535,9 +477,10 @@ export function PetScreen({ pet, now, spritesDatabase, collection, busy, notice,
             aria-valuemin={0}
             aria-valuemax={100}
             aria-valuenow={Math.round(ev.health)}
+            aria-valuetext={HEALTH_WORD[healthLevel]}
             className="h-3 w-full bg-slate-950 rounded-full overflow-hidden border border-slate-800/80"
           >
-            <div className={`h-full rounded-full transition-all duration-500 ${healthBarClass(ev.health)}`} style={{ width: `${Math.round(ev.health)}%` }} />
+            <div className={`h-full rounded-full transition-all duration-500 ${HEALTH_BAR[healthLevel]}`} style={{ width: `${Math.round(ev.health)}%` }} />
           </div>
         </div>
         {NEEDS.map((need) => <NeedBar key={need} need={need} info={ev.needs[need]} />)}
@@ -555,7 +498,7 @@ export function PetScreen({ pet, now, spritesDatabase, collection, busy, notice,
       </section>
 
       {reminders && <RemindersCard reminders={reminders} onToggle={onToggleReminders} />}
-      {tools && <PreviewToolsCard tools={tools} />}
+      {tools && <PreviewToolsCard tools={tools} ev={ev} />}
 
       <button
         type="button"
@@ -574,7 +517,7 @@ export function PetScreen({ pet, now, spritesDatabase, collection, busy, notice,
           spritesDatabase={spritesDatabase}
           collection={collection}
           ageMs={ev.ageMs}
-          beep={playBeep}
+          beep={beep}
           onQuick={() => { setPlayOpen(false); onAction('play'); }}
           onCollect={(quality) => { setPlayOpen(false); onAction('play', { quality }); }}
           onClose={() => setPlayOpen(false)}
@@ -630,7 +573,7 @@ export default function PetView({ uid, spritesDatabase, collection, playBeep, on
     return () => clearTimeout(id);
   }, [reaction]);
 
-  const beep = (args) => { if (playBeep && args) playBeep(...args); };
+  const beep = (tone) => playTone(playBeep, tone);
 
   const run = async (task) => {
     setBusy(true);
