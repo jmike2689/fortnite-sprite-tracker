@@ -11,7 +11,7 @@ const DAY = 24 * HOUR;
 export const SERVER = '__server_time__';
 
 // Flip PET_PUBLIC_RELEASE to true to show the Pet tab to everyone.
-export const PET_PUBLIC_RELEASE = false;
+export const PET_PUBLIC_RELEASE = true;
 export const PET_PREVIEW_UIDS = ['G7MQ2w1jijYhXEqXk6DiwMAo2AB3'];
 export const isPetEnabledFor = (uid) => Boolean(uid) && (PET_PUBLIC_RELEASE || PET_PREVIEW_UIDS.includes(uid));
 
