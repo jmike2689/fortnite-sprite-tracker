@@ -101,6 +101,10 @@ service cloud.firestore {
     //    The rules below keep a pet honest: it is born at the server's time, every care action is stamped
     //    with the server's time, nothing can be refilled faster than the game allows, cooldowns are
     //    enforced, and a pet nobody cared for in 76 hours is dead and can never be revived.
+    //
+    //    A pet may have a nickname. It is optional, private, and can only be chosen at adoption (isNewPet).
+    //    No other write below lists 'nickname' among its changes, so a Sprite can never be renamed, and one
+    //    adopted without a name can never be given one. A new name needs a new adoption.
     match /pets/{petId} {
 
       function isOwner() {
@@ -119,7 +123,7 @@ service cloud.firestore {
           && n.keys().hasOnly(['ownerId', 'spriteId', 'variant', 'bornAt', 'health', 'healthAt',
                'hungerEmptyAt', 'happinessEmptyAt', 'cleanlinessEmptyAt', 'energyEmptyAt',
                'sleepingSince', 'sickSince', 'sickImmuneUntil', 'lastFedAt', 'lastPlayedAt',
-               'lastBathedAt', 'lastMedicineAt', 'endedAt', 'endReason', 'history'])
+               'lastBathedAt', 'lastMedicineAt', 'endedAt', 'endReason', 'history', 'nickname'])
           && n.spriteId is string
           && n.variant is string
           && n.bornAt == request.time
@@ -138,7 +142,10 @@ service cloud.firestore {
           && n.cleanlinessEmptyAt <= request.time + duration.value(1450, 'm')
           && n.energyEmptyAt <= request.time + duration.value(1210, 'm')
           && n.sickImmuneUntil <= request.time + duration.value(1450, 'm')
-          && n.history is list;
+          && n.history is list
+          // No name, or a short one (the app allows 14 characters; 60 leaves room however the length is counted).
+          && (n.get('nickname', null) == null
+            || (n.nickname is string && n.nickname.size() >= 1 && n.nickname.size() <= 60));
       }
 
       // Left alone, or stamped with this very write's time. Care stamps (lastFedAt...) can only ever be

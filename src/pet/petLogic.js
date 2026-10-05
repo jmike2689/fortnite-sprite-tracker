@@ -2,6 +2,8 @@
 // The pet is never simulated in the background. Everything is derived from a few
 // stored timestamps whenever it is looked at, so closed-app neglect still counts.
 
+import { cleanNickname } from './petName.js';
+
 const MINUTE = 60 * 1000;
 const HOUR = 60 * MINUTE;
 const DAY = 24 * HOUR;
@@ -441,17 +443,22 @@ export function planDeathRecord(ev) {
 }
 
 export function historyEntryFor(pet, ev) {
+  const nickname = cleanNickname(pet.nickname);
   return {
     spriteId: pet.spriteId,
     variant: pet.variant,
     bornAt: pet.bornAt,
     diedAt: Math.round(pet.endedAt ?? ev.deathAtMs),
     cause: pet.endReason ?? ev.cause,
+    ...(nickname ? { nickname } : {}),
   };
 }
 
-export function newPetFields(ownerId, spriteId, variant, nowMs, history = []) {
+// The nickname is only ever written here, at adoption, and only when there is one. A pet without a
+// `nickname` field stays unnamed for good (see the pets rules).
+export function newPetFields(ownerId, spriteId, variant, nowMs, history = [], nickname = '') {
   const cfg = PET_CONFIG;
+  const name = cleanNickname(nickname);
   return {
     ownerId,
     spriteId,
@@ -473,5 +480,6 @@ export function newPetFields(ownerId, spriteId, variant, nowMs, history = []) {
     endedAt: null,
     endReason: null,
     history,
+    ...(name ? { nickname: name } : {}),
   };
 }

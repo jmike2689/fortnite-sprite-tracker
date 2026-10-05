@@ -1,18 +1,13 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { PawPrint, Heart, Ghost } from 'lucide-react';
+import PetRoom from './PetRoom';
+import { RARITY_EDGE, FALLBACK_EDGE } from './roomLogic';
 import { MOOD_META, REACTION_ICON, REACTION_COLOR } from './petMoods';
+import { cleanNickname } from './petName';
 import {
   MOVES, ACTION_MOVE, TAP_MOVE, TAP_HEARTS, TIMING, SPEECH, between,
   canWander, canIdle, nextWander, nextIdleMove, pickSpeech,
 } from './petLife';
-
-const RARITY_SCENE = {
-  Mythic: 'from-yellow-500/40 via-amber-700/30 to-slate-950',
-  Legendary: 'from-orange-500/40 via-orange-800/30 to-slate-950',
-  Epic: 'from-purple-500/40 via-purple-800/30 to-slate-950',
-  Rare: 'from-blue-500/40 via-blue-800/30 to-slate-950',
-};
-const FALLBACK_SCENE = 'from-slate-600/40 via-slate-800/30 to-slate-950';
 
 const REDUCED_MOTION = '(prefers-reduced-motion: reduce)';
 function useReducedMotion() {
@@ -29,11 +24,16 @@ function useReducedMotion() {
 
 // The Sprite on its little stage. When `interactive` it wanders, does small idle moves, chats now and then,
 // reacts to care actions and can be tapped. All of that is for show: nothing here changes a stat.
-export default function PetStage({ sprite, image, moodKey, reaction, interactive = false, onTap }) {
+// `nickname` (the owner's private name for it, if it was adopted with one) shows on a little nameplate.
+// `phase` is the time of day outside (morning, day, evening or night) and decides how the room looks. When the
+// Sprite is asleep the lights go out, and a Sprite that has passed away has a quiet dark room.
+export default function PetStage({ sprite, image, moodKey, reaction, nickname, phase = 'day', interactive = false, onTap }) {
+  const name = cleanNickname(nickname);
   const mood = MOOD_META[moodKey] || MOOD_META.ok;
   const Bubble = mood.bubble;
   const Reaction = reaction ? REACTION_ICON[reaction.type] : null;
-  const scene = RARITY_SCENE[sprite?.rarity] || FALLBACK_SCENE;
+  const rarity = sprite?.rarity;
+  const gone = moodKey === 'dead';
   const reduceMotion = useReducedMotion();
 
   const moverRef = useRef(null);
@@ -155,7 +155,8 @@ export default function PetStage({ sprite, image, moodKey, reaction, interactive
   );
 
   return (
-    <div className={`relative rounded-3xl border-2 border-white/10 overflow-hidden bg-gradient-to-b ${scene}`}>
+    <div className={`relative overflow-hidden rounded-3xl border-2 bg-slate-950 ${RARITY_EDGE[rarity] || FALLBACK_EDGE}`}>
+      <PetRoom phase={gone ? 'night' : phase} rarity={rarity} dim={gone || moodKey === 'sleeping'} />
       <div className="relative flex items-end justify-center h-64 pb-10">
         <div
           className="absolute bottom-8 w-40 h-5 rounded-[50%] bg-black/50 blur-md"
@@ -169,7 +170,7 @@ export default function PetStage({ sprite, image, moodKey, reaction, interactive
                 <button
                   type="button"
                   onClick={handleTap}
-                  aria-label={`Tap ${sprite?.name || 'your Sprite'}`}
+                  aria-label={`Tap ${name || sprite?.name || 'your Sprite'}`}
                   className="block touch-manipulation cursor-pointer rounded-3xl outline-none focus-visible:ring-2 focus-visible:ring-pink-300/70"
                 >
                   {figure}
@@ -179,6 +180,11 @@ export default function PetStage({ sprite, image, moodKey, reaction, interactive
           </div>
         </div>
 
+        {name && (
+          <div className="absolute bottom-2 left-1/2 z-20 max-w-[70%] -translate-x-1/2 truncate rounded-full bg-black/45 px-3 py-0.5 text-[11px] font-black tracking-wide text-white/90 pointer-events-none">
+            {name}
+          </div>
+        )}
         {Bubble && (
           <div key={moodKey} className="absolute top-5 right-[22%] z-20 flex items-center justify-center w-10 h-10 rounded-2xl bg-white text-slate-900 shadow-lg animate-[petpop_0.3s_ease-out]">
             <Bubble className="w-5 h-5" />

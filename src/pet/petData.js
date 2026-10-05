@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { doc, onSnapshot, setDoc, updateDoc, serverTimestamp, Timestamp } from 'firebase/firestore';
 import { db } from '../firebase';
 import { SERVER, NEEDS, newPetFields } from './petLogic';
+import { cleanNickname } from './petName';
 import { normalizeBadge } from './petBadge';
 
 // Stored as Firestore Timestamps so security rules can compare them to request.time.
@@ -27,6 +28,7 @@ export function normalizePet(data) {
   pet.sickImmuneUntil = pet.sickImmuneUntil ?? 0;
   pet.endReason = data.endReason ?? null;
   pet.history = Array.isArray(data.history) ? data.history : [];
+  pet.nickname = cleanNickname(data.nickname) || null;
   for (const need of NEEDS) {
     const key = `${need}EmptyAt`;
     if (pet[key] == null) pet[key] = pet.healthAt;
@@ -88,8 +90,9 @@ export function usePetBadge(uid) {
   return { badge: state.badge };
 }
 
-export function adoptPet(uid, spriteId, variant, history = []) {
-  return setDoc(doc(db, 'pets', uid), encode(newPetFields(uid, spriteId, variant, Date.now(), history)));
+// `nickname` is the one chance to name the Sprite: the rules refuse any later change or addition.
+export function adoptPet(uid, spriteId, variant, history = [], nickname = '') {
+  return setDoc(doc(db, 'pets', uid), encode(newPetFields(uid, spriteId, variant, Date.now(), history, nickname)));
 }
 
 export function savePetFields(uid, fields) {

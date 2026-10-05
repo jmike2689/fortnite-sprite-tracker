@@ -9,6 +9,9 @@ import {
 } from 'lucide-react';
 import PlayHub from './games/PlayHub';
 import PetStage from './PetStage';
+import AdoptDialog from './AdoptDialog';
+import { PHASES, timeOfDay } from './roomLogic';
+import { petName, cleanNickname } from './petName';
 import { PET_STYLES, MOOD_META } from './petMoods';
 import { PIPS, pipsFilled, needWord, healthTier, HEALTH_WORD, careHint, TAP_BEEP } from './petLife';
 import { usePet, adoptPet, savePetFields } from './petData';
@@ -44,7 +47,8 @@ const VARIANT_LABELS = {
 const variantLabel = (v) => VARIANT_LABELS[v] || (v ? v.charAt(0).toUpperCase() + v.slice(1) : '');
 
 const hoursLabel = (ms) => `${Math.round(ms / 3600000)}h`;
-const spriteNameOf = (spritesDatabase, pet) => (pet ? spritesDatabase?.find((s) => s.id === pet.spriteId)?.name || 'Your Sprite' : null);
+// What the Sprite is called to its owner: the nickname it was adopted with, otherwise its own name.
+const petNameOf = (spritesDatabase, pet) => (pet ? petName(pet, spritesDatabase?.find((s) => s.id === pet.spriteId)) : null);
 const spriteImage = (sprite, variant) => sprite?.images?.[variant] || sprite?.images?.base || null;
 const HEALTH_BAR = { healthy: 'bg-emerald-400', weak: 'bg-amber-400', critical: 'bg-red-500 animate-pulse motion-reduce:animate-none' };
 const HEALTH_TEXT = { healthy: 'text-emerald-300', weak: 'text-amber-300', critical: 'text-red-400' };
@@ -106,6 +110,7 @@ function CareGuide() {
     'Hunger, Happiness, Energy and Cleanliness slowly run down. Each shows five pips, and a need turns red when it is running low.',
     'Feed, Play, Bathe and Lights Out refill a need, never past full.',
     'Tap your Sprite to say hi. It might have something to say.',
+    'You can name a Sprite once, when you adopt it. A name is permanent, and only you can see it.',
     'An empty need drains health, and health refills slowly once everything is looked after.',
     'A Sprite you ignore completely lasts about 3 days.',
     `A sick Sprite needs medicine within ${hoursLabel(c.sickness.deathMs)}, and a dirty one gets sick.`,
@@ -141,13 +146,17 @@ function PastSprites({ history, spritesDatabase }) {
         {rows.map((row, index) => {
           const sprite = spritesDatabase?.find((s) => s.id === row.spriteId);
           const image = spriteImage(sprite, row.variant);
+          const nickname = cleanNickname(row.nickname);
           return (
             <div key={`${row.bornAt}-${index}`} className="flex items-center gap-3 rounded-xl bg-black/30 border border-white/5 p-2">
               <div className="w-10 h-10 rounded-lg bg-black/40 flex items-center justify-center shrink-0">
                 {image ? <img src={image} alt="" className="w-8 h-8 object-contain grayscale opacity-70" /> : <PawPrint className="w-5 h-5 text-slate-600" />}
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-black text-white truncate">{sprite?.name || 'Sprite'} <span className="text-[10px] text-slate-500 font-bold uppercase">{variantLabel(row.variant)}</span></p>
+                <p className="text-sm font-black text-white truncate">
+                  {nickname || sprite?.name || 'Sprite'}{' '}
+                  <span className="text-[10px] text-slate-500 font-bold uppercase">{nickname ? `${sprite?.name || 'Sprite'} - ` : ''}{variantLabel(row.variant)}</span>
+                </p>
                 <p className="text-[10px] font-mono text-slate-500">Lived {formatDuration(row.lifeMs)} - {describeCause(row.cause)}</p>
               </div>
               {index === 0 && <span className="text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded bg-amber-500/15 border border-amber-400/40 text-amber-300">Longest</span>}
@@ -159,8 +168,17 @@ function PastSprites({ history, spritesDatabase }) {
   );
 }
 
-function AdoptPicker({ spritesDatabase, collection, busy, onAdopt, title, blurb }) {
+function AdoptPicker({ spritesDatabase, collection, busy, onAdopt, onOverlayChange, title, blurb }) {
   const [selected, setSelected] = useState(null);
+  const [dialogOpen, setDialogOpen] = useState(false);
+  // Kept here so a cancelled dialog, or a save that failed, does not lose what was typed.
+  const [draftName, setDraftName] = useState('');
+  const closeDialog = useCallback(() => setDialogOpen(false), []);
+
+  const select = (spriteId, variant) => {
+    if (selected?.spriteId !== spriteId) setDraftName('');
+    setSelected({ spriteId, variant });
+  };
 
   const rows = useMemo(() => {
     const out = [];
@@ -201,7 +219,7 @@ function AdoptPicker({ spritesDatabase, collection, busy, onAdopt, title, blurb 
                     <button
                       key={v}
                       type="button"
-                      onClick={() => setSelected({ spriteId: sprite.id, variant: v })}
+                      onClick={() => select(sprite.id, v)}
                       aria-label={`${sprite.name} ${variantLabel(v)}`}
                       aria-pressed={active}
                       className={`flex flex-col items-center w-14 p-1.5 rounded-lg border-2 transition-colors ${active ? 'border-pink-400 bg-pink-500/15' : 'border-slate-700 bg-black/40 hover:bg-slate-800'}`}
@@ -228,13 +246,27 @@ function AdoptPicker({ spritesDatabase, collection, busy, onAdopt, title, blurb 
             <button
               type="button"
               disabled={busy}
-              onClick={() => onAdopt(selected.spriteId, selected.variant)}
+              onClick={() => setDialogOpen(true)}
               className="px-4 py-2.5 rounded-xl bg-pink-600 hover:bg-pink-500 disabled:opacity-50 text-white text-xs font-black uppercase tracking-wider transition-colors"
             >
               Adopt
             </button>
           </div>
         </div>
+      )}
+
+      {dialogOpen && selected && chosen && (
+        <AdoptDialog
+          sprite={chosen}
+          variantLabel={variantLabel(selected.variant)}
+          image={spriteImage(chosen, selected.variant)}
+          name={draftName}
+          onNameChange={setDraftName}
+          busy={busy}
+          onCancel={closeDialog}
+          onConfirm={(nickname) => { setDialogOpen(false); onAdopt(selected.spriteId, selected.variant, nickname); }}
+          onOverlayChange={onOverlayChange}
+        />
       )}
     </div>
   );
@@ -284,6 +316,23 @@ function PreviewToolsCard({ tools, ev }) {
         <button type="button" className={button} onClick={() => tools.onSkip(6)}>Skip 6h</button>
         <button type="button" className={button} onClick={() => tools.onSkip(24)}>Skip 24h</button>
       </div>
+      <p className="mt-3 mb-1.5 text-[10px] font-black uppercase tracking-widest text-slate-400">Room time</p>
+      <div className="flex gap-1.5" role="group" aria-label="Room time of day">
+        {[[null, 'Auto'], ...PHASES.map((p) => [p, p.charAt(0).toUpperCase() + p.slice(1)])].map(([value, label]) => {
+          const on = (tools.roomPhase || null) === value;
+          return (
+            <button
+              key={label}
+              type="button"
+              aria-pressed={on}
+              onClick={() => tools.onRoomPhase(value)}
+              className={`flex-1 py-1.5 rounded-lg border text-[9px] font-black uppercase tracking-wider transition-colors ${on ? 'border-pink-400/70 bg-pink-500/15 text-pink-200' : 'border-dashed border-slate-600 bg-black/30 text-slate-400 hover:bg-slate-800'}`}
+            >
+              {label}
+            </button>
+          );
+        })}
+      </div>
       {ev && (
         <dl className="mt-2.5 grid grid-cols-2 gap-x-3 gap-y-1 font-mono text-[10px] text-slate-400">
           <div className="flex justify-between gap-2"><dt>Health</dt><dd>{Math.round(ev.health)}%</dd></div>
@@ -323,11 +372,14 @@ export function PetScreen({ pet, now, spritesDatabase, collection, busy, notice,
 
   const sprite = pet ? spritesDatabase?.find((s) => s.id === pet.spriteId) : null;
   const image = pet ? spriteImage(sprite, pet.variant) : null;
+  // The room outside the window follows the phone's clock (this screen already re-renders every second).
+  // Only the owner's Preview tools can pin it to another time of day, to look at the room without waiting.
+  const phase = tools?.roomPhase || timeOfDay(now);
 
-  const adoptWithHistory = (spriteId, variant) => {
+  const adoptWithHistory = (spriteId, variant, nickname) => {
     const history = pet ? [...pet.history] : [];
     if (pet && ev && !ev.alive && !ev.released) history.push(historyEntryFor(pet, ev));
-    onAdopt(spriteId, variant, history);
+    onAdopt(spriteId, variant, history, nickname);
   };
 
   const noticeBanner = notice && (
@@ -346,6 +398,7 @@ export function PetScreen({ pet, now, spritesDatabase, collection, busy, notice,
           collection={collection}
           busy={busy}
           onAdopt={adoptWithHistory}
+          onOverlayChange={onOverlayChange}
           title="Adopt a Sprite"
           blurb="Pick any Sprite you have collected to raise as your pet. Feed it, play with it, keep it clean and let it sleep. If you neglect it, it will not make it. Your longest-lived pet is remembered."
         />
@@ -362,9 +415,9 @@ export function PetScreen({ pet, now, spritesDatabase, collection, busy, notice,
       <div className="flex flex-col gap-4">
         <style>{PET_STYLES}</style>
         {noticeBanner}
-        <PetStage sprite={sprite} image={image} moodKey="dead" />
+        <PetStage sprite={sprite} image={image} moodKey="dead" nickname={pet.nickname} phase={phase} />
         <div className="text-center">
-          <h2 className="text-xl font-black uppercase italic text-slate-200">Rest in peace, {sprite?.name || 'Sprite'}</h2>
+          <h2 className="text-xl font-black uppercase italic text-slate-200">Rest in peace, {petName(pet, sprite)}</h2>
           <p className="text-xs font-mono text-slate-500 mt-1">Lived {formatDuration(ev.ageMs)} - {describeCause(ev.cause)}</p>
         </div>
         {deathFailed && !deathSaved && (
@@ -379,6 +432,7 @@ export function PetScreen({ pet, now, spritesDatabase, collection, busy, notice,
             collection={collection}
             busy={busy}
             onAdopt={adoptWithHistory}
+            onOverlayChange={onOverlayChange}
             title="Adopt a new Sprite"
             blurb="Every Sprite starts fresh. Beat your longest life."
           />
@@ -440,7 +494,7 @@ export function PetScreen({ pet, now, spritesDatabase, collection, busy, notice,
       {showGuide && <CareGuide />}
       {noticeBanner}
 
-      <PetStage sprite={sprite} image={image} moodKey={ev.mood} reaction={reaction} interactive onTap={(moodKey) => beep(TAP_BEEP[moodKey])} />
+      <PetStage sprite={sprite} image={image} moodKey={ev.mood} reaction={reaction} nickname={pet.nickname} phase={phase} interactive onTap={(moodKey) => beep(TAP_BEEP[moodKey])} />
 
       <div className="text-center -mt-1">
         <p className={`text-sm font-black uppercase tracking-widest ${mood.text}`}>{mood.label}</p>
@@ -548,6 +602,7 @@ export default function PetView({ uid, spritesDatabase, collection, playBeep, on
   const [reaction, setReaction] = useState(null);
   const [reminders, setReminders] = useState(null);
   const [deathFailedFor, setDeathFailedFor] = useState(null);
+  const [roomPhase, setRoomPhase] = useState(null); // Preview tools only: look at the room at another time of day
   const deathTried = useRef(null);
 
   useEffect(() => {
@@ -607,16 +662,14 @@ export default function PetView({ uid, spritesDatabase, collection, playBeep, on
     run(() => savePetFields(uid, plan.fields));
   };
 
-  const handleAdopt = (spriteId, variant, history) => {
-    const sprite = spritesDatabase?.find((s) => s.id === spriteId);
-    const ok = window.confirm(`Adopt ${sprite?.name || 'this Sprite'} (${variantLabel(variant)})? You can not swap it for another one until it passes away or you release it.`);
-    if (!ok) return;
+  // The adoption dialog has already asked, and said that the name (if any) is permanent.
+  const handleAdopt = (spriteId, variant, history, nickname) => {
     haptic();
     beep([1046, 'sine', 0.2]);
     run(async () => {
       // The phone's permission prompt belongs in the same tap that adopts the Sprite.
       if (reminders?.enabled) await requestReminderPermission();
-      await adoptPet(uid, spriteId, variant, history);
+      await adoptPet(uid, spriteId, variant, history, nickname);
       setReminders(await getReminderStatus());
     });
   };
@@ -631,12 +684,13 @@ export default function PetView({ uid, spritesDatabase, collection, playBeep, on
       if (permission !== 'granted') setNotice({ kind: 'info', text: 'Notifications are blocked. Turn them on in your phone settings to get reminders.' });
     }
     setReminders(await getReminderStatus());
-    syncPetReminders(pet, spriteNameOf(spritesDatabase, pet));
+    syncPetReminders(pet, petNameOf(spritesDatabase, pet));
   };
 
   const handleRelease = () => {
     if (!pet) return;
-    const ok = window.confirm('Release this Sprite? It will leave for good and will not be added to your past Sprites.');
+    const named = Boolean(pet.nickname);
+    const ok = window.confirm(`Release ${named ? petNameOf(spritesDatabase, pet) : 'this Sprite'}? It will leave for good${named ? ', and so will its name,' : ''} and will not be added to your past Sprites.`);
     if (!ok) return;
     beep([220, 'sawtooth', 0.2]);
     run(() => savePetFields(uid, planRelease(pet, Date.now())));
@@ -651,7 +705,7 @@ export default function PetView({ uid, spritesDatabase, collection, playBeep, on
   };
 
   const handleTestReminder = async () => {
-    const message = await scheduleTestReminder(spriteNameOf(spritesDatabase, pet));
+    const message = await scheduleTestReminder(petNameOf(spritesDatabase, pet));
     setNotice({ kind: 'info', text: message });
   };
 
@@ -692,7 +746,7 @@ export default function PetView({ uid, spritesDatabase, collection, playBeep, on
       notice={notice}
       reaction={reaction}
       reminders={reminders}
-      tools={petToolsEnabledFor(uid) ? { onSkip: handleSkip, onTestReminder: handleTestReminder } : null}
+      tools={petToolsEnabledFor(uid) ? { onSkip: handleSkip, onTestReminder: handleTestReminder, roomPhase, onRoomPhase: setRoomPhase } : null}
       deathFailed={pet ? deathFailedFor === pet.bornAt : false}
       playBeep={playBeep}
       onOverlayChange={onOverlayChange}
@@ -729,7 +783,7 @@ export function PetReminderSync({ uid, spritesDatabase, onOpenPet }) {
   const { pet, loading, error } = usePet(uid);
   const [resumeTick, setResumeTick] = useState(0);
   const openRef = useRef(onOpenPet);
-  const spriteName = spriteNameOf(spritesDatabase, pet);
+  const spriteName = petNameOf(spritesDatabase, pet);
 
   useEffect(() => {
     openRef.current = onOpenPet;
