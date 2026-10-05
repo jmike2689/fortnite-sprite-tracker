@@ -21,6 +21,7 @@ import { auth, db } from './firebase';
 import PetView, { PetAttentionDot, PetReminderSync } from './pet/PetView';
 import { isPetEnabledFor } from './pet/petLogic';
 import PetBadgeCard from './pet/PetBadgeCard';
+import { statusChips, statusForTab, showDot, cardVariant, emptyListMessage } from './spriteList';
 
 // --- CHAPTER 7 SEASON 4 IMPORTS ---
 import jackrabbitBase from './assets/Jackrabbit Base.webp';
@@ -847,7 +848,7 @@ function MainApp() {
 
   const [rarityFilter, setRarityFilter] = useState('All');
   const [variantFilter, setVariantFilter] = useState('All');
-  const [statusFilter, setStatusFilter] = useState('All');
+  const [savedStatusFilter, setStatusFilter] = useState('All');
   const [sortBy, setSortBy] = useState('A-Z');
 
   const [soundEnabled, setSoundEnabled] = useState(true);
@@ -1433,10 +1434,11 @@ function MainApp() {
   };
 
   const handleSearchFriend = async () => {
-    if (!friendSearchQuery || friendSearchQuery.toLowerCase() === spriteId) return;
+    const wantedId = friendSearchQuery.trim().toLowerCase();
+    if (!wantedId || wantedId === spriteId) return;
     setFriendSearchStatus('searching');
     try {
-      const q = query(firestoreCollection(db, "users"), where("spriteId", "==", friendSearchQuery.toLowerCase()));
+      const q = query(firestoreCollection(db, "users"), where("spriteId", "==", wantedId));
       const querySnapshot = await getDocs(q);
       if (!querySnapshot.empty) { setFriendSearchResult({ id: querySnapshot.docs[0].id, ...querySnapshot.docs[0].data() }); setFriendSearchStatus('found'); } else { setFriendSearchResult(null); setFriendSearchStatus('not-found'); }
     } catch (e) { setFriendSearchStatus('error'); }
@@ -1843,11 +1845,13 @@ function MainApp() {
   const handleAcknowledgeTransmission = async () => { setShowTransmission(false); if (user) { try { await setDoc(doc(db, "users", user.uid), { lastSeenVersion: PATCH_NOTES[0].version }, { merge: true }); } catch (err) { } } };
 
   const isMasteryView = currentView === 'mastery';
+  // The Sprites and Mastery tabs have different status chips, so a status saved on the other tab counts as "All".
+  const statusFilter = statusForTab(savedStatusFilter, isMasteryView);
   const displayVariantKey = variantFilter === 'All' ? 'All' : variantFilter.replace(/\s+/g, '').toLowerCase();
 
   const filteredSprites = useMemo(() => {
     return [...SPRITES_DATABASE].filter(sprite => {
-      const matchesSearch = sprite.name.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesSearch = sprite.name.toLowerCase().includes(searchQuery.trim().toLowerCase());
       const matchesRarity = rarityFilter === 'All' || sprite.rarity === rarityFilter;
       const matchesVariant = variantFilter === 'All' || sprite.variants.includes(displayVariantKey);
       const matchesSeason = seasonFilter === 'All' || sprite.season === seasonFilter;
@@ -1861,8 +1865,8 @@ function MainApp() {
     }).sort((a, b) => {
       if (sortBy === 'A-Z') return a.name.localeCompare(b.name);
       if (sortBy === 'Z-A') return b.name.localeCompare(a.name);
-      if (sortBy === 'Rarity (High to Low)') return RARITY_WEIGHT[b.rarity] - RARITY_WEIGHT[a.rarity];
-      if (sortBy === 'Rarity (Low to High)') return RARITY_WEIGHT[a.rarity] - RARITY_WEIGHT[b.rarity];
+      if (sortBy === 'Rarity (High to Low)') return RARITY_WEIGHT[b.rarity] - RARITY_WEIGHT[a.rarity] || a.name.localeCompare(b.name);
+      if (sortBy === 'Rarity (Low to High)') return RARITY_WEIGHT[a.rarity] - RARITY_WEIGHT[b.rarity] || a.name.localeCompare(b.name);
       return a.name.localeCompare(b.name);
     });
   }, [searchQuery, rarityFilter, variantFilter, statusFilter, seasonFilter, sortBy, isMasteryView, displayVariantKey, collection, mastery]);
@@ -1870,7 +1874,7 @@ function MainApp() {
   const filteredFriendSprites = useMemo(() => {
     return [...SPRITES_DATABASE].filter(sprite => {
       if (!activeViewingFriend) return false;
-      const matchesSearch = sprite.name.toLowerCase().includes(fSearchQuery.toLowerCase());
+      const matchesSearch = sprite.name.toLowerCase().includes(fSearchQuery.trim().toLowerCase());
       const matchesRarity = fRarityFilter === 'All' || sprite.rarity === fRarityFilter;
       const matchesVariant = fVariantFilter === 'All' || sprite.variants.includes(fVariantFilter === 'All' ? 'base' : fVariantFilter.replace(/\s+/g, '').toLowerCase());
       const matchesSeason = fSeasonFilter === 'All' || sprite.season === fSeasonFilter;
@@ -1897,15 +1901,15 @@ function MainApp() {
     }).sort((a, b) => {
       if (fSortBy === 'A-Z') return a.name.localeCompare(b.name);
       if (fSortBy === 'Z-A') return b.name.localeCompare(a.name);
-      if (fSortBy === 'Rarity (High to Low)') return RARITY_WEIGHT[b.rarity] - RARITY_WEIGHT[a.rarity];
-      if (fSortBy === 'Rarity (Low to High)') return RARITY_WEIGHT[a.rarity] - RARITY_WEIGHT[b.rarity];
+      if (fSortBy === 'Rarity (High to Low)') return RARITY_WEIGHT[b.rarity] - RARITY_WEIGHT[a.rarity] || a.name.localeCompare(b.name);
+      if (fSortBy === 'Rarity (Low to High)') return RARITY_WEIGHT[a.rarity] - RARITY_WEIGHT[b.rarity] || a.name.localeCompare(b.name);
       return a.name.localeCompare(b.name);
     });
   }, [activeViewingFriend, fSearchQuery, fRarityFilter, fVariantFilter, fStatusFilter, fSeasonFilter, fSortBy, collection]);
 
   const filteredSquad = useMemo(() => {
     return richFriends.filter(f =>
-      (f.spriteId || '').toLowerCase().includes(squadSearchQuery.toLowerCase())
+      (f.spriteId || '').toLowerCase().includes(squadSearchQuery.trim().toLowerCase())
     ).sort((a, b) => {
       if (b.completionRate !== a.completionRate) return b.completionRate - a.completionRate;
       if (b.masteryRate !== a.masteryRate) return (b.masteryRate || 0) - (a.masteryRate || 0);
@@ -1929,7 +1933,7 @@ function MainApp() {
       }
       return false;
     });
-  }, [commsPosts, commsFilter, showPerfectOnly, collection, user]);
+  }, [commsPosts, blockedUsers, commsFilter, showPerfectOnly, collection, user]);
 
   const formatJoinDate = (timestamp) => {
     if (!timestamp) return 'Unknown';
@@ -3137,7 +3141,7 @@ function MainApp() {
                   <div>
                     <span className="text-[9px] text-slate-500 font-black uppercase tracking-widest mb-1.5 block">Collection Status</span>
                     <div className="flex flex-wrap gap-1.5">
-                      {['All', isMasteryView ? 'Mastered' : 'Collected', isMasteryView ? 'Unmastered' : 'Missing'].map(status => (
+                      {statusChips(isMasteryView).map(status => (
                         <button key={status} onClick={() => setStatusFilter(status)} className={`px-3 py-1.5 text-[10px] font-black tracking-wider rounded-lg border uppercase ${statusFilter === status ? 'bg-emerald-500 text-white border-emerald-400' : 'bg-black/40 text-slate-400 border-slate-800'}`}>
                           {label(status.toLowerCase())}
                         </button>
@@ -3149,16 +3153,19 @@ function MainApp() {
             </section>
 
             <section className="flex flex-col">
-              {filteredSprites.length === 0 && (
-                <div className="text-center p-8 bg-[#12141f] rounded-2xl border border-slate-800">
-                  <Crown className="w-12 h-12 text-slate-700 mx-auto mb-4" />
-                  <p className="text-sm sm:text-base text-slate-400 font-bold uppercase tracking-widest">{isMasteryView ? "No Collectables Found" : "No Sprites Found"}</p>
-                </div>
-              )}
+              {filteredSprites.length === 0 && (() => {
+                const empty = emptyListMessage({ isMasteryView, status: statusFilter, search: searchQuery, seasonFilter, sprites: SPRITES_DATABASE, collection });
+                return (
+                  <div className="text-center p-8 bg-[#12141f] rounded-2xl border border-slate-800">
+                    <Crown className="w-12 h-12 text-slate-700 mx-auto mb-4" />
+                    <p className="text-sm sm:text-base text-slate-400 font-bold uppercase tracking-widest">{empty.title}</p>
+                    <p className="text-xs sm:text-sm text-slate-500 mt-2 max-w-xs mx-auto leading-relaxed">{empty.hint}</p>
+                  </div>
+                );
+              })()}
               <div className="flex flex-col gap-4 animate-in fade-in duration-300">
                 {filteredSprites.map(sprite => {
-                  const displayVariant = variantFilter === 'All' ? 'base' : variantFilter.replace(/\s+/g, '').toLowerCase();
-                  const validInitialVariant = sprite.variants.includes(displayVariant) ? displayVariant : 'base';
+                  const validInitialVariant = cardVariant({ sprite, variantFilter, variantOrder: variantsList, isMasteryView, status: statusFilter, collection, mastery });
                   const hasAnyVariant = variantsList.some(v => collection[sprite.id]?.[v]);
                   return (
                     <div key={sprite.id} onClick={() => setSelectedSprite({ id: sprite.id, variant: validInitialVariant })} className="flex items-center gap-4 bg-[#151722] border border-slate-800/90 rounded-2xl p-4 hover:bg-slate-800/80 transition-colors cursor-pointer shadow-sm">
@@ -3174,7 +3181,7 @@ function MainApp() {
                           {variantsList.map(v => {
                             if (!sprite.variants.includes(v)) return null;
                             const isLocked = isVariantLocked(sprite.id, v); const isCollected = collection[sprite.id]?.[v]; const isMastered = mastery[sprite.id]?.[v];
-                            if (statusFilter === 'Missing' && isCollected && !isMasteryView) return null;
+                            if (!showDot({ isMasteryView, status: statusFilter, collected: isCollected, mastered: isMastered })) return null;
                             return (
                               <div key={v} className="flex flex-col items-center gap-1">
                                 <div onContextMenu={(e) => e.preventDefault()} onMouseDown={(e) => handleDotPressStart(e, sprite.id, v)} onMouseUp={handleDotPressEnd} onMouseLeave={handleDotPressEnd} onTouchStart={(e) => handleDotPressStart(e, sprite.id, v)} onTouchEnd={handleDotPressEnd} onClick={(e) => e.stopPropagation()} className={`w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center border-2 transition-all duration-300 relative select-none cursor-pointer ${activeHoldId === `${sprite.id}_${v}` ? 'scale-[1.3] ring-2 ring-cyan-400 shadow-[0_0_20px_rgba(34,211,238,0.8)]' : ''} ${isLocked ? 'bg-slate-950/80 border-slate-800/60 opacity-60' : isMasteryView && isMastered ? 'bg-yellow-900/40 border-yellow-400' : isCollected ? `bg-slate-900 ${VARIANT_INFO[v]?.borderColor}` : 'bg-black border-slate-800'}`}>
