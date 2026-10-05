@@ -86,7 +86,7 @@ function NeedBar({ need, info }) {
   );
 }
 
-// `compact` is the small version used four across, right under the Sprite.
+// `compact` is the small version used four across, right under the stats.
 function ActionButton({ action, plan, busy, onClick, compact = false }) {
   const style = ACTION_STYLE[action];
   const enabled = plan.ok && !busy;
@@ -494,7 +494,6 @@ export function PetScreen({ pet, now, spritesDatabase, collection, busy, notice,
 
       {showGuide && <CareGuide />}
 
-      {/* The Sprite and what you can do for it stay together, so a care action can be watched as it happens. */}
       <div className="flex flex-col gap-2.5">
         <PetStage sprite={sprite} image={image} moodKey={ev.mood} reaction={reaction} nickname={pet.nickname} phase={phase} interactive onTap={(moodKey) => beep(TAP_BEEP[moodKey])} />
 
@@ -502,18 +501,7 @@ export function PetScreen({ pet, now, spritesDatabase, collection, busy, notice,
           <p className={`text-sm font-black uppercase tracking-widest ${mood.text}`}>{mood.label}</p>
           <p className="text-[11px] text-slate-500 mt-0.5">{hint}</p>
         </div>
-
-        <section aria-label="Care" className="flex flex-col gap-2">
-          <div className="grid grid-cols-4 gap-1.5">
-            {actionKeys.map((key) => (
-              <ActionButton key={key} compact action={key} plan={plans[key]} busy={busy} onClick={() => (key === 'play' ? setPlayOpen(true) : onAction(key))} />
-            ))}
-          </div>
-          {ev.sick && <ActionButton action="medicine" plan={plans.medicine} busy={busy} onClick={() => onAction('medicine')} />}
-        </section>
       </div>
-
-      {noticeBanner}
 
       {ev.lastChance ? (
         <div className="flex items-start gap-2 rounded-xl border border-red-500/60 bg-red-950/50 px-3 py-2.5 text-xs font-bold text-red-300">
@@ -526,33 +514,49 @@ export function PetScreen({ pet, now, spritesDatabase, collection, busy, notice,
           Health is critical. Look after your Sprite now.
         </div>
       ) : null}
+      {/* Medicine is the one urgent button, so it stays with the warning and the Sprite instead of waiting under the stats. */}
       {ev.sick && (
-        <div className="flex items-start gap-2 rounded-xl border border-lime-500/50 bg-lime-950/30 px-3 py-2.5 text-xs font-bold text-lime-300">
-          <Pill className="w-4 h-4 shrink-0 mt-0.5" />
-          Your Sprite is sick. Give medicine within {formatDuration(ev.sickDeadlineMs - now)}.
+        <div className="flex flex-col gap-2">
+          <div className="flex items-start gap-2 rounded-xl border border-lime-500/50 bg-lime-950/30 px-3 py-2.5 text-xs font-bold text-lime-300">
+            <Pill className="w-4 h-4 shrink-0 mt-0.5" />
+            Your Sprite is sick. Give medicine within {formatDuration(ev.sickDeadlineMs - now)}.
+          </div>
+          <ActionButton action="medicine" plan={plans.medicine} busy={busy} onClick={() => onAction('medicine')} />
         </div>
       )}
 
-      <section className="rounded-2xl border border-white/5 bg-black/30 p-4 flex flex-col gap-3.5">
-        <div>
-          <div className="flex items-center justify-between mb-1">
-            <span className="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest text-emerald-300"><HeartPulse className="w-3.5 h-3.5" /> Health</span>
-            <span className={`text-[10px] font-black uppercase tracking-widest ${HEALTH_TEXT[healthLevel]}`}>{HEALTH_WORD[healthLevel]}</span>
+      {/* The buttons sit right under the stats, so the bars and the Sprite can be watched while you care for it. */}
+      <div className="flex flex-col gap-2.5">
+        <section className="rounded-2xl border border-white/5 bg-black/30 p-4 flex flex-col gap-3.5">
+          <div>
+            <div className="flex items-center justify-between mb-1">
+              <span className="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest text-emerald-300"><HeartPulse className="w-3.5 h-3.5" /> Health</span>
+              <span className={`text-[10px] font-black uppercase tracking-widest ${HEALTH_TEXT[healthLevel]}`}>{HEALTH_WORD[healthLevel]}</span>
+            </div>
+            <div
+              role="progressbar"
+              aria-label="Health"
+              aria-valuemin={0}
+              aria-valuemax={100}
+              aria-valuenow={Math.round(ev.health)}
+              aria-valuetext={HEALTH_WORD[healthLevel]}
+              className="h-3 w-full bg-slate-950 rounded-full overflow-hidden border border-slate-800/80"
+            >
+              <div className={`h-full rounded-full transition-all duration-500 ${HEALTH_BAR[healthLevel]}`} style={{ width: `${Math.round(ev.health)}%` }} />
+            </div>
           </div>
-          <div
-            role="progressbar"
-            aria-label="Health"
-            aria-valuemin={0}
-            aria-valuemax={100}
-            aria-valuenow={Math.round(ev.health)}
-            aria-valuetext={HEALTH_WORD[healthLevel]}
-            className="h-3 w-full bg-slate-950 rounded-full overflow-hidden border border-slate-800/80"
-          >
-            <div className={`h-full rounded-full transition-all duration-500 ${HEALTH_BAR[healthLevel]}`} style={{ width: `${Math.round(ev.health)}%` }} />
-          </div>
-        </div>
-        {NEEDS.map((need) => <NeedBar key={need} need={need} info={ev.needs[need]} />)}
-      </section>
+          {NEEDS.map((need) => <NeedBar key={need} need={need} info={ev.needs[need]} />)}
+        </section>
+
+        <section aria-label="Care" className="relative grid grid-cols-4 gap-1.5">
+          {actionKeys.map((key) => (
+            <ActionButton key={key} compact action={key} plan={plans[key]} busy={busy} onClick={() => (key === 'play' ? setPlayOpen(true) : onAction(key))} />
+          ))}
+          {/* A message hovers over the free space above the buttons, so nothing moves to make room for it
+              and the buttons stay put under the finger that just tapped one. */}
+          {notice && <div className="pointer-events-none absolute inset-x-0 bottom-full z-10 mb-1 rounded-xl bg-slate-950">{noticeBanner}</div>}
+        </section>
+      </div>
 
       {reminders && <RemindersCard reminders={reminders} onToggle={onToggleReminders} />}
       {tools && <PreviewToolsCard tools={tools} ev={ev} />}
