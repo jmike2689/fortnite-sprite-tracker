@@ -321,6 +321,25 @@ import gemDemon from './assets/Gem Demon.webp';
 import gemPunk from './assets/Gem Punk.webp';
 import gemAura from './assets/Gem Aura.webp';
 import quackZeroPoint from './assets/Quack Zero Point.webp';
+// --- WAVE 4 SPRITES: Honey, One Wish Willow ---
+import honeyBase from './assets/Base Honey.webp';
+import honeyGold from './assets/Gold Honey.webp';
+import honeyCheatMaster from './assets/Cheatmaster Honey.webp';
+import honeyLootHacker from './assets/Loot Hacker Honey.webp';
+import honeyBountyHunter from './assets/Bounty Hunter Honey.webp';
+import trtHoney from './assets/TrT Honey.webp';
+import oneWishWillowBase from './assets/Base One Wish Willow.webp';
+import oneWishWillowGold from './assets/Gold One Wish Willow.webp';
+import oneWishWillowCheatMaster from './assets/Cheatmaster One Wish Willow.webp';
+import oneWishWillowLootHacker from './assets/Loot Hacker One Wish Willow.webp';
+import oneWishWillowBountyHunter from './assets/Bounty Hunter One Wish Willow.webp';
+import trtOneWishWillow from './assets/TrT One Wish Willow.webp';
+// --- QUACK VARIANTS FOR SEASON 4 SPRITES ---
+import quackBush from './assets/Quack Bush.webp';
+import quackAdventure from './assets/Quack Adventure.webp';
+import quackKlombo from './assets/Quack Klombo.webp';
+import quackJonesy from './assets/Quack Jonesy.webp';
+import quackSpooky from './assets/Quack Spooky.webp';
 
 const variantsList = ['base', 'gold', 'gummy', 'galaxy', 'holofoil', 'cube', 'gem', 'quack', 'cheatmaster', 'loothacker', 'bountyhunter', 'trickortreat'];
 const LOCKED_VARIANTS = {};
@@ -438,12 +457,12 @@ const SPRITES_DATABASE = [
   // --- NEW SEASON 4 SPRITES ---
   { id: "jackrabbit", name: "Jackrabbit", rarity: "Legendary", season: 'C7S4', images: { base: jackrabbitBase, gold: jackrabbitGold, cheatmaster: jackrabbitCheatMaster, loothacker: jackrabbitLootHacker, bountyhunter: jackrabbitBountyHunter, trickortreat: trtJackrabbit }, variants: ['base', 'gold', 'cheatmaster', 'loothacker', 'bountyhunter', 'trickortreat'], baseAbility: "Grants the ability to perform another jump while mid-air! Cooldown between jumps decreases with each Level Up!" },
   { id: "shadow", name: "Shadow", rarity: "Epic", season: 'C7S4', images: { base: shadowBase, gold: shadowGold, cheatmaster: shadowCheatMaster, loothacker: shadowLootHacker, bountyhunter: shadowBountyHunter, trickortreat: trtShadow }, variants: ['base', 'gold', 'cheatmaster', 'loothacker', 'bountyhunter', 'trickortreat'], baseAbility: "Automatically reload unequipped weapons over time. Reloads equipped weapon at max level. Automatic reload gets faster with each Level Up!" },
-  { id: "bush", name: "Bush", rarity: "Rare", season: 'C7S4', images: { base: bushBase, gold: bushGold, cheatmaster: bushCheatMaster, loothacker: bushLootHacker, bountyhunter: bushBountyHunter, trickortreat: trtBush }, variants: ['base', 'gold', 'cheatmaster', 'loothacker', 'bountyhunter', 'trickortreat'], baseAbility: "Grants a bush on you after a duration, gain a bush on elimination at max level. Time between bush activating decreases with each Level Up!" },
+  { id: "bush", name: "Bush", rarity: "Rare", season: 'C7S4', images: { base: bushBase, gold: bushGold, quack: quackBush, cheatmaster: bushCheatMaster, loothacker: bushLootHacker, bountyhunter: bushBountyHunter, trickortreat: trtBush }, variants: ['base', 'gold', 'quack', 'cheatmaster', 'loothacker', 'bountyhunter', 'trickortreat'], baseAbility: "Grants a bush on you after a duration, gain a bush on elimination at max level. Time between bush activating decreases with each Level Up!" },
   { id: "tails", name: "Tails", rarity: "Epic", season: 'C7S4', images: { base: tailsBase, gold: tailsGold, cheatmaster: tailsCheatMaster, loothacker: tailsLootHacker, bountyhunter: tailsBountyHunter, trickortreat: trtTails }, variants: ['base', 'gold', 'cheatmaster', 'loothacker', 'bountyhunter', 'trickortreat'], baseAbility: "Grants the ability to hover with the Help of Tails! Hover speed increased with each Level Up!" },
   { id: "killswitch", name: "Killswitch", rarity: "Legendary", season: 'C7S4', images: { base: killswitchBase, gold: killswitchGold, cheatmaster: killswitchCheatMaster, loothacker: killswitchLootHacker, bountyhunter: killswitchBountyHunter, trickortreat: trtKillswitch }, variants: ['base', 'gold', 'cheatmaster', 'loothacker', 'bountyhunter', 'trickortreat'], baseAbility: "Enter Hangtime with improved accuracy when aiming while jumping and falling. Accuracy increases with each Level Up!" },
-  { id: "adventure", name: "Adventure", rarity: "Rare", season: 'C7S4', images: { base: adventureBase, gold: adventureGold, cheatmaster: adventureCheatMaster, loothacker: adventureLootHacker, bountyhunter: adventureBountyHunter, trickortreat: trtAdventure }, variants: ['base', 'gold', 'cheatmaster', 'loothacker', 'bountyhunter', 'trickortreat'], baseAbility: "Upgrades a random item in the player's inventory with each Level Up!" },
-  { id: "klombo", name: "Klombo", rarity: "Mythic", season: 'C7S4', images: { base: klomboBase, gold: klomboGold, cheatmaster: klomboCheatMaster, loothacker: klomboLootHacker, bountyhunter: klomboBountyHunter, trickortreat: trtKlombo }, variants: ['base', 'gold', 'cheatmaster', 'loothacker', 'bountyhunter', 'trickortreat'], baseAbility: "Grants random items at each level, only levels up by consuming items. Item quality increases with each Level Up!" },
-  { id: "jonesy", name: "Jonesy", rarity: "Rare", season: 'C7S4', images: { base: jonesyBase, gold: jonesyGold, cheatmaster: jonesyCheatMaster, loothacker: jonesyLootHacker, bountyhunter: jonesyBountyHunter, trickortreat: trtJonesy }, variants: ['base', 'gold', 'cheatmaster', 'loothacker', 'bountyhunter', 'trickortreat'], baseAbility: "Recover some health or shields after being damaged after a short duration. Increase amount healed with each Level Up!" },
+  { id: "adventure", name: "Adventure", rarity: "Rare", season: 'C7S4', images: { base: adventureBase, gold: adventureGold, quack: quackAdventure, cheatmaster: adventureCheatMaster, loothacker: adventureLootHacker, bountyhunter: adventureBountyHunter, trickortreat: trtAdventure }, variants: ['base', 'gold', 'quack', 'cheatmaster', 'loothacker', 'bountyhunter', 'trickortreat'], baseAbility: "Upgrades a random item in the player's inventory with each Level Up!" },
+  { id: "klombo", name: "Klombo", rarity: "Mythic", season: 'C7S4', images: { base: klomboBase, gold: klomboGold, quack: quackKlombo, cheatmaster: klomboCheatMaster, loothacker: klomboLootHacker, bountyhunter: klomboBountyHunter, trickortreat: trtKlombo }, variants: ['base', 'gold', 'quack', 'cheatmaster', 'loothacker', 'bountyhunter', 'trickortreat'], baseAbility: "Grants random items at each level, only levels up by consuming items. Item quality increases with each Level Up!" },
+  { id: "jonesy", name: "Jonesy", rarity: "Rare", season: 'C7S4', images: { base: jonesyBase, gold: jonesyGold, quack: quackJonesy, cheatmaster: jonesyCheatMaster, loothacker: jonesyLootHacker, bountyhunter: jonesyBountyHunter, trickortreat: trtJonesy }, variants: ['base', 'gold', 'quack', 'cheatmaster', 'loothacker', 'bountyhunter', 'trickortreat'], baseAbility: "Recover some health or shields after being damaged after a short duration. Increase amount healed with each Level Up!" },
   { id: "sonic", name: "Sonic", rarity: "Epic", season: 'C7S4', images: { base: sonicBase, gold: sonicGold, cheatmaster: sonicCheatMaster, loothacker: sonicLootHacker, bountyhunter: sonicBountyHunter, trickortreat: trtSonic }, variants: ['base', 'gold', 'cheatmaster', 'loothacker', 'bountyhunter', 'trickortreat'], baseAbility: "Gotta Go Fast! Sprint faster with each Level Up!" },
   { id: "crown", name: "Crown", rarity: "Mythic", season: 'C7S4', images: { base: crownBase, gold: crownGold, cheatmaster: crownCheatMaster, loothacker: crownLootHacker, bountyhunter: crownBountyHunter, trickortreat: trtCrown }, variants: ['base', 'gold', 'cheatmaster', 'loothacker', 'bountyhunter', 'trickortreat'], baseAbility: "Only levels up by winning matches. Level up faster with Crown Wins. New variants unlocked after mastering!" },
   { id: "eight-bit", name: "8-Bit", rarity: "Rare", season: 'C7S4', images: { base: eightBitBase, gold: eightBitGold, cheatmaster: eightBitCheatMaster, loothacker: eightBitLootHacker, bountyhunter: eightBitBountyHunter, trickortreat: trtEightBit }, variants: ['base', 'gold', 'cheatmaster', 'loothacker', 'bountyhunter', 'trickortreat'], baseAbility: "Find an 8-Bit Shotgun in your first chest and gain a score multiplier for it." },
@@ -461,13 +480,26 @@ const SPRITES_DATABASE = [
   { id: "morgana", name: "Morgana", rarity: "Epic", season: 'C7S4', images: { base: morganaBase, gold: morganaGold, cheatmaster: morganaCheatMaster, loothacker: morganaLootHacker, bountyhunter: morganaBountyHunter, trickortreat: trtMorgana }, variants: ['base', 'gold', 'cheatmaster', 'loothacker', 'bountyhunter', 'trickortreat'], baseAbility: "Increases the effectiveness of healing items. Healing effectiveness increases with each Level Up!" },
 
   // --- NEW WAVE 3 SPRITES ---
-  { id: "spooky-dash", name: "Spooky Dash", rarity: "Mythic", season: 'C7S4', images: { base: spookyBase, gold: spookyGold, cheatmaster: spookyCheatMaster, loothacker: spookyLootHacker, bountyhunter: spookyBountyHunter, trickortreat: trtSpookyDash }, variants: ['base', 'gold', 'cheatmaster', 'loothacker', 'bountyhunter', 'trickortreat'], baseAbility: "(Active - Jump in Air) Spooky Dash lets you phase through some objects. Gains charge over time. Charge cooldown decreases with each Level Up!" },
+  { id: "spooky-dash", name: "Spooky Dash", rarity: "Mythic", season: 'C7S4', images: { base: spookyBase, gold: spookyGold, quack: quackSpooky, cheatmaster: spookyCheatMaster, loothacker: spookyLootHacker, bountyhunter: spookyBountyHunter, trickortreat: trtSpookyDash }, variants: ['base', 'gold', 'quack', 'cheatmaster', 'loothacker', 'bountyhunter', 'trickortreat'], baseAbility: "(Active - Jump in Air) Spooky Dash lets you phase through some objects. Gains charge over time. Charge cooldown decreases with each Level Up!" },
   { id: "vampire", name: "Vampire", rarity: "Legendary", season: 'C7S4', images: { base: vampireBase, gold: vampireGold, cheatmaster: vampireCheatMaster, loothacker: vampireLootHacker, bountyhunter: vampireBountyHunter, trickortreat: trtVampire }, variants: ['base', 'gold', 'cheatmaster', 'loothacker', 'bountyhunter', 'trickortreat'], baseAbility: "Recover health when damaging an enemy. Health recovered percent increases with each Level Up!" },
   { id: "the-deer", name: "The Deer", rarity: "Legendary", season: 'C7S4', images: { base: deerBase, gold: deerGold, cheatmaster: deerCheatMaster, loothacker: deerLootHacker, bountyhunter: deerBountyHunter, trickortreat: trtTheDeer }, variants: ['base', 'gold', 'cheatmaster', 'loothacker', 'bountyhunter', 'trickortreat'], baseAbility: "Melee attacks deal more damage. Melee attack damage increases with each Level Up!" },
-  { id: "dumpster-dive", name: "Dumpster Dive", rarity: "Epic", season: 'C7S4', images: { base: dumpsterBase, gold: dumpsterGold, cheatmaster: dumpsterCheatMaster, loothacker: dumpsterLootHacker, bountyhunter: dumpsterBountyHunter, trickortreat: trtDumpster }, variants: ['base', 'gold', 'cheatmaster', 'loothacker', 'bountyhunter', 'trickortreat'], baseAbility: "Food provides bonus healing. Find food when jumping out of hiding props, and a small chance when opening containers. Find better food with each Level Up!" }
+  { id: "dumpster-dive", name: "Dumpster Dive", rarity: "Epic", season: 'C7S4', images: { base: dumpsterBase, gold: dumpsterGold, cheatmaster: dumpsterCheatMaster, loothacker: dumpsterLootHacker, bountyhunter: dumpsterBountyHunter, trickortreat: trtDumpster }, variants: ['base', 'gold', 'cheatmaster', 'loothacker', 'bountyhunter', 'trickortreat'], baseAbility: "Food provides bonus healing. Find food when jumping out of hiding props, and a small chance when opening containers. Find better food with each Level Up!" },
+
+  // --- NEW WAVE 4 SPRITES ---
+  { id: "honey", name: "Honey", rarity: "Epic", season: 'C7S4', images: { base: honeyBase, gold: honeyGold, cheatmaster: honeyCheatMaster, loothacker: honeyLootHacker, bountyhunter: honeyBountyHunter, trickortreat: trtHoney }, variants: ['base', 'gold', 'cheatmaster', 'loothacker', 'bountyhunter', 'trickortreat'], baseAbility: "Chance to spawn bees at the hit location upon dealing damage with a ranged weapon." },
+  { id: "one-wish-willow", name: "One Wish Willow", rarity: "Mythic", season: 'C7S4', images: { base: oneWishWillowBase, gold: oneWishWillowGold, cheatmaster: oneWishWillowCheatMaster, loothacker: oneWishWillowLootHacker, bountyhunter: oneWishWillowBountyHunter, trickortreat: trtOneWishWillow }, variants: ['base', 'gold', 'cheatmaster', 'loothacker', 'bountyhunter', 'trickortreat'], baseAbility: "Extract other players equipped Sprites when eliminating them. Push everything away when damaged. Gets upset when removed and marks you on the map." }
 ];
 
 const PATCH_NOTES = [
+  {
+    version: "v2.9.0",
+    date: "10/15/2026",
+    title: "Wave 4 Sprites & More Quack Variants!",
+    changes: [
+      "New Sprites: Honey (Epic) and One Wish Willow (Mythic) have joined the pool, each with Base, Gold, Cheat Master, Loot Hacker, Bounty Hunter and Trick or Treat variants.",
+      "More Quack Variants: Adventure, Bush, Jonesy, Klombo and Spooky Dash now have a Quack variant to collect."
+    ]
+  },
   {
     version: "v2.8.0",
     date: "10/05/2026",
