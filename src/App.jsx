@@ -20,6 +20,7 @@ import { auth, db } from './firebase';
 
 import PetView, { PetAttentionDot, PetReminderSync } from './pet/PetView';
 import { isPetEnabledFor } from './pet/petLogic';
+import PetClosetShop from './pet/PetClosetShop';
 import PetBadgeCard from './pet/PetBadgeCard';
 import { statusChips, statusForTab, showDot, cardVariant, emptyListMessage } from './spriteList';
 
@@ -340,8 +341,44 @@ import quackAdventure from './assets/Quack Adventure.webp';
 import quackKlombo from './assets/Quack Klombo.webp';
 import quackJonesy from './assets/Quack Jonesy.webp';
 import quackSpooky from './assets/Quack Spooky.webp';
+// --- CHAPTER 7 : MS SPRITES ---
+import halfpeeldBase from "./assets/Halfpeel'd Base.webp";
+import halfpeeldFortune from "./assets/Halfpeel'd Fortune.webp";
+import halfpeeldCursed from "./assets/Halfpeel'd Cursed.webp";
+import rePeteBase from "./assets/Re-Pete Base.webp";
+import rePeteFortune from "./assets/Re-Pete Fortune.webp";
+import rePeteCursed from "./assets/Re-Pete Cursed.webp";
+import barryOFishBase from "./assets/Barry O'Fish Base.webp";
+import barryOFishFortune from "./assets/Barry O'Fish Fortune.webp";
+import barryOFishCursed from "./assets/Barry O'Fish Cursed.webp";
+import chesterBase from "./assets/Chester Base.webp";
+import chesterFortune from "./assets/Chester Fortune.webp";
+import chesterCursed from "./assets/Chester Cursed.webp";
+import exmarksBase from "./assets/Exmarks Base.webp";
+import exmarksFortune from "./assets/Exmarks Fortune.webp";
+import exmarksCursed from "./assets/Exmarks Cursed.webp";
+import wayfinderBase from "./assets/Wayfinder Base.webp";
+import wayfinderFortune from "./assets/Wayfinder Fortune.webp";
+import wayfinderCursed from "./assets/Wayfinder Cursed.webp";
+import kelperBase from "./assets/Kelper Base.webp";
+import kelperFortune from "./assets/Kelper Fortune.webp";
+import kelperCursed from "./assets/Kelper Cursed.webp";
+import sweetDreamsBase from "./assets/Sweet Dreams Base.webp";
+import lilSquibblyBase from "./assets/Lil' Squibbly Base.webp";
+import lilSquibblyFortune from "./assets/Lil' Squibbly Fortune.webp";
+import lilSquibblyCursed from "./assets/Lil' Squibbly Cursed.webp";
+import lilFlackoBase from "./assets/Lil' Flacko Base.webp";
+import lilFlackoFortune from "./assets/Lil' Flacko Fortune.webp";
+import lilFlackoCursed from "./assets/Lil' Flacko Cursed.webp";
+import lilUziVertJrBase from "./assets/Lil' Uzi Vert Jr Base.webp";
+import lilUziVertJrFortune from "./assets/Lil' Uzi Vert Jr Fortune.webp";
+import lilUziVertJrCursed from "./assets/Lil' Uzi Vert Jr Cursed.webp";
+import plundarrghBase from "./assets/Plundarrgh Base.webp";
+import plundarrghFortune from "./assets/Plundarrgh Fortune.webp";
+import plundarrghCursed from "./assets/Plundarrgh Cursed.webp";
+import transponderSnailBase from "./assets/Transponder Snail Base.webp";
 
-const variantsList = ['base', 'gold', 'gummy', 'galaxy', 'holofoil', 'cube', 'gem', 'quack', 'cheatmaster', 'loothacker', 'bountyhunter', 'trickortreat'];
+const variantsList = ['base', 'gold', 'gummy', 'galaxy', 'holofoil', 'cube', 'gem', 'quack', 'cheatmaster', 'loothacker', 'bountyhunter', 'trickortreat', 'fortune', 'cursed'];
 const LOCKED_VARIANTS = {};
 
 const isVariantLocked = (spriteId, variant) => {
@@ -416,6 +453,14 @@ const AURA_DICTIONARY = {
     profileGlow: 'shadow-[0_0_30px_rgba(250,204,21,0.3)] border-yellow-400/50',
     profileBg: 'bg-[#151722]'
   },
+  'harvest_feast': {
+    name: 'Harvest Feast', tier: 4, isAnimated: true,
+    spinnerClass: 'bg-[conic-gradient(from_0deg,transparent_0%,#f59e0b_20%,#b91c1c_40%,#f59e0b_60%,#b45309_80%,transparent_100%)] opacity-80',
+    text: 'text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-red-500 drop-shadow-[0_0_8px_rgba(245,158,11,0.8)]',
+    ring: 'border-2 border-amber-400 shadow-[0_0_15px_rgba(185,28,28,0.8)] text-amber-400',
+    profileGlow: 'shadow-[0_0_30px_rgba(217,119,6,0.5)] border-amber-500/50',
+    profileBg: "bg-[#120905] bg-[url('data:image/svg+xml,%3Csvg%20width=%2260%22%20height=%2260%22%20viewBox=%220%200%2060%2060%22%20xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cpath%20d=%22M30%208%20C42%2018%2044%2032%2030%2046%20C16%2032%2018%2018%2030%208%20Z%22%20fill=%22%23f59e0b%22%20fill-opacity=%220.09%22/%3E%3Cpath%20d=%22M30%2014%20L30%2050%22%20stroke=%22%23b45309%22%20stroke-opacity=%220.18%22%20stroke-width=%221.5%22/%3E%3Ccircle%20cx=%2250%22%20cy=%2214%22%20r=%222%22%20fill=%22%23b91c1c%22%20fill-opacity=%220.2%22/%3E%3Ccircle%20cx=%2210%22%20cy=%2250%22%20r=%222%22%20fill=%22%23b91c1c%22%20fill-opacity=%220.15%22/%3E%3C/svg%3E')]"
+  },
   'spectral_haunt': {
     name: 'Spectral Haunt', tier: 4, isAnimated: true,
     spinnerClass: 'bg-[conic-gradient(from_0deg,transparent_0%,#ea580c_20%,#9333ea_40%,#ea580c_60%,#9333ea_80%,transparent_100%)] opacity-80',
@@ -426,6 +471,19 @@ const AURA_DICTIONARY = {
   }
 };
 
+
+// Limited auras sell only inside their window (UTC). Once it closes the aura is gone from the shop for everyone; owners keep it
+// and equip it from their profile's "Equip Aura" list.
+// firestore.rules enforces the same dates, so keep the two in step. Auras not listed here are always on sale.
+const AURA_SALE_WINDOWS = {
+  spectral_haunt: { from: '2026-10-01T00:00:00Z', until: '2026-11-01T00:00:00Z' },
+  harvest_feast: { from: '2026-11-01T00:00:00Z', until: '2026-12-01T00:00:00Z' },
+};
+const LIMITED_SHOP_LABEL = '🦃 Limited Edition (November)';
+const isAuraOnSale = (key, now = Date.now()) => {
+  const w = AURA_SALE_WINDOWS[key];
+  return !w || (now >= Date.parse(w.from) && now < Date.parse(w.until));
+};
 
 const SPRITES_DATABASE = [
   { id: "iron-mouse", name: "Iron Mouse", rarity: "Mythic", season: 'C7S3', images: { base: ironMouseBase }, variants: ['base'], baseAbility: "Regenerate health over time when low. While regenerating, gain Cloak and low gravity! Health regenerated to increases at each Level Up: 60 Health -> 70 Health -> 80 Health -> 90 Health -> 100 Health" },
@@ -487,10 +545,38 @@ const SPRITES_DATABASE = [
 
   // --- NEW WAVE 4 SPRITES ---
   { id: "honey", name: "Honey", rarity: "Epic", season: 'C7S4', images: { base: honeyBase, gold: honeyGold, cheatmaster: honeyCheatMaster, loothacker: honeyLootHacker, bountyhunter: honeyBountyHunter, trickortreat: trtHoney }, variants: ['base', 'gold', 'cheatmaster', 'loothacker', 'bountyhunter', 'trickortreat'], baseAbility: "Chance to spawn bees at the hit location upon dealing damage with a ranged weapon." },
-  { id: "one-wish-willow", name: "One Wish Willow", rarity: "Mythic", season: 'C7S4', images: { base: oneWishWillowBase, gold: oneWishWillowGold, cheatmaster: oneWishWillowCheatMaster, loothacker: oneWishWillowLootHacker, bountyhunter: oneWishWillowBountyHunter, trickortreat: trtOneWishWillow }, variants: ['base', 'gold', 'cheatmaster', 'loothacker', 'bountyhunter', 'trickortreat'], baseAbility: "Extract other players equipped Sprites when eliminating them. Push everything away when damaged. Gets upset when removed and marks you on the map." }
+  { id: "one-wish-willow", name: "One Wish Willow", rarity: "Mythic", season: 'C7S4', images: { base: oneWishWillowBase, gold: oneWishWillowGold, cheatmaster: oneWishWillowCheatMaster, loothacker: oneWishWillowLootHacker, bountyhunter: oneWishWillowBountyHunter, trickortreat: trtOneWishWillow }, variants: ['base', 'gold', 'cheatmaster', 'loothacker', 'bountyhunter', 'trickortreat'], baseAbility: "Extract other players equipped Sprites when eliminating them. Push everything away when damaged. Gets upset when removed and marks you on the map." },
+
+  // --- CHAPTER 7 : MS SPRITES (a whole new season) ---
+  { id: "halfpeeld", name: "Halfpeel'd", rarity: "Rare", season: 'C7MS', images: { base: halfpeeldBase, fortune: halfpeeldFortune, cursed: halfpeeldCursed }, variants: ['base', 'fortune', 'cursed'], baseAbility: "Marks eliminations on the map. Effect radius increases with each level up!" },
+  { id: "re-pete", name: "Re-Pete", rarity: "Rare", season: 'C7MS', images: { base: rePeteBase, fortune: rePeteFortune, cursed: rePeteCursed }, variants: ['base', 'fortune', 'cursed'], baseAbility: "Increases reload speed, with a chance that reloading refunds ammo. Reload faster and higher chance of ammo refunds with each Level Up!" },
+  { id: "barry-ofish", name: "Barry O'Fish", rarity: "Rare", season: 'C7MS', images: { base: barryOFishBase, fortune: barryOFishFortune, cursed: barryOFishCursed }, variants: ['base', 'fortune', 'cursed'], baseAbility: "Reduces tactical sprint stamina drain when in water. Gain Slap at max level!" },
+  { id: "chester", name: "Chester", rarity: "Epic", season: 'C7MS', images: { base: chesterBase, fortune: chesterFortune, cursed: chesterCursed }, variants: ['base', 'fortune', 'cursed'], baseAbility: "Grants a chance to spawn extra loot from Treasure Chests and nullifies fall damage. Increased chance of spawning an extra loot item with each Level Up!" },
+  { id: "exmarks", name: "Exmarks", rarity: "Epic", season: 'C7MS', images: { base: exmarksBase, fortune: exmarksFortune, cursed: exmarksCursed }, variants: ['base', 'fortune', 'cursed'], baseAbility: "Reveals Treasure Maps and Wanted Posters. Spawns a Treasure Map at Max Level!" },
+  { id: "wayfinder", name: "Wayfinder", rarity: "Rare", season: 'C7MS', images: { base: wayfinderBase, fortune: wayfinderFortune, cursed: wayfinderCursed }, variants: ['base', 'fortune', 'cursed'], baseAbility: "Reveals Sprites nearby and grants more items when opening Buried Chests. Sprite detection radius increases with each Level Up!" },
+  { id: "kelper", name: "Kelper", rarity: "Epic", season: 'C7MS', images: { base: kelperBase, fortune: kelperFortune, cursed: kelperCursed }, variants: ['base', 'fortune', 'cursed'], baseAbility: "Restores health over time when in water. Increased amount of health with each Level Up!" },
+  { id: "sweet-dreams", name: "Sweet Dreams", rarity: "Mythic", season: 'C7MS', images: { base: sweetDreamsBase }, variants: ['base'], baseAbility: "Grants a random item at each level, exploding with Mythic loot at Max Level. Loot value increases at each Level Up!" },
+  { id: "lil-squibbly", name: "Lil' Squibbly", rarity: "Epic", season: 'C7MS', images: { base: lilSquibblyBase, fortune: lilSquibblyFortune, cursed: lilSquibblyCursed }, variants: ['base', 'fortune', 'cursed'], baseAbility: "Jumping into a fishing hole fishes it and gives some bonus loot. Get more loot as you level up." },
+  { id: "lil-flacko", name: "Lil' Flacko", rarity: "Legendary", season: 'C7MS', images: { base: lilFlackoBase, fortune: lilFlackoFortune, cursed: lilFlackoCursed }, variants: ['base', 'fortune', 'cursed'], baseAbility: "Creates a small shockwave on landing, knocking back enemies. Increased knockback strength with each Level Up!" },
+  { id: "lil-uzi-vert-jr", name: "Lil' Uzi Vert Jr.", rarity: "Legendary", season: 'C7MS', images: { base: lilUziVertJrBase, fortune: lilUziVertJrFortune, cursed: lilUziVertJrCursed }, variants: ['base', 'fortune', 'cursed'], baseAbility: "Generates a Chug Splash effect when restoring shields. Decreased cooldown with each Level Up!" },
+  { id: "plundarrgh", name: "Plundarrgh", rarity: "Mythic", season: 'C7MS', images: { base: plundarrghBase, fortune: plundarrghFortune, cursed: plundarrghCursed }, variants: ['base', 'fortune', 'cursed'], baseAbility: "Opening Chest grants increased pickaxe speed and movement speed." },
+  { id: "transponder-snail", name: "Transponder Snail", rarity: "Mythic", season: 'C7MS', images: { base: transponderSnailBase }, variants: ['base'], baseAbility: "Grants extra resources on pickup, with Teammates who also have this Sprite equipped receiving some extra resources as well! Increased amount of resources received at each Level Up!" }
 ];
 
 const PATCH_NOTES = [
+  {
+    version: "v3.0.0",
+    date: "11/01/2026",
+    title: "Chapter 7: MS Has Arrived!",
+    changes: [
+      "13 NEW SPRITES! Halfpeel'd, Re-Pete, Barry O'Fish, Wayfinder, Chester, Exmarks, Kelper, Lil' Squibbly, Lil' Flacko, Lil' Uzi Vert Jr., Plundarrgh, Sweet Dreams and Transponder Snail join the pool.",
+      "New Variants: Fortune reveals nearby Chests and Cursed gives you a special bonus. Sweet Dreams and Transponder Snail only come in Base.",
+      "Ch 7: MS Everywhere: Filter by the new season in your Sprites list, friend views and profile cards, and see it on your Collector Card.",
+      "Vaulted Seasons: Season 3 and Season 4 Sprites are now vaulted. Trades and extraction targets only list Ch 7: MS Sprites, but vaulted Sprites still count in your collection and can be raised as pets.",
+      "New Limited Aura: Harvest Feast is in the Black Market through November 30. Spectral Haunt has left the shop for good, but everyone who got it keeps it.",
+      "Sprite Pet Closet: the Black Market now sells 7 accessories (hats, a halo, orbiting stars) and 6 room themes for your Sprite Pet. Buy them once, then pick them from the new Wardrobe button on your pet."
+    ]
+  },
   {
     version: "v2.9.0",
     date: "10/15/2026",
@@ -784,13 +870,17 @@ const VARIANT_INFO = {
   cheatmaster: { name: "Cheat Master", color: "text-green-500", bgColor: "bg-green-500", borderColor: "border-green-500/70" },
   loothacker: { name: "Loot Hacker", color: "text-purple-300", bgColor: "bg-purple-300", borderColor: "border-purple-500/70" },
   bountyhunter: { name: "Bounty Hunter", color: "text-red-500", bgColor: "bg-red-500", borderColor: "border-red-500/70" },
-  trickortreat: { name: "Trick or Treat", color: "text-orange-500", bgColor: "bg-orange-500", borderColor: "border-orange-500/70" }
+  trickortreat: { name: "Trick or Treat", color: "text-orange-500", bgColor: "bg-orange-500", borderColor: "border-orange-500/70" },
+  fortune: { name: "Fortune", color: "text-rose-500", bgColor: "bg-rose-600", borderColor: "border-rose-500/70" },
+  cursed: { name: "Cursed", color: "text-yellow-400", bgColor: "bg-yellow-400", borderColor: "border-yellow-500/70" }
 };
+
+const SEASON_LABELS = { C7S3: 'Ch 7: S3', C7S4: 'Ch 7: S4', C7MS: 'Ch 7: MS' };
 
 // Display names for the filter chips and badges that are looked up by key. Anything not listed shows as the key itself.
 const LABELS = {
   all: "All", mythic: "Mythic", legendary: "Legendary", epic: "Epic", rare: "Rare", unknown: "Unknown",
-  base: "Base", gold: "Gold", gummy: "Gummy", galaxy: "Galaxy", holofoil: "Holofoil", cube: "Cube", gem: "Gem", quack: "Quack",
+  base: "Base", gold: "Gold", gummy: "Gummy", galaxy: "Galaxy", holofoil: "Holofoil", cube: "Cube", gem: "Gem", quack: "Quack", fortune: "Fortune", cursed: "Cursed",
   collected: "Collected", missing: "Missing", i_need: "I Need", they_need: "They Need", mastered: "Mastered", unmastered: "Unmastered"
 };
 const label = (key) => LABELS[key] || key;
@@ -947,6 +1037,8 @@ function MainApp() {
   const [fSortBy, setFSortBy] = useState('A-Z');
 
   const [fragments, setFragments] = useState(0);
+  const [petItems, setPetItems] = useState([]); // Sprite Pet accessories and room themes bought in the Black Market
+  const [petLook, setPetLook] = useState({}); // which of them the pet wears / lives in: { accessory, room }
   const [lastRadarSweep, setLastRadarSweep] = useState(null);
   const [sweepStreak, setSweepStreak] = useState(0);
   const [dailyIntel, setDailyIntel] = useState("");
@@ -1138,7 +1230,7 @@ function MainApp() {
       setProfileData({ bio: '', epicName: '', twitchName: '', tiktokName: '', youtubeName: '', kickName: '', trophies: [null, null, null, null, null], activeAura: null });
       setSpriteId(null); setDesiredSpriteId(''); setFriendsList([]); setPendingRequests([]);
       setSentRequests([]); setRichFriends([]); setActiveViewingFriend(null); setHasCheckedVersion(false);
-      setFragments(0); setLastRadarSweep(null); setSweepStreak(0); setDailyIntel(""); setNewsFeed([]);
+      setFragments(0); setPetItems([]); setPetLook({}); setLastRadarSweep(null); setSweepStreak(0); setDailyIntel(""); setNewsFeed([]);
       setUnlockedMilestones([]); setReputationVouches([]); setBlockedUsers([]);
       return;
     }
@@ -1167,6 +1259,7 @@ function MainApp() {
         setExtractionTargets(data.extractionTargets || []);
         setProfileData(data.profile || { bio: '', epicName: '', twitchName: '', tiktokName: '', youtubeName: '', kickName: '', trophies: [null, null, null, null, null], activeAura: null });
         setFriendsList(data.friends || []); setFragments(data.fragments || 0);
+        setPetItems(Array.isArray(data.petItems) ? data.petItems : []); setPetLook(data.petLook || {});
         setLastRadarSweep(data.lastRadarSweep && typeof data.lastRadarSweep.toDate === 'function' ? data.lastRadarSweep.toDate() : null);
         setSweepStreak(data.sweepStreak || 0); setDailyIntel(data.dailyIntel || "");
         setUnlockedMilestones(data.unlockedMilestones || []);
@@ -1328,7 +1421,7 @@ function MainApp() {
     if (isVariantLocked(spriteId, variant)) return;
     const currentVal = collection[spriteId]?.[variant]; const newVal = !currentVal;
     if (newVal) {
-      if (variant === 'holofoil' || variant === 'cube' || variant === 'gem' || variant === 'quack' || variant === 'cheatmaster' || variant === 'trickortreat') playBeep(1200, 'square', 0.15);
+      if (variant === 'holofoil' || variant === 'cube' || variant === 'gem' || variant === 'quack' || variant === 'cheatmaster' || variant === 'trickortreat' || variant === 'fortune' || variant === 'cursed') playBeep(1200, 'square', 0.15);
       else if (variant === 'galaxy') playBeep(880, 'triangle', 0.15);
       else if (variant === 'gold') playBeep(659, 'sine', 0.1);
       else if (variant === 'gummy') playBeep(587, 'sine', 0.1);
@@ -1432,6 +1525,27 @@ function MainApp() {
       alert("Failed to fetch stats. Check console for error.");
       console.error(error);
     }
+  };
+
+  // Sprite Pet Closet: buy an accessory or room theme with fragments, and choose what the pet wears (id null = take it off).
+  const handleBuyPetItem = async (item) => {
+    if (petItems.includes(item.id)) return;
+    if (fragments < item.price) return alert("Not enough fragments!");
+    if (!window.confirm(`Purchase ${item.name} for ${item.price.toLocaleString()} Fragments?`)) return;
+    try {
+      const newFrags = fragments - item.price;
+      const newItems = [...petItems, item.id];
+      await updateDoc(doc(db, "users", user.uid), { fragments: newFrags, petItems: newItems });
+      setFragments(newFrags); setPetItems(newItems); playBeep(1046.50, 'sine', 0.2);
+    } catch { alert("The purchase could not be completed. Please try again."); }
+  };
+
+  const handleEquipPetItem = async (kind, id) => {
+    const next = { ...petLook, [kind]: id };
+    try {
+      await updateDoc(doc(db, "users", user.uid), { petLook: next });
+      setPetLook(next); playBeep(880, 'sine', 0.1);
+    } catch { /* the look stays as it was */ }
   };
 
   const handleAbsoluteReset = () => {
@@ -1998,6 +2112,8 @@ function MainApp() {
       case 'gem': return "Take 30% less Fall damage";
       case 'quack': return "Gives 50% Sprite XP earned to all other Sprites in your inventory";
       case 'trickortreat': return "Chance to find candy when opening containers.";
+      case 'fortune': return "Reveals nearby Chests.";
+      case 'cursed': return "Gives you a special bonus!";
       default: return null;
     }
   };
@@ -2072,7 +2188,7 @@ function MainApp() {
             {!isEditingProfile && (
               <>
                 <div className="bg-black/40 p-1 rounded-xl mb-4 flex border border-white/5 shadow-inner" data-html2canvas-ignore="true">
-                  {['All', 'C7S3', 'C7S4'].map(s => (
+                  {['All', 'C7S3', 'C7S4', 'C7MS'].map(s => (
                     <button key={s} onClick={() => setCurrentFilter(s)} className={`flex-1 py-1.5 text-[10px] font-black uppercase tracking-wider rounded-lg transition-all duration-300 ${currentFilter === s ? 'bg-indigo-600 text-white shadow-md' : 'text-slate-500 hover:text-slate-300 hover:bg-white/5'}`}>
                       {s === 'All' ? 'All Seasons' : s}
                     </button>
@@ -2485,10 +2601,10 @@ function MainApp() {
                   {[4, 1, 2, 3].map(tier => (
                     <div key={tier} className={`rounded-xl p-3 ${tier === 4 ? 'bg-orange-950/20 border-2 border-orange-500/50 shadow-[0_0_20px_rgba(249,115,22,0.1)]' : 'bg-slate-900/50 border border-slate-800'}`}>
                       <span className={`block text-[10px] font-black uppercase tracking-widest mb-3 border-b pb-2 ${tier === 4 ? 'text-orange-400 border-orange-500/30' : 'text-slate-400 border-slate-800'}`}>
-                        {tier === 4 ? '💀 Limited Edition (October)' : `Tier ${tier}`}
+                        {tier === 4 ? LIMITED_SHOP_LABEL : `Tier ${tier}`}
                       </span>
                       <div className="flex flex-col gap-3">
-                        {Object.entries(AURA_DICTIONARY).filter(([_, aura]) => aura.tier === tier).map(([key, aura]) => {
+                        {Object.entries(AURA_DICTIONARY).filter(([key, aura]) => aura.tier === tier && isAuraOnSale(key)).map(([key, aura]) => {
                           const cost = tier === 1 ? 1000 : tier === 2 ? 2500 : tier === 3 ? 5000 : 1250;
                           const isOwned = profileData.purchasedAuras?.includes(key);
 
@@ -2520,6 +2636,7 @@ function MainApp() {
                                   }
 
                                   // PURCHASE LOGIC
+                                  if (!isAuraOnSale(key)) return alert("This limited aura is no longer available.");
                                   if (fragments < cost) return alert("Not enough fragments!");
                                   if (!window.confirm(`Purchase ${aura.name} for ${cost.toLocaleString()} Fragments?`)) return;
                                   try {
@@ -2542,6 +2659,11 @@ function MainApp() {
                   ))}
                 </div>
               </section>
+
+              {/* SPRITE PET CLOSET */}
+              {isPetEnabledFor(user?.uid) && (
+                <PetClosetShop fragments={fragments} petItems={petItems} petLook={petLook} onBuy={handleBuyPetItem} onEquip={handleEquipPetItem} />
+              )}
 
             </div>
           </div>
@@ -2682,8 +2804,8 @@ function MainApp() {
             </header>
             <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-4">
               {SPRITES_DATABASE.map(sprite => {
-                // RESTRICT TRADE BOARD AND EXTRACTIONS TO ACTIVE SEASON ONLY
-                if ((selectorContext === 'commsLooking' || selectorContext === 'commsOffering' || selectorContext === 'extraction') && sprite.season !== 'C7S4') {
+                // RESTRICT TRADE BOARD AND EXTRACTIONS TO ACTIVE SEASON ONLY (earlier seasons are vaulted in game)
+                if ((selectorContext === 'commsLooking' || selectorContext === 'commsOffering' || selectorContext === 'extraction') && sprite.season !== 'C7MS') {
                   return null;
                 }
 
@@ -2766,7 +2888,7 @@ function MainApp() {
                     <div className="flex items-center gap-2 mt-1 flex-wrap">
                       <span className={`text-[9px] sm:text-[10px] font-black uppercase px-2 py-0.5 rounded border ${RARITY_COLORS[sprite.rarity]}`}>{label(sprite.rarity.toLowerCase())}</span>
                       <span className={`text-[9px] sm:text-[10px] font-black uppercase px-2 py-0.5 rounded border border-slate-700 bg-slate-800 ${VARIANT_INFO[v]?.color}`}>{label(v)}</span>
-                      {sprite.season === 'C7S3' && <span className="text-[9px] sm:text-[10px] font-black uppercase px-2 py-0.5 rounded border border-slate-700 bg-slate-900 text-slate-400">Vaulted</span>}
+                      {sprite.season !== 'C7MS' && <span className="text-[9px] sm:text-[10px] font-black uppercase px-2 py-0.5 rounded border border-slate-700 bg-slate-900 text-slate-400">Vaulted</span>}
                       {isLocked && <span className="text-[9px] sm:text-[10px] font-black uppercase px-2 py-0.5 rounded border border-amber-500/50 bg-amber-950/60 text-amber-400 flex items-center gap-1"><Lock className="w-3 h-3" /> Locked</span>}
                     </div>
                   </div>
@@ -2908,9 +3030,9 @@ function MainApp() {
                   <div>
                     <span className="text-[9px] text-slate-500 font-black uppercase tracking-widest mb-1.5 block">Season Filter</span>
                     <div className="flex flex-wrap gap-1.5">
-                      {['All', 'C7S3', 'C7S4'].map(season => (
+                      {['All', 'C7S3', 'C7S4', 'C7MS'].map(season => (
                         <button key={season} onClick={() => setFSeasonFilter(season)} className={`px-3 py-1.5 text-[10px] font-black tracking-wider rounded-lg border uppercase ${fSeasonFilter === season ? 'bg-indigo-500 text-white border-indigo-400' : 'bg-black/40 text-slate-400 border-slate-800'}`}>
-                          {season === 'All' ? 'All Seasons' : season === 'C7S3' ? 'Ch 7: S3' : 'Ch 7: S4'}
+                          {season === 'All' ? 'All Seasons' : SEASON_LABELS[season]}
                         </button>
                       ))}
                     </div>
@@ -2928,7 +3050,7 @@ function MainApp() {
                   <div>
                     <span className="text-[9px] text-slate-500 font-black uppercase tracking-widest mb-1.5 block">Variant Type</span>
                     <div className="flex flex-wrap gap-1.5">
-                      {['All', 'Base', 'Gold', 'Gummy', 'Galaxy', 'Holofoil', 'Cube', 'Gem', 'Quack', 'Cheatmaster', 'Loot Hacker', 'Bounty Hunter', 'Trick or Treat'].map(variant => (
+                      {['All', 'Base', 'Gold', 'Gummy', 'Galaxy', 'Holofoil', 'Cube', 'Gem', 'Quack', 'Cheatmaster', 'Loot Hacker', 'Bounty Hunter', 'Trick or Treat', 'Fortune', 'Cursed'].map(variant => (
                         <button key={variant} onClick={() => setFVariantFilter(variant)} className={`px-3 py-1.5 text-[10px] font-black tracking-wider rounded-lg border uppercase ${fVariantFilter === variant ? 'bg-purple-500 text-white border-purple-400' : 'bg-black/40 text-slate-400 border-slate-800'}`}>
                           {label(variant.toLowerCase())}
                         </button>
@@ -2979,7 +3101,7 @@ function MainApp() {
                   </div>
                   <div className="flex-1 flex flex-col justify-center min-w-0">
                     <div className="flex flex-col mb-2.5">
-                      <span className="font-black text-base sm:text-lg text-white uppercase italic tracking-tight truncate">{sprite.name} {sprite.season === 'C7S3' && <span className="text-[8px] bg-slate-800 text-slate-400 px-1.5 py-0.5 rounded ml-1 not-italic">VAULTED</span>}</span>
+                      <span className="font-black text-base sm:text-lg text-white uppercase italic tracking-tight truncate">{sprite.name} {sprite.season !== 'C7MS' && <span className="text-[8px] bg-slate-800 text-slate-400 px-1.5 py-0.5 rounded ml-1 not-italic">VAULTED</span>}</span>
                       <span className={`text-[8px] sm:text-[9px] font-black uppercase tracking-widest ${VARIANT_INFO[validInitialVariant]?.color}`}>{label(validInitialVariant)}</span>
                     </div>
                     <div className="flex flex-wrap gap-x-3 gap-y-2">
@@ -3047,7 +3169,7 @@ function MainApp() {
       <main className="flex-1 max-w-md w-full mx-auto p-4 flex flex-col gap-5 pb-24">
         {/* --- SPRITE PET VIEW --- */}
         {currentView === 'pet' && user && isPetEnabledFor(user.uid) && (
-          <PetView uid={user.uid} spritesDatabase={SPRITES_DATABASE} collection={collection} playBeep={playBeep} onOverlayChange={setPetOverlay} />
+          <PetView uid={user.uid} spritesDatabase={SPRITES_DATABASE} collection={collection} playBeep={playBeep} petItems={petItems} petLook={petLook} onEquipPetItem={handleEquipPetItem} onOverlayChange={setPetOverlay} />
         )}
 
         {/* --- PROFILE VIEW --- */}
@@ -3157,9 +3279,9 @@ function MainApp() {
                   <div>
                     <span className="text-[9px] text-slate-500 font-black uppercase tracking-widest mb-1.5 block">Season Filter</span>
                     <div className="flex flex-wrap gap-1.5">
-                      {['All', 'C7S3', 'C7S4'].map(season => (
+                      {['All', 'C7S3', 'C7S4', 'C7MS'].map(season => (
                         <button key={season} onClick={() => handleSeasonFilterChange(season)} className={`px-3 py-1.5 text-[10px] font-black tracking-wider rounded-lg border uppercase ${seasonFilter === season ? 'bg-cyan-500 text-white border-cyan-400' : 'bg-black/40 text-slate-400 border-slate-800'}`}>
-                          {season === 'All' ? 'All Seasons' : season === 'C7S3' ? 'Ch 7: S3' : 'Ch 7: S4'}
+                          {season === 'All' ? 'All Seasons' : SEASON_LABELS[season]}
                         </button>
                       ))}
                     </div>
@@ -3177,7 +3299,7 @@ function MainApp() {
                   <div>
                     <span className="text-[9px] text-slate-500 font-black uppercase tracking-widest mb-1.5 block">Variant Type</span>
                     <div className="flex flex-wrap gap-1.5">
-                      {['All', 'Base', 'Gold', 'Gummy', 'Galaxy', 'Holofoil', 'Cube', 'Gem', 'Quack', 'Cheatmaster', 'Loot Hacker', 'Bounty Hunter', 'Trick or Treat'].map(variant => (
+                      {['All', 'Base', 'Gold', 'Gummy', 'Galaxy', 'Holofoil', 'Cube', 'Gem', 'Quack', 'Cheatmaster', 'Loot Hacker', 'Bounty Hunter', 'Trick or Treat', 'Fortune', 'Cursed'].map(variant => (
                         <button key={variant} onClick={() => setVariantFilter(variant)} className={`px-3 py-1.5 text-[10px] font-black tracking-wider rounded-lg border uppercase ${variantFilter === variant ? 'bg-purple-500 text-white border-purple-400' : 'bg-black/40 text-slate-400 border-slate-800'}`}>
                           {label(variant.toLowerCase())}
                         </button>
@@ -3220,7 +3342,7 @@ function MainApp() {
                       </div>
                       <div className="flex-1 flex flex-col justify-center min-w-0">
                         <div className="flex flex-col mb-2.5">
-                          <span className="font-black text-base sm:text-lg text-white uppercase italic tracking-tight truncate">{sprite.name} {sprite.season === 'C7S3' && <span className="text-[8px] bg-slate-800 text-slate-400 px-1.5 py-0.5 rounded ml-1 not-italic">VAULTED</span>}</span>
+                          <span className="font-black text-base sm:text-lg text-white uppercase italic tracking-tight truncate">{sprite.name} {sprite.season !== 'C7MS' && <span className="text-[8px] bg-slate-800 text-slate-400 px-1.5 py-0.5 rounded ml-1 not-italic">VAULTED</span>}</span>
                           <span className={`text-[8px] sm:text-[9px] font-black uppercase tracking-widest ${VARIANT_INFO[validInitialVariant]?.color}`}>{label(validInitialVariant)}</span>
                         </div>
                         <div className="flex flex-wrap gap-x-3 gap-y-2">
@@ -3616,7 +3738,8 @@ function MainApp() {
       {/* --- HIDDEN COLLECTOR CARD POSTER FOR EXPORT --- */}
       {user && (() => {
         // Separate sprites by season
-        const s4Sprites = SPRITES_DATABASE.filter(s => s.season !== 'C7S3');
+        const msSprites = SPRITES_DATABASE.filter(s => s.season === 'C7MS');
+        const s4Sprites = SPRITES_DATABASE.filter(s => s.season === 'C7S4');
         const s3Sprites = SPRITES_DATABASE.filter(s => s.season === 'C7S3');
 
         // Helper to calculate accurate variants math for a specific season
@@ -3633,10 +3756,12 @@ function MainApp() {
           };
         };
 
+        const msStats = getStats(msSprites);
         const s4Stats = getStats(s4Sprites);
         const s3Stats = getStats(s3Sprites);
 
         // Check if the user actually owns anything in these seasons to prevent empty sections
+        const hasMS = msSprites.some(s => variantsList.some(v => collection[s.id]?.[v]));
         const hasS4 = s4Sprites.some(s => variantsList.some(v => collection[s.id]?.[v]));
         const hasS3 = s3Sprites.some(s => variantsList.some(v => collection[s.id]?.[v]));
 
@@ -3678,11 +3803,25 @@ function MainApp() {
                 </div>
               </div>
 
+              {/* Chapter 7 : MS Section (current season) */}
+              {hasMS && (
+                <div className={hasS4 || hasS3 ? "mb-10" : "mb-4"}>
+                  <div className="flex justify-between items-end border-b border-slate-700/50 pb-2 mb-6">
+                    <h3 className="text-2xl font-black text-cyan-400 italic">CHAPTER 7 : MS</h3>
+                    <div className="text-right">
+                      <span className="text-2xl font-black text-white font-mono block mb-0.5">{msStats.percentage}% COMPLETE</span>
+                      <span className="text-sm font-bold text-slate-400 uppercase tracking-widest">{msStats.collected} / {msStats.possible} SECURED</span>
+                    </div>
+                  </div>
+                  {renderGrid(msSprites)}
+                </div>
+              )}
+
               {/* Season 4 Section */}
               {hasS4 && (
                 <div className={hasS3 ? "mb-10" : "mb-4"}>
                   <div className="flex justify-between items-end border-b border-slate-700/50 pb-2 mb-6">
-                    <h3 className="text-2xl font-black text-cyan-400 italic">CHAPTER 7 : SEASON 4</h3>
+                    <h3 className="text-2xl font-black text-slate-400 italic">CHAPTER 7 : SEASON 4 <span className="text-sm bg-slate-800 px-2 py-1 rounded ml-2 not-italic text-slate-300 tracking-wider">VAULTED</span></h3>
                     <div className="text-right">
                       <span className="text-2xl font-black text-white font-mono block mb-0.5">{s4Stats.percentage}% COMPLETE</span>
                       <span className="text-sm font-bold text-slate-400 uppercase tracking-widest">{s4Stats.collected} / {s4Stats.possible} SECURED</span>

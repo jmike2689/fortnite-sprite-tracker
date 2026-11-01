@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { PawPrint, Heart, Ghost } from 'lucide-react';
 import PetRoom from './PetRoom';
+import PetAccessory from './PetAccessory';
 import { RARITY_EDGE, FALLBACK_EDGE } from './roomLogic';
 import { MOOD_META, REACTION_ICON, REACTION_COLOR } from './petMoods';
 import { cleanNickname } from './petName';
@@ -28,7 +29,8 @@ function useReducedMotion() {
 // `nickname` (the owner's private name for it, if it was adopted with one) shows on a little nameplate.
 // `phase` is the time of day outside (morning, day, evening or night) and decides how the room looks. When the
 // Sprite is asleep the lights go out, and a Sprite that has passed away has a quiet dark room.
-export default function PetStage({ sprite, image, moodKey, reaction, nickname, phase = 'day', interactive = false, onTap }) {
+// `accessory` and `room` are the shop items (from petItems.js) it wears and lives in, or null for none.
+export default function PetStage({ sprite, image, moodKey, reaction, nickname, phase = 'day', accessory = null, room = null, interactive = false, onTap }) {
   const name = cleanNickname(nickname);
   const mood = MOOD_META[moodKey] || MOOD_META.ok;
   const Bubble = mood.bubble;
@@ -114,20 +116,24 @@ export default function PetStage({ sprite, image, moodKey, reaction, nickname, p
   const facingLeft = here && stance.left;
   const glide = reduceMotion ? 'none' : `transform ${TIMING.wanderGlide}ms ease-in-out`;
 
+  // The picture and its accessory share one box, so the hat moves, bounces and turns with the Sprite.
   const figure = image ? (
-    <img
-      src={image}
-      alt={sprite?.name || 'Sprite'}
-      draggable={false}
-      className={`block w-44 h-44 object-contain select-none drop-shadow-[0_10px_18px_rgba(0,0,0,0.55)] ${mood.anim} ${mood.tone}`}
-    />
+    <div className="relative w-44 h-44">
+      <img
+        src={image}
+        alt={sprite?.name || 'Sprite'}
+        draggable={false}
+        className={`block w-44 h-44 object-contain select-none drop-shadow-[0_10px_18px_rgba(0,0,0,0.55)] ${mood.anim} ${mood.tone}`}
+      />
+      {accessory && !gone && <PetAccessory item={accessory} image={image} />}
+    </div>
   ) : (
     <PawPrint className="w-24 h-24 text-slate-500 mb-6" />
   );
 
   return (
     <div className={`relative overflow-hidden rounded-3xl border-2 bg-slate-950 ${RARITY_EDGE[rarity] || FALLBACK_EDGE}`}>
-      <PetRoom phase={gone ? 'night' : phase} rarity={rarity} dim={gone || moodKey === 'sleeping'} />
+      <PetRoom phase={gone ? 'night' : phase} rarity={rarity} dim={gone || moodKey === 'sleeping'} theme={room} />
       <div className="relative flex items-end justify-center h-64 pb-10">
         <div
           className="absolute bottom-8 w-40 h-5 rounded-[50%] bg-black/50 blur-md"

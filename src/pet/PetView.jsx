@@ -5,11 +5,13 @@ import { Haptics, ImpactStyle } from '@capacitor/haptics';
 import { LocalNotifications } from '@capacitor/local-notifications';
 import {
   PawPrint, Utensils, Heart, Droplets, Zap, Moon, Sun, Pill, Gamepad2, Bath, HeartPulse,
-  TriangleAlert, Info, Sparkles, Bell, BellOff,
+  TriangleAlert, Info, Sparkles, Bell, BellOff, Shirt,
 } from 'lucide-react';
 import PlayHub from './games/PlayHub';
 import PetStage from './PetStage';
 import AdoptDialog from './AdoptDialog';
+import PetWardrobe from './PetWardrobe';
+import { equippedItem } from './petItems';
 import { PHASES, timeOfDay } from './roomLogic';
 import { petName, cleanNickname } from './petName';
 import { PET_STYLES, MOOD_META } from './petMoods';
@@ -349,8 +351,12 @@ function PreviewToolsCard({ tools, ev }) {
   );
 }
 
-export function PetScreen({ pet, now, spritesDatabase, collection, busy, notice, reaction, reminders, tools, deathFailed, playBeep, onOverlayChange, onToggleReminders, onAction, onAdopt, onRelease, onDeath }) {
+export function PetScreen({ pet, now, spritesDatabase, collection, busy, notice, reaction, reminders, tools, deathFailed, playBeep, petItems, petLook, onEquipPetItem, onOverlayChange, onToggleReminders, onAction, onAdopt, onRelease, onDeath }) {
   const [showGuide, setShowGuide] = useState(false);
+  const [showWardrobe, setShowWardrobe] = useState(false);
+  // Only things you really own are shown, whatever the saved look says.
+  const accessory = equippedItem('accessory', petLook, petItems);
+  const room = equippedItem('room', petLook, petItems);
   const [showPicker, setShowPicker] = useState(false);
   const [playOpen, setPlayOpen] = useState(false);
 
@@ -416,7 +422,7 @@ export function PetScreen({ pet, now, spritesDatabase, collection, busy, notice,
       <div className="flex flex-col gap-4">
         <style>{PET_STYLES}</style>
         {noticeBanner}
-        <PetStage sprite={sprite} image={image} moodKey="dead" nickname={pet.nickname} phase={phase} />
+        <PetStage sprite={sprite} image={image} moodKey="dead" nickname={pet.nickname} phase={phase} room={room} />
         <div className="text-center">
           <h2 className="text-xl font-black uppercase italic text-slate-200">Rest in peace, {petName(pet, sprite)}</h2>
           <p className="text-xs font-mono text-slate-500 mt-1">Lived {formatDuration(ev.ageMs)} - {describeCause(ev.cause)}</p>
@@ -481,21 +487,33 @@ export function PetScreen({ pet, now, spritesDatabase, collection, busy, notice,
             {sprite?.name || 'Sprite'} - {variantLabel(pet.variant)} - Age {formatDuration(ev.ageMs)}
           </p>
         </div>
-        <button
-          type="button"
-          onClick={() => setShowGuide((v) => !v)}
-          aria-label="Care guide"
-          aria-pressed={showGuide}
-          className="p-2 rounded-xl bg-slate-900 border-2 border-slate-700/60 hover:bg-slate-800 transition-colors"
-        >
-          <Info className="w-5 h-5 text-slate-300" />
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => setShowWardrobe((v) => !v)}
+            aria-label="Wardrobe"
+            aria-pressed={showWardrobe}
+            className="p-2 rounded-xl bg-slate-900 border-2 border-slate-700/60 hover:bg-slate-800 transition-colors"
+          >
+            <Shirt className="w-5 h-5 text-slate-300" />
+          </button>
+          <button
+            type="button"
+            onClick={() => setShowGuide((v) => !v)}
+            aria-label="Care guide"
+            aria-pressed={showGuide}
+            className="p-2 rounded-xl bg-slate-900 border-2 border-slate-700/60 hover:bg-slate-800 transition-colors"
+          >
+            <Info className="w-5 h-5 text-slate-300" />
+          </button>
+        </div>
       </div>
 
       {showGuide && <CareGuide />}
+      {showWardrobe && <PetWardrobe petItems={petItems} equippedAccessory={accessory} equippedRoom={room} onEquip={onEquipPetItem} />}
 
       <div className="flex flex-col gap-2.5">
-        <PetStage sprite={sprite} image={image} moodKey={ev.mood} reaction={reaction} nickname={pet.nickname} phase={phase} interactive onTap={(moodKey) => beep(TAP_BEEP[moodKey])} />
+        <PetStage sprite={sprite} image={image} moodKey={ev.mood} reaction={reaction} nickname={pet.nickname} phase={phase} accessory={accessory} room={room} interactive onTap={(moodKey) => beep(TAP_BEEP[moodKey])} />
 
         <div className="text-center -mt-1">
           <p className={`text-sm font-black uppercase tracking-widest ${mood.text}`}>{mood.label}</p>
@@ -601,7 +619,7 @@ const ACTION_BEEP = {
   sleep: [330, 'sine', 0.2], wake: [587, 'sine', 0.1], medicine: [880, 'sine', 0.1],
 };
 
-export default function PetView({ uid, spritesDatabase, collection, playBeep, onOverlayChange }) {
+export default function PetView({ uid, spritesDatabase, collection, playBeep, petItems, petLook, onEquipPetItem, onOverlayChange }) {
   const { pet, loading, error } = usePet(uid);
   const [now, setNow] = useState(() => Date.now());
   const [busy, setBusy] = useState(false);
@@ -756,6 +774,9 @@ export default function PetView({ uid, spritesDatabase, collection, playBeep, on
       tools={petToolsEnabledFor(uid) ? { onSkip: handleSkip, onTestReminder: handleTestReminder, roomPhase, onRoomPhase: setRoomPhase } : null}
       deathFailed={pet ? deathFailedFor === pet.bornAt : false}
       playBeep={playBeep}
+      petItems={petItems}
+      petLook={petLook}
+      onEquipPetItem={onEquipPetItem}
       onOverlayChange={onOverlayChange}
       onToggleReminders={handleToggleReminders}
       onAction={handleAction}

@@ -15,6 +15,7 @@ export const PET_STYLES = `
 @keyframes petbubble { 0% { opacity: 0; transform: translateY(0) scale(0.6); } 20% { opacity: 1; } 100% { opacity: 0; transform: translateY(-70px) scale(1.15); } }
 @keyframes petglow { 0% { opacity: 0; transform: scale(0.6); } 40% { opacity: 1; } 100% { opacity: 0; transform: scale(1.15); } }
 @keyframes pettwinkle { 0%,100% { opacity: 1; } 50% { opacity: 0.25; } }
+@keyframes petorbit { to { transform: rotate(360deg); } }
 `;
 
 export const MOOD_META = {

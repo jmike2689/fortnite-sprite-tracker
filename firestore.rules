@@ -15,6 +15,31 @@ service cloud.firestore {
       // Read access remains open so the @mention scanner and friend search queries function.
       allow read: if request.auth != null;
 
+      // LIMITED AURAS: an aura can be added to profile.purchasedAuras only while it is on sale (dates are UTC and
+      // mirror AURA_SALE_WINDOWS in src/App.jsx). Existing owners are untouched because only NEWLY added keys are checked.
+      function limitedAuraAdded() {
+        let before = resource.data.get('profile', {}).get('purchasedAuras', []);
+        let after = request.resource.data.get('profile', {}).get('purchasedAuras', []);
+        let added = after.toSet().difference(before.toSet());
+        return added.hasAny(['spectral_haunt']) ||
+          (added.hasAny(['harvest_feast']) &&
+           !(request.time >= timestamp.date(2026, 11, 1) && request.time < timestamp.date(2026, 12, 1)));
+      }
+
+      // SPRITE PET CLOSET: the shop's accessories and room themes (ids mirror src/pet/petItems.js). Only real item ids can be
+      // owned, and what the pet wears or lives in must be something owned.
+      function petCosmeticsOk() {
+        let n = request.resource.data;
+        let items = n.get('petItems', []);
+        let look = n.get('petLook', {});
+        return items.size() <= 20
+          && items.toSet().hasOnly(['acc_party_hat', 'acc_flower_crown', 'acc_cowboy_hat', 'acc_wizard_hat', 'acc_halo',
+               'acc_royal_crown', 'acc_sparkle_orbit', 'room_meadow', 'room_beach', 'room_candy', 'room_cabin',
+               'room_starlit', 'room_arcade'])
+          && (look.get('accessory', null) == null || look.accessory in items)
+          && (look.get('room', null) == null || look.room in items);
+      }
+
       allow create: if request.auth != null && request.auth.uid == userId;
 
       allow update: if request.auth != null && (
@@ -31,6 +56,16 @@ service cloud.firestore {
            (request.resource.data.lastRadarSweep == request.time &&
             (resource.data.get('lastRadarSweep', null) == null || request.time >= resource.data.lastRadarSweep + duration.value(24, 'h')))
           )
+
+          &&
+
+          // LIMITED AURAS: retired or out-of-window auras cannot be added (the owner's own account is exempt for the admin panel).
+          (!limitedAuraAdded() || request.auth.uid == 'G7MQ2w1jijYhXEqXk6DiwMAo2AB3')
+
+          &&
+
+          // SPRITE PET CLOSET
+          petCosmeticsOk()
 
           &&
 
