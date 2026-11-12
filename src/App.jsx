@@ -378,6 +378,33 @@ import plundarrghFortune from "./assets/Plundarrgh Fortune.webp";
 import plundarrghCursed from "./assets/Plundarrgh Cursed.webp";
 import transponderSnailBase from "./assets/Transponder Snail Base.webp";
 
+// --- Gold for Ch 7: MS ---
+import halfpeeldGold from "./assets/Halfpeel'd Gold.webp";
+import rePeteGold from "./assets/Re-Pete Gold.webp";
+import barryOFishGold from "./assets/Barry O'Fish Gold.webp";
+import chesterGold from "./assets/Chester Gold.webp";
+import exmarksGold from "./assets/Exmarks Gold.webp";
+import wayfinderGold from "./assets/Wayfinder Gold.webp";
+import kelperGold from "./assets/Kelper Gold.webp";
+import lilSquibblyGold from "./assets/Lil' Squibbly Gold.webp";
+import lilFlackoGold from "./assets/Lil' Flacko Gold.webp";
+import lilUziVertJrGold from "./assets/Lil' Uzi Vert Jr Gold.webp";
+import plundarrghGold from "./assets/Plundarrgh Gold.webp";
+// --- Ch 7: MS wave 2 ---
+import squiplashBase from "./assets/Squiplash Base.webp";
+import squiplashFortune from "./assets/Squiplash Fortune.webp";
+import squiplashCursed from "./assets/Squiplash Cursed.webp";
+import squiplashGold from "./assets/Squiplash Gold.webp";
+import sirOscarBase from "./assets/Sir Oscar The Second Base.webp";
+import sirOscarFortune from "./assets/Sir Oscar The Second Fortune.webp";
+import sirOscarCursed from "./assets/Sir Oscar The Second Cursed.webp";
+import sirOscarGold from "./assets/Sir Oscar The Second Gold.webp";
+import miniMikuBase from "./assets/Mini Miku Base.webp";
+import miniMikuFortune from "./assets/Mini Miku Fortune.webp";
+import miniMikuCursed from "./assets/Mini Miku Cursed.webp";
+import miniMikuGold from "./assets/Mini Miku Gold.webp";
+import zeeBase from "./assets/Zee Base.webp";
+
 const variantsList = ['base', 'gold', 'gummy', 'galaxy', 'holofoil', 'cube', 'gem', 'quack', 'cheatmaster', 'loothacker', 'bountyhunter', 'trickortreat', 'fortune', 'cursed'];
 const LOCKED_VARIANTS = {};
 
@@ -548,22 +575,37 @@ const SPRITES_DATABASE = [
   { id: "one-wish-willow", name: "One Wish Willow", rarity: "Mythic", season: 'C7S4', images: { base: oneWishWillowBase, gold: oneWishWillowGold, cheatmaster: oneWishWillowCheatMaster, loothacker: oneWishWillowLootHacker, bountyhunter: oneWishWillowBountyHunter, trickortreat: trtOneWishWillow }, variants: ['base', 'gold', 'cheatmaster', 'loothacker', 'bountyhunter', 'trickortreat'], baseAbility: "Extract other players equipped Sprites when eliminating them. Push everything away when damaged. Gets upset when removed and marks you on the map." },
 
   // --- CHAPTER 7 : MS SPRITES (a whole new season) ---
-  { id: "halfpeeld", name: "Halfpeel'd", rarity: "Rare", season: 'C7MS', images: { base: halfpeeldBase, fortune: halfpeeldFortune, cursed: halfpeeldCursed }, variants: ['base', 'fortune', 'cursed'], baseAbility: "Marks eliminations on the map. Effect radius increases with each level up!" },
-  { id: "re-pete", name: "Re-Pete", rarity: "Rare", season: 'C7MS', images: { base: rePeteBase, fortune: rePeteFortune, cursed: rePeteCursed }, variants: ['base', 'fortune', 'cursed'], baseAbility: "Increases reload speed, with a chance that reloading refunds ammo. Reload faster and higher chance of ammo refunds with each Level Up!" },
-  { id: "barry-ofish", name: "Barry O'Fish", rarity: "Rare", season: 'C7MS', images: { base: barryOFishBase, fortune: barryOFishFortune, cursed: barryOFishCursed }, variants: ['base', 'fortune', 'cursed'], baseAbility: "Reduces tactical sprint stamina drain when in water. Gain Slap at max level!" },
-  { id: "chester", name: "Chester", rarity: "Epic", season: 'C7MS', images: { base: chesterBase, fortune: chesterFortune, cursed: chesterCursed }, variants: ['base', 'fortune', 'cursed'], baseAbility: "Grants a chance to spawn extra loot from Treasure Chests and nullifies fall damage. Increased chance of spawning an extra loot item with each Level Up!" },
-  { id: "exmarks", name: "Exmarks", rarity: "Epic", season: 'C7MS', images: { base: exmarksBase, fortune: exmarksFortune, cursed: exmarksCursed }, variants: ['base', 'fortune', 'cursed'], baseAbility: "Reveals Treasure Maps and Wanted Posters. Spawns a Treasure Map at Max Level!" },
-  { id: "wayfinder", name: "Wayfinder", rarity: "Rare", season: 'C7MS', images: { base: wayfinderBase, fortune: wayfinderFortune, cursed: wayfinderCursed }, variants: ['base', 'fortune', 'cursed'], baseAbility: "Reveals Sprites nearby and grants more items when opening Buried Chests. Sprite detection radius increases with each Level Up!" },
-  { id: "kelper", name: "Kelper", rarity: "Epic", season: 'C7MS', images: { base: kelperBase, fortune: kelperFortune, cursed: kelperCursed }, variants: ['base', 'fortune', 'cursed'], baseAbility: "Restores health over time when in water. Increased amount of health with each Level Up!" },
+  { id: "halfpeeld", name: "Halfpeel'd", rarity: "Rare", season: 'C7MS', images: { base: halfpeeldBase, gold: halfpeeldGold, fortune: halfpeeldFortune, cursed: halfpeeldCursed }, variants: ['base', 'gold', 'fortune', 'cursed'], baseAbility: "Marks eliminations on the map. Effect radius increases with each level up!" },
+  { id: "re-pete", name: "Re-Pete", rarity: "Rare", season: 'C7MS', images: { base: rePeteBase, gold: rePeteGold, fortune: rePeteFortune, cursed: rePeteCursed }, variants: ['base', 'gold', 'fortune', 'cursed'], baseAbility: "Increases reload speed, with a chance that reloading refunds ammo. Reload faster and higher chance of ammo refunds with each Level Up!" },
+  { id: "barry-ofish", name: "Barry O'Fish", rarity: "Rare", season: 'C7MS', images: { base: barryOFishBase, gold: barryOFishGold, fortune: barryOFishFortune, cursed: barryOFishCursed }, variants: ['base', 'gold', 'fortune', 'cursed'], baseAbility: "Reduces tactical sprint stamina drain when in water. Gain Slap at max level!" },
+  { id: "chester", name: "Chester", rarity: "Epic", season: 'C7MS', images: { base: chesterBase, gold: chesterGold, fortune: chesterFortune, cursed: chesterCursed }, variants: ['base', 'gold', 'fortune', 'cursed'], baseAbility: "Grants a chance to spawn extra loot from Treasure Chests and nullifies fall damage. Increased chance of spawning an extra loot item with each Level Up!" },
+  { id: "exmarks", name: "Exmarks", rarity: "Epic", season: 'C7MS', images: { base: exmarksBase, gold: exmarksGold, fortune: exmarksFortune, cursed: exmarksCursed }, variants: ['base', 'gold', 'fortune', 'cursed'], baseAbility: "Reveals Treasure Maps and Wanted Posters. Spawns a Treasure Map at Max Level!" },
+  { id: "wayfinder", name: "Wayfinder", rarity: "Rare", season: 'C7MS', images: { base: wayfinderBase, gold: wayfinderGold, fortune: wayfinderFortune, cursed: wayfinderCursed }, variants: ['base', 'gold', 'fortune', 'cursed'], baseAbility: "Reveals Sprites nearby and grants more items when opening Buried Chests. Sprite detection radius increases with each Level Up!" },
+  { id: "kelper", name: "Kelper", rarity: "Epic", season: 'C7MS', images: { base: kelperBase, gold: kelperGold, fortune: kelperFortune, cursed: kelperCursed }, variants: ['base', 'gold', 'fortune', 'cursed'], baseAbility: "Restores health over time when in water. Increased amount of health with each Level Up!" },
   { id: "sweet-dreams", name: "Sweet Dreams", rarity: "Mythic", season: 'C7MS', images: { base: sweetDreamsBase }, variants: ['base'], baseAbility: "Grants a random item at each level, exploding with Mythic loot at Max Level. Loot value increases at each Level Up!" },
-  { id: "lil-squibbly", name: "Lil' Squibbly", rarity: "Epic", season: 'C7MS', images: { base: lilSquibblyBase, fortune: lilSquibblyFortune, cursed: lilSquibblyCursed }, variants: ['base', 'fortune', 'cursed'], baseAbility: "Jumping into a fishing hole fishes it and gives some bonus loot. Get more loot as you level up." },
-  { id: "lil-flacko", name: "Lil' Flacko", rarity: "Legendary", season: 'C7MS', images: { base: lilFlackoBase, fortune: lilFlackoFortune, cursed: lilFlackoCursed }, variants: ['base', 'fortune', 'cursed'], baseAbility: "Creates a small shockwave on landing, knocking back enemies. Increased knockback strength with each Level Up!" },
-  { id: "lil-uzi-vert-jr", name: "Lil' Uzi Vert Jr.", rarity: "Legendary", season: 'C7MS', images: { base: lilUziVertJrBase, fortune: lilUziVertJrFortune, cursed: lilUziVertJrCursed }, variants: ['base', 'fortune', 'cursed'], baseAbility: "Generates a Chug Splash effect when restoring shields. Decreased cooldown with each Level Up!" },
-  { id: "plundarrgh", name: "Plundarrgh", rarity: "Mythic", season: 'C7MS', images: { base: plundarrghBase, fortune: plundarrghFortune, cursed: plundarrghCursed }, variants: ['base', 'fortune', 'cursed'], baseAbility: "Opening Chest grants increased pickaxe speed and movement speed." },
-  { id: "transponder-snail", name: "Transponder Snail", rarity: "Mythic", season: 'C7MS', images: { base: transponderSnailBase }, variants: ['base'], baseAbility: "Grants extra resources on pickup, with Teammates who also have this Sprite equipped receiving some extra resources as well! Increased amount of resources received at each Level Up!" }
+  { id: "lil-squibbly", name: "Lil' Squibbly", rarity: "Epic", season: 'C7MS', images: { base: lilSquibblyBase, gold: lilSquibblyGold, fortune: lilSquibblyFortune, cursed: lilSquibblyCursed }, variants: ['base', 'gold', 'fortune', 'cursed'], baseAbility: "Jumping into a fishing hole fishes it and gives some bonus loot. Get more loot as you level up." },
+  { id: "lil-flacko", name: "Lil' Flacko", rarity: "Legendary", season: 'C7MS', images: { base: lilFlackoBase, gold: lilFlackoGold, fortune: lilFlackoFortune, cursed: lilFlackoCursed }, variants: ['base', 'gold', 'fortune', 'cursed'], baseAbility: "Creates a small shockwave on landing, knocking back enemies. Increased knockback strength with each Level Up!" },
+  { id: "lil-uzi-vert-jr", name: "Lil' Uzi Vert Jr.", rarity: "Legendary", season: 'C7MS', images: { base: lilUziVertJrBase, gold: lilUziVertJrGold, fortune: lilUziVertJrFortune, cursed: lilUziVertJrCursed }, variants: ['base', 'gold', 'fortune', 'cursed'], baseAbility: "Generates a Chug Splash effect when restoring shields. Decreased cooldown with each Level Up!" },
+  { id: "plundarrgh", name: "Plundarrgh", rarity: "Mythic", season: 'C7MS', images: { base: plundarrghBase, gold: plundarrghGold, fortune: plundarrghFortune, cursed: plundarrghCursed }, variants: ['base', 'gold', 'fortune', 'cursed'], baseAbility: "Opening Chest grants increased pickaxe speed and movement speed." },
+  { id: "transponder-snail", name: "Transponder Snail", rarity: "Mythic", season: 'C7MS', images: { base: transponderSnailBase }, variants: ['base'], baseAbility: "Grants extra resources on pickup, with Teammates who also have this Sprite equipped receiving some extra resources as well! Increased amount of resources received at each Level Up!" },
+
+  // --- CHAPTER 7 : MS SPRITES (wave 2) ---
+  { id: "squiplash", name: "Squiplash", rarity: "Epic", season: 'C7MS', images: { base: squiplashBase, gold: squiplashGold, fortune: squiplashFortune, cursed: squiplashCursed }, variants: ['base', 'gold', 'fortune', 'cursed'], baseAbility: "Deploys a Healing Smoke Bomb at low health. Decreased cooldown and increased duration and healing with each Level Up!" },
+  { id: "sir-oscar-the-second", name: "Sir Oscar the Second", rarity: "Legendary", season: 'C7MS', images: { base: sirOscarBase, gold: sirOscarGold, fortune: sirOscarFortune, cursed: sirOscarCursed }, variants: ['base', 'gold', 'fortune', 'cursed'], baseAbility: "Grants increased Pickaxe damage, also gives a temporary speed boost when your Shield breaks. Increased Pickaxe damage and speed boost with each Level Up!" },
+  { id: "mini-miku", name: "Mini Miku", rarity: "Mythic", season: 'C7MS', images: { base: miniMikuBase, gold: miniMikuGold, fortune: miniMikuFortune, cursed: miniMikuCursed }, variants: ['base', 'gold', 'fortune', 'cursed'], baseAbility: "Grants a Friendship Bubble when emoting with other players. Decreased cooldown with each Level Up!" },
+  { id: "zee", name: "Zee", rarity: "Mythic", season: 'C7MS', images: { base: zeeBase }, variants: ['base'], baseAbility: "Grants regenerating Zero Point dash charges. Max charges increase and recharge time decrease with Level Up!" }
 ];
 
 const PATCH_NOTES = [
+  {
+    version: "v3.1.0",
+    date: "11/12/2026",
+    title: "Gold Is Back in Ch 7: MS!",
+    changes: [
+      "4 NEW SPRITES! Squiplash, Sir Oscar the Second, Mini Miku and Zee join the Ch 7: MS pool.",
+      "Gold Variants Return: Gold is now available for Halfpeel'd, Re-Pete, Barry O'Fish, Chester, Exmarks, Wayfinder, Kelper, Lil' Squibbly, Lil' Flacko, Lil' Uzi Vert Jr., Plundarrgh, Squiplash, Sir Oscar the Second and Mini Miku. Zee only comes in Base."
+    ]
+  },
   {
     version: "v3.0.0",
     date: "11/01/2026",
